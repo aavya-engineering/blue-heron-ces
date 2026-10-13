@@ -1,0 +1,112 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CesTesterScenario",
+  "description": "ces-tester scenario file schema v1 - FREEZE BASELINE (Step 0 schema insurance, 2026-07-11, cross-cutting O1). M3 implements the loader/validator against THIS file; the two reserved fields below (lanes, muster.readiness_payload) are part of the frozen interface and must survive into the M3 build. Skeleton source: PLAN.md sec. 'schema today' (lines ~96-127).",
+  "type": "object",
+  "required": ["scenario_id"],
+  "additionalProperties": false,
+  "properties": {
+    "scenario_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Becomes stacksim's required top-level 'name' when the seed block is materialized."
+    },
+    "description": { "type": "string" },
+    "target_level": { "type": "string", "enum": ["L1", "L2", "L3"] },
+    "lanes": {
+      "type": "array",
+      "description": "RESERVED (schema insurance): which tenant lanes this scenario runs on. Dual-tenant parity is first-class: the same scenario file must be runnable on both lanes and verifier verdicts (result.json shape) must be bit-identical across sim and live. The live lane stays BLOCKED-ON-FD-LIVE-SMOKE-HOLD; until it opens, validators accept only [\"sim\"]. A scenario whose lanes and seed disagree (e.g. lanes includes \"sim\" but no stacksim_seed) must be REJECTED by the M3 validator.",
+      "items": { "type": "string", "enum": ["sim", "live"] },
+      "minItems": 1,
+      "uniqueItems": true,
+      "default": ["sim"]
+    },
+    "stacksim_seed": {
+      "type": "object",
+      "description": "stacksim's own schema (ScenarioEngine.ts) - the orchestrator splices 'name': scenario_id at top level and materializes to <tempdir>/<scenario_id>.json. Kept loose here; stacksim validates its own format. Required when lanes includes 'sim'; absent for live-only scenarios.",
+      "properties": {
+        "stance": { "type": "string" },
+        "countOverrides": { "type": "object" },
+        "steps": { "type": "array" }
+      },
+      "additionalProperties": true
+    },
+    "muster": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "answer_map": {
+          "type": "object",
+          "description": "Question-id -> answer map driven through Muster's wizard (data-question-id DOM hooks).",
+          "additionalProperties": true
+        },
+        "mid_pipeline_assertions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["path", "assert"],
+            "additionalProperties": true,
+            "properties": {
+              "path": { "type": "string" },
+              "assert": { "type": "string" }
+            }
+          }
+        },
+        "plan_source": {
+          "type": "object",
+          "description": "Flow-through MS-R10 (2026-09-27, additive): source the Mission Plan from ces-muster's REAL generator (buildPlanArtifacts) instead of driving the legacy ces-planner wizard. SIT answers come from the answer_map rows whose wizard is 'sit' (real SI-bank question ids); requirement_results is the readiness posture Muster feeds the generator.",
+          "required": ["kind", "requirement_results"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "type": "string", "const": "muster-generator" },
+            "ces_id": { "type": "string", "minLength": 1 },
+            "requirement_results": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["requirement_id", "status"],
+                "additionalProperties": false,
+                "properties": {
+                  "requirement_id": { "type": "string", "minLength": 1 },
+                  "status": { "type": "string", "enum": ["met", "partial", "not_met", "unknown"] }
+                }
+              }
+            }
+          }
+        },
+        "readiness_payload": {
+          "type": "object",
+          "description": "RESERVED (schema insurance): injects a readiness-result.v1 payload fixture into the scenario, consumed via Muster's import seam once the readiness lane is driven by tester. The payload format is ces-muster's public/schemas/readiness-result.schema.json (readiness-result/1.0.0) - THE import-file format, no second format ever. fixture_ref points at a payload file relative to the scenario file.",
+          "required": ["fixture_ref"],
+          "additionalProperties": false,
+          "properties": {
+            "fixture_ref": { "type": "string", "minLength": 1 },
+            "schema_version": {
+              "type": "string",
+              "const": "readiness-result/1.0.0",
+              "description": "Pin: the fixture must validate against this payload schema version."
+            }
+          }
+        }
+      }
+    },
+    "stamper": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "execution_mode": { "type": "string", "enum": ["auto", "manual", "dry-run"] }
+      }
+    },
+    "fault_injection": { "type": "array" },
+    "expected_state": {
+      "type": "object",
+      "description": "Verified against stacksim /resolve (sim lane) or the live read path (live lane).",
+      "additionalProperties": true
+    },
+    "expected_evidence": {
+      "type": "array",
+      "description": "Verified against Stamper's local evidence + stacksim /evidence (capture_received defers to the M7 EO lane per PHASE0_FINDINGS item 5).",
+      "items": { "type": "object" }
+    }
+  }
+}

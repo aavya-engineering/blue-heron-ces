@@ -1,0 +1,24 @@
+{
+  "name": "tenant-stacksim",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "CES Tenant Stack Simulator (G-STACKSIM-1) - fakes a Microsoft GCC High tenant for Stamper/AO/EO integration testing",
+  "bin": {
+    "stacksim": "bin/stacksim.mjs"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "build": "tsc -p tsconfig.json",
+    "stacksim": "npm run build && node bin/stacksim.mjs up",
+    "coverage:ao": "npm run build && node bin/stacksim.mjs coverage-ao",
+    "demo": "npm run build && node scripts/build-demo-scenario.mjs && node bin/stacksim.mjs scenario demo-dib-small && node bin/stacksim.mjs serve m365_azure --slug demo-dib-small",
+    "demo:build": "node scripts/build-demo-scenario.mjs",
+    "demo:reset": "npm run build && node scripts/build-demo-scenario.mjs && node bin/stacksim.mjs scenario demo-dib-small"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.5"
+  }
+}

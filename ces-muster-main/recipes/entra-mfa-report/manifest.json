@@ -1,0 +1,13 @@
+{
+  "name": "entra-mfa-report",
+  "version": "1.0.0",
+  "description": "Read-only capture of Entra ID conditional access policies and MFA registration via Microsoft Graph PowerShell read cmdlets. Requires Policy.Read.All and Reports.Read.All.",
+  "output_maps_to": [
+    {
+      "question_id": "iam-001",
+      "when": "conditionalAccessPolicies[*] where state=='enabled' AND grantControls.builtInControls includes 'mfa' — at least one such policy exists"
+    }
+  ],
+  "read_only": true,
+  "sha256": "4552b63ab14995c0d1b26b45b30c2d7e767f6e772f7d535bf2386444e59076fc"
+}

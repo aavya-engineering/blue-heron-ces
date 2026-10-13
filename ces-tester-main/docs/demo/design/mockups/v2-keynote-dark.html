@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<!--
+  SPDX-FileCopyrightText: Blue Heron Defense LLC and its licensors. All rights reserved.
+  SPDX-License-Identifier: LicenseRef-BHD-Proprietary
+  CONFIDENTIAL - TRADE SECRET. Unpublished work. Provided solely to perform work for Blue Heron Defense LLC at its direction.
+  Any other use, copying, disclosure, or reuse, in whole or in part, is prohibited.
+  Changes made to this file for Blue Heron Defense LLC are made on its behalf; it claims all rights in them.
+  Submitting a change to this repository means you accept TERMS.md.
+  Removing or altering this notice is prohibited (17 U.S.C. 1202). Ref: BHD-CES-TESTER-2026A
+  See LICENSE and TERMS.md.
+-->
+
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>V2 — Keynote Dark — BHD slide window mockup</title>
+<style>
+/* ===========================================================================
+   V2 — KEYNOTE DARK
+   Apple-keynote minimalism on the BHD navy. One idea per slide, huge type,
+   enormous negative space, gold reserved for ONE phrase per slide.
+
+   Sizing follows the real renderer's contract: --u is 1% of the 16:9 stage's
+   width, so this mockup drops straight into slide-render.ts. Research numbers
+   are authored on a 1920 canvas; every value below is that number / 19.2.
+     eyebrow 24px = 1.25u | body 36px = 1.875u | subhead 48px = 2.5u
+     title 72px = 3.75u   | hero 96-112px = 5-5.8u | floor 28px = 1.46u
+   =========================================================================== */
+
+:root{
+  /* BHD-BRAND.md palette */
+  --navy:#1a2332; --navy-deep:#0f1923; --navy-mid:#152030;
+  --gold:#f5b74a; --gold-glow:rgba(245,183,74,.25);
+  /* RESEARCH_SUMMARY.md §4 text ramp on #1a2332 — nothing dimmer than --t4 */
+  --t1:#e8edf2; --t2:#c9d4e0; --t3:#8fa3b8; --t4:#7d8fa3;
+  --green:#4ade80;            /* pass */
+  --amber:#ffb454;            /* fail — amber, never red (§5) */
+  --hair:rgba(255,255,255,.10);  /* the ONLY separator: no panel fills (§1) */
+  --hair-kbd:rgba(255,255,255,.18);
+  --ease:cubic-bezier(.16,1,.3,1);
+  --slide-in:280ms;
+  --frag-in:180ms;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;height:100%;background:#0b131d;overflow:hidden;}
+body{
+  font-family:'Roboto', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+  color:var(--t1); user-select:none; cursor:default;
+}
+
+/* ---- the stage: fixed 16:9, letterboxed into whatever window it gets ----- */
+.stage{
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:min(100vw, 177.78vh); height:min(56.25vw, 100vh);
+  --u:calc(min(100vw, 177.78vh) / 100);
+  display:flex; flex-direction:column; overflow:hidden;
+  /* subtle radial vignette — low amplitude, dark gradients band on projectors */
+  background:
+    radial-gradient(ellipse 130% 105% at 50% 34%,
+      #1e2939 0%, var(--navy) 46%, #16202d 78%, #131b26 100%);
+}
+
+/* ---- deck area ---------------------------------------------------------- */
+.deck{position:relative; flex:1; min-height:0;}
+
+/* safe margins: 8% horizontal, 7% vertical */
+.slide{
+  position:absolute; inset:0; display:none;
+  flex-direction:column; justify-content:center;
+  padding:calc(4.2*var(--u)) calc(8*var(--u));
+}
+.slide.active{display:flex; opacity:0; transform:translateY(calc(.73*var(--u)));}
+.slide.active.enter{
+  opacity:1; transform:none;
+  transition:opacity var(--slide-in) var(--ease), transform var(--slide-in) var(--ease);
+}
+
+/* fragment reveals: 180ms opacity + 8px translateY, 70ms stagger (§2) */
+.frag{opacity:0; transform:translateY(calc(.42*var(--u)));}
+.slide.active.enter .frag{
+  opacity:1; transform:none;
+  transition:opacity var(--frag-in) var(--ease), transform var(--frag-in) var(--ease);
+  transition-delay:calc(var(--slide-in) + var(--d, 0ms));
+}
+.d0{--d:0ms;} .d1{--d:70ms;} .d2{--d:140ms;} .d3{--d:210ms;}
+
+/* ---- type --------------------------------------------------------------- */
+.eyebrow{
+  display:flex; align-items:center; gap:calc(1.1*var(--u));
+  font-size:calc(1.25*var(--u)); font-weight:700;
+  text-transform:uppercase; letter-spacing:.14em; color:var(--t3);
+}
+.eyebrow .num{font-variant-numeric:tabular-nums; color:var(--t4);}
+.rule{width:calc(2.6*var(--u)); height:2px; background:var(--gold); border-radius:2px;}
+
+.chips{display:inline-flex; gap:calc(.8*var(--u));}
+.chip{
+  font-size:calc(1.5*var(--u)); font-weight:400; letter-spacing:.1em;
+  text-transform:lowercase; color:var(--t3);
+  border:1px solid var(--hair); border-radius:999px;
+  padding:calc(.25*var(--u)) calc(1.1*var(--u));
+}
+.chip.sm{font-size:calc(1.05*var(--u)); padding:calc(.15*var(--u)) calc(.9*var(--u));}
+
+.hero{
+  font-size:calc(5*var(--u)); font-weight:600; line-height:1.05;
+  letter-spacing:-.02em; margin:calc(2.2*var(--u)) 0 0; max-width:16ch;
+}
+.hero.xl{font-size:calc(5.8*var(--u)); max-width:14ch;}
+.hero .key{color:var(--gold);}          /* THE one gold phrase of the slide */
+
+.lede{
+  font-size:calc(2.5*var(--u)); font-weight:300; line-height:1.35;
+  color:var(--t2); margin:calc(2.4*var(--u)) 0 0; max-width:40ch;
+}
+
+/* quiet full-width statements — hairline separators, never a filled panel */
+.statements{margin-top:calc(4*var(--u)); max-width:46ch;}
+.stmt{border-top:1px solid var(--hair); padding:calc(1.8*var(--u)) 0 0; margin-top:calc(1.8*var(--u));}
+.stmt:first-child{border-top:0; margin-top:0; padding-top:0;}
+.stmt .label{
+  font-size:calc(1.25*var(--u)); font-weight:700; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--t4); margin-bottom:calc(.9*var(--u));
+}
+.stmt .label.hot{color:var(--gold);}     /* gold #2: marks the assertion */
+.stmt p{margin:0; font-size:calc(1.875*var(--u)); line-height:1.45; color:var(--t2); font-weight:300;}
+.stmt.assert p{font-size:calc(2.5*var(--u)); line-height:1.3; color:var(--t1); font-weight:400;}
+
+/* ---- dwell countdown (§5): linear, constant colour, gold at 40%, no pulse - */
+.dwell{margin-top:calc(4.6*var(--u)); max-width:46ch;}
+.dwell-meta{
+  display:flex; align-items:baseline; gap:calc(1.2*var(--u));
+  font-size:calc(1.25*var(--u)); letter-spacing:.12em; text-transform:uppercase;
+  color:var(--t3); margin-bottom:calc(1*var(--u));
+}
+.dwell-meta b{color:var(--t2); font-weight:500; font-variant-numeric:tabular-nums; letter-spacing:.06em;}
+.dwell-track{height:calc(.3*var(--u)); background:var(--hair); border-radius:999px; overflow:hidden;}
+.dwell-fill{height:100%; width:38%; background:var(--gold); opacity:.4; border-radius:999px;}
+
+/* ---- hold card (§3 ladder, step 3): full-slide, slow 2s opacity pulse ----- */
+.slide.hold{align-items:flex-start; justify-content:center; text-align:left;}
+.hold-inner{max-width:26ch;}
+.hold-eyebrow{
+  display:flex; align-items:center; gap:calc(.9*var(--u));
+  font-size:calc(1.25*var(--u)); font-weight:700; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--t3);
+}
+.hold-dot{
+  width:calc(.75*var(--u)); height:calc(.75*var(--u)); border-radius:50%;
+  background:var(--gold); box-shadow:0 0 0 calc(.3*var(--u)) var(--gold-glow);
+}
+.hold-line{
+  font-size:calc(3.4*var(--u)); font-weight:400; line-height:1.22;
+  letter-spacing:-.01em; margin:calc(2.6*var(--u)) 0 0; color:var(--t1);
+}
+.hold-line .key{color:var(--gold); font-weight:500;}
+.hold-foot{
+  margin-top:calc(3.6*var(--u)); font-size:calc(1.46*var(--u)); color:var(--t4);
+  font-variant-numeric:tabular-nums; letter-spacing:.06em;
+}
+.slide.hold.enter .hold-inner{animation:holdPulse 2s var(--ease) var(--slide-in) infinite;}
+@keyframes holdPulse{0%,100%{opacity:1;} 50%{opacity:.62;}}
+
+/* ---- logo (§4): 3.75u on the title slide, 1.67u elsewhere @ .8 opacity ---- */
+.logo-mark svg{display:block; height:calc(3.75*var(--u)); width:auto;}
+.logo-corner{
+  position:absolute; right:calc(8*var(--u)); bottom:calc(2.4*var(--u));
+  opacity:.8; pointer-events:none;
+}
+.logo-corner svg{display:block; height:calc(1.67*var(--u)); width:auto;}
+body[data-state="1"] .logo-corner, body[data-state="4"] .logo-corner{display:none;}
+
+/* ---- chrome: ultra-minimal — number, op pill, nothing else ---------------- */
+.chrome{
+  flex:0 0 auto; display:flex; align-items:center; gap:calc(1*var(--u));
+  padding:calc(1.4*var(--u)) calc(8*var(--u));
+  font-size:calc(1.05*var(--u)); color:var(--t4);
+}
+.chrome .grow{flex:1;}
+.pos{font-variant-numeric:tabular-nums; letter-spacing:.16em; opacity:.4;}
+body[data-state="4"] .chrome{display:none;}   /* the hold card is full-slide */
+
+.pill{
+  display:inline-flex; align-items:center; gap:calc(.55*var(--u));
+  height:calc(1.35*var(--u)); border-radius:999px;
+  padding:0 calc(1*var(--u)); border:1px solid var(--hair);
+  font-size:calc(.68*var(--u)); font-weight:500;
+  text-transform:uppercase; letter-spacing:.08em; color:var(--t3);
+  transition:color 240ms var(--ease), border-color 240ms var(--ease);
+}
+.pill.done{color:var(--green); border-color:rgba(74,222,128,.35);}
+.pill.running{color:var(--gold); border-color:rgba(245,183,74,.4);}
+.pill.failed{color:var(--amber); border-color:rgba(255,180,84,.4);}  /* fail = amber */
+.pill .dot{width:calc(.42*var(--u)); height:calc(.42*var(--u)); border-radius:50%; background:currentColor;}
+.pill.running .dot{animation:dotPulse 1.6s ease-in-out infinite;}
+@keyframes dotPulse{0%,100%{opacity:.4;} 50%{opacity:1;}}
+
+/* 3px progress rail, gold fill (§2) */
+.progress{flex:0 0 auto; height:3px; background:rgba(255,255,255,.06);}
+.progress i{
+  display:block; height:100%; width:25%; background:var(--gold);
+  transition:width 420ms var(--ease);
+}
+
+/* ---- presenter band ('t') ------------------------------------------------ */
+.presenter{
+  flex:0 0 auto; background:var(--navy-deep); border-top:1px solid var(--hair);
+  padding:calc(1.6*var(--u)) calc(8*var(--u)); max-height:24%; overflow:auto;
+}
+.presenter p{
+  margin:0 0 calc(.7*var(--u)); font-size:calc(1.6*var(--u));
+  line-height:1.45; color:var(--t3); font-weight:300;
+}
+.presenter p:last-child{margin-bottom:0;}
+.presenter .tag{
+  font-size:calc(.95*var(--u)); font-weight:700; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--t4); margin-bottom:calc(.9*var(--u));
+}
+.presenter[hidden]{display:none;}
+
+/* ---- keyboard hints: auto-show 4s, then fade; '?' toggles ---------------- */
+.hints{
+  position:absolute; left:50%; bottom:calc(2.2*var(--u)); transform:translateX(-50%);
+  display:flex; align-items:center; gap:calc(1.2*var(--u));
+  font-size:calc(.68*var(--u)); color:var(--t4); letter-spacing:.06em;
+  opacity:0; transition:opacity 240ms var(--ease); pointer-events:none;
+}
+.hints.on{opacity:1;}
+kbd{
+  font:inherit; font-size:calc(.68*var(--u));
+  border:1px solid var(--hair-kbd); border-radius:calc(.26*var(--u));
+  padding:calc(.16*var(--u)) calc(.36*var(--u)); color:var(--t3);
+}
+
+/* ---- mockup caption (not part of the design) ---------------------------- */
+.caption{
+  position:fixed; right:14px; bottom:11px; z-index:9;
+  font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--t4); opacity:.45;
+}
+
+@media (prefers-reduced-motion: reduce){
+  :root{--slide-in:120ms; --frag-in:120ms;}
+  .slide.active{transform:none;}
+  .slide.active.enter{transition:opacity 120ms linear;}
+  .frag{transform:none;}
+  .slide.active.enter .frag{transition:opacity 120ms linear;}
+  .pill.running .dot, .slide.hold.enter .hold-inner{animation:none;}
+}
+</style>
+</head>
+<body data-state="1">
+
+<div class="stage">
+  <div class="deck">
+
+    <!-- ============ 1 · OPENING / TITLE ==================================== -->
+    <section class="slide" data-state="1">
+      <div class="logo-mark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="60" viewBox="0 0 200 60">
+          <rect width="200" height="60" rx="8" fill="transparent"/>
+          <text x="100" y="37" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="700" fill="#ffffff" text-anchor="middle">BHD</text>
+        </svg>
+      </div>
+      <h1 class="hero xl">CES in <span class="key">one run</span></h1>
+      <p class="lede frag d0">Orchestrates five tools end to end against a live tenant.</p>
+      <div class="chips frag d1" style="margin-top:calc(3.6*var(--u));">
+        <span class="chip">stacksim</span><span class="chip">muster</span>
+        <span class="chip">stamper</span><span class="chip">ao</span><span class="chip">eo</span>
+      </div>
+    </section>
+
+    <!-- ============ 2 · CONTENT (slide 06 — warm / done) =================== -->
+    <section class="slide" data-state="2">
+      <div class="eyebrow">
+        <span class="rule"></span><span class="num">06</span>
+        <span class="chips"><span class="chip sm">ao</span></span>
+      </div>
+      <h1 class="hero">AdminOps</h1>
+      <div class="statements">
+        <div class="stmt frag d0">
+          <div class="label">Function</div>
+          <p>A tiered command registry for day-two administrative operations</p>
+        </div>
+        <div class="stmt assert frag d1">
+          <div class="label hot">Benefit</div>
+          <p>Routine tenant changes stop being ad-hoc scripts on somebody’s laptop</p>
+        </div>
+        <div class="stmt frag d2">
+          <div class="label">Differentiator</div>
+          <p>Tier gating plus auto-collected evidence on every single execution</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 3 · LIVE OP RUNNING (slide 07 — dwell holding) ========= -->
+    <section class="slide" data-state="3">
+      <div class="eyebrow">
+        <span class="num">07</span>
+        <span class="chips"><span class="chip sm">ao</span><span class="chip sm">live</span></span>
+      </div>
+      <h1 class="hero">Live command execution</h1>
+      <p class="lede frag d0">Browse the registry, open a Tier-1 command, execute it against the tenant.</p>
+      <div class="dwell frag d1">
+        <div class="dwell-meta"><span>dwell</span><b>holding</b><span>·</span><b>34s</b><span>left</span></div>
+        <div class="dwell-track"><i class="dwell-fill"></i></div>
+      </div>
+    </section>
+
+    <!-- ============ 4 · HOLD CARD (ladder step 3, >2.5s) =================== -->
+    <section class="slide hold" data-state="4">
+      <div class="hold-inner">
+        <div class="hold-eyebrow"><span class="hold-dot"></span>still running · ao-registry</div>
+        <p class="hold-line">The evidence is collected <span class="key">by the tool</span>, not assembled afterwards by the human.</p>
+        <div class="hold-foot">07 / 08 · 00:04 elapsed</div>
+      </div>
+    </section>
+
+    <div class="logo-corner">
+      <svg xmlns="http://www.w3.org/2000/svg" width="200" height="60" viewBox="0 0 200 60">
+        <rect width="200" height="60" rx="8" fill="transparent"/>
+        <text x="100" y="37" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="700" fill="#ffffff" text-anchor="middle">BHD</text>
+      </svg>
+    </div>
+
+    <div class="hints" id="hints">
+      <span><kbd>←</kbd> <kbd>→</kbd> navigate</span>
+      <span><kbd>t</kbd> presenter</span>
+      <span><kbd>?</kbd> hints</span>
+    </div>
+  </div>
+
+  <div class="presenter" id="presenter" hidden>
+    <div class="tag">talk track</div>
+    <div id="talk"></div>
+  </div>
+
+  <div class="chrome">
+    <span class="pos" id="pos">01 / 08</span>
+    <span class="grow"></span>
+    <span id="ops"></span>
+  </div>
+
+  <div class="progress"><i id="bar"></i></div>
+</div>
+
+<div class="caption">V2 — Keynote Dark</div>
+
+<script>
+(function(){
+  var STATES = [
+    { pos:'01 / 08', ops:'', talk:['Welcome. CES turns a CMMC assessment from a six-week consulting engagement into a repeatable run that leaves evidence behind.'] },
+    { pos:'06 / 08',
+      ops:'<span class="pill">warm</span> <span class="pill done"><span class="dot"></span>ao-registry · done</span>',
+      talk:['AdminOps is the day-two surface. We warm it up now so it is ready the moment we need it.'] },
+    { pos:'07 / 08',
+      ops:'<span class="pill">live</span> <span class="pill running"><span class="dot"></span>ao-registry · running</span>',
+      talk:['Here it is live — the real AdminOps GUI, driven exactly the way an operator drives it.'] },
+    { pos:'07 / 08', ops:'', talk:['Hold card: the op passed 2.5s, so the differentiator takes the full slide. Read it, do not narrate the spinner.'] }
+  ];
+
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var posEl = document.getElementById('pos');
+  var opsEl = document.getElementById('ops');
+  var barEl = document.getElementById('bar');
+  var presenterEl = document.getElementById('presenter');
+  var talkEl = document.getElementById('talk');
+  var hintsEl = document.getElementById('hints');
+  var i = 0, presenter = false;
+
+  function draw(){
+    var s = STATES[i];
+    document.body.setAttribute('data-state', String(i + 1));
+    slides.forEach(function(el, n){
+      el.classList.remove('enter');
+      el.classList.toggle('active', n === i);
+    });
+    // force reflow so the 280ms enter transition re-triggers on every nav
+    void slides[i].offsetWidth;
+    slides[i].classList.add('enter');
+
+    posEl.textContent = s.pos;
+    opsEl.innerHTML = s.ops;
+    barEl.style.width = ((i + 1) / STATES.length * 100) + '%';
+    talkEl.innerHTML = s.talk.map(function(t){
+      var p = document.createElement('p'); p.textContent = t; return p.outerHTML;
+    }).join('');
+    presenterEl.hidden = !presenter;
+  }
+
+  document.addEventListener('keydown', function(e){
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === 'ArrowRight' || e.key === ' ') { i = (i + 1) % STATES.length; draw(); }
+    else if (e.key === 'ArrowLeft') { i = (i - 1 + STATES.length) % STATES.length; draw(); }
+    else if (e.key === 't' || e.key === 'T') { presenter = !presenter; presenterEl.hidden = !presenter; }
+    else if (e.key === '?') { hintsEl.classList.toggle('on'); }
+    else return;
+    e.preventDefault();
+  });
+
+  draw();
+  // hints auto-show for 4s on launch, then fade (§5)
+  hintsEl.classList.add('on');
+  setTimeout(function(){ hintsEl.classList.remove('on'); }, 4000);
+})();
+</script>
+</body>
+</html>

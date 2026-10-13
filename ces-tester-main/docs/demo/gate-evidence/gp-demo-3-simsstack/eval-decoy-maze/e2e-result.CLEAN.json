@@ -1,0 +1,432 @@
+{
+  "runId": "gpd3-decoymaze-clean",
+  "configId": "eval-decoy-maze",
+  "slug": "eval-decoy-maze",
+  "fullChain": true,
+  "runDir": "C:\\Users\\mhsut\\DevProjects\\ces\\ces-tester\\runs\\e2e\\gpd3-decoymaze-clean",
+  "beats": [
+    {
+      "id": 0,
+      "label": "pre-flight + gates -> reset/seed the tenant -> stacksim serve :4390 — seed + serve on http://127.0.0.1:4390",
+      "status": "pass"
+    },
+    {
+      "id": 1,
+      "label": "posture discovery read (presence-based) vs pinned ground truth, read-only -> EO live assess (before) — 329 observations, 0 mismatch(es), read-only=true; EO before 38/110 met",
+      "status": "pass",
+      "artifactRef": "C:\\Users\\mhsut\\DevProjects\\ces\\ces-tester\\runs\\e2e\\gpd3-decoymaze-clean\\discovery-result.json"
+    },
+    {
+      "id": 2,
+      "label": "Muster wizard (Playwright) -> Mission Plan + Tenant Manifest — mission plan + tenant manifest produced",
+      "status": "pass",
+      "artifactRef": "C:\\Users\\mhsut\\DevProjects\\ces\\ces-tester\\runs\\e2e\\gpd3-decoymaze-clean\\artifacts\\plans\\manual-mission-plan-2026-09-01T00-32-57-924Z.json"
+    },
+    {
+      "id": 3,
+      "label": "Stamper GUI (Playwright): Connect -> Assess -> Translate -> live Execute — execute report partial",
+      "status": "pass",
+      "artifactRef": "C:\\Users\\mhsut\\DevProjects\\ces\\ces-tester\\runs\\e2e\\gpd3-decoymaze-clean\\ledger-snapshot.json"
+    },
+    {
+      "id": 4,
+      "label": "EO SPA (Playwright) re-assess (after) -> unified before->after dashboard — EO after 56/110 met (106 live)",
+      "status": "pass"
+    },
+    {
+      "id": 5,
+      "label": "AdminOps GUI (Playwright): A-18 live -> evidence of the change was auto-collected — evidence of the change was auto-collected",
+      "status": "pass"
+    }
+  ],
+  "facts": {
+    "configId": "eval-decoy-maze",
+    "fullChain": true,
+    "calibrateAccepted": false,
+    "preflight": {
+      "ok": true,
+      "issues": []
+    },
+    "seed": {
+      "seeded": true,
+      "serveReady": true
+    },
+    "discovery": {
+      "ran": true,
+      "readOnly": true,
+      "ledgerWriteDelta": 0,
+      "mismatches": [],
+      "observationCount": 329,
+      "resultPath": "C:\\Users\\mhsut\\DevProjects\\ces\\ces-tester\\runs\\e2e\\gpd3-decoymaze-clean\\discovery-result.json"
+    },
+    "postRemediation": {
+      "applicable": true,
+      "ran": true,
+      "readOnly": true,
+      "ledgerWriteDelta": 0,
+      "mismatches": [],
+      "observationCount": 329,
+      "resultPath": "C:\\Users\\mhsut\\DevProjects\\ces\\ces-tester\\runs\\e2e\\gpd3-decoymaze-clean\\discovery-after-result.json",
+      "provenance": "live-adjudicated"
+    },
+    "muster": {
+      "missionPlanPath": "C:\\Users\\mhsut\\DevProjects\\ces\\ces-tester\\runs\\e2e\\gpd3-decoymaze-clean\\artifacts\\plans\\manual-mission-plan-2026-09-01T00-32-57-924Z.json",
+      "manifestPath": "C:\\Users\\mhsut\\DevProjects\\ces\\ces-tester\\runs\\e2e\\gpd3-decoymaze-clean\\artifacts\\plans\\tenant-manifest-2026-09-01T00-32-57-932Z.json"
+    },
+    "stamper": {
+      "ran": true,
+      "executeBadge": "Complete",
+      "report": {
+        "status": "partial",
+        "totalTasks": 110,
+        "completedTasks": 96,
+        "failures": [
+          {
+            "taskId": "step_task_IA.L2-3.5.9_mthxo4i0_niflvbn",
+            "entryId": "IA.L2-3.5.9.tap-config",
+            "controlId": "IA.L2-3.5.9",
+            "error": "IA.L2-3.5.9.tap-config: verification failed — Evidence validation failed"
+          },
+          {
+            "taskId": "step_task_AC.L2-3.1.15_mthxo4i0_wna3hjm",
+            "controlId": "AC.L2-3.1.15",
+            "error": "Unresolved runtime variables: phishingResistantStrengthId. These should be produced by prior command captures."
+          },
+          {
+            "taskId": "step_task_SI.L1-3.14.1_mthxo4i2_cm0br0y",
+            "entryId": "AZ-SEN-001",
+            "controlId": "SI.L1-3.14.1",
+            "error": "AZ-SEN-001: verification failed — Command exited with non-zero code"
+          },
+          {
+            "taskId": "step_task_AC.L2-3.1.14_mthxo4i0_uu7crqm",
+            "controlId": "AC.L2-3.1.14",
+            "error": "Unresolved runtime variables: namedLocationId. These should be produced by prior command captures."
+          },
+          {
+            "taskId": "step_task_SC.L1-3.13.1_mthxo4i0_bmgdywj",
+            "entryId": "AZ-NET-003",
+            "controlId": "SC.L1-3.13.1",
+            "error": "AZ-NET-003: verification failed — Command exited with non-zero code; AZ-NET-004: verification failed — Command exited with non-zero code; AZ-NET-005: verification failed — Command exited with non-zero code; AZ-NSG-003: verification failed — Command exited with non-zero code"
+          },
+          {
+            "taskId": "step_task_SC.L1-3.13.5_mthxo4i0_pz9udy7",
+            "entryId": "AZ-NET-002",
+            "controlId": "SC.L1-3.13.5",
+            "error": "AZ-NET-002: verification failed — Command exited with non-zero code; AZ-NSG-002: verification failed — Command exited with non-zero code"
+          },
+          {
+            "taskId": "step_task_SC.L2-3.13.10_mthxo4i1_q93ue03",
+            "entryId": "AZ-LOG-002a",
+            "controlId": "SC.L2-3.13.10",
+            "error": "AZ-LOG-002a: verification failed — Evidence validation failed"
+          },
+          {
+            "taskId": "step_task_SC.L2-3.13.6_mthxo4i0_r3vtcsm",
+            "entryId": "AZ-NET-002",
+            "controlId": "SC.L2-3.13.6",
+            "error": "AZ-NET-002: verification failed — Command exited with non-zero code; AZ-NET-003: verification failed — Command exited with non-zero code; AZ-NET-004: verification failed — Command exited with non-zero code; AZ-NET-005: verification failed — Command exited with non-zero code; AZ-NSG-002: verification failed — Command exited with non-zero code"
+          },
+          {
+            "taskId": "step_task_SC.L2-3.13.7_mthxo4i0_llqtgyd",
+            "controlId": "SC.L2-3.13.7",
+            "error": "Unresolved runtime variables: namedLocationId. These should be produced by prior command captures."
+          },
+          {
+            "taskId": "step_task_AC.L1-3.1.1_mthxo4hy_flo40kh",
+            "controlId": "AC.L1-3.1.1",
+            "error": "Unresolved runtime variables: eoSpObjectId. These should be produced by prior command captures."
+          },
+          {
+            "taskId": "step_task_AU.L2-3.3.1_mthxo4i1_9xc28ea",
+            "entryId": "AZ-LOG-001",
+            "controlId": "AU.L2-3.3.1",
+            "error": "AZ-LOG-001: verification failed — Evidence validation failed"
+          },
+          {
+            "taskId": "step_task_AU.L2-3.3.3_mthxo4i1_x9fct2w",
+            "entryId": "AU.L2-3.3.3.sentinel-connector",
+            "controlId": "AU.L2-3.3.3",
+            "error": "AU.L2-3.3.3.sentinel-connector: verification failed — Command exited with non-zero code"
+          },
+          {
+            "taskId": "step_task_CM.L2-3.4.1_mthxo4i1_13lqtdr",
+            "controlId": "CM.L2-3.4.1",
+            "error": "Unresolved runtime variables: lawWorkspaceId. These should be produced by prior command captures."
+          },
+          {
+            "taskId": "step_task_SI.L2-3.14.7_mthxo4i2_c6z7snd",
+            "entryId": "AZ-SEN-010",
+            "controlId": "SI.L2-3.14.7",
+            "error": "AZ-SEN-010: verification failed — Command exited with non-zero code"
+          }
+        ],
+        "failureIds": [
+          "IA.L2-3.5.9.tap-config",
+          "AC.L2-3.1.15",
+          "AZ-SEN-001",
+          "AC.L2-3.1.14",
+          "AZ-NET-003",
+          "AZ-NET-002",
+          "AZ-LOG-002a",
+          "SC.L2-3.13.7",
+          "AC.L1-3.1.1",
+          "AZ-LOG-001",
+          "AU.L2-3.3.3.sentinel-connector",
+          "CM.L2-3.4.1",
+          "AZ-SEN-010"
+        ]
+      },
+      "ledgerSnapshotPath": "C:\\Users\\mhsut\\DevProjects\\ces\\ces-tester\\runs\\e2e\\gpd3-decoymaze-clean\\ledger-snapshot.json",
+      "knownFalseFails": [
+        "IA.L2-3.5.9.tap-config",
+        "AZ-LOG-001",
+        "AZ-LOG-002a",
+        "AZ-SEN-001",
+        "AZ-SEN-010",
+        "AU.L2-3.3.3.sentinel-connector",
+        "AZ-NET-002",
+        "AZ-NSG-003",
+        "AZ-NET-003",
+        "AZ-NET-004",
+        "AZ-NSG-002",
+        "AC.L2-3.1.14",
+        "SC.L2-3.13.7",
+        "AC.L2-3.1.15",
+        "AC.L1-3.1.1",
+        "CM.L2-3.4.1"
+      ],
+      "taxonomyPath": "C:\\Users\\mhsut\\DevProjects\\ces\\ces-tester\\runs\\e2e\\gpd3-decoymaze-clean\\stamper-failure-taxonomy.json"
+    },
+    "eo": {
+      "before": {
+        "live": true,
+        "liveAssessmentCount": 106,
+        "controlsMet": 38,
+        "controlsTotal": 110,
+        "sprsScore": -89,
+        "snapshotId": "95b4a7d5-0f6e-40ed-aeaf-9222f249a4d7",
+        "mfaControl": {
+          "controlId": "IA.L2-3.5.3",
+          "status": "met",
+          "nistRef": "3.5.3"
+        }
+      },
+      "after": {
+        "live": true,
+        "liveAssessmentCount": 106,
+        "controlsMet": 56,
+        "controlsTotal": 110,
+        "sprsScore": -33,
+        "snapshotId": "3c96a455-03a8-4783-9061-59c9380316d6",
+        "mfaControl": {
+          "controlId": "IA.L2-3.5.3",
+          "status": "met",
+          "nistRef": "3.5.3"
+        }
+      }
+    },
+    "ao": {
+      "available": true,
+      "executed": true,
+      "tenantId": "sim-tenant-eval-decoy-maze",
+      "commandId": "A-18",
+      "verdict": {
+        "satisfied": true,
+        "rowCountDelta": 1,
+        "ledgerMutationDelta": 1,
+        "newest": {
+          "id": "A-18:A-18-1788223633998",
+          "tenantId": "sim-tenant-eval-decoy-maze",
+          "createdAt": "2026-09-01T00:47:13.998Z",
+          "outcome": "automated_success",
+          "complianceVerdict": "SAT",
+          "metadata": {
+            "stateChanged": true,
+            "commandExecuted": "Invoke-MgGraphRequest -Method PATCH -Uri '/v1.0/policies/authorizationPolicy' -Body @{ defaultUserRolePermissions=@{ allowedToCreateApps=$false; allowedToCreateSecurityGroups=$false; allowedToCreateTenants=$false } }",
+            "sha256Hash": "0190614b68378817340dec14fad65f836c4630d410c7a712123f88bf0e6498a5",
+            "controlIds": [
+              "AC.L1-3.1.2"
+            ],
+            "executorIdentity": "cse-ao-service",
+            "timestamp": "2026-09-01T00:47:13.997Z",
+            "preStateOutput": "[dry-run] PowerShell commands validated",
+            "postStateOutput": "[dry-run] PowerShell commands validated"
+          }
+        },
+        "stateChanged": true,
+        "hasCommandExecuted": true,
+        "hasSha256Hash": true,
+        "failures": []
+      },
+      "addedRows": [
+        {
+          "id": "A-18:A-18-1788223633998",
+          "tenantId": "sim-tenant-eval-decoy-maze",
+          "createdAt": "2026-09-01T00:47:13.998Z",
+          "outcome": "automated_success",
+          "complianceVerdict": "SAT",
+          "metadata": {
+            "stateChanged": true,
+            "commandExecuted": "Invoke-MgGraphRequest -Method PATCH -Uri '/v1.0/policies/authorizationPolicy' -Body @{ defaultUserRolePermissions=@{ allowedToCreateApps=$false; allowedToCreateSecurityGroups=$false; allowedToCreateTenants=$false } }",
+            "sha256Hash": "0190614b68378817340dec14fad65f836c4630d410c7a712123f88bf0e6498a5",
+            "controlIds": [
+              "AC.L1-3.1.2"
+            ],
+            "executorIdentity": "cse-ao-service",
+            "timestamp": "2026-09-01T00:47:13.997Z",
+            "preStateOutput": "[dry-run] PowerShell commands validated",
+            "postStateOutput": "[dry-run] PowerShell commands validated"
+          }
+        }
+      ],
+      "ui": {
+        "statusBadge": "SUCCESS",
+        "outcomeBadge": "automated_success",
+        "executeResponse": {
+          "success": true,
+          "result": {
+            "success": true,
+            "output": "\r\nid                  allowInvitesFrom       guestUserRoleId                      defaultUserRolePermissions             \r\n--                  ----------------       ---------------                      --------------------------             \r\nauthorizationPolicy adminsAndGuestInviters 10dae51f-b6af-4016-8d66-8c2a99b929b3 @{allowedToCreateSecurityGroups=Fals...\r\nSTAMPER_EXECUTION_SUCCESS\r\n\r\n\r\n",
+            "stdout": "\r\nid                  allowInvitesFrom       guestUserRoleId                      defaultUserRolePermissions             \r\n--                  ----------------       ---------------                      --------------------------             \r\nauthorizationPolicy adminsAndGuestInviters 10dae51f-b6af-4016-8d66-8c2a99b929b3 @{allowedToCreateSecurityGroups=Fals...\r\nSTAMPER_EXECUTION_SUCCESS\r\n\r\n\r\n",
+            "stderr": "",
+            "exit_code": 0,
+            "duration_ms": 406,
+            "evidence": {
+              "rawResponse": "\r\nid                  allowInvitesFrom       guestUserRoleId                      defaultUserRolePermissions             \r\n--                  ----------------       ---------------                      --------------------------             \r\nauthorizationPolicy adminsAndGuestInviters 10dae51f-b6af-4016-8d66-8c2a99b929b3 @{allowedToCreateSecurityGroups=Fals...\r\nSTAMPER_EXECUTION_SUCCESS\r\n\r\n\r\n",
+              "outcome": "automated_success",
+              "outcomeRationale": "Command completed successfully (exit code 0)",
+              "complianceVerdict": "SAT",
+              "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+              "metadata": {
+                "controlIds": [
+                  "AC.L1-3.1.2"
+                ],
+                "timestamp": "2026-09-01T00:47:13.997Z",
+                "executorIdentity": "cse-ao-service",
+                "commandExecuted": "Invoke-MgGraphRequest -Method PATCH -Uri '/v1.0/policies/authorizationPolicy' -Body @{ defaultUserRolePermissions=@{ allowedToCreateApps=$false; allowedToCreateSecurityGroups=$false; allowedToCreateTenants=$false } }",
+                "sha256Hash": "0190614b68378817340dec14fad65f836c4630d410c7a712123f88bf0e6498a5",
+                "environment": "GCC-High",
+                "preStateOutput": "[dry-run] PowerShell commands validated",
+                "postStateOutput": "[dry-run] PowerShell commands validated",
+                "stateChanged": true
+              }
+            },
+            "evidencePath": "adminops_evidence/A-18:A-18-1788223633998",
+            "metadataPath": "adminops_evidence/A-18:A-18-1788223633998"
+          },
+          "evidence": {
+            "rawResponse": "\r\nid                  allowInvitesFrom       guestUserRoleId                      defaultUserRolePermissions             \r\n--                  ----------------       ---------------                      --------------------------             \r\nauthorizationPolicy adminsAndGuestInviters 10dae51f-b6af-4016-8d66-8c2a99b929b3 @{allowedToCreateSecurityGroups=Fals...\r\nSTAMPER_EXECUTION_SUCCESS\r\n\r\n\r\n",
+            "outcome": "automated_success",
+            "outcomeRationale": "Command completed successfully (exit code 0)",
+            "complianceVerdict": "SAT",
+            "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+            "metadata": {
+              "controlIds": [
+                "AC.L1-3.1.2"
+              ],
+              "timestamp": "2026-09-01T00:47:13.997Z",
+              "executorIdentity": "cse-ao-service",
+              "commandExecuted": "Invoke-MgGraphRequest -Method PATCH -Uri '/v1.0/policies/authorizationPolicy' -Body @{ defaultUserRolePermissions=@{ allowedToCreateApps=$false; allowedToCreateSecurityGroups=$false; allowedToCreateTenants=$false } }",
+              "sha256Hash": "0190614b68378817340dec14fad65f836c4630d410c7a712123f88bf0e6498a5",
+              "environment": "GCC-High",
+              "preStateOutput": "[dry-run] PowerShell commands validated",
+              "postStateOutput": "[dry-run] PowerShell commands validated",
+              "stateChanged": true
+            }
+          },
+          "evidencePath": "adminops_evidence/A-18:A-18-1788223633998",
+          "metadataPath": "adminops_evidence/A-18:A-18-1788223633998"
+        },
+        "screenshots": [
+          "C:\\Users\\mhsut\\DevProjects\\ces\\ces-tester\\runs\\e2e\\gpd3-decoymaze-clean\\screenshots\\01-command-form.png",
+          "C:\\Users\\mhsut\\DevProjects\\ces\\ces-tester\\runs\\e2e\\gpd3-decoymaze-clean\\screenshots\\02-live-armed.png",
+          "C:\\Users\\mhsut\\DevProjects\\ces\\ces-tester\\runs\\e2e\\gpd3-decoymaze-clean\\screenshots\\03-execute-result.png"
+        ]
+      }
+    },
+    "dashboard": {
+      "path": "C:\\Users\\mhsut\\DevProjects\\ces\\ces-tester\\runs\\e2e\\gpd3-decoymaze-clean\\unified-dashboard.html",
+      "beatIds": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    "gates": {
+      "typecheck": "pass",
+      "tests": "pass"
+    }
+  },
+  "verdict": {
+    "clauses": [
+      {
+        "id": 1,
+        "name": "pre-flight",
+        "status": "pass",
+        "detail": "all builds fresh, all ports free"
+      },
+      {
+        "id": 2,
+        "name": "seed + serve",
+        "status": "pass",
+        "detail": "tenant materialized, stacksim serve ready"
+      },
+      {
+        "id": 3,
+        "name": "discovery ground truth",
+        "status": "pass",
+        "detail": "every probe matched (329 observations), read-only proved"
+      },
+      {
+        "id": 4,
+        "name": "Muster wizard artifacts",
+        "status": "pass",
+        "detail": "mission plan + tenant manifest produced (C:\\Users\\mhsut\\DevProjects\\ces\\ces-tester\\runs\\e2e\\gpd3-decoymaze-clean\\artifacts\\plans\\manual-mission-plan-2026-09-01T00-32-57-924Z.json)"
+      },
+      {
+        "id": 5,
+        "name": "Stamper execute",
+        "status": "pass",
+        "detail": "96/110 tasks completed; 13 failure(s), all inside the calibrated GUI-leg known set; ledger snapshot written"
+      },
+      {
+        "id": 6,
+        "name": "EO before/after live",
+        "status": "pass",
+        "detail": "before 38/110 met (106 live), after 56/110 met (106 live)"
+      },
+      {
+        "id": 7,
+        "name": "AO evidence auto-collected",
+        "status": "pass",
+        "detail": "+1 adminops_evidence row(s) for sim-tenant-eval-decoy-maze, stateChanged=true, commandExecuted + sha256Hash present, +1 ledger mutate entr(y/ies)"
+      },
+      {
+        "id": 8,
+        "name": "unified dashboard",
+        "status": "pass",
+        "detail": "C:\\Users\\mhsut\\DevProjects\\ces\\ces-tester\\runs\\e2e\\gpd3-decoymaze-clean\\unified-dashboard.html (Beat 5 present)"
+      },
+      {
+        "id": 9,
+        "name": "gates",
+        "status": "pass",
+        "detail": "tsc --noEmit clean; npm test clean"
+      },
+      {
+        "id": 10,
+        "name": "post-remediation Muster re-read",
+        "status": "pass",
+        "detail": "every probe matched the after-truth (329 observations), read-only proved — the gap closed in Muster's own re-read"
+      }
+    ],
+    "satisfied": true,
+    "calibrating": [],
+    "failures": []
+  },
+  "exitCode": 0
+}

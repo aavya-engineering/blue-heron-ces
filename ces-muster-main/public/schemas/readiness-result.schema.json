@@ -1,0 +1,255 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ReadinessResult",
+  "description": "readiness-result.v1 (G-MUSTER-READINESS-1 M1). Design rule: this payload IS the import-file format - one schema serves four producers (canned fixture, admin-run script upload, ces-tester run, BHD-run readiness session). No second format ever. Spec: docs/design/readiness-result-v1.md.",
+  "type": "object",
+  "required": ["schema_version", "manifest", "observations", "derived", "provenance"],
+  "additionalProperties": false,
+  "definitions": {
+    "consent": {
+      "type": "object",
+      "description": "Who consented, when, to which scopes, for which tenant and area (device-code, read-only).",
+      "required": ["consented_by", "consented_at", "scopes", "tenant_id", "auth_tier"],
+      "additionalProperties": false,
+      "properties": {
+        "consented_by": { "type": "string", "minLength": 1 },
+        "consented_at": { "type": "string", "minLength": 1 },
+        "scopes": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "tenant_id": { "type": "string", "minLength": 1 },
+        "auth_tier": { "type": "string", "enum": ["device-code"] },
+        "client_id": { "type": "string" },
+        "area": { "type": "string", "enum": ["graph", "exchange", "purview", "azure", "teams"] },
+        "reader_roles": { "type": "array", "description": "FC-MU-5 (additive, optional): the reader roles proven at consent time (non-Graph areas).", "items": { "type": "string", "minLength": 1 } },
+        "subscription_id": { "type": "string", "minLength": 1, "description": "FC-MU-5 (additive, optional): the Azure subscription the reader check covered." }
+      }
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "description": "FC-MU-3: 1.1.0 is written; 1.0.0 is still accepted on import. 1.1.0 = 1.0.0 plus the optional manifest.consent (FC-MU-2), manifest.consents[] with a per-area consent, and facts[].source.",
+      "enum": ["readiness-result/1.0.0", "readiness-result/1.1.0"]
+    },
+    "manifest": {
+      "type": "object",
+      "description": "Session manifest. The auth tier achieved is itself provenance.",
+      "required": ["mode", "auth_tier", "tenant", "operator", "engagement_id", "party_id", "engagement_kind", "started_at"],
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["self-hosted", "independent", "collaborative-bhd"]
+        },
+        "auth_tier": {
+          "type": "string",
+          "enum": ["device-code", "script-upload", "lite", "cert-app-only"]
+        },
+        "tenant": {
+          "type": "object",
+          "description": "The observed M365 tenant in ces-tenant registry semantics (slug + kind, sim and live are the same code path). NAME COLLISION: this is NOT muster-api's SaaS Tenant model.",
+          "required": ["slug", "kind"],
+          "additionalProperties": false,
+          "properties": {
+            "slug": { "type": "string", "minLength": 1 },
+            "kind": { "type": "string", "enum": ["live", "sim"] }
+          }
+        },
+        "operator": {
+          "type": "object",
+          "required": ["name", "role"],
+          "additionalProperties": false,
+          "properties": {
+            "name": { "type": "string", "minLength": 1 },
+            "role": { "type": "string", "minLength": 1 }
+          }
+        },
+        "bhd_presence": {
+          "type": "object",
+          "description": "Present only for collaborative-bhd sessions.",
+          "required": ["name"],
+          "additionalProperties": false,
+          "properties": {
+            "name": { "type": "string", "minLength": 1 }
+          }
+        },
+        "engagement_id": { "type": "string", "minLength": 1 },
+        "party_id": { "type": "string", "minLength": 1 },
+        "engagement_kind": {
+          "type": "string",
+          "enum": ["prime_and_subs", "individual_contractor"]
+        },
+        "started_at": { "type": "string", "minLength": 1 },
+        "completed_at": { "type": "string" },
+        "consent": {
+          "$ref": "#/definitions/consent",
+          "description": "FC-MU-2 (additive, optional): the customer's consent for a LIVE tenant read. Present only on live (tenant.kind 'live') device-code runs. With several consents (FC-MU-3), this is the Graph one."
+        },
+        "consents": {
+          "type": "array",
+          "description": "FC-MU-3 (1.1.0, optional): every live device-code consent the run used, one per area (graph, exchange, purview, azure; FC-MU-5: teams).",
+          "minItems": 1,
+          "items": { "$ref": "#/definitions/consent" }
+        }
+      }
+    },
+    "observations": {
+      "type": "array",
+      "description": "Per-control observation rows: the shipped DiscoveryResult shape extended with execution provenance.",
+      "items": {
+        "type": "object",
+        "required": ["control_id", "objective_ids", "confidence", "ran_entry_ids", "derived_posture"],
+        "additionalProperties": false,
+        "properties": {
+          "control_id": { "type": "string", "minLength": 1 },
+          "objective_ids": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "confidence": {
+            "type": "string",
+            "enum": ["high", "medium", "low", "unknown"]
+          },
+          "ran_entry_ids": {
+            "type": "array",
+            "description": "Registry entry ids actually run for this row.",
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "raw_capture_ref": {
+            "type": "string",
+            "description": "Pointer (path/hash) to captured command output. Raw output is NEVER inline.",
+            "minLength": 1
+          },
+          "derived_posture": {
+            "type": "string",
+            "enum": ["met", "not_met", "partial", "unknown"]
+          },
+          "objective_coverage": {
+            "type": "object",
+            "description": "Per-objective coverage bucket (planner_gen2_feed skeleton).",
+            "additionalProperties": {
+              "type": "string",
+              "enum": ["A", "B", "C"]
+            }
+          },
+          "residual_must_have": {
+            "type": "array",
+            "description": "EMX archetype names, verbatim from planner_gen2_feed residual_documentary_must_have.",
+            "items": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "facts": {
+      "type": "array",
+      "description": "Optional session facts in the InterviewFact shape plus GO-2's attestation extension. Draft facts carry their draft provenance strings; drafts prune, never pass.",
+      "items": {
+        "type": "object",
+        "required": ["question_id", "question_text", "answer", "provenance", "confidence", "recorded_at"],
+        "additionalProperties": false,
+        "properties": {
+          "question_id": { "type": "string", "minLength": 1 },
+          "question_text": { "type": "string", "minLength": 1 },
+          "answer": { "type": "string" },
+          "provenance": { "type": "string" },
+          "confidence": {
+            "type": "string",
+            "enum": ["high", "medium", "low", "unknown"]
+          },
+          "recorded_at": { "type": "string", "minLength": 1 },
+          "source": {
+            "type": "string",
+            "minLength": 1,
+            "description": "FC-MU-3 (additive, optional): where an auto-detected answer came from, e.g. 'graph:conditionalAccess'."
+          },
+          "attestation": {
+            "type": "object",
+            "description": "GO-2 M4 record: rendered as 'drafted by [source], confirmed by [name] on [date]'. All three fields required when present - a partial attestation is not an attestation; unconfirmed drafts omit the object entirely.",
+            "required": ["drafted_by", "confirmed_by", "confirmed_on"],
+            "additionalProperties": false,
+            "properties": {
+              "drafted_by": { "type": "string", "minLength": 1 },
+              "confirmed_by": { "type": "string", "minLength": 1 },
+              "confirmed_on": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    "derived": {
+      "type": "object",
+      "required": ["sprs_now", "gaps", "sprs_after"],
+      "additionalProperties": false,
+      "properties": {
+        "sprs_now": {
+          "type": "object",
+          "description": "One-SPRS rule: computeSprs (sprsCalc.ts) output, counting only attested/observed non-draft facts.",
+          "required": ["sprs", "assessed_count", "deductions"],
+          "additionalProperties": false,
+          "properties": {
+            "sprs": { "type": "number", "minimum": -203, "maximum": 110 },
+            "assessed_count": { "type": "integer", "minimum": 0 },
+            "deductions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["requirement_id", "weight"],
+                "additionalProperties": false,
+                "properties": {
+                  "requirement_id": { "type": "string", "minLength": 1 },
+                  "weight": { "type": "number" }
+                }
+              }
+            }
+          }
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["requirement_id", "weight", "fix_entry_ids", "fixable"],
+            "additionalProperties": false,
+            "properties": {
+              "requirement_id": { "type": "string", "minLength": 1 },
+              "weight": { "type": "number" },
+              "fix_entry_ids": {
+                "type": "array",
+                "description": "Registry entries whose set_command is the fix path (empty when fixable = manual).",
+                "items": { "type": "string", "minLength": 1 }
+              },
+              "fixable": { "type": "string", "enum": ["registry", "manual"] }
+            }
+          }
+        },
+        "sprs_after": {
+          "type": "number",
+          "description": "The SAME calculator re-run with every registry-fixable gap flipped to met. A PROJECTION - must always render labeled as one.",
+          "minimum": -203,
+          "maximum": 110
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["registry_versions", "coverage_dataset", "engine", "generated_at"],
+      "additionalProperties": false,
+      "properties": {
+        "registry_versions": {
+          "type": "object",
+          "description": "Registry name -> version.",
+          "additionalProperties": { "type": "string" }
+        },
+        "coverage_dataset": { "type": "string", "minLength": 1 },
+        "engine": {
+          "type": "object",
+          "required": ["name", "version"],
+          "additionalProperties": false,
+          "properties": {
+            "name": { "type": "string", "minLength": 1 },
+            "version": { "type": "string", "minLength": 1 }
+          }
+        },
+        "generated_at": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

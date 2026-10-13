@@ -1,0 +1,30 @@
+{
+  "configId": "eval-decoys",
+  "description": "T5 (docs/demo/EVAL-CONFIGS.md) — the trap, layer-honest. 3 CA policies exist but are decoy-named (Legacy-MFA, Pilot-CA, Block-Old-TLS), not the required CMMC names, so every CA-backed probe (P1-P5) reads unknown despite objects being present. The acid test: presence of the WRONG objects earns no credit. User-5 disabled and default users/cross-tenant policy still read met (P6-P9) — the trap is scoped to CA naming, not a blanket unknown.",
+  "slug": "eval-decoys",
+  "cliExitCode": 3221226505,
+  "cliStdout": "{\"ok\":true,\"out\":\"C:\\\\Users\\\\mhsut\\\\DevProjects\\\\ces\\\\ces-tester\\\\runs\\\\eval\\\\eval-1785299544883\\\\eval-decoys.discovery-result.json\",\"stats\":{\"entries\":223,\"ran\":201,\"manual_only_skipped\":22,\"degraded\":5,\"failed\":1},\"postures\":{\"met\":58,\"unknown\":271,\"not_met\":0}}\n",
+  "cliStderr": "Assertion failed: !(handle->flags & UV_HANDLE_CLOSING), file src\\win\\async.c, line 76\r\n",
+  "schemaValid": true,
+  "readOnly": true,
+  "ledgerDelta": 0,
+  "diff": {
+    "matches": [
+      "AC.L2-3.1.11",
+      "AC.L2-3.1.14",
+      "SC.L2-3.13.7",
+      "AC.L2-3.1.15",
+      "MA.L2-3.7.5",
+      "PS.L2-3.9.2",
+      "IA.L2-3.5.5",
+      "IA.L2-3.5.6",
+      "AC.L1-3.1.20",
+      "AC.L2-3.1.12",
+      "IA.L2-3.5.4"
+    ],
+    "mismatches": [],
+    "pass": true
+  },
+  "pass": true,
+  "outPath": "C:\\Users\\mhsut\\DevProjects\\ces\\ces-tester\\runs\\eval\\eval-1785299544883\\eval-decoys.discovery-result.json"
+}

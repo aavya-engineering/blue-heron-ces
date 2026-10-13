@@ -1,0 +1,9 @@
+# The golden shell-page fixture is compared BYTE-FOR-BYTE against what
+# `renderShowHtml` emits, which is always LF. This repo has core.autocrlf on, so
+# without this line the fixture is checked out CRLF and the no-theme invariant
+# fails on the very machine that wrote it.
+#
+# The test also normalizes line endings on both sides — belt and braces, because
+# a golden that can fail for a reason unrelated to the design lock is a golden
+# people learn to ignore.
+tests/fixtures/show-page-baseline.html eol=lf

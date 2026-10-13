@@ -1,0 +1,201 @@
+schema_version: '1.0'
+module: TCP_Help
+questions:
+  TCP.TI.001:
+    guidance:
+      description: The Entra tenant ID is a globally unique identifier (GUID) for your Microsoft cloud tenant.
+      why_it_matters: The tenant ID is required by every Graph API call, PowerShell module connection, and automation script that targets your environment.
+      common_pitfalls:
+      - Copying the tenant ID from a different tenant (e.g., dev vs. production)
+      - Confusing the tenant ID with the subscription ID or directory ID
+  TCP.TI.002:
+    guidance:
+      description: The primary domain is the default verified domain used for new user UPNs and email routing.
+      why_it_matters: All automation scripts and provisioning commands need the correct primary domain suffix.
+      common_pitfalls:
+      - Using .onmicrosoft.com instead of the custom verified domain
+      - Using the wrong domain suffix for GCC High (.us vs .com)
+  TCP.TI.003:
+    guidance:
+      description: Custom domains are additional verified domains registered on the tenant beyond the primary.
+      why_it_matters: Conditional Access policies and email routing may reference specific domains.
+  TCP.TI.004:
+    guidance:
+      description: The cloud environment determines which Microsoft endpoints, APIs, and service URLs your tenant uses.
+      why_it_matters: GCC High and DoD environments use different endpoints than commercial. All automation must target the correct cloud.
+      common_pitfalls:
+      - Using commercial Graph API endpoints against a GCC High tenant
+      - Confusing GCC (moderate) with GCC High (high impact)
+  TCP.TI.005:
+    guidance:
+      description: The display name is the human-readable organization name shown in Entra ID and service interfaces.
+      why_it_matters: Used in reports, audit logs, and compliance documentation.
+  TCP.LIC.001:
+    guidance:
+      description: The primary license SKU determines which compliance features are available in your tenant.
+      why_it_matters: CMMC implementation heavily depends on available Defender, Purview, and Intune features tied to the license tier.
+      common_pitfalls:
+      - Assuming G3/E3 includes all Defender features (many require G5/E5 or add-ons)
+      - Not verifying that GCC High SKU variants include the same features as commercial
+  TCP.LIC.002:
+    guidance:
+      description: The total count of assigned licenses for capacity planning and cost estimation.
+      why_it_matters: Affects per-user policy deployment scope and ensures sufficient licenses for all in-scope users.
+  TCP.LIC.003:
+    guidance:
+      description: Add-on SKUs provide additional capabilities beyond the base license.
+      why_it_matters: Features like PIM, advanced DLP, and Sentinel may require add-on SKUs.
+  TCP.LIC.004:
+    guidance:
+      description: Service activations confirm which M365 services are live and configured in the tenant.
+      why_it_matters: Manifest config intents can only target services that are actually activated.
+      common_pitfalls:
+      - Assuming a licensed service is automatically activated and configured
+  TCP.IA.001:
+    guidance:
+      description: Break-glass accounts are emergency-access cloud-only accounts excluded from Conditional Access.
+      why_it_matters: CMMC requires documented emergency access procedures. These UPNs must be explicitly excluded from CA policies.
+      common_pitfalls:
+      - Not having at least two break-glass accounts
+      - Including break-glass accounts in Conditional Access policies
+      - Using weak or shared passwords for break-glass accounts
+  TCP.IA.002:
+    guidance:
+      description: A consistent admin naming convention makes privileged accounts easily identifiable in logs and reviews.
+      why_it_matters: Assessors look for clear separation between privileged and standard accounts.
+  TCP.IA.003:
+    guidance:
+      description: Service accounts should follow a distinct naming pattern separate from admin and user accounts.
+      why_it_matters: Automated processes using service accounts need proper auditing and lifecycle management.
+  TCP.IA.004:
+    guidance:
+      description: The identity provider model determines how user authentication and authorization are managed.
+      why_it_matters: Federation, synchronization, and MFA configurations all depend on the identity provider model.
+      common_pitfalls:
+      - Hybrid configurations with unsecured sync agents
+      - External IdP without proper federation trust verification
+  TCP.IA.005:
+    guidance:
+      description: Directory synchronization syncs on-premises AD objects to Entra ID.
+      why_it_matters: Affects identity lifecycle, password policies, and group management strategies.
+  TCP.PA.001:
+    guidance:
+      description: Global Administrators have unrestricted access to all tenant settings and data.
+      why_it_matters: CMMC requires minimal standing privileges. More than 2-3 global admins is a red flag.
+      common_pitfalls:
+      - Having more than 5 global admins
+      - Using global admin accounts for daily work
+  TCP.PA.002:
+    guidance:
+      description: Security Administrators manage security policies, threat detection, and incident response.
+      why_it_matters: These accounts need specific CA policies and monitoring rules.
+  TCP.PA.003:
+    guidance:
+      description: Compliance Administrators manage data governance, eDiscovery, and compliance policies.
+      why_it_matters: DLP, retention, and sensitivity label policies are managed by these accounts.
+  TCP.PA.004:
+    guidance:
+      description: Privileged Identity Management provides just-in-time role activation with approval workflows.
+      why_it_matters: PIM is a key control for CMMC AC.L2-3.1.5 (least privilege) and AC.L2-3.1.6 (non-privileged accounts).
+      common_pitfalls:
+      - Enabling PIM but not configuring activation approval workflows
+      - Not monitoring PIM activation alerts
+  TCP.PA.005:
+    guidance:
+      description: The break-glass exclusion group is used in CA policies to ensure emergency accounts bypass all restrictions.
+      why_it_matters: If break-glass accounts are blocked by CA, you lose emergency access to the tenant.
+  TCP.GA.001:
+    guidance:
+      description: A consistent security group naming convention enables automation and simplifies access reviews.
+      why_it_matters: CA policies, app assignments, and compliance policies all reference security groups by name.
+  TCP.GA.002:
+    guidance:
+      description: Key security groups map organizational roles to access levels in the tenant.
+      why_it_matters: Manifest config intents reference these group names when building CA policies and app assignments.
+  TCP.GA.003:
+    guidance:
+      description: Distribution groups are used for email distribution and may also be used for resource access.
+      why_it_matters: If distribution groups are used for access control, they must be included in security reviews.
+  TCP.GA.004:
+    guidance:
+      description: Dynamic groups auto-populate based on user attributes; assigned groups require manual management.
+      why_it_matters: Dynamic groups reduce administrative overhead but require correct attribute data in the directory.
+      common_pitfalls:
+      - Dynamic group rules that include too many or too few users
+      - Mixing dynamic and assigned membership on the same group
+  TCP.CA.001:
+    guidance:
+      description: A consistent CA policy naming convention enables quick identification and troubleshooting.
+      why_it_matters: Manifest-generated CA policies will follow this convention for consistency.
+  TCP.CA.002:
+    guidance:
+      description: Named locations define trusted IP ranges or countries used in CA policy conditions.
+      why_it_matters: Location-based CA policies are a core control for CUI access restriction.
+      common_pitfalls:
+      - Overly broad IP ranges that include untrusted networks
+      - Forgetting to update named locations when network infrastructure changes
+  TCP.CA.003:
+    guidance:
+      description: The count of existing CA policies helps assess complexity and potential conflicts.
+      why_it_matters: New manifest-generated policies must not conflict with existing ones.
+  TCP.DM.001:
+    guidance:
+      description: The device enrollment type determines how devices are registered and managed in Intune.
+      why_it_matters: CMMC requires managed devices for CUI access. The enrollment type affects compliance policy scope.
+      common_pitfalls:
+      - Allowing unmanaged device access to CUI
+      - Not enforcing device compliance checks in CA policies
+  TCP.DM.002:
+    guidance:
+      description: Device naming conventions enable identification in logs and compliance reports.
+      why_it_matters: Consistent naming simplifies inventory management and incident response.
+  TCP.DM.003:
+    guidance:
+      description: Compliance policy naming conventions enable quick identification of policy purpose and scope.
+      why_it_matters: Manifest-generated compliance policies will follow this convention.
+  TCP.DM.004:
+    guidance:
+      description: Platforms in scope define which device operating systems need compliance policies.
+      why_it_matters: Each platform requires its own compliance policy with platform-specific settings.
+  TCP.DP.001:
+    guidance:
+      description: Sensitivity labels classify and protect CUI data across M365 services.
+      why_it_matters: Label naming conventions ensure consistent classification and are referenced in DLP policies.
+  TCP.DP.002:
+    guidance:
+      description: SharePoint sites designated for CUI need specific sensitivity labels, DLP, and access controls.
+      why_it_matters: Manifest config intents will target these sites for CUI protection policies.
+  TCP.DP.003:
+    guidance:
+      description: Teams channels used for CUI collaboration need appropriate sensitivity labels and policies.
+      why_it_matters: Teams is a common CUI collaboration vector that needs specific data protection controls.
+  TCP.DP.004:
+    guidance:
+      description: DLP policy naming conventions enable consistent policy management and auditing.
+      why_it_matters: Manifest-generated DLP policies will follow this convention.
+  TCP.MON.001:
+    guidance:
+      description: The Sentinel workspace name identifies where security logs and analytics are centralized.
+      why_it_matters: All evidence monitors and drift detection reference this workspace.
+  TCP.MON.002:
+    guidance:
+      description: The Azure resource group containing the Sentinel workspace for resource management.
+      why_it_matters: Automation scripts need the resource group to deploy analytics rules and connectors.
+  TCP.MON.003:
+    guidance:
+      description: The Log Analytics workspace ID is required for API queries and automation targeting the workspace.
+      why_it_matters: Evidence collection scripts use this ID to query logs and export compliance evidence.
+      common_pitfalls:
+      - Confusing the workspace ID with the workspace name
+      - Using the wrong workspace when multiple exist
+  TCP.MON.004:
+    guidance:
+      description: Data connectors feed security logs from various sources into Sentinel for analysis.
+      why_it_matters: CMMC audit logging requirements depend on having the right connectors enabled.
+      common_pitfalls:
+      - Not enabling all relevant connectors for in-scope services
+      - Connectors enabled but not actually ingesting data
+  TCP.MON.005:
+    guidance:
+      description: Alert rule naming conventions enable quick triage and correlation during incident response.
+      why_it_matters: Manifest-generated analytics rules will follow this convention.

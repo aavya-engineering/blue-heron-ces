@@ -1,0 +1,646 @@
+schema_version: '1.0'
+module: Policy_Inputs
+purpose: Collect organization metadata, key personnel, org-defined parameters (ODPs), governance settings, and physical security details needed to auto-generate assessment-ready CMMC policy documents.
+metadata:
+  created_utc: '2026-03-03T00:00:00Z'
+  owner: CES
+  notes: Questions across 5 sections. Each question has bindings.policy_inputs mapping to PolicyInputsOutput paths.
+sections:
+- id: PI-01
+  name: Organization Metadata
+  questions:
+  - id: PI.ORG.001
+    section: Organization Metadata
+    prompt: What is the organization's full legal name?
+    answer_type: text
+    options: []
+    required: true
+    help: The name as it appears on official contracts, SAM.gov registration, and CAGE code records.
+    roles:
+      primary_respondents:
+      - Executive Sponsor
+      validators:
+      - Compliance Officer
+    bindings:
+      policy_inputs: organization.legal_name
+    risk_flags: []
+  - id: PI.ORG.002
+    section: Organization Metadata
+    prompt: What is the organization's street address?
+    answer_type: text
+    options: []
+    required: true
+    help: Primary business address used for official correspondence.
+    roles:
+      primary_respondents:
+      - Executive Sponsor
+      validators:
+      - Facilities Manager
+    bindings:
+      policy_inputs: organization.address.street
+    risk_flags: []
+  - id: PI.ORG.003
+    section: Organization Metadata
+    prompt: City
+    answer_type: text
+    options: []
+    required: true
+    help: ''
+    roles:
+      primary_respondents:
+      - Executive Sponsor
+      validators: []
+    bindings:
+      policy_inputs: organization.address.city
+    risk_flags: []
+  - id: PI.ORG.004
+    section: Organization Metadata
+    prompt: State
+    answer_type: text
+    options: []
+    required: true
+    help: Two-letter state abbreviation (e.g., VA, MD, TX).
+    roles:
+      primary_respondents:
+      - Executive Sponsor
+      validators: []
+    bindings:
+      policy_inputs: organization.address.state
+    risk_flags: []
+  - id: PI.ORG.005
+    section: Organization Metadata
+    prompt: ZIP Code
+    answer_type: text
+    options: []
+    required: true
+    help: ''
+    roles:
+      primary_respondents:
+      - Executive Sponsor
+      validators: []
+    bindings:
+      policy_inputs: organization.address.zip
+    risk_flags: []
+  - id: PI.ORG.006
+    section: Organization Metadata
+    prompt: What is the organization's CAGE code?
+    answer_type: text
+    options: []
+    required: false
+    help: 5-character alphanumeric code assigned by DLA. Found on SAM.gov.
+    roles:
+      primary_respondents:
+      - Contracts Manager
+      validators:
+      - Compliance Officer
+    bindings:
+      policy_inputs: organization.cage_code
+    risk_flags: []
+  - id: PI.ORG.007
+    section: Organization Metadata
+    prompt: What is the organization's DUNS/UEI number?
+    answer_type: text
+    options: []
+    required: false
+    help: Unique Entity Identifier (UEI) from SAM.gov, replacing legacy DUNS.
+    roles:
+      primary_respondents:
+      - Contracts Manager
+      validators: []
+    bindings:
+      policy_inputs: organization.duns_number
+    risk_flags: []
+  - id: PI.ORG.008
+    section: Organization Metadata
+    prompt: What is the organization's relationship to DoD contracts?
+    answer_type: single_select
+    options:
+    - Prime Contractor
+    - Subcontractor
+    - Vendor / Supplier
+    - Other
+    required: true
+    help: Determines the applicable flow-down requirements and policy language.
+    roles:
+      primary_respondents:
+      - Executive Sponsor
+      validators:
+      - Contracts Manager
+    bindings:
+      policy_inputs: organization.org_type
+    risk_flags: []
+  - id: PI.ORG.009
+    section: Organization Metadata
+    prompt: What industry does the organization operate in?
+    answer_type: text
+    options: []
+    required: false
+    help: E.g., Aerospace & Defense, IT Services, Manufacturing, Engineering.
+    roles:
+      primary_respondents:
+      - Executive Sponsor
+      validators: []
+    bindings:
+      policy_inputs: organization.industry
+    risk_flags: []
+  - id: PI.ORG.010
+    section: Organization Metadata
+    prompt: What is the organization's primary NAICS code?
+    answer_type: text
+    options: []
+    required: false
+    help: 6-digit NAICS code (e.g., 541512 for Computer Systems Design Services).
+    roles:
+      primary_respondents:
+      - Contracts Manager
+      validators: []
+    bindings:
+      policy_inputs: organization.naics_code
+    risk_flags: []
+  - id: PI.ORG.011
+    section: Organization Metadata
+    prompt: Does this organization have a parent company? If so, what is the name?
+    answer_type: text
+    options: []
+    required: false
+    help: Leave blank if the organization is independent.
+    roles:
+      primary_respondents:
+      - Executive Sponsor
+      validators: []
+    bindings:
+      policy_inputs: organization.parent_company
+    risk_flags: []
+
+- id: PI-02
+  name: Key Personnel
+  questions:
+  - id: PI.PER.001
+    section: Key Personnel
+    prompt: "Who is the Information System Security Officer (ISSO)? Provide: Name, Title, Email"
+    answer_type: text
+    options: []
+    required: true
+    help: "The ISSO is responsible for maintaining the security posture of the information system. Format: Name | Title | email@domain.com"
+    roles:
+      primary_respondents:
+      - ISSO
+      - IT Director
+      validators:
+      - Executive Sponsor
+    bindings:
+      policy_inputs: personnel.isso
+    risk_flags: []
+  - id: PI.PER.002
+    section: Key Personnel
+    prompt: "Who is the System Owner? Provide: Name, Title, Email"
+    answer_type: text
+    options: []
+    required: true
+    help: "The individual responsible for the operation and maintenance of the information system. Format: Name | Title | email@domain.com"
+    roles:
+      primary_respondents:
+      - IT Director
+      validators:
+      - Executive Sponsor
+    bindings:
+      policy_inputs: personnel.system_owner
+    risk_flags: []
+  - id: PI.PER.003
+    section: Key Personnel
+    prompt: "Who is the Compliance Officer? Provide: Name, Title, Email"
+    answer_type: text
+    options: []
+    required: true
+    help: "The individual responsible for ensuring regulatory compliance. Format: Name | Title | email@domain.com"
+    roles:
+      primary_respondents:
+      - Compliance Officer
+      validators:
+      - Executive Sponsor
+    bindings:
+      policy_inputs: personnel.compliance_officer
+    risk_flags: []
+  - id: PI.PER.004
+    section: Key Personnel
+    prompt: "Who is the IT Director / CTO? Provide: Name, Title, Email"
+    answer_type: text
+    options: []
+    required: true
+    help: "The senior technology leader. Format: Name | Title | email@domain.com"
+    roles:
+      primary_respondents:
+      - IT Director
+      validators:
+      - Executive Sponsor
+    bindings:
+      policy_inputs: personnel.it_director
+    risk_flags: []
+  - id: PI.PER.005
+    section: Key Personnel
+    prompt: "Who is the HR representative for security awareness training? Provide: Name, Title, Email"
+    answer_type: text
+    options: []
+    required: false
+    help: "The HR contact responsible for coordinating security awareness training. Format: Name | Title | email@domain.com"
+    roles:
+      primary_respondents:
+      - HR Manager
+      validators: []
+    bindings:
+      policy_inputs: personnel.hr_representative
+    risk_flags: []
+  - id: PI.PER.006
+    section: Key Personnel
+    prompt: "Who is the Incident Response Lead? Provide: Name, Title, Email"
+    answer_type: text
+    options: []
+    required: true
+    help: "The individual who leads incident response activities. Format: Name | Title | email@domain.com"
+    roles:
+      primary_respondents:
+      - ISSO
+      - IT Director
+      validators: []
+    bindings:
+      policy_inputs: personnel.ir_lead
+    risk_flags: []
+  - id: PI.PER.007
+    section: Key Personnel
+    prompt: "Who is the Facilities / Physical Security Manager? Provide: Name, Title, Email"
+    answer_type: text
+    options: []
+    required: false
+    help: "The individual responsible for physical security controls. Format: Name | Title | email@domain.com"
+    roles:
+      primary_respondents:
+      - Facilities Manager
+      validators: []
+    bindings:
+      policy_inputs: personnel.facilities_manager
+    risk_flags: []
+  - id: PI.PER.008
+    section: Key Personnel
+    prompt: "Who is the Legal / Contracts representative? Provide: Name, Title, Email"
+    answer_type: text
+    options: []
+    required: false
+    help: "The legal contact for contract flow-down and regulatory questions. Format: Name | Title | email@domain.com"
+    roles:
+      primary_respondents:
+      - Legal Counsel
+      validators: []
+    bindings:
+      policy_inputs: personnel.legal_representative
+    risk_flags: []
+
+- id: PI-03
+  name: Org-Defined Parameters (ODPs)
+  questions:
+  - id: PI.ODP.001
+    section: Org-Defined Parameters
+    prompt: What is the account lockout threshold (failed login attempts before lockout)?
+    answer_type: number
+    options: []
+    required: true
+    recommended: 3
+    help: DoD recommended value is 3 consecutive failed attempts. NIST SP 800-171 AC.L2-3.1.8.
+    roles:
+      primary_respondents:
+      - ISSO
+      validators:
+      - IT Director
+    bindings:
+      policy_inputs: odps.account_lockout_threshold
+    risk_flags: []
+  - id: PI.ODP.002
+    section: Org-Defined Parameters
+    prompt: What is the account lockout duration (minutes)?
+    answer_type: number
+    options: []
+    required: true
+    recommended: 15
+    help: Duration the account remains locked after exceeding failed login threshold. DoD recommends 15 minutes minimum.
+    roles:
+      primary_respondents:
+      - ISSO
+      validators: []
+    bindings:
+      policy_inputs: odps.account_lockout_duration_minutes
+    risk_flags: []
+  - id: PI.ODP.003
+    section: Org-Defined Parameters
+    prompt: What is the maximum session inactivity timeout (minutes)?
+    answer_type: number
+    options: []
+    required: true
+    recommended: 15
+    help: Session lock after period of inactivity. DoD recommends 15 minutes. NIST SP 800-171 AC.L2-3.1.10.
+    roles:
+      primary_respondents:
+      - ISSO
+      validators: []
+    bindings:
+      policy_inputs: odps.session_timeout_minutes
+    risk_flags: []
+  - id: PI.ODP.004
+    section: Org-Defined Parameters
+    prompt: What is the minimum password length (characters)?
+    answer_type: number
+    options: []
+    required: true
+    recommended: 14
+    help: DoD recommends minimum 14 characters. NIST SP 800-171 IA.L2-3.5.7.
+    roles:
+      primary_respondents:
+      - ISSO
+      validators: []
+    bindings:
+      policy_inputs: odps.min_password_length
+    risk_flags: []
+  - id: PI.ODP.005
+    section: Org-Defined Parameters
+    prompt: What is the password history depth (number of remembered passwords)?
+    answer_type: number
+    options: []
+    required: true
+    recommended: 24
+    help: Number of previous passwords that cannot be reused. DoD recommends 24.
+    roles:
+      primary_respondents:
+      - ISSO
+      validators: []
+    bindings:
+      policy_inputs: odps.password_history_count
+    risk_flags: []
+  - id: PI.ODP.006
+    section: Org-Defined Parameters
+    prompt: What is the maximum password age (days)?
+    answer_type: number
+    options: []
+    required: true
+    recommended: 60
+    help: Maximum number of days before password must be changed. DoD recommends 60 days.
+    roles:
+      primary_respondents:
+      - ISSO
+      validators: []
+    bindings:
+      policy_inputs: odps.max_password_age_days
+    risk_flags: []
+  - id: PI.ODP.007
+    section: Org-Defined Parameters
+    prompt: What is the audit log retention period (days)?
+    answer_type: number
+    options: []
+    required: true
+    recommended: 365
+    help: Minimum retention for audit logs. DoD recommends 1 year (365 days). NIST SP 800-171 AU.L2-3.3.1.
+    roles:
+      primary_respondents:
+      - ISSO
+      validators:
+      - Compliance Officer
+    bindings:
+      policy_inputs: odps.audit_log_retention_days
+    risk_flags: []
+  - id: PI.ODP.008
+    section: Org-Defined Parameters
+    prompt: What is the vulnerability scan frequency?
+    answer_type: single_select
+    options:
+    - Weekly
+    - Biweekly
+    - Monthly
+    - Quarterly
+    required: true
+    recommended: Monthly
+    help: How often vulnerability scans are performed. DoD recommends at least monthly. NIST SP 800-171 RA.L2-3.11.2.
+    roles:
+      primary_respondents:
+      - ISSO
+      validators: []
+    bindings:
+      policy_inputs: odps.vuln_scan_frequency
+    risk_flags: []
+  - id: PI.ODP.009
+    section: Org-Defined Parameters
+    prompt: What is the critical vulnerability patch timeline (days)?
+    answer_type: number
+    options: []
+    required: true
+    recommended: 14
+    help: Maximum days to remediate critical vulnerabilities. DoD recommends 14 days. NIST SP 800-171 SI.L2-3.14.1.
+    roles:
+      primary_respondents:
+      - ISSO
+      validators:
+      - IT Director
+    bindings:
+      policy_inputs: odps.critical_patch_timeline_days
+    risk_flags: []
+  - id: PI.ODP.010
+    section: Org-Defined Parameters
+    prompt: What is the high-severity vulnerability patch timeline (days)?
+    answer_type: number
+    options: []
+    required: true
+    recommended: 30
+    help: Maximum days to remediate high-severity vulnerabilities. DoD recommends 30 days.
+    roles:
+      primary_respondents:
+      - ISSO
+      validators: []
+    bindings:
+      policy_inputs: odps.high_patch_timeline_days
+    risk_flags: []
+  - id: PI.ODP.011
+    section: Org-Defined Parameters
+    prompt: What is the security awareness training frequency?
+    answer_type: single_select
+    options:
+    - Annually
+    - Semi-annually
+    - Quarterly
+    required: true
+    recommended: Annually
+    help: Frequency of required security awareness training for all personnel. NIST SP 800-171 AT.L2-3.2.1.
+    roles:
+      primary_respondents:
+      - HR Manager
+      - ISSO
+      validators: []
+    bindings:
+      policy_inputs: odps.training_frequency
+    risk_flags: []
+  - id: PI.ODP.012
+    section: Org-Defined Parameters
+    prompt: What is the incident reporting timeline (hours)?
+    answer_type: number
+    options: []
+    required: true
+    recommended: 72
+    help: Maximum hours to report a cybersecurity incident to the contracting officer and DC3. DFARS 252.204-7012 requires 72 hours.
+    roles:
+      primary_respondents:
+      - ISSO
+      - IR Lead
+      validators:
+      - Legal Counsel
+    bindings:
+      policy_inputs: odps.incident_reporting_hours
+    risk_flags: []
+  - id: PI.ODP.013
+    section: Org-Defined Parameters
+    prompt: What is the access review frequency?
+    answer_type: single_select
+    options:
+    - Monthly
+    - Quarterly
+    - Semi-annually
+    - Annually
+    required: true
+    recommended: Quarterly
+    help: How often user access rights are reviewed and validated. NIST SP 800-171 AC.L2-3.1.1.
+    roles:
+      primary_respondents:
+      - ISSO
+      validators: []
+    bindings:
+      policy_inputs: odps.access_review_frequency
+    risk_flags: []
+  - id: PI.ODP.014
+    section: Org-Defined Parameters
+    prompt: What is the backup frequency for CUI systems?
+    answer_type: single_select
+    options:
+    - Daily
+    - Weekly
+    - Real-time replication
+    required: true
+    recommended: Daily
+    help: Frequency of backups for systems that process or store CUI. NIST SP 800-171 MP.L2-3.8.9.
+    roles:
+      primary_respondents:
+      - IT Director
+      validators:
+      - ISSO
+    bindings:
+      policy_inputs: odps.backup_frequency
+    risk_flags: []
+  - id: PI.ODP.015
+    section: Org-Defined Parameters
+    prompt: What is the media sanitization standard?
+    answer_type: single_select
+    options:
+    - NIST SP 800-88 Clear
+    - NIST SP 800-88 Purge
+    - NIST SP 800-88 Destroy
+    required: true
+    recommended: NIST SP 800-88 Purge
+    help: Sanitization method for media containing CUI before disposal or reuse. NIST SP 800-171 MP.L2-3.8.3.
+    roles:
+      primary_respondents:
+      - ISSO
+      - IT Director
+      validators: []
+    bindings:
+      policy_inputs: odps.media_sanitization_standard
+    risk_flags: []
+
+- id: PI-04
+  name: Governance & Temporal
+  questions:
+  - id: PI.GOV.001
+    section: Governance & Temporal
+    prompt: What is the effective date for CMMC policies?
+    answer_type: text
+    options: []
+    required: true
+    help: The date policies take effect. Format YYYY-MM-DD.
+    roles:
+      primary_respondents:
+      - Compliance Officer
+      validators:
+      - Executive Sponsor
+    bindings:
+      policy_inputs: governance.policy_effective_date
+    risk_flags: []
+  - id: PI.GOV.002
+    section: Governance & Temporal
+    prompt: How often should policies be reviewed and updated (months)?
+    answer_type: number
+    options: []
+    required: true
+    recommended: 12
+    help: Review cycle in months. CMMC requires at least annual (12-month) review.
+    roles:
+      primary_respondents:
+      - Compliance Officer
+      validators: []
+    bindings:
+      policy_inputs: governance.review_cycle_months
+    risk_flags: []
+  - id: PI.GOV.003
+    section: Governance & Temporal
+    prompt: What month does the fiscal year start? (1-12)
+    answer_type: number
+    options: []
+    required: true
+    recommended: 1
+    help: Used to align policy review dates with fiscal year. January = 1, October = 10.
+    roles:
+      primary_respondents:
+      - Executive Sponsor
+      validators: []
+    bindings:
+      policy_inputs: governance.fiscal_year_start_month
+    risk_flags: []
+
+- id: PI-05
+  name: Physical Security
+  questions:
+  - id: PI.PHY.001
+    section: Physical Security
+    prompt: List all facility addresses where CUI is processed or stored (one per line).
+    answer_type: list
+    options: []
+    required: false
+    help: Include all locations — offices, data centers, remote work sites — where CUI is handled.
+    roles:
+      primary_respondents:
+      - Facilities Manager
+      validators:
+      - ISSO
+    bindings:
+      policy_inputs: physical_security.facility_addresses
+    risk_flags: []
+  - id: PI.PHY.002
+    section: Physical Security
+    prompt: What physical access control system is used?
+    answer_type: text
+    options: []
+    required: false
+    help: E.g., badge readers, biometric scanners, key locks, security guards.
+    roles:
+      primary_respondents:
+      - Facilities Manager
+      validators: []
+    bindings:
+      policy_inputs: physical_security.access_control_system
+    risk_flags: []
+  - id: PI.PHY.003
+    section: Physical Security
+    prompt: What visitor management procedures are in place?
+    answer_type: text
+    options: []
+    required: false
+    help: Describe the visitor sign-in process, escort requirements, and badge issuance.
+    roles:
+      primary_respondents:
+      - Facilities Manager
+      validators:
+      - ISSO
+    bindings:
+      policy_inputs: physical_security.visitor_management
+    risk_flags: []

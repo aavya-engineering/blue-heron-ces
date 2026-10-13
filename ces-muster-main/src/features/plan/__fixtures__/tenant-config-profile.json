@@ -1,0 +1,96 @@
+{
+  "ces": {
+    "artifact": "tenant_config_profile",
+    "version": "1.0",
+    "generated_on": "2026-01-15",
+    "tcp_bank_version": "1.0"
+  },
+  "tenant_config": {
+    "identity": {
+      "tenant_id": "",
+      "primary_domain": "",
+      "custom_domains": [],
+      "cloud_environment": "gcc_high",
+      "display_name": "Golden Fixture Co"
+    },
+    "licensing": {
+      "primary_sku": "Microsoft 365 G5",
+      "license_count": 0,
+      "addon_skus": [
+        "IDENTITY_THREAT_PROTECTION",
+        "CLOUD_APP_SECURITY"
+      ],
+      "service_activations": {
+        "exchange_online": true,
+        "sharepoint_online": true,
+        "teams": true,
+        "intune": true,
+        "defender_for_endpoint": true,
+        "defender_for_office_365": true,
+        "defender_for_identity": true,
+        "purview_compliance": true,
+        "sentinel": true
+      }
+    },
+    "identity_architecture": {
+      "break_glass_accounts": [],
+      "admin_naming_convention": "",
+      "service_account_naming_convention": "",
+      "identity_provider": "entra_native",
+      "directory_sync_enabled": false
+    },
+    "privileged_access": {
+      "global_admins": [],
+      "security_admins": [],
+      "compliance_admins": [],
+      "pim_enabled": true,
+      "break_glass_exclusion_group": "SG-BreakGlass-Exclusion"
+    },
+    "group_architecture": {
+      "security_group_convention": "SG-{Department}-{Function}",
+      "key_groups": {},
+      "distribution_group_convention": "DL-{Department}",
+      "group_strategy": "dynamic"
+    },
+    "conditional_access": {
+      "ca_naming_convention": "CA-{Number}-{Purpose}",
+      "named_locations": [],
+      "existing_policy_count": 0
+    },
+    "device_management": {
+      "enrollment_type": "azure_ad_join",
+      "device_naming_convention": "GOLDENFIXTURECO-{Type}-{Number}",
+      "compliance_policy_convention": "CP-{Platform}-{Level}",
+      "platforms_in_scope": [
+        "Windows",
+        "iOS/iPadOS"
+      ]
+    },
+    "data_protection": {
+      "sensitivity_label_convention": "GOLDENFIXTURECO-{Classification}-{Handling}",
+      "cui_sharepoint_sites": [
+        "https://golden-fixture.sharepoint.us/sites/CUI"
+      ],
+      "cui_teams_channels": [
+        "CUI Operations",
+        "CMMC Compliance"
+      ],
+      "dlp_policy_convention": "DLP-{Scope}-{Action}"
+    },
+    "monitoring": {
+      "sentinel_workspace_name": "golden-fixture-law-prod",
+      "sentinel_resource_group": "golden-fixture-rg-security",
+      "log_analytics_workspace_id": "",
+      "data_connectors": [
+        "Azure Active Directory",
+        "Microsoft 365",
+        "Microsoft Defender for Endpoint",
+        "Microsoft Defender for Office 365",
+        "Microsoft Defender for Identity",
+        "Azure Activity",
+        "Windows Security Events"
+      ],
+      "alert_rule_convention": "AR-{Severity}-{Source}-{Description}"
+    }
+  }
+}

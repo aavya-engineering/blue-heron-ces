@@ -1,0 +1,26 @@
+{
+  "config_id": "eval-bare",
+  "description": "T1 (docs/demo/EVAL-CONFIGS.md) — brand-new tenant, nothing configured. Zeroes out CA policies, users, and the cross-tenant access policy via countOverrides so every CMMC-named-CA and user-presence probe reads unknown (the honest zero); only the always-present authorizationPolicy singleton (P8) reads met.",
+  "stacksim_seed": {
+    "stance": "m365_azure",
+    "countOverrides": {
+      "caPolicies": 0,
+      "users": 0,
+      "crossTenantAccessPolicy": 0
+    },
+    "steps": []
+  },
+  "expected_discovery": {
+    "AC.L2-3.1.11": "unknown",
+    "AC.L2-3.1.14": "unknown",
+    "SC.L2-3.13.7": "unknown",
+    "AC.L2-3.1.15": "unknown",
+    "MA.L2-3.7.5": "unknown",
+    "PS.L2-3.9.2": "unknown",
+    "IA.L2-3.5.5": "unknown",
+    "IA.L2-3.5.6": "unknown",
+    "AC.L1-3.1.20": "unknown",
+    "AC.L2-3.1.12": "unknown",
+    "IA.L2-3.5.4": "unknown"
+  }
+}

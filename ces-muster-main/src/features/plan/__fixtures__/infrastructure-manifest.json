@@ -1,0 +1,1028 @@
+{
+  "ces": {
+    "artifact": "infrastructure_manifest",
+    "version": "1.0.0",
+    "generated_on": "2026-01-15T00:00:00.000Z",
+    "intent": "CMMC L2 Azure infrastructure specification for golden-fixture-rg-security"
+  },
+  "infrastructure": {
+    "identity": [
+      {
+        "resource_id": "id-break-glass",
+        "resource_type": "entra_account",
+        "name": "BreakGlass-",
+        "control_ids": [
+          "AC.L2-3.1.1"
+        ],
+        "registry_entry_ids": [],
+        "properties": {
+          "purpose": "Emergency access account for break-glass scenarios",
+          "mfa_required": true
+        },
+        "depends_on": []
+      },
+      {
+        "resource_id": "id-ca-mfa-all",
+        "resource_type": "conditional_access_policy",
+        "name": "CA-MFA-All-Users",
+        "control_ids": [
+          "AC.L2-3.1.1",
+          "AC.L2-3.1.2"
+        ],
+        "registry_entry_ids": [],
+        "properties": {
+          "grant_controls": [
+            "mfa"
+          ],
+          "state": "enabled",
+          "applies_to": "All users",
+          "excludes": [
+            "BreakGlass-"
+          ]
+        },
+        "depends_on": [
+          "id-break-glass"
+        ]
+      },
+      {
+        "resource_id": "id-ca-block-legacy",
+        "resource_type": "conditional_access_policy",
+        "name": "CA-Block-Legacy-Auth",
+        "control_ids": [
+          "AC.L2-3.1.1"
+        ],
+        "registry_entry_ids": [],
+        "properties": {
+          "grant_controls": [
+            "block"
+          ],
+          "state": "enabled",
+          "condition": "Legacy authentication clients"
+        },
+        "depends_on": []
+      },
+      {
+        "resource_id": "id-eo-sp",
+        "resource_type": "service_principal",
+        "name": "EvidenceOps-Automation",
+        "control_ids": [
+          "AU.L2-3.3.1"
+        ],
+        "registry_entry_ids": [],
+        "properties": {
+          "purpose": "Evidence collection automation service principal",
+          "credential_type": "certificate"
+        },
+        "depends_on": []
+      }
+    ],
+    "logging": [
+      {
+        "resource_id": "log-rg",
+        "resource_type": "resource_group",
+        "name": "golden-fixture-rg-security",
+        "control_ids": [
+          "AU.L2-3.3.1"
+        ],
+        "registry_entry_ids": [
+          "AZ-FOUND-001"
+        ],
+        "properties": {
+          "location": "usgovvirginia"
+        },
+        "depends_on": []
+      },
+      {
+        "resource_id": "log-law",
+        "resource_type": "log_analytics_workspace",
+        "name": "golden-fixture-law-prod",
+        "control_ids": [
+          "AU.L2-3.3.1",
+          "AU.L2-3.3.2",
+          "SI.L2-3.14.6"
+        ],
+        "registry_entry_ids": [
+          "AZ-LOG-001"
+        ],
+        "properties": {
+          "sku": "PerGB2018",
+          "retention_days": 365,
+          "location": "usgovvirginia",
+          "resource_group": "golden-fixture-rg-security"
+        },
+        "depends_on": [
+          "log-rg"
+        ]
+      },
+      {
+        "resource_id": "log-entra-diag",
+        "resource_type": "diagnostic_setting",
+        "name": "entra-to-law",
+        "control_ids": [
+          "AU.L2-3.3.1",
+          "AU.L2-3.3.2"
+        ],
+        "registry_entry_ids": [
+          "AZ-LOG-003"
+        ],
+        "properties": {
+          "log_categories": [
+            "AuditLogs",
+            "SignInLogs",
+            "NonInteractiveUserSignInLogs",
+            "ServicePrincipalSignInLogs",
+            "RiskyUsers"
+          ],
+          "destination": "golden-fixture-law-prod"
+        },
+        "depends_on": [
+          "log-law"
+        ]
+      },
+      {
+        "resource_id": "log-sentinel",
+        "resource_type": "sentinel_onboarding",
+        "name": "sentinel",
+        "control_ids": [
+          "AU.L2-3.3.1",
+          "SI.L2-3.14.1",
+          "SI.L2-3.14.6"
+        ],
+        "registry_entry_ids": [
+          "AZ-SEN-001"
+        ],
+        "properties": {
+          "workspace": "golden-fixture-law-prod",
+          "content_hub_solutions": [
+            "CMMC 2.0"
+          ]
+        },
+        "depends_on": [
+          "log-law"
+        ]
+      }
+    ],
+    "security": [
+      {
+        "resource_id": "sec-defender",
+        "resource_type": "defender_for_cloud",
+        "name": "defender-plans",
+        "control_ids": [
+          "SI.L2-3.14.1",
+          "SI.L2-3.14.6",
+          "CM.L2-3.4.1"
+        ],
+        "registry_entry_ids": [
+          "AZ-FOUND-003"
+        ],
+        "properties": {
+          "plans": [
+            {
+              "name": "VirtualMachines",
+              "tier": "Standard",
+              "subPlan": "P2"
+            },
+            {
+              "name": "StorageAccounts",
+              "tier": "Standard"
+            },
+            {
+              "name": "CloudPosture",
+              "tier": "Standard"
+            },
+            {
+              "name": "Arm",
+              "tier": "Standard"
+            }
+          ],
+          "scope": "subscription"
+        },
+        "depends_on": []
+      },
+      {
+        "resource_id": "sec-cmmc-initiative",
+        "resource_type": "policy_assignment",
+        "name": "CMMC L2 Policy Initiative",
+        "control_ids": [
+          "CM.L2-3.4.1",
+          "CM.L2-3.4.2"
+        ],
+        "registry_entry_ids": [
+          "AZ-FOUND-002"
+        ],
+        "properties": {
+          "initiative": "CMMC Level 2",
+          "scope": "/subscriptions/sub_mkeonpc0_lo73tbt",
+          "enforcement_mode": "Default"
+        },
+        "depends_on": []
+      }
+    ],
+    "storage": [
+      {
+        "resource_id": "sto-kv",
+        "resource_type": "key_vault",
+        "name": "cmmc-kv-prod",
+        "control_ids": [
+          "SC.L2-3.13.10",
+          "SC.L2-3.13.16"
+        ],
+        "registry_entry_ids": [
+          "AZ-KV-001",
+          "AZ-KV-002"
+        ],
+        "properties": {
+          "sku": "Premium",
+          "enable_rbac_authorization": true,
+          "enable_purge_protection": true,
+          "public_network_access": "Disabled",
+          "soft_delete_retention_days": 90,
+          "location": "usgovvirginia",
+          "resource_group": "golden-fixture-rg-security"
+        },
+        "depends_on": [
+          "log-rg"
+        ]
+      },
+      {
+        "resource_id": "sto-cmk",
+        "resource_type": "key_vault_key",
+        "name": "cmk-cmmc",
+        "control_ids": [
+          "SC.L2-3.13.10",
+          "SC.L2-3.13.16"
+        ],
+        "registry_entry_ids": [
+          "AZ-KV-003"
+        ],
+        "properties": {
+          "key_type": "RSA-HSM",
+          "key_size": 4096,
+          "vault": "cmmc-kv-prod"
+        },
+        "depends_on": [
+          "sto-kv"
+        ]
+      },
+      {
+        "resource_id": "sto-sa",
+        "resource_type": "storage_account",
+        "name": "cmmcevops01",
+        "control_ids": [
+          "AU.L2-3.3.1",
+          "AU.L2-3.3.2",
+          "SC.L2-3.13.10"
+        ],
+        "registry_entry_ids": [
+          "AZ-LOG-002",
+          "AZ-LOG-002a"
+        ],
+        "properties": {
+          "sku": "Standard_ZRS",
+          "kind": "StorageV2",
+          "encryption": {
+            "source": "Microsoft.Keyvault",
+            "key_vault_uri": "https://cmmc-kv-prod.vault.usgovcloudapi.net",
+            "key_name": "cmk-cmmc"
+          },
+          "public_network_access": "Disabled",
+          "minimum_tls_version": "TLS1_2",
+          "allow_blob_public_access": false,
+          "identity_type": "SystemAssigned",
+          "location": "usgovvirginia",
+          "resource_group": "golden-fixture-rg-security"
+        },
+        "depends_on": [
+          "sto-cmk"
+        ]
+      },
+      {
+        "resource_id": "sto-worm-audit-logs",
+        "resource_type": "storage_container",
+        "name": "audit-logs",
+        "control_ids": [
+          "AU.L2-3.3.2"
+        ],
+        "registry_entry_ids": [
+          "AZ-LOG-002b",
+          "AZ-LOG-002c"
+        ],
+        "properties": {
+          "storage_account": "cmmcevops01",
+          "immutable_storage": {
+            "enabled": true,
+            "immutability_period_days": 365,
+            "locked": true
+          }
+        },
+        "depends_on": [
+          "sto-sa"
+        ]
+      },
+      {
+        "resource_id": "sto-worm-compliance-reports",
+        "resource_type": "storage_container",
+        "name": "compliance-reports",
+        "control_ids": [
+          "AU.L2-3.3.2"
+        ],
+        "registry_entry_ids": [],
+        "properties": {
+          "storage_account": "cmmcevops01",
+          "immutable_storage": {
+            "enabled": true,
+            "immutability_period_days": 365,
+            "locked": true
+          }
+        },
+        "depends_on": [
+          "sto-sa"
+        ]
+      },
+      {
+        "resource_id": "sto-worm-incident-evidence",
+        "resource_type": "storage_container",
+        "name": "incident-evidence",
+        "control_ids": [
+          "AU.L2-3.3.2"
+        ],
+        "registry_entry_ids": [],
+        "properties": {
+          "storage_account": "cmmcevops01",
+          "immutable_storage": {
+            "enabled": true,
+            "immutability_period_days": 365,
+            "locked": true
+          }
+        },
+        "depends_on": [
+          "sto-sa"
+        ]
+      }
+    ],
+    "network": [
+      {
+        "resource_id": "net-vnet",
+        "resource_type": "virtual_network",
+        "name": "cmmc-vnet-eo",
+        "control_ids": [
+          "SC.L2-3.13.1",
+          "SC.L2-3.13.5",
+          "SC.L2-3.13.6"
+        ],
+        "registry_entry_ids": [
+          "AZ-NET-001"
+        ],
+        "properties": {
+          "address_space": [
+            "10.0.0.0/16"
+          ],
+          "location": "usgovvirginia",
+          "resource_group": "golden-fixture-rg-security"
+        },
+        "depends_on": [
+          "log-rg"
+        ]
+      },
+      {
+        "resource_id": "net-snet-pe",
+        "resource_type": "subnet",
+        "name": "snet-pe",
+        "control_ids": [
+          "SC.L2-3.13.1",
+          "SC.L2-3.13.5"
+        ],
+        "registry_entry_ids": [
+          "AZ-NET-002"
+        ],
+        "properties": {
+          "vnet": "cmmc-vnet-eo",
+          "address_prefix": "10.0.1.0/27",
+          "private_endpoint_network_policies": "Disabled"
+        },
+        "depends_on": [
+          "net-vnet"
+        ]
+      },
+      {
+        "resource_id": "net-snet-mgmt",
+        "resource_type": "subnet",
+        "name": "snet-mgmt",
+        "control_ids": [
+          "SC.L2-3.13.1"
+        ],
+        "registry_entry_ids": [],
+        "properties": {
+          "vnet": "cmmc-vnet-eo",
+          "address_prefix": "10.0.2.0/27"
+        },
+        "depends_on": [
+          "net-vnet"
+        ]
+      },
+      {
+        "resource_id": "net-snet-identity",
+        "resource_type": "subnet",
+        "name": "snet-identity",
+        "control_ids": [
+          "SC.L2-3.13.1"
+        ],
+        "registry_entry_ids": [],
+        "properties": {
+          "vnet": "cmmc-vnet-eo",
+          "address_prefix": "10.0.3.0/27"
+        },
+        "depends_on": [
+          "net-vnet"
+        ]
+      },
+      {
+        "resource_id": "net-snet-fw",
+        "resource_type": "subnet",
+        "name": "AzureFirewallSubnet",
+        "control_ids": [
+          "SC.L2-3.13.1"
+        ],
+        "registry_entry_ids": [],
+        "properties": {
+          "vnet": "cmmc-vnet-eo",
+          "address_prefix": "10.0.5.0/27"
+        },
+        "depends_on": [
+          "net-vnet"
+        ]
+      },
+      {
+        "resource_id": "net-dns-kv",
+        "resource_type": "private_dns_zone",
+        "name": "privatelink.vaultcore.usgovcloudapi.net",
+        "control_ids": [
+          "SC.L2-3.13.1"
+        ],
+        "registry_entry_ids": [
+          "AZ-NET-003"
+        ],
+        "properties": {
+          "linked_vnet": "cmmc-vnet-eo",
+          "resource_group": "golden-fixture-rg-security"
+        },
+        "depends_on": [
+          "net-vnet"
+        ]
+      },
+      {
+        "resource_id": "net-dns-blob",
+        "resource_type": "private_dns_zone",
+        "name": "privatelink.blob.core.usgovcloudapi.net",
+        "control_ids": [
+          "SC.L2-3.13.1"
+        ],
+        "registry_entry_ids": [
+          "AZ-NET-004"
+        ],
+        "properties": {
+          "linked_vnet": "cmmc-vnet-eo",
+          "resource_group": "golden-fixture-rg-security"
+        },
+        "depends_on": [
+          "net-vnet"
+        ]
+      },
+      {
+        "resource_id": "net-pe-kv",
+        "resource_type": "private_endpoint",
+        "name": "cmmc-pe-kv",
+        "control_ids": [
+          "SC.L2-3.13.1",
+          "SC.L2-3.13.6"
+        ],
+        "registry_entry_ids": [
+          "AZ-PE-001"
+        ],
+        "properties": {
+          "target_resource": "cmmc-kv-prod",
+          "target_sub_resource": "vault",
+          "subnet": "snet-pe",
+          "dns_zone": "privatelink.vaultcore.usgovcloudapi.net"
+        },
+        "depends_on": [
+          "sto-kv",
+          "net-snet-pe",
+          "net-dns-kv"
+        ]
+      },
+      {
+        "resource_id": "net-pe-blob",
+        "resource_type": "private_endpoint",
+        "name": "cmmc-pe-blob",
+        "control_ids": [
+          "SC.L2-3.13.1",
+          "SC.L2-3.13.6"
+        ],
+        "registry_entry_ids": [
+          "AZ-PE-002"
+        ],
+        "properties": {
+          "target_resource": "cmmcevops01",
+          "target_sub_resource": "blob",
+          "subnet": "snet-pe",
+          "dns_zone": "privatelink.blob.core.usgovcloudapi.net"
+        },
+        "depends_on": [
+          "sto-sa",
+          "net-snet-pe",
+          "net-dns-blob"
+        ]
+      },
+      {
+        "resource_id": "net-nsg-pe",
+        "resource_type": "network_security_group",
+        "name": "cmmc-nsg-pe",
+        "control_ids": [
+          "SC.L2-3.13.1",
+          "SC.L2-3.13.5",
+          "SC.L2-3.13.6"
+        ],
+        "registry_entry_ids": [
+          "AZ-NSG-001"
+        ],
+        "properties": {
+          "rules": [
+            {
+              "name": "DenyInternetInbound",
+              "priority": 100,
+              "direction": "Inbound",
+              "access": "Deny",
+              "source_address_prefix": "Internet",
+              "destination_address_prefix": "*",
+              "destination_port_range": "*",
+              "protocol": "*"
+            }
+          ],
+          "location": "usgovvirginia",
+          "resource_group": "golden-fixture-rg-security"
+        },
+        "depends_on": [
+          "log-rg"
+        ]
+      }
+    ],
+    "automation": [
+      {
+        "resource_id": "auto-account",
+        "resource_type": "automation_account",
+        "name": "cmmc-automation-eo",
+        "control_ids": [
+          "AU.L2-3.3.1"
+        ],
+        "registry_entry_ids": [
+          "AZ-AUTO-001",
+          "AZ-AUTO-002"
+        ],
+        "properties": {
+          "sku": "Basic",
+          "identity_type": "SystemAssigned",
+          "location": "usgovvirginia",
+          "resource_group": "golden-fixture-rg-security"
+        },
+        "depends_on": [
+          "log-rg"
+        ]
+      },
+      {
+        "resource_id": "auto-rbac",
+        "resource_type": "role_assignments",
+        "name": "automation-rbac",
+        "control_ids": [
+          "AC.L2-3.1.1",
+          "AC.L2-3.1.2",
+          "AU.L2-3.3.1"
+        ],
+        "registry_entry_ids": [
+          "AZ-AUTO-003"
+        ],
+        "properties": {
+          "assignments": [
+            {
+              "role": "Security Reader",
+              "scope": "subscription"
+            },
+            {
+              "role": "Log Analytics Reader",
+              "scope": "golden-fixture-law-prod"
+            },
+            {
+              "role": "Storage Blob Data Contributor",
+              "scope": "cmmcevops01"
+            },
+            {
+              "role": "Key Vault Crypto Service Encryption User",
+              "scope": "cmmc-kv-prod"
+            }
+          ]
+        },
+        "depends_on": [
+          "auto-account",
+          "log-law",
+          "sto-sa",
+          "sto-kv"
+        ]
+      }
+    ],
+    "diagnostics": [
+      {
+        "resource_id": "diag-kv",
+        "resource_type": "diagnostic_setting",
+        "name": "kv-to-law",
+        "control_ids": [
+          "AU.L2-3.3.1",
+          "AU.L2-3.3.2"
+        ],
+        "registry_entry_ids": [
+          "AZ-DIAG-002"
+        ],
+        "properties": {
+          "target_resource": "cmmc-kv-prod",
+          "workspace": "golden-fixture-law-prod",
+          "log_categories": [
+            "AuditEvent",
+            "AzurePolicyEvaluationDetails"
+          ],
+          "metric_categories": [
+            "AllMetrics"
+          ]
+        },
+        "depends_on": [
+          "sto-kv",
+          "log-law"
+        ]
+      },
+      {
+        "resource_id": "diag-sa",
+        "resource_type": "diagnostic_setting",
+        "name": "sa-to-law",
+        "control_ids": [
+          "AU.L2-3.3.1",
+          "AU.L2-3.3.2"
+        ],
+        "registry_entry_ids": [
+          "AZ-DIAG-003"
+        ],
+        "properties": {
+          "target_resource": "cmmcevops01",
+          "workspace": "golden-fixture-law-prod",
+          "log_categories": [
+            "StorageRead",
+            "StorageWrite",
+            "StorageDelete"
+          ],
+          "metric_categories": [
+            "AllMetrics"
+          ]
+        },
+        "depends_on": [
+          "sto-sa",
+          "log-law"
+        ]
+      },
+      {
+        "resource_id": "diag-auto",
+        "resource_type": "diagnostic_setting",
+        "name": "auto-to-law",
+        "control_ids": [
+          "AU.L2-3.3.1"
+        ],
+        "registry_entry_ids": [
+          "AZ-DIAG-005"
+        ],
+        "properties": {
+          "target_resource": "cmmc-automation-eo",
+          "workspace": "golden-fixture-law-prod",
+          "log_categories": [
+            "JobLogs",
+            "JobStreams",
+            "DscNodeStatus"
+          ],
+          "metric_categories": [
+            "AllMetrics"
+          ]
+        },
+        "depends_on": [
+          "auto-account",
+          "log-law"
+        ]
+      },
+      {
+        "resource_id": "diag-sub",
+        "resource_type": "diagnostic_setting",
+        "name": "subscription-to-law",
+        "control_ids": [
+          "AU.L2-3.3.1",
+          "AU.L2-3.3.2"
+        ],
+        "registry_entry_ids": [
+          "AZ-DIAG-006"
+        ],
+        "properties": {
+          "scope": "/subscriptions/sub_mkeonpc0_lo73tbt",
+          "workspace": "golden-fixture-law-prod",
+          "log_categories": [
+            "Administrative",
+            "Security",
+            "ServiceHealth",
+            "Alert",
+            "Recommendation",
+            "Policy",
+            "Autoscale",
+            "ResourceHealth"
+          ]
+        },
+        "depends_on": [
+          "log-law"
+        ]
+      }
+    ],
+    "stamper_variable_map": {
+      "subscriptionId": "sub_mkeonpc0_lo73tbt",
+      "resourceGroup": "golden-fixture-rg-security",
+      "location": "usgovvirginia",
+      "lawWorkspaceName": "golden-fixture-law-prod",
+      "storageAccountName": "cmmcevops01",
+      "keyVaultName": "cmmc-kv-prod",
+      "cmkKeyName": "cmk-cmmc",
+      "vnetName": "cmmc-vnet-eo",
+      "vnetCidr": "10.0.0.0/16",
+      "mgmtSubnetCidr": "10.0.2.0/27",
+      "identitySubnetCidr": "10.0.3.0/27",
+      "peSubnetCidr": "10.0.4.0/27",
+      "fwSubnetCidr": "10.0.5.0/27",
+      "subnetPeName": "snet-pe",
+      "subnetPeCidr": "10.0.1.0/27",
+      "nsgPeName": "cmmc-nsg-pe",
+      "automationAccountName": "cmmc-automation-eo",
+      "eoAppDisplayName": "EvidenceOps-Automation",
+      "firewallSubnetCidr": "10.0.5.0/27",
+      "workloadSubnetCidr": "10.0.6.0/27",
+      "bastionSubnetCidr": "10.0.7.0/26",
+      "firewallName": "cmmc-afw",
+      "publicIpName": "cmmc-afw-pip",
+      "vmName": "cmmc-vm-mgmt",
+      "vmImage": "Win2022Datacenter",
+      "vmSize": "Standard_B2s"
+    },
+    "registry_coverage": {
+      "total_infra_entries": 53,
+      "covered_entry_ids": [
+        "AZ-FOUND-001",
+        "AZ-LOG-001",
+        "AZ-LOG-003",
+        "AZ-SEN-001",
+        "AZ-FOUND-003",
+        "AZ-FOUND-002",
+        "AZ-KV-001",
+        "AZ-KV-002",
+        "AZ-KV-003",
+        "AZ-LOG-002",
+        "AZ-LOG-002a",
+        "AZ-LOG-002b",
+        "AZ-LOG-002c",
+        "AZ-NET-001",
+        "AZ-NET-002",
+        "AZ-NET-003",
+        "AZ-NET-004",
+        "AZ-PE-001",
+        "AZ-PE-002",
+        "AZ-NSG-001",
+        "AZ-AUTO-001",
+        "AZ-AUTO-002",
+        "AZ-AUTO-003",
+        "AZ-DIAG-002",
+        "AZ-DIAG-003",
+        "AZ-DIAG-005",
+        "AZ-DIAG-006"
+      ],
+      "uncovered_entry_ids": [],
+      "coverage_pct": 51
+    },
+    "provenance": [
+      {
+        "field": "identity.break_glass",
+        "value": "BreakGlass-",
+        "source": "tcp",
+        "rule": "Break glass account from TCP identity architecture"
+      },
+      {
+        "field": "identity.ca_policies",
+        "value": [
+          "MFA-All-Users",
+          "Block-Legacy-Auth"
+        ],
+        "source": "convention",
+        "rule": "Always required for CMMC L2"
+      },
+      {
+        "field": "identity.eo_sp",
+        "value": "EvidenceOps-Automation",
+        "source": "convention",
+        "rule": "Convention: EvidenceOps-Automation"
+      },
+      {
+        "field": "logging.law_name",
+        "value": "golden-fixture-law-prod",
+        "source": "tcp",
+        "rule": "From TCP monitoring.sentinel_workspace_name or convention {prefix}-law-prod"
+      },
+      {
+        "field": "logging.retention_days",
+        "value": 365,
+        "source": "tcp",
+        "rule": "WORM retention from SI evidence retention or default 2557"
+      },
+      {
+        "field": "security.defender_plans",
+        "value": [
+          "VirtualMachines",
+          "StorageAccounts",
+          "CloudPosture",
+          "Arm"
+        ],
+        "source": "convention",
+        "rule": "Standard tier for CMMC L2"
+      },
+      {
+        "field": "security.cmmc_initiative",
+        "value": "CMMC Level 2",
+        "source": "convention",
+        "rule": "CMMC L2 policy initiative at subscription scope"
+      },
+      {
+        "field": "storage.kv_name",
+        "value": "cmmc-kv-prod",
+        "source": "convention",
+        "rule": "{prefix}-kv-prod where prefix=cmmc"
+      },
+      {
+        "field": "storage.cmk_key",
+        "value": "cmk-cmmc",
+        "source": "convention",
+        "rule": "cmk-{prefix} RSA-HSM 4096"
+      },
+      {
+        "field": "storage.sa_name",
+        "value": "cmmcevops01",
+        "source": "convention",
+        "rule": "{prefix}evops01 (no hyphens)"
+      },
+      {
+        "field": "storage.worm_containers",
+        "value": [
+          "audit-logs",
+          "compliance-reports",
+          "incident-evidence"
+        ],
+        "source": "convention",
+        "rule": "audit-logs, compliance-reports, incident-evidence"
+      },
+      {
+        "field": "storage.worm_retention",
+        "value": 365,
+        "source": "policy_odp",
+        "rule": "Immutability period from SI evidence retention or default 2557"
+      },
+      {
+        "field": "network.vnet_name",
+        "value": "cmmc-vnet-eo",
+        "source": "convention",
+        "rule": "{prefix}-vnet-eo where prefix=cmmc"
+      },
+      {
+        "field": "network.vnet_cidr",
+        "value": "10.0.0.0/16",
+        "source": "default",
+        "rule": "Default 10.0.0.0/16"
+      },
+      {
+        "field": "network.pe_subnet",
+        "value": "snet-pe 10.0.1.0/27",
+        "source": "convention",
+        "rule": "snet-pe /27 from first available range"
+      },
+      {
+        "field": "network.dns_zones",
+        "value": [
+          "privatelink.vaultcore.usgovcloudapi.net",
+          "privatelink.blob.core.usgovcloudapi.net"
+        ],
+        "source": "convention",
+        "rule": "DNS zones with suffix usgovcloudapi.net"
+      },
+      {
+        "field": "network.nsg",
+        "value": "cmmc-nsg-pe",
+        "source": "convention",
+        "rule": "{prefix}-nsg-pe with DenyInternetInbound"
+      },
+      {
+        "field": "mgmtSubnetCidr",
+        "value": "10.0.2.0/27",
+        "source": "convention",
+        "rule": "/27 from vnet octet[2]=2"
+      },
+      {
+        "field": "identitySubnetCidr",
+        "value": "10.0.3.0/27",
+        "source": "convention",
+        "rule": "/27 from vnet octet[2]=3"
+      },
+      {
+        "field": "peSubnetCidr",
+        "value": "10.0.4.0/27",
+        "source": "convention",
+        "rule": "/27 from vnet octet[2]=4"
+      },
+      {
+        "field": "fwSubnetCidr",
+        "value": "10.0.5.0/27",
+        "source": "convention",
+        "rule": "/27 from vnet octet[2]=5"
+      },
+      {
+        "field": "automation.account_name",
+        "value": "cmmc-automation-eo",
+        "source": "convention",
+        "rule": "{prefix}-automation-eo where prefix=cmmc"
+      },
+      {
+        "field": "automation.rbac",
+        "value": [
+          "Security Reader",
+          "Log Analytics Reader",
+          "Storage Blob Data Contributor",
+          "KV Crypto Service Encryption User"
+        ],
+        "source": "convention",
+        "rule": "Least-privilege roles for evidence collection"
+      },
+      {
+        "field": "diagnostics.targets",
+        "value": [
+          "KeyVault",
+          "Storage",
+          "Automation",
+          "Subscription"
+        ],
+        "source": "convention",
+        "rule": "All core resources route logs to LAW for CMMC AU.L2"
+      },
+      {
+        "field": "stamper_variable_map.firewallSubnetCidr",
+        "value": "10.0.5.0/27",
+        "source": "convention",
+        "rule": "canonical name for the generator fwSubnetCidr (AzureFirewallSubnet)"
+      },
+      {
+        "field": "stamper_variable_map.workloadSubnetCidr",
+        "value": "10.0.6.0/27",
+        "source": "convention",
+        "rule": "/27 from vnet octet[2]=6 (next free index after the generator subnets 1-5)"
+      },
+      {
+        "field": "stamper_variable_map.bastionSubnetCidr",
+        "value": "10.0.7.0/26",
+        "source": "convention",
+        "rule": "/26 from vnet octet[2]=7 (AzureBastionSubnet minimum size /26)"
+      },
+      {
+        "field": "stamper_variable_map.firewallName",
+        "value": "cmmc-afw",
+        "source": "convention",
+        "rule": "{prefix}-afw"
+      },
+      {
+        "field": "stamper_variable_map.publicIpName",
+        "value": "cmmc-afw-pip",
+        "source": "convention",
+        "rule": "{prefix}-afw-pip"
+      },
+      {
+        "field": "stamper_variable_map.vmName",
+        "value": "cmmc-vm-mgmt",
+        "source": "convention",
+        "rule": "{prefix}-vm-mgmt"
+      },
+      {
+        "field": "stamper_variable_map.vmImage",
+        "value": "Win2022Datacenter",
+        "source": "default",
+        "rule": "management VM image default"
+      },
+      {
+        "field": "stamper_variable_map.vmSize",
+        "value": "Standard_B2s",
+        "source": "default",
+        "rule": "management VM size default"
+      }
+    ],
+    "infrastructure_model": "m365_azure"
+  }
+}

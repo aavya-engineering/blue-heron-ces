@@ -1,0 +1,23 @@
+{
+  "name": "muster-configured",
+  "description": "Fully configured for Muster's current probe set: an admin has enabled MFA on an existing CA policy (real PATCH through the resolver, ledger-recorded), MDM and compliance policies present from seed.",
+  "stance": "m365_azure",
+  "steps": [
+    {
+      "kind": "uri",
+      "method": "PATCH",
+      "uri": "/v1.0/identity/conditionalAccess/policies/caPolicy-1",
+      "body": {
+        "state": "enabled",
+        "grantControls": { "operator": "OR", "builtInControls": ["mfa"] }
+      },
+      "note": "Enable MFA grant on seeded CA policy caPolicy-1 -> iam-001/iam-004 become detectable as yes"
+    }
+  ],
+  "expectedFacts": {
+    "iam-001": "yes",
+    "iam-004": "yes",
+    "ep-001": "yes",
+    "ep-002": "yes"
+  }
+}

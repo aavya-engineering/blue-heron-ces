@@ -1,0 +1,1988 @@
+# CES Vendor Playbook — Microsoft 365 / Azure
+# Maps each implementation pattern action to specific M365 services,
+# admin portal paths, PowerShell/Graph API commands, and evidence collection.
+#
+# For policy/document actions: references M365 tools that support the process.
+# For configuration actions: provides specific portal paths and automation commands.
+# For monitoring actions: provides Sentinel/Defender query and alert setup.
+#
+# m365_service: primary M365 product
+# portal_path: admin center navigation
+# powershell: automation commands (Connect-* assumed already run)
+# graph_api: Microsoft Graph REST calls where applicable
+# evidence_commands: commands to export evidence artifacts
+# notes: caveats, prerequisites, or alternatives
+
+ces:
+  artifact: vendor_playbook
+  vendor: microsoft_365
+  version: "1.0.0"
+  generated_on: "2026-02-07"
+  license_requirements:
+    - Microsoft 365 E5 or E5 Security (recommended for full coverage)
+    - Microsoft 365 E3 + E5 Security add-on (minimum for most controls)
+    - Azure P2 license for PIM, Access Reviews, Identity Protection
+    - Microsoft Sentinel (consumption-based)
+
+# =============================================================================
+# IDENTITY & ACCESS MANAGEMENT (IAM)
+# =============================================================================
+playbook:
+
+  - action_id: IAM-001-01
+    signal: manual
+    m365_service: Compliance Manager
+    implementation: Use Compliance Manager CMMC assessment template to document access control policy
+    portal_path: compliance.microsoft.com > Compliance Manager > Assessments
+    evidence_commands:
+      - "# Export assessment report from Compliance Manager portal"
+    notes: Policy document; M365 provides template scaffolding only
+
+  - action_id: IAM-001-02
+    signal: configure
+    m365_service: Entra ID
+    implementation: Configure Entra ID as identity provider with Lifecycle Workflows for automated provisioning/deprovisioning
+    portal_path: entra.microsoft.com > Identity > Users > Lifecycle Workflows
+    powershell:
+      - "Connect-MgGraph -Scopes 'User.ReadWrite.All','LifecycleWorkflows.ReadWrite.All'"
+      - "New-MgIdentityGovernanceLifecycleWorkflow -DisplayName 'Onboard new hire' -Category 'joiner' ..."
+      - "New-MgIdentityGovernanceLifecycleWorkflow -DisplayName 'Offboard employee' -Category 'leaver' ..."
+    evidence_commands:
+      - "Get-MgUser -All | Select DisplayName,AccountEnabled,CreatedDateTime | Export-Csv active_users.csv"
+      - "Get-MgIdentityGovernanceLifecycleWorkflow | Select DisplayName,Category,IsEnabled"
+
+  - action_id: IAM-001-03
+    signal: configure
+    m365_service: Entra ID Governance
+    implementation: Create Entra ID Access Reviews for all privileged and standard access on quarterly schedule
+    portal_path: entra.microsoft.com > Identity Governance > Access Reviews > New access review
+    powershell:
+      - "Connect-MgGraph -Scopes 'AccessReview.ReadWrite.All'"
+      - "New-MgIdentityGovernanceAccessReviewDefinition -DisplayName 'Quarterly Access Review' -Scope @{query='...'} -Reviewers @(@{query='/me'}) -Settings @{mailNotificationsEnabled=$true; recurrence=@{pattern=@{type='absoluteMonthly';interval=3}}}"
+    evidence_commands:
+      - "Get-MgIdentityGovernanceAccessReviewDefinition | Select DisplayName,Status,Schedule"
+      - "Get-MgIdentityGovernanceAccessReviewDefinitionInstance -AccessReviewScheduleDefinitionId {id} | Select Status,StartDateTime,EndDateTime"
+
+  - action_id: IAM-002-01
+    signal: manual
+    m365_service: Compliance Manager
+    implementation: Document account management lifecycle procedures; reference Entra ID Lifecycle Workflows as implementation mechanism
+    portal_path: compliance.microsoft.com > Compliance Manager
+    evidence_commands:
+      - "# Export account management policy document from Compliance Manager"
+
+  - action_id: IAM-002-02
+    signal: configure
+    m365_service: Entra ID
+    implementation: Configure Lifecycle Workflows with HR-driven triggers (Workday/SAP SuccessFactors connector or CSV-based)
+    portal_path: entra.microsoft.com > Identity > Users > Lifecycle Workflows > Create workflow
+    powershell:
+      - "# Configure HR provisioning connector"
+      - "New-MgIdentityGovernanceLifecycleWorkflow -Category 'joiner' -ExecutionConditions @{trigger=@{type='attributeChanges';value=@{attributeName='employeeHireDate'}}} -Tasks @(@{taskDefinitionId='...';displayName='Create user account'})"
+    evidence_commands:
+      - "Get-MgIdentityGovernanceLifecycleWorkflow | Select DisplayName,Category,IsEnabled,LastModifiedDateTime"
+      - "Get-MgAuditLogProvisioning -Top 50 | Select ActivityDisplayName,StatusInfo,InitiatedBy"
+
+  - action_id: IAM-002-03
+    signal: configure
+    m365_service: Entra ID
+    implementation: Configure sign-in activity policy to disable accounts after 90 days of inactivity
+    portal_path: entra.microsoft.com > Identity > Users > User settings
+    powershell:
+      - "$inactiveDate = (Get-Date).AddDays(-90)"
+      - "Get-MgUser -All -Property SignInActivity | Where-Object { $_.SignInActivity.LastSignInDateTime -lt $inactiveDate -and $_.AccountEnabled } | ForEach-Object { Update-MgUser -UserId $_.Id -AccountEnabled:$false }"
+    evidence_commands:
+      - "Get-MgUser -All -Property SignInActivity,AccountEnabled | Select DisplayName,AccountEnabled,@{N='LastSignIn';E={$_.SignInActivity.LastSignInDateTime}} | Export-Csv account_activity.csv"
+
+  - action_id: IAM-002-04
+    signal: configure
+    m365_service: Entra ID Governance
+    implementation: Create recurring Access Reviews requiring manager sign-off for all group memberships and app assignments
+    portal_path: entra.microsoft.com > Identity Governance > Access Reviews
+    powershell:
+      - "New-MgIdentityGovernanceAccessReviewDefinition -DisplayName 'Manager Account Review' -Reviewers @(@{query='./manager'}) -Settings @{autoApplyDecisionsEnabled=$true}"
+    evidence_commands:
+      - "Get-MgIdentityGovernanceAccessReviewDefinitionInstanceDecision -AccessReviewScheduleDefinitionId {id} -AccessReviewInstanceId {instanceId} | Select Principal,Decision,ReviewedBy"
+
+  - action_id: IAM-003-01
+    signal: customize
+    m365_service: Entra ID
+    implementation: Document RBAC model; export current Entra ID role assignments and app role assignments as baseline
+    portal_path: entra.microsoft.com > Identity > Roles and administrators
+    evidence_commands:
+      - "Get-MgDirectoryRole | ForEach-Object { $role=$_; Get-MgDirectoryRoleMember -DirectoryRoleId $_.Id | Select @{N='Role';E={$role.DisplayName}},@{N='Member';E={$_.AdditionalProperties.displayName}} } | Export-Csv rbac_model.csv"
+
+  - action_id: IAM-003-02
+    signal: configure
+    m365_service: Entra ID
+    implementation: Configure Entra ID directory roles, administrative units, and application roles per RBAC model
+    portal_path: entra.microsoft.com > Identity > Roles and administrators > Add assignments
+    powershell:
+      - "New-MgRoleManagementDirectoryRoleAssignment -PrincipalId {userId} -RoleDefinitionId {roleId} -DirectoryScopeId '/'"
+      - "# For app roles: New-MgServicePrincipalAppRoleAssignment"
+    evidence_commands:
+      - "Get-MgRoleManagementDirectoryRoleAssignment -All | Select PrincipalId,RoleDefinitionId,DirectoryScopeId | Export-Csv role_assignments.csv"
+
+  - action_id: IAM-004-01
+    signal: configure
+    m365_service: Entra ID PIM
+    implementation: Export all privileged role holders from PIM; document as privileged account inventory
+    portal_path: entra.microsoft.com > Identity Governance > Privileged Identity Management > Entra roles
+    powershell:
+      - "Get-MgRoleManagementDirectoryRoleAssignmentSchedule -All | Select PrincipalId,RoleDefinitionId,AssignmentType,ScheduleInfo"
+    evidence_commands:
+      - "Get-MgRoleManagementDirectoryRoleEligibilitySchedule -All | Select PrincipalId,RoleDefinitionId,Status | Export-Csv privileged_account_inventory.csv"
+
+  - action_id: IAM-004-02
+    signal: configure
+    m365_service: Entra ID PIM
+    implementation: Configure PIM requiring justification, approval, and MFA for privileged role activation with maximum 8-hour duration
+    portal_path: entra.microsoft.com > Identity Governance > PIM > Entra roles > Settings
+    powershell:
+      - "# Configure PIM role settings via Graph API"
+      - "Update-MgPolicyRoleManagementPolicyRule -UnifiedRoleManagementPolicyId {policyId} -UnifiedRoleManagementPolicyRuleId {ruleId} -AdditionalProperties @{setting=@{isApprovalRequired=$true;approvalMode='Serial';approvalStages=@(@{approvers=@(@{query='/groups/{groupId}'})})}}"
+    evidence_commands:
+      - "Get-MgRoleManagementDirectoryRoleAssignmentSchedule -All | Select PrincipalId,RoleDefinitionId,AssignmentType,ScheduleInfo | Export-Csv pim_config_export.csv"
+      - "Get-MgAuditLogDirectoryAudit -Filter \"activityDisplayName eq 'Add member to role completed (PIM activation)'\" -Top 100 | Export-Csv elevation_logs.csv"
+
+  - action_id: IAM-004-03
+    signal: configure
+    m365_service: Conditional Access
+    implementation: Create Conditional Access policy requiring compliant/hybrid-joined device and trusted location for admin portal access
+    portal_path: entra.microsoft.com > Protection > Conditional Access > New policy
+    powershell:
+      - "New-MgIdentityConditionalAccessPolicy -DisplayName 'Require PAW for Admin Access' -Conditions @{users=@{includeRoles=@('62e90394-69f5-4237-9190-012177145e10')};applications=@{includeApplications=@('All')};platforms=@{includePlatforms=@('windows')}} -GrantControls @{builtInControls=@('compliantDevice');operator='OR'} -State 'enabled'"
+    evidence_commands:
+      - "Get-MgIdentityConditionalAccessPolicy | Where DisplayName -like '*PAW*' | Select DisplayName,State,Conditions,GrantControls | ConvertTo-Json -Depth 5"
+
+  - action_id: IAM-005-01
+    signal: manual
+    m365_service: Entra ID Governance
+    implementation: Document SoD matrix; use Entra ID incompatible access packages to enforce
+    portal_path: entra.microsoft.com > Identity Governance > Entitlement Management > Incompatible access packages
+    evidence_commands:
+      - "# Export SoD matrix document from governance documentation"
+
+  - action_id: IAM-005-02
+    signal: configure
+    m365_service: Entra ID Governance
+    implementation: Configure incompatible access packages in Entitlement Management to prevent conflicting role assignments
+    portal_path: entra.microsoft.com > Identity Governance > Entitlement Management > Access packages
+    powershell:
+      - "New-MgEntitlementManagementAccessPackageIncompatibleAccessPackage -AccessPackageId {pkgA} -BodyParameter @{'@odata.id'='https://graph.microsoft.com/v1.0/identityGovernance/entitlementManagement/accessPackages/{pkgB}'}"
+    evidence_commands:
+      - "Get-MgEntitlementManagementAccessPackageIncompatibleAccessPackage -AccessPackageId {pkgId} | Select DisplayName,Id"
+
+  - action_id: IAM-006-01
+    signal: manual
+    m365_service: Compliance Manager
+    implementation: Document least privilege policy; reference Entra ID PIM and Conditional Access as enforcement mechanisms
+    evidence_commands:
+      - "# Export least privilege policy document"
+
+  - action_id: IAM-006-02
+    signal: configure
+    m365_service: Conditional Access
+    implementation: Create baseline Conditional Access policy blocking all access by default, with explicit grant policies per scenario
+    portal_path: entra.microsoft.com > Protection > Conditional Access > New policy
+    powershell:
+      - "# Block all by default policy"
+      - "New-MgIdentityConditionalAccessPolicy -DisplayName 'Default Block All' -Conditions @{users=@{includeUsers=@('All')};applications=@{includeApplications=@('All')}} -GrantControls @{builtInControls=@('block');operator='OR'} -State 'enabledForReportingButNotEnforced'"
+      - "# Then create specific allow policies with higher priority"
+    evidence_commands:
+      - "Get-MgIdentityConditionalAccessPolicy | Select DisplayName,State,CreatedDateTime | Export-Csv conditional_access_policies.csv"
+
+  - action_id: IAM-006-03
+    signal: customize
+    m365_service: Entra ID Governance
+    implementation: Schedule quarterly Access Reviews to identify and remove excess permissions
+    portal_path: entra.microsoft.com > Identity Governance > Access Reviews
+    evidence_commands:
+      - "Get-MgIdentityGovernanceAccessReviewDefinition | Select DisplayName,Status,Schedule | Export-Csv access_reviews.csv"
+
+  - action_id: IAM-007-01
+    signal: configure
+    m365_service: Entra ID
+    implementation: Create separate cloud-only admin accounts (admin_user@domain) without M365 license for admin duties; block admin accounts from email/Teams
+    portal_path: entra.microsoft.com > Identity > Users > New user
+    powershell:
+      - "New-MgUser -DisplayName 'Admin - John Smith' -UserPrincipalName 'admin_jsmith@contoso.com' -AccountEnabled -PasswordProfile @{forceChangePasswordNextSignIn=$true;password='TempP@ss!'} -MailNickname 'admin_jsmith'"
+      - "# Create CA policy blocking admin accounts from Exchange/Teams"
+    evidence_commands:
+      - "Get-MgUser -Filter \"startsWith(displayName,'Admin')\" | Select DisplayName,UserPrincipalName,AccountEnabled | Export-Csv admin_accounts.csv"
+
+  - action_id: IAM-008-01
+    signal: configure
+    m365_service: Entra ID
+    implementation: Ensure non-admin users cannot access admin portals; configure Conditional Access to block non-privileged users from Azure/M365 admin centers
+    portal_path: entra.microsoft.com > Protection > Conditional Access
+    powershell:
+      - "New-MgIdentityConditionalAccessPolicy -DisplayName 'Block Non-Admin from Admin Portals' -Conditions @{users=@{excludeRoles=@('62e90394-69f5-4237-9190-012177145e10')};applications=@{includeApplications=@('c44b4083-3bb0-49c1-b47d-974e53cbdf3c')}} -GrantControls @{builtInControls=@('block');operator='OR'} -State 'enabled'"
+    evidence_commands:
+      - "Get-MgIdentityConditionalAccessPolicy | Where DisplayName -like '*Admin Portal*' | ConvertTo-Json -Depth 5"
+
+  - action_id: IAM-009-01
+    signal: configure
+    m365_service: Entra ID
+    implementation: Configure Entra ID Smart Lockout with threshold of 10 attempts and 60-second lockout duration
+    portal_path: entra.microsoft.com > Protection > Authentication methods > Password protection
+    powershell:
+      - "# Smart Lockout is configured in Azure Portal; verify via Graph"
+      - "Get-MgPolicyAuthenticationMethodPolicy"
+    evidence_commands:
+      - "# Screenshot Smart Lockout settings from portal"
+      - "Get-MgAuditLogSignIn -Filter \"status/errorCode eq 50053\" -Top 100 | Select UserPrincipalName,CreatedDateTime,Status | Export-Csv lockout_events.csv"
+
+  - action_id: IAM-010-01
+    signal: manual
+    m365_service: Compliance Manager
+    implementation: Draft system use notification banner text meeting DoD/organizational requirements
+    evidence_commands:
+      - "# Export banner text document"
+
+  - action_id: IAM-010-02
+    signal: customize
+    m365_service: Entra ID + Intune
+    implementation: Configure Entra ID custom branding with use notification text on sign-in page; deploy logon banner via Intune device configuration
+    portal_path: entra.microsoft.com > Identity > Company branding > Edit > Sign-in page text
+    powershell:
+      - "# Intune device config for Windows logon banner"
+      - "# Create Settings Catalog profile: Computer Configuration > Windows Settings > Security Settings > Local Policies > Security Options > Interactive logon: Message text/title"
+    evidence_commands:
+      - "Get-MgOrganizationBranding | Select SignInPageText"
+      - "# Screenshot Entra ID sign-in page showing banner"
+
+  - action_id: IAM-011-01
+    signal: configure
+    m365_service: Intune + Conditional Access
+    implementation: Deploy Intune device configuration for 15-minute screen lock timeout; set Conditional Access sign-in frequency to 12 hours
+    portal_path: intune.microsoft.com > Devices > Configuration > Create > Settings catalog
+    powershell:
+      - "# Intune Settings Catalog: MaxInactivityTimeLock = 15 minutes"
+      - "# Conditional Access sign-in frequency"
+      - "New-MgIdentityConditionalAccessPolicy -DisplayName 'Session Lock 12hr' -SessionControls @{signInFrequency=@{value=12;type='hours';isEnabled=$true}} -State 'enabled'"
+    evidence_commands:
+      - "Get-MgDeviceManagementDeviceConfiguration | Where DisplayName -like '*screen lock*' | Select DisplayName,Id"
+
+  - action_id: IAM-012-01
+    signal: configure
+    m365_service: Conditional Access
+    implementation: Configure Conditional Access persistent browser session controls; disable 'stay signed in' and set session lifetime
+    portal_path: entra.microsoft.com > Protection > Conditional Access > Session controls
+    powershell:
+      - "New-MgIdentityConditionalAccessPolicy -DisplayName 'Session Termination' -SessionControls @{persistentBrowser=@{mode='never';isEnabled=$true};signInFrequency=@{value=12;type='hours';isEnabled=$true}} -State 'enabled'"
+    evidence_commands:
+      - "Get-MgIdentityConditionalAccessPolicy | Where DisplayName -like '*Session*' | Select DisplayName,SessionControls | ConvertTo-Json -Depth 4"
+
+  - action_id: IAM-013-01
+    signal: manual
+    m365_service: Compliance Manager
+    implementation: Document critical operations requiring dual authorization (e.g., Global Admin changes, eDiscovery, DLP policy changes)
+    evidence_commands:
+      - "# Export critical operations inventory document"
+
+  - action_id: IAM-013-02
+    signal: customize
+    m365_service: Entra ID PIM
+    implementation: Configure PIM with approval workflows requiring a second authorized individual for critical role activations
+    portal_path: entra.microsoft.com > Identity Governance > PIM > Entra roles > Settings > Require approval
+    powershell:
+      - "# Configure approval requirement on Global Admin PIM role"
+      - "# Set approvers to a security group of authorized approvers"
+    evidence_commands:
+      - "Get-MgAuditLogDirectoryAudit -Filter \"activityDisplayName eq 'Add member to role completed (PIM activation)'\" | Select ActivityDisplayName,InitiatedBy,TargetResources | Export-Csv dual_auth_logs.csv"
+
+  - action_id: IAM-020-01
+    signal: configure
+    m365_service: Entra ID
+    implementation: Entra ID inherently assigns unique ObjectId and UPN to each user; verify no shared accounts exist
+    portal_path: entra.microsoft.com > Identity > Users
+    powershell:
+      - "Get-MgUser -All | Select Id,UserPrincipalName,DisplayName,AccountEnabled"
+    evidence_commands:
+      - "Get-MgUser -All | Select Id,UserPrincipalName,DisplayName,UserType | Export-Csv unique_user_ids.csv"
+      - "# Verify no shared/generic accounts: Get-MgUser -Filter \"startsWith(displayName,'shared')\" "
+
+  - action_id: IAM-021-01
+    signal: configure
+    m365_service: Entra ID
+    implementation: Configure device registration, managed identities for services, and service principals with certificates
+    portal_path: entra.microsoft.com > Identity > Devices + App registrations
+    powershell:
+      - "Get-MgDevice -All | Select DisplayName,DeviceId,OperatingSystem,TrustType"
+      - "Get-MgServicePrincipal -All | Select DisplayName,ServicePrincipalType,AccountEnabled"
+    evidence_commands:
+      - "Get-MgUser -All | Measure-Object | Select Count"
+      - "Get-MgDevice -All | Measure-Object | Select Count"
+      - "Get-MgServicePrincipal -All -Filter \"servicePrincipalType eq 'ManagedIdentity'\" | Select DisplayName | Export-Csv managed_identities.csv"
+
+  - action_id: IAM-022-01
+    signal: configure
+    m365_service: Entra ID
+    implementation: Configure Entra ID authentication methods (password + MFA) as required authentication mechanisms
+    portal_path: entra.microsoft.com > Protection > Authentication methods
+    powershell:
+      - "Get-MgPolicyAuthenticationMethodPolicy | Select -ExpandProperty AuthenticationMethodConfigurations | Select Id,State"
+    evidence_commands:
+      - "Get-MgReportAuthenticationMethodUserRegistrationDetail | Select UserPrincipalName,MethodsRegistered,IsMfaRegistered | Export-Csv auth_methods_report.csv"
+
+  - action_id: IAM-023-01
+    signal: configure
+    m365_service: Intune + Entra ID
+    implementation: Configure Intune device enrollment with compliance policies; require Entra ID device registration
+    portal_path: intune.microsoft.com > Devices > Enrollment + Compliance policies
+    powershell:
+      - "Get-MgDeviceManagementDeviceCompliancePolicy | Select DisplayName,Id,LastModifiedDateTime"
+    evidence_commands:
+      - "Get-MgDevice -All | Select DisplayName,DeviceId,IsCompliant,TrustType,OperatingSystem | Export-Csv device_enrollment.csv"
+      - "Get-MgDeviceManagementDeviceCompliancePolicy | Select DisplayName | Export-Csv compliance_policies.csv"
+
+  - action_id: IAM-024-01
+    signal: manual
+    m365_service: Compliance Manager
+    implementation: Document MFA policy specifying local, network, and privileged access scenarios where MFA is required
+    evidence_commands:
+      - "# Export MFA policy document"
+
+  - action_id: IAM-024-02
+    signal: configure
+    m365_service: Conditional Access
+    implementation: Create Conditional Access policies requiring MFA for all users, all cloud apps, with trusted location exceptions if needed
+    portal_path: entra.microsoft.com > Protection > Conditional Access > New policy
+    powershell:
+      - "New-MgIdentityConditionalAccessPolicy -DisplayName 'Require MFA - All Users' -Conditions @{users=@{includeUsers=@('All')};applications=@{includeApplications=@('All')}} -GrantControls @{builtInControls=@('mfa');operator='OR'} -State 'enabled'"
+    evidence_commands:
+      - "Get-MgIdentityConditionalAccessPolicy | Where {$_.GrantControls.BuiltInControls -contains 'mfa'} | Select DisplayName,State | Export-Csv mfa_policies.csv"
+      - "Get-MgReportAuthenticationMethodUserRegistrationDetail | Where IsMfaRegistered -eq $false | Select UserPrincipalName | Export-Csv users_without_mfa.csv"
+
+  - action_id: IAM-025-01
+    signal: configure
+    m365_service: Entra ID
+    implementation: Enable FIDO2 security keys and/or certificate-based authentication as replay-resistant methods; disable SMS/voice
+    portal_path: entra.microsoft.com > Protection > Authentication methods > FIDO2 security key + Certificate-based
+    powershell:
+      - "# Enable FIDO2 via Authentication Methods Policy"
+      - "Update-MgPolicyAuthenticationMethodPolicyAuthenticationMethodConfiguration -AuthenticationMethodConfigurationId 'fido2' -State 'enabled'"
+    evidence_commands:
+      - "Get-MgPolicyAuthenticationMethodPolicy | Select -ExpandProperty AuthenticationMethodConfigurations | Where Id -in 'fido2','x509Certificate' | Select Id,State"
+
+  - action_id: IAM-026-01
+    signal: configure
+    m365_service: Entra ID
+    implementation: Entra ID prevents identifier reuse via 30-day soft-delete; verify soft-delete is not bypassed
+    portal_path: entra.microsoft.com > Identity > Users > Deleted users
+    powershell:
+      - "Get-MgDirectoryDeletedItemAsUser | Select DisplayName,DeletedDateTime,UserPrincipalName"
+    evidence_commands:
+      - "Get-MgDirectoryDeletedItemAsUser | Select DisplayName,DeletedDateTime | Export-Csv deleted_users_softdelete.csv"
+    notes: Entra ID inherently prevents UPN reuse for 30 days after deletion
+
+  - action_id: IAM-027-01
+    signal: configure
+    m365_service: Entra ID
+    implementation: Configure automated script or Lifecycle Workflow to disable accounts after 90 days of sign-in inactivity
+    portal_path: entra.microsoft.com > Identity > Users > Lifecycle Workflows
+    powershell:
+      - "$threshold = (Get-Date).AddDays(-90)"
+      - "Get-MgUser -All -Property SignInActivity | Where { $_.SignInActivity.LastSignInDateTime -lt $threshold -and $_.AccountEnabled } | ForEach-Object { Update-MgUser -UserId $_.Id -AccountEnabled:$false }"
+    evidence_commands:
+      - "Get-MgUser -All -Property SignInActivity,AccountEnabled | Where AccountEnabled -eq $false | Select DisplayName,@{N='LastSignIn';E={$_.SignInActivity.LastSignInDateTime}} | Export-Csv disabled_inactive_accounts.csv"
+
+  - action_id: IAM-028-01
+    signal: configure
+    m365_service: Entra ID
+    implementation: Configure Entra ID Password Protection with custom banned password list and minimum 14-character length
+    portal_path: entra.microsoft.com > Protection > Authentication methods > Password protection
+    powershell:
+      - "# Password Protection settings via portal; verify:"
+      - "Get-MgPolicyAuthenticationMethodPolicy"
+    evidence_commands:
+      - "# Screenshot Password Protection settings showing complexity and banned list"
+
+  - action_id: IAM-029-01
+    signal: manual
+    m365_service: Entra ID
+    implementation: Entra ID cloud-only users use NIST 800-63B guidance (no periodic rotation, banned password list); for hybrid, configure AD password history
+    portal_path: entra.microsoft.com > Protection > Authentication methods > Password protection
+    evidence_commands:
+      - "# Document password policy configuration and NIST alignment"
+    notes: Microsoft recommends eliminating periodic password rotation per NIST 800-63B; use banned passwords + MFA instead
+
+  - action_id: IAM-030-01
+    signal: configure
+    m365_service: Entra ID
+    implementation: Configure Temporary Access Pass (TAP) with one-time use and defined lifetime for initial authentication
+    portal_path: entra.microsoft.com > Protection > Authentication methods > Temporary Access Pass
+    powershell:
+      - "Update-MgPolicyAuthenticationMethodPolicyAuthenticationMethodConfiguration -AuthenticationMethodConfigurationId 'temporaryAccessPass' -State 'enabled' -AdditionalProperties @{defaultLifetimeInMinutes=60;isUsableOnce=$true}"
+    evidence_commands:
+      - "Get-MgPolicyAuthenticationMethodPolicy | Select -ExpandProperty AuthenticationMethodConfigurations | Where Id -eq 'temporaryAccessPass' | ConvertTo-Json"
+
+  - action_id: IAM-031-01
+    signal: manual
+    m365_service: Entra ID
+    implementation: Entra ID stores passwords using PBKDF2 with per-user salt (inherent); verify no legacy hash storage
+    portal_path: N/A - inherent platform security
+    evidence_commands:
+      - "# Reference Microsoft documentation on Entra ID password storage: PBKDF2 with per-user salt"
+      - "# For hybrid AD: Verify FIPS-compliant hash in AD DS"
+    notes: Entra ID inherently uses approved cryptographic hashing; document verification
+
+  - action_id: IAM-032-01
+    signal: manual
+    m365_service: Entra ID
+    implementation: Entra ID sign-in page inherently masks password input; verify custom apps also mask
+    portal_path: N/A - inherent platform behavior
+    evidence_commands:
+      - "# Screenshot Entra ID sign-in page showing password field masking"
+    notes: Inherent M365 behavior; verify any custom applications also comply
+
+  - action_id: IAM-033-01
+    signal: configure
+    m365_service: Entra ID + Azure Key Vault
+    implementation: Configure managed identities for Azure services; use certificates or federated credentials for cross-system auth
+    portal_path: portal.azure.com > Resource > Identity > System assigned managed identity
+    powershell:
+      - "Get-MgServicePrincipal -Filter \"servicePrincipalType eq 'ManagedIdentity'\" | Select DisplayName,AppId"
+      - "Get-MgApplication -All | Select DisplayName,@{N='CertCount';E={($_.KeyCredentials | Measure).Count}}"
+    evidence_commands:
+      - "Get-MgServicePrincipal -All -Filter \"servicePrincipalType eq 'ManagedIdentity'\" | Select DisplayName,AppId | Export-Csv managed_identities.csv"
+
+  - action_id: IAM-034-01
+    signal: configure
+    m365_service: Azure Key Vault
+    implementation: Configure Key Vault certificate and secret rotation policies with automated renewal
+    portal_path: portal.azure.com > Key Vault > Certificates > Rotation policy
+    powershell:
+      - "Set-AzKeyVaultSecret -VaultName {vault} -Name {secret} -Expires (Get-Date).AddDays(90)"
+      - "# Configure rotation policy via Azure Policy or Key Vault lifecycle management"
+    evidence_commands:
+      - "Get-AzKeyVaultSecret -VaultName {vault} | Select Name,Expires,Created | Export-Csv secret_rotation_status.csv"
+
+  - action_id: IAM-035-01
+    signal: customize
+    m365_service: Entra ID
+    implementation: Configure Entra ID Password Protection with custom banned password list including known compromised passwords
+    portal_path: entra.microsoft.com > Protection > Authentication methods > Password protection > Custom banned passwords
+    powershell:
+      - "# Upload custom banned password list via portal"
+      - "# Enable Entra ID Identity Protection sign-in risk policies"
+    evidence_commands:
+      - "# Screenshot banned password list configuration"
+      - "Get-MgIdentityProtectionRiskyUser | Select UserPrincipalName,RiskLevel,RiskState | Export-Csv risky_users.csv"
+
+  # =============================================================================
+  # NETWORK & BOUNDARY PROTECTION (NBP)
+  # =============================================================================
+
+  - action_id: NBP-001-01
+    signal: customize
+    m365_service: Compliance Manager
+    implementation: Document all external system connections; reference Azure Network Watcher topology for cloud connections
+    portal_path: portal.azure.com > Network Watcher > Topology
+    evidence_commands:
+      - "Get-AzNetworkWatcherTopology -NetworkWatcherName {name} -ResourceGroupName {rg} -TargetResourceGroupName {rg}"
+
+  - action_id: NBP-001-02
+    signal: configure
+    m365_service: Azure Firewall + NSGs
+    implementation: Configure Azure Firewall application and network rules; configure NSGs on all subnets
+    portal_path: portal.azure.com > Firewall > Rules > Application/Network rule collection
+    powershell:
+      - "Get-AzFirewall | Select Name,@{N='RuleCount';E={($_.NetworkRuleCollections | Measure).Count}}"
+      - "Get-AzNetworkSecurityGroup | Select Name,ResourceGroupName,@{N='RuleCount';E={($_.SecurityRules | Measure).Count}}"
+    evidence_commands:
+      - "Get-AzFirewall | Select Name,ProvisioningState | Export-Csv firewall_inventory.csv"
+      - "Get-AzNetworkSecurityGroup | ForEach-Object { $nsg=$_; $_.SecurityRules | Select @{N='NSG';E={$nsg.Name}},Name,Direction,Access,Priority,SourceAddressPrefix,DestinationPortRange } | Export-Csv nsg_rules.csv"
+
+  - action_id: NBP-002-01
+    signal: customize
+    m365_service: Microsoft Sentinel
+    implementation: Configure Sentinel to ingest Entra ID sign-in logs; create analytics rule for remote access monitoring
+    portal_path: portal.azure.com > Sentinel > Data connectors > Azure Active Directory > Sign-in logs
+    powershell:
+      - "# KQL query for remote access monitoring"
+      - "# SigninLogs | where IsInteractive == true | where NetworkLocationDetails contains 'untrusted' | summarize count() by UserPrincipalName, IPAddress, bin(TimeGenerated, 1h)"
+    evidence_commands:
+      - "# Export Sentinel analytics rules"
+      - "Get-AzSentinelAlertRule -WorkspaceName {ws} -ResourceGroupName {rg} | Select DisplayName,Severity,Enabled | Export-Csv sentinel_rules.csv"
+
+  - action_id: NBP-002-02
+    signal: configure
+    m365_service: Conditional Access
+    implementation: Configure Conditional Access named locations to define permitted remote access locations and methods
+    portal_path: entra.microsoft.com > Protection > Conditional Access > Named locations
+    powershell:
+      - "New-MgIdentityConditionalAccessNamedLocation -DisplayName 'Corporate VPN Egress' -AdditionalProperties @{'@odata.type'='#microsoft.graph.ipNamedLocation';ipRanges=@(@{cidrAddress='203.0.113.0/24';'@odata.type'='#microsoft.graph.iPv4CidrRange'});isTrusted=$true}"
+    evidence_commands:
+      - "Get-MgIdentityConditionalAccessNamedLocation | Select DisplayName,Id | Export-Csv named_locations.csv"
+
+  - action_id: NBP-003-01
+    signal: configure
+    m365_service: Azure VPN Gateway
+    implementation: Configure Azure VPN Gateway with IKEv2/OpenVPN and TLS 1.2+ for all remote access connections
+    portal_path: portal.azure.com > Virtual Network Gateway > Point-to-site configuration
+    powershell:
+      - "Get-AzVirtualNetworkGateway | Select Name,VpnType,GatewayType,@{N='P2SProtocols';E={$_.VpnClientConfiguration.VpnClientProtocols}}"
+    evidence_commands:
+      - "Get-AzVirtualNetworkGateway | Select Name,VpnType,@{N='P2SConfig';E={$_.VpnClientConfiguration | ConvertTo-Json}} | Export-Csv vpn_config.csv"
+
+  - action_id: NBP-004-01
+    signal: configure
+    m365_service: Azure VPN Gateway
+    implementation: Enable forced tunneling to route all remote access traffic through Azure VPN Gateway managed access control point
+    portal_path: portal.azure.com > Virtual Network Gateway > Configuration
+    powershell:
+      - "# Enable forced tunneling on route table"
+      - "New-AzRouteConfig -Name 'ForcedTunnel' -AddressPrefix '0.0.0.0/0' -NextHopType VirtualNetworkGateway"
+    evidence_commands:
+      - "Get-AzRouteTable | ForEach-Object { $rt=$_; $_.Routes | Select @{N='RouteTable';E={$rt.Name}},Name,AddressPrefix,NextHopType } | Export-Csv route_tables.csv"
+
+  - action_id: NBP-005-01
+    signal: customize
+    m365_service: Conditional Access + PIM
+    implementation: Configure Conditional Access policy requiring PIM activation + compliant device + trusted location for privileged remote access
+    portal_path: entra.microsoft.com > Protection > Conditional Access
+    powershell:
+      - "# Combine CA policy targeting admin roles with PIM JIT activation"
+    evidence_commands:
+      - "Get-MgIdentityConditionalAccessPolicy | Where {$_.Conditions.Users.IncludeRoles} | Select DisplayName,State | Export-Csv privileged_remote_policies.csv"
+
+  - action_id: NBP-006-01
+    signal: configure
+    m365_service: Entra ID
+    implementation: Use Entra ID External Identities and cross-tenant access settings to verify and authorize external connections
+    portal_path: entra.microsoft.com > External Identities > Cross-tenant access settings
+    powershell:
+      - "Get-MgPolicyCrossTenantAccessPolicy | Select -ExpandProperty Partners"
+    evidence_commands:
+      - "Get-MgPolicyCrossTenantAccessPolicyPartner | Select TenantId,B2BCollaborationInbound,B2BCollaborationOutbound | Export-Csv external_access_config.csv"
+
+  - action_id: NBP-007-01
+    signal: customize
+    m365_service: Intune
+    implementation: Configure Intune Wi-Fi profiles requiring 802.1X authentication for corporate wireless access
+    portal_path: intune.microsoft.com > Devices > Configuration > Create > Wi-Fi
+    powershell:
+      - "# Create Intune Wi-Fi configuration profile with EAP-TLS"
+    evidence_commands:
+      - "Get-MgDeviceManagementDeviceConfiguration -Filter \"contains(displayName,'Wi-Fi')\" | Select DisplayName,Id"
+    notes: Wireless infrastructure configuration is on-premises; Intune delivers client-side Wi-Fi profiles
+
+  - action_id: NBP-008-01
+    signal: customize
+    m365_service: Intune
+    implementation: Deploy Intune Wi-Fi profile enforcing WPA3/WPA2-Enterprise with certificate-based authentication
+    portal_path: intune.microsoft.com > Devices > Configuration > Wi-Fi profile
+    evidence_commands:
+      - "Get-MgDeviceManagementDeviceConfiguration -Filter \"contains(displayName,'Wi-Fi')\" | Select DisplayName | Export-Csv wifi_profiles.csv"
+    notes: Access point configuration is on-premises; Intune manages client profiles
+
+  - action_id: NBP-010-01
+    signal: configure
+    m365_service: Azure Firewall + NSGs
+    implementation: Deploy Azure Firewall at network perimeter VNet; configure NSGs as secondary boundary on all subnets
+    portal_path: portal.azure.com > Firewall > Create
+    powershell:
+      - "Get-AzFirewall | Select Name,ProvisioningState,ThreatIntelMode"
+      - "Get-AzNetworkSecurityGroup | Select Name,ResourceGroupName"
+    evidence_commands:
+      - "Get-AzFirewall | Select Name,ProvisioningState,Location | Export-Csv boundary_devices.csv"
+      - "Get-AzNetworkSecurityGroup | Select Name,Location | Export-Csv nsg_inventory.csv"
+
+  - action_id: NBP-011-01
+    signal: configure
+    m365_service: Azure Virtual Networks
+    implementation: Create separate VNet/subnet for DMZ with public-facing services isolated from internal CUI network
+    portal_path: portal.azure.com > Virtual networks > Create/Subnets
+    powershell:
+      - "Get-AzVirtualNetwork | Select Name,@{N='Subnets';E={$_.Subnets.Name -join ', '}},AddressSpace"
+    evidence_commands:
+      - "Get-AzVirtualNetwork | ForEach-Object { $vnet=$_; $_.Subnets | Select @{N='VNet';E={$vnet.Name}},Name,AddressPrefix,@{N='NSG';E={$_.NetworkSecurityGroup.Id}} } | Export-Csv network_segmentation.csv"
+
+  - action_id: NBP-012-01
+    signal: configure
+    m365_service: Microsoft Sentinel
+    implementation: Configure Sentinel data connectors for Azure Firewall, NSG flow logs, and Azure Activity; create monitoring analytics rules
+    portal_path: portal.azure.com > Sentinel > Data connectors > Azure Firewall
+    powershell:
+      - "# Enable Azure Firewall diagnostic logging to Log Analytics"
+      - "Set-AzDiagnosticSetting -ResourceId {firewallId} -WorkspaceId {workspaceId} -Enabled $true -Category AzureFirewallApplicationRule,AzureFirewallNetworkRule"
+    evidence_commands:
+      - "Get-AzDiagnosticSetting -ResourceId {firewallId} | Select Name,WorkspaceId | Export-Csv firewall_diagnostics.csv"
+
+  - action_id: NBP-012-02
+    signal: manual
+    m365_service: Microsoft Sentinel
+    implementation: Create Sentinel workbook for boundary traffic analysis with weekly review cadence
+    portal_path: portal.azure.com > Sentinel > Workbooks > Add workbook
+    evidence_commands:
+      - "# KQL: AzureFirewallNetworkRule | summarize count() by DestinationIp, DestinationPort | top 50 by count_"
+
+  - action_id: NBP-013-01
+    signal: customize
+    m365_service: Compliance Manager
+    implementation: Document security architecture using Azure network topology export as basis; annotate defense-in-depth layers
+    portal_path: portal.azure.com > Network Watcher > Topology
+    evidence_commands:
+      - "Get-AzNetworkWatcherTopology -NetworkWatcherName {name} -ResourceGroupName {rg} -TargetResourceGroupName {rg} | ConvertTo-Json -Depth 5 > topology.json"
+
+  - action_id: NBP-014-01
+    signal: configure
+    m365_service: Azure Virtual Networks
+    implementation: Deploy application components in separate subnets/VNets; use Private Endpoints for backend service communication
+    portal_path: portal.azure.com > Virtual networks > Subnets + Private endpoints
+    powershell:
+      - "Get-AzPrivateEndpoint | Select Name,Subnet,PrivateLinkServiceConnection"
+    evidence_commands:
+      - "Get-AzPrivateEndpoint | Select Name,@{N='Subnet';E={$_.Subnet.Id}},@{N='Service';E={$_.PrivateLinkServiceConnections.PrivateLinkServiceId}} | Export-Csv private_endpoints.csv"
+
+  - action_id: NBP-015-01
+    signal: configure
+    m365_service: Azure Private Link
+    implementation: Configure Private Link and service endpoints to restrict shared resource access to authorized VNets only
+    portal_path: portal.azure.com > Resource > Networking > Private endpoint connections
+    powershell:
+      - "Get-AzPrivateLinkService | Select Name,PrivateEndpointConnections"
+    evidence_commands:
+      - "Get-AzPrivateEndpoint | Select Name,Location | Export-Csv private_link_config.csv"
+
+  - action_id: NBP-016-01
+    signal: configure
+    m365_service: Azure Virtual Networks + NSGs
+    implementation: Create dedicated VNet/subnet for CUI workloads with NSGs restricting inter-subnet traffic
+    portal_path: portal.azure.com > Virtual networks > Subnets > NSG association
+    powershell:
+      - "Get-AzVirtualNetwork | ForEach-Object { $_.Subnets | Select Name,AddressPrefix,@{N='NSG';E={$_.NetworkSecurityGroup.Id}} }"
+    evidence_commands:
+      - "Get-AzVirtualNetwork | ForEach-Object { $vnet=$_; $_.Subnets | Select @{N='VNet';E={$vnet.Name}},Name,AddressPrefix } | Export-Csv vnet_subnets.csv"
+      - "Get-AzNetworkSecurityGroup | ForEach-Object { $nsg=$_; $_.SecurityRules | Select @{N='NSG';E={$nsg.Name}},Name,Direction,Access,Priority,SourceAddressPrefix,DestinationPortRange } | Export-Csv acl_rules.csv"
+
+  - action_id: NBP-017-01
+    signal: configure
+    m365_service: Azure Firewall + NSGs
+    implementation: Configure NSGs with default deny-all inbound/outbound rules; add explicit allow rules per documented requirements
+    portal_path: portal.azure.com > NSG > Inbound/Outbound security rules
+    powershell:
+      - "# NSGs have implicit deny-all; verify no overly permissive rules"
+      - "Get-AzNetworkSecurityGroup | ForEach-Object { $_.SecurityRules | Where { $_.SourceAddressPrefix -eq '*' -and $_.Access -eq 'Allow' } } | Select Name,Direction,DestinationPortRange"
+    evidence_commands:
+      - "Get-AzNetworkSecurityGroup | ForEach-Object { $nsg=$_; $_.SecurityRules | Select @{N='NSG';E={$nsg.Name}},Name,Direction,Access,Priority } | Export-Csv default_deny_rules.csv"
+
+  - action_id: NBP-018-01
+    signal: configure
+    m365_service: Azure VPN Gateway
+    implementation: Configure VPN client to use forced tunneling preventing split tunnel; verify VPN profile disables local network access
+    portal_path: portal.azure.com > Virtual Network Gateway > Point-to-site configuration
+    powershell:
+      - "# Verify forced tunneling route"
+      - "Get-AzVirtualNetworkGateway | Select Name,@{N='ForcedTunnel';E={$_.CustomRoutes}}"
+    evidence_commands:
+      - "Get-AzVirtualNetworkGateway | Select Name,@{N='P2SConfig';E={$_.VpnClientConfiguration | ConvertTo-Json}} | Export-Csv vpn_split_tunnel_evidence.csv"
+
+  - action_id: NBP-019-01
+    signal: customize
+    m365_service: Conditional Access + Azure Firewall
+    implementation: Configure Conditional Access sign-in frequency and Azure Firewall idle timeout for automatic session termination
+    portal_path: entra.microsoft.com > Protection > Conditional Access > Session controls
+    evidence_commands:
+      - "Get-MgIdentityConditionalAccessPolicy | Select DisplayName,SessionControls | ConvertTo-Json -Depth 3"
+
+  - action_id: NBP-020-01
+    signal: configure
+    m365_service: Microsoft Teams Admin
+    implementation: Configure Teams meeting policies preventing unauthorized remote desktop sharing and camera activation
+    portal_path: admin.teams.microsoft.com > Meeting policies
+    powershell:
+      - "Get-CsTeamsMeetingPolicy | Select Identity,ScreenSharingMode,AllowIPVideo,AllowExternalParticipantGiveRequestControl"
+    evidence_commands:
+      - "Get-CsTeamsMeetingPolicy | Select Identity,ScreenSharingMode,AllowIPVideo | Export-Csv teams_meeting_policies.csv"
+
+  - action_id: NBP-021-01
+    signal: configure
+    m365_service: Microsoft Teams Admin
+    implementation: Configure Teams calling policies with encryption; restrict external calling if applicable
+    portal_path: admin.teams.microsoft.com > Voice > Calling policies
+    powershell:
+      - "Get-CsTeamsCallingPolicy | Select Identity,AllowPrivateCalling,AllowWebPSTNCalling"
+    evidence_commands:
+      - "Get-CsTeamsCallingPolicy | Export-Csv teams_calling_policies.csv"
+    notes: Teams uses SRTP encryption for media by default
+
+  - action_id: NBP-022-01
+    signal: configure
+    m365_service: Entra ID + Azure
+    implementation: M365 and Azure services inherently use TLS 1.2+ for all communications; verify TLS minimum version settings
+    portal_path: portal.azure.com > Resource > TLS/SSL settings
+    powershell:
+      - "Get-AzWebApp | Select Name,@{N='MinTls';E={$_.SiteConfig.MinTlsVersion}}"
+    evidence_commands:
+      - "# Verify TLS configuration across Azure resources"
+      - "Get-AzWebApp | Select Name,@{N='MinTls';E={$_.SiteConfig.MinTlsVersion}} | Export-Csv tls_settings.csv"
+
+  - action_id: NBP-023-01
+    signal: manual
+    m365_service: Azure
+    implementation: Deploy complementary security components from multiple vendors alongside Microsoft stack where appropriate
+    notes: Primarily an architectural decision; document vendor diversity in security architecture
+    evidence_commands:
+      - "# Document component inventory with vendor diversity analysis"
+
+  - action_id: NBP-024-01
+    signal: configure
+    m365_service: Azure
+    implementation: Deploy across Azure availability zones and regions; configure Traffic Manager for workload distribution
+    portal_path: portal.azure.com > Traffic Manager > Create
+    powershell:
+      - "Get-AzTrafficManagerProfile | Select Name,TrafficRoutingMethod,MonitorStatus"
+    evidence_commands:
+      - "Get-AzResource | Select Name,Location,ResourceType | Group Location | Select Name,Count | Export-Csv regional_distribution.csv"
+
+  # =============================================================================
+  # DATA PROTECTION & CLASSIFICATION (DPC)
+  # =============================================================================
+
+  - action_id: DPC-001-01
+    signal: manual
+    m365_service: Compliance Manager
+    implementation: Document public posting policy; reference Purview sensitivity labels as enforcement mechanism
+    evidence_commands:
+      - "# Export public posting policy document"
+
+  - action_id: DPC-001-02
+    signal: configure
+    m365_service: SharePoint Online
+    implementation: Configure SharePoint approval workflows requiring review before external sharing or public site publication
+    portal_path: admin.microsoft.com > SharePoint admin center > Policies > Sharing
+    powershell:
+      - "Set-SPOTenant -SharingCapability ExternalUserAndGuestSharing -RequireAcceptingAccountMatchInvitedAccount $true"
+    evidence_commands:
+      - "Get-SPOTenant | Select SharingCapability,RequireAcceptingAccountMatchInvitedAccount | Export-Csv spo_sharing_config.csv"
+
+  - action_id: DPC-002-01
+    signal: manual
+    m365_service: Compliance Manager
+    implementation: Document CUI data flows using Purview Data Map and content explorer to identify CUI locations
+    portal_path: compliance.microsoft.com > Data classification > Content explorer
+    evidence_commands:
+      - "# Export content explorer summary showing CUI locations"
+
+  - action_id: DPC-002-02
+    signal: configure
+    m365_service: Purview DLP
+    implementation: Create Purview DLP policies detecting CUI sensitive info types; configure block/notify actions for unauthorized channels
+    portal_path: compliance.microsoft.com > Data loss prevention > Policies > Create
+    powershell:
+      - "Get-DlpCompliancePolicy | Select Name,Enabled,Mode"
+      - "Get-DlpComplianceRule | Select Name,ParentPolicyName,ContentContainsSensitiveInformation"
+    evidence_commands:
+      - "Get-DlpCompliancePolicy | Select Name,Enabled,Mode,Workload | Export-Csv dlp_policies.csv"
+      - "Get-DlpComplianceRule | Select Name,ParentPolicyName,BlockAccess | Export-Csv dlp_rules.csv"
+
+  - action_id: DPC-003-01
+    signal: configure
+    m365_service: Purview DLP + Sensitivity Labels
+    implementation: Configure DLP rule blocking CUI-labeled content from being shared externally or posted to public sites
+    portal_path: compliance.microsoft.com > DLP > Policies + Information protection > Labels
+    powershell:
+      - "Get-Label | Select DisplayName,Priority,ContentType,Settings"
+    evidence_commands:
+      - "Get-DlpComplianceRule | Where BlockAccess -eq $true | Select Name,ContentContainsSensitiveInformation | Export-Csv dlp_block_rules.csv"
+
+  - action_id: DPC-004-01
+    signal: configure
+    m365_service: Sensitivity Labels + Conditional Access
+    implementation: Apply sensitivity labels restricting CUI access; configure Conditional Access requiring compliant device for CUI-labeled content
+    portal_path: compliance.microsoft.com > Information protection > Labels > Auto-labeling
+    powershell:
+      - "Get-Label | Select DisplayName,Priority,@{N='Encryption';E={$_.EncryptionEnabled}},@{N='Rights';E={$_.EncryptionRightsDefinitions}}"
+    evidence_commands:
+      - "Get-Label | Select DisplayName,Priority,ParentId | Export-Csv sensitivity_labels.csv"
+
+  - action_id: DPC-005-01
+    signal: configure
+    m365_service: Purview Message Encryption
+    implementation: Configure Purview Message Encryption for CUI email; configure sensitivity labels with encryption for document sharing
+    portal_path: compliance.microsoft.com > Information protection > Labels > Encryption settings
+    powershell:
+      - "Get-IRMConfiguration | Select AzureRMSLicensingEnabled,SimplifiedClientAccessEnabled"
+    evidence_commands:
+      - "Get-IRMConfiguration | Export-Csv irm_config.csv"
+      - "Get-Label | Where EncryptionEnabled -eq $true | Select DisplayName | Export-Csv encrypted_labels.csv"
+
+  - action_id: DPC-006-01
+    signal: configure
+    m365_service: BitLocker + Azure Storage Encryption
+    implementation: Enable BitLocker via Intune for endpoints; verify Azure Storage encryption at rest (enabled by default with Microsoft-managed keys)
+    portal_path: intune.microsoft.com > Endpoint security > Disk encryption
+    powershell:
+      - "Get-MgDeviceManagementDeviceCompliancePolicy | Where DisplayName -like '*BitLocker*'"
+      - "Get-AzStorageAccount | Select StorageName,@{N='Encryption';E={$_.Encryption.Services.Blob.Enabled}}"
+    evidence_commands:
+      - "Get-AzStorageAccount | Select StorageAccountName,@{N='BlobEncryption';E={$_.Encryption.Services.Blob.Enabled}},@{N='FileEncryption';E={$_.Encryption.Services.File.Enabled}} | Export-Csv storage_encryption.csv"
+
+  - action_id: DPC-007-01
+    signal: customize
+    m365_service: Defender for Endpoint
+    implementation: Configure Defender for Endpoint attack surface reduction rules to restrict macro execution and untrusted code
+    portal_path: security.microsoft.com > Endpoints > Configuration management > Attack surface reduction
+    powershell:
+      - "# Deploy ASR rules via Intune endpoint security profile"
+    evidence_commands:
+      - "Get-MpPreference | Select AttackSurfaceReductionRules_Ids,AttackSurfaceReductionRules_Actions"
+
+  - action_id: DPC-008-01
+    signal: configure
+    m365_service: Purview DLP + Defender for Cloud Apps
+    implementation: Configure Defender for Cloud Apps session policies to detect and block bulk downloads; configure Purview endpoint DLP
+    portal_path: security.microsoft.com > Cloud apps > Policies > Session policies
+    powershell:
+      - "Get-DlpCompliancePolicy | Where Workload -like '*EndpointDevices*' | Select Name,Mode"
+    evidence_commands:
+      - "Get-DlpCompliancePolicy | Select Name,Workload,Mode | Export-Csv endpoint_dlp_policies.csv"
+
+  - action_id: DPC-009-01
+    signal: customize
+    m365_service: Purview Information Protection
+    implementation: Configure sensitivity labels with encryption and rights management to obfuscate CUI from unauthorized viewers
+    portal_path: compliance.microsoft.com > Information protection > Labels > Encryption
+    evidence_commands:
+      - "Get-Label | Where EncryptionEnabled -eq $true | Select DisplayName,EncryptionRightsDefinitions | Export-Csv obfuscation_labels.csv"
+
+  # =============================================================================
+  # CRYPTOGRAPHIC PROTECTION (CRY)
+  # =============================================================================
+
+  - action_id: CRY-001-01
+    signal: configure
+    m365_service: Azure + M365
+    implementation: Verify TLS 1.2 minimum across all Azure resources; disable TLS 1.0/1.1 on Azure App Services, Storage, SQL
+    portal_path: portal.azure.com > Resource > TLS/SSL settings
+    powershell:
+      - "Get-AzWebApp | Select Name,@{N='MinTls';E={$_.SiteConfig.MinTlsVersion}}"
+      - "Get-AzSqlServer | Select ServerName,MinimalTlsVersion"
+      - "Get-AzStorageAccount | Select StorageAccountName,MinimumTlsVersion"
+    evidence_commands:
+      - "Get-AzWebApp | Select Name,@{N='MinTls';E={$_.SiteConfig.MinTlsVersion}} | Export-Csv tls_webapp.csv"
+      - "Get-AzStorageAccount | Select StorageAccountName,MinimumTlsVersion | Export-Csv tls_storage.csv"
+
+  - action_id: CRY-002-01
+    signal: configure
+    m365_service: Azure Key Vault
+    implementation: Deploy Azure Key Vault with soft-delete and purge protection; configure key rotation policies
+    portal_path: portal.azure.com > Key Vault > Create/Settings
+    powershell:
+      - "New-AzKeyVault -Name {name} -ResourceGroupName {rg} -Location {loc} -EnableSoftDelete -EnablePurgeProtection"
+      - "Get-AzKeyVaultKey -VaultName {vault} | Select Name,KeyType,Expires,Created"
+    evidence_commands:
+      - "Get-AzKeyVault | Select VaultName,EnableSoftDelete,EnablePurgeProtection | Export-Csv keyvault_config.csv"
+      - "Get-AzKeyVaultKey -VaultName {vault} | Select Name,KeyType,Expires | Export-Csv key_inventory.csv"
+
+  - action_id: CRY-003-01
+    signal: configure
+    m365_service: Windows + Azure
+    implementation: Enable FIPS mode on Windows endpoints via Intune; verify Azure Key Vault uses FIPS 140-2 Level 2 HSM
+    portal_path: intune.microsoft.com > Devices > Configuration > Settings catalog > FIPS
+    powershell:
+      - "# Intune Settings Catalog: System Cryptography - Use FIPS compliant algorithms = Enabled"
+      - "Get-AzKeyVault | Select VaultName,Sku"
+    evidence_commands:
+      - "# Verify FIPS mode on endpoints"
+      - "Get-AzKeyVault | Select VaultName,@{N='SKU';E={$_.Sku}} | Export-Csv keyvault_fips.csv"
+    notes: Azure Key Vault Premium SKU uses FIPS 140-2 Level 2 validated HSMs
+
+  - action_id: CRY-003-02
+    signal: manual
+    m365_service: Azure
+    implementation: Audit all Azure services for FIPS compliance; verify managed disk encryption, storage encryption, and SQL TDE use FIPS modules
+    evidence_commands:
+      - "# Document FIPS validation certificates for each cryptographic service in use"
+      - "# Reference Microsoft FIPS 140 validation documentation"
+
+  - action_id: CRY-004-01
+    signal: customize
+    m365_service: Intune
+    implementation: Configure Intune compliance policy requiring device encryption; deploy BitLocker for Windows, FileVault for macOS
+    portal_path: intune.microsoft.com > Endpoint security > Disk encryption > Create profile
+    powershell:
+      - "# Create Intune disk encryption profile"
+    evidence_commands:
+      - "Get-MgDeviceManagementManagedDevice -All | Select DeviceName,IsEncrypted,ComplianceState | Export-Csv device_encryption_status.csv"
+
+  - action_id: CRY-005-01
+    signal: manual
+    m365_service: BitLocker + Intune
+    implementation: Configure BitLocker To Go policy via Intune for removable media encryption
+    portal_path: intune.microsoft.com > Endpoint security > Disk encryption > BitLocker
+    evidence_commands:
+      - "# Export Intune BitLocker policy including removable drive settings"
+
+  # =============================================================================
+  # ENDPOINT MANAGEMENT (EPM)
+  # =============================================================================
+
+  - action_id: EPM-001-01
+    signal: configure
+    m365_service: Intune
+    implementation: Configure Intune enrollment restrictions and compliance policies; require MDM enrollment for mobile devices
+    portal_path: intune.microsoft.com > Devices > Enrollment restrictions + Compliance policies
+    powershell:
+      - "Get-MgDeviceManagementDeviceCompliancePolicy | Select DisplayName,LastModifiedDateTime"
+      - "Get-MgDeviceManagementDeviceEnrollmentConfiguration | Select DisplayName,Priority"
+    evidence_commands:
+      - "Get-MgDeviceManagementDeviceCompliancePolicy | Select DisplayName,Id | Export-Csv compliance_policies.csv"
+      - "Get-MgDeviceManagementManagedDevice -All | Select DeviceName,OperatingSystem,ComplianceState,EnrolledDateTime | Export-Csv enrolled_devices.csv"
+
+  - action_id: EPM-001-02
+    signal: configure
+    m365_service: Conditional Access
+    implementation: Create Conditional Access policy requiring device compliance or Hybrid Azure AD Join for all cloud app access
+    portal_path: entra.microsoft.com > Protection > Conditional Access > New policy
+    powershell:
+      - "New-MgIdentityConditionalAccessPolicy -DisplayName 'Require Compliant Device' -Conditions @{users=@{includeUsers=@('All')};applications=@{includeApplications=@('All')}} -GrantControls @{builtInControls=@('compliantDevice');operator='OR'} -State 'enabled'"
+    evidence_commands:
+      - "Get-MgIdentityConditionalAccessPolicy | Where {$_.GrantControls.BuiltInControls -contains 'compliantDevice'} | Select DisplayName,State | Export-Csv device_compliance_ca.csv"
+
+  - action_id: EPM-002-01
+    signal: customize
+    m365_service: Intune + Defender for Endpoint
+    implementation: Configure Intune device restriction profile to block USB storage; use Defender for Endpoint device control for granular removable media policy
+    portal_path: intune.microsoft.com > Devices > Configuration > Create > Device restrictions > General > Removable storage
+    powershell:
+      - "# Deploy Intune device restriction profile blocking removable storage"
+    evidence_commands:
+      - "Get-MgDeviceManagementDeviceConfiguration -Filter \"contains(displayName,'removable') or contains(displayName,'USB')\" | Select DisplayName"
+
+  - action_id: EPM-003-01
+    signal: manual
+    m365_service: Compliance Manager
+    implementation: Document baseline configurations per system type; reference Intune security baselines and CIS benchmarks
+    evidence_commands:
+      - "# Export baseline configuration documentation"
+
+  - action_id: EPM-003-02
+    signal: configure
+    m365_service: Intune
+    implementation: Deploy Intune Security Baselines for Windows, Edge, and Defender; create custom configuration profiles for additional hardening
+    portal_path: intune.microsoft.com > Endpoint security > Security baselines
+    powershell:
+      - "Get-MgDeviceManagementIntent | Select DisplayName,TemplateId,LastModifiedDateTime"
+    evidence_commands:
+      - "Get-MgDeviceManagementIntent | Select DisplayName,LastModifiedDateTime | Export-Csv security_baselines.csv"
+      - "Get-MgDeviceManagementManagedDevice -All | Select DeviceName,ComplianceState | Group ComplianceState | Select Name,Count"
+
+  - action_id: EPM-004-01
+    signal: configure
+    m365_service: Intune
+    implementation: Deploy Intune configuration profiles aligned with CIS Microsoft 365 Benchmark and DISA STIGs
+    portal_path: intune.microsoft.com > Devices > Configuration > Create > Settings catalog
+    powershell:
+      - "Get-MgDeviceManagementDeviceConfiguration | Select DisplayName,@{N='Type';E={$_.AdditionalProperties.'@odata.type'}}"
+    evidence_commands:
+      - "Get-MgDeviceManagementDeviceConfiguration | Select DisplayName,LastModifiedDateTime | Export-Csv config_profiles.csv"
+
+  - action_id: EPM-005-01
+    signal: customize
+    m365_service: Intune
+    implementation: Configure Intune configuration profiles to disable unnecessary Windows features, services, and protocols
+    portal_path: intune.microsoft.com > Devices > Configuration > Settings catalog
+    powershell:
+      - "# Settings Catalog: disable SMBv1, Telnet, PowerShell v2, etc."
+    evidence_commands:
+      - "Get-MgDeviceManagementDeviceConfiguration | Where DisplayName -like '*hardening*' | Select DisplayName"
+
+  - action_id: EPM-006-01
+    signal: customize
+    m365_service: Intune + Defender for Endpoint
+    implementation: Configure Defender Application Control (WDAC) or AppLocker policies via Intune to restrict unauthorized applications
+    portal_path: intune.microsoft.com > Endpoint security > Application control
+    powershell:
+      - "# Deploy WDAC policy via Intune"
+    evidence_commands:
+      - "Get-MgDeviceManagementDeviceConfiguration -Filter \"contains(displayName,'Application Control')\" | Select DisplayName"
+
+  - action_id: EPM-007-01
+    signal: manual
+    m365_service: Intune
+    implementation: Deploy WDAC with deny-by-default base policy and managed installer rules for approved software
+    portal_path: intune.microsoft.com > Endpoint security > Application control > Create WDAC policy
+    evidence_commands:
+      - "# Export WDAC policy XML from Intune"
+
+  - action_id: EPM-008-01
+    signal: configure
+    m365_service: Intune
+    implementation: Configure Intune app management to control user-installable software; use Win32 app deployment for approved software
+    portal_path: intune.microsoft.com > Apps > All apps + App configuration policies
+    powershell:
+      - "Get-MgDeviceAppManagementMobileApp | Select DisplayName,PublishingState,@{N='Type';E={$_.AdditionalProperties.'@odata.type'}}"
+    evidence_commands:
+      - "Get-MgDeviceAppManagementMobileApp | Select DisplayName,PublishingState | Export-Csv managed_apps.csv"
+      - "Get-MgDeviceManagementDetectedApp -All | Select DisplayName,DeviceCount | Sort DeviceCount -Descending | Export-Csv detected_software.csv"
+
+  - action_id: EPM-009-01
+    signal: configure
+    m365_service: Intune + Azure DevOps
+    implementation: Export Intune configurations as code using Microsoft Graph; store in Azure DevOps/GitHub repository with version control
+    portal_path: N/A - automation via Graph API export
+    powershell:
+      - "# Use IntuneBackupAndRestore module or custom Graph export"
+      - "Get-MgDeviceManagementDeviceConfiguration | ConvertTo-Json -Depth 10 > intune_configs_backup.json"
+    evidence_commands:
+      - "# Git log showing configuration version history"
+
+  - action_id: EPM-010-01
+    signal: configure
+    m365_service: Intune + Defender for Endpoint
+    implementation: Configure Intune compliance policies to detect non-compliant configurations; enable Defender for Endpoint configuration assessment
+    portal_path: intune.microsoft.com > Devices > Monitor > Noncompliant devices
+    powershell:
+      - "Get-MgDeviceManagementManagedDevice -All | Where ComplianceState -ne 'compliant' | Select DeviceName,ComplianceState"
+    evidence_commands:
+      - "Get-MgDeviceManagementManagedDevice -All | Select DeviceName,ComplianceState | Group ComplianceState | Export-Csv compliance_summary.csv"
+
+  - action_id: EPM-011-01
+    signal: manual
+    m365_service: Defender for Endpoint
+    implementation: Enable Defender for Endpoint device discovery to automatically find unmanaged network-connected assets
+    portal_path: security.microsoft.com > Endpoints > Device inventory > Device discovery
+    powershell:
+      - "# Enable via Defender portal: Settings > Endpoints > Advanced features > Device discovery"
+    evidence_commands:
+      - "# Export device inventory from Defender portal"
+      - "# KQL: DeviceInfo | summarize arg_max(Timestamp, *) by DeviceId | where OnboardingStatus == 'Can be onboarded'"
+
+  # =============================================================================
+  # CONFIGURATION & CHANGE MANAGEMENT (CCM)
+  # =============================================================================
+
+  - action_id: CCM-001-01
+    signal: customize
+    m365_service: Azure DevOps
+    implementation: Define change management process using Azure DevOps Boards work items with approval gates
+    portal_path: dev.azure.com > Project > Boards > Process customization
+    evidence_commands:
+      - "# Export Azure DevOps work item queries for change requests"
+      - "az boards work-item query --wiql \"SELECT [System.Id],[System.Title],[System.State] FROM workitems WHERE [System.WorkItemType] = 'Change Request'\" --org {org}"
+
+  - action_id: CCM-001-02
+    signal: configure
+    m365_service: Azure Monitor + Intune
+    implementation: Enable Azure Change Tracking for VMs; configure Intune audit logs for endpoint configuration changes
+    portal_path: portal.azure.com > Automation account > Change tracking + Intune admin center > Tenant administration > Audit logs
+    powershell:
+      - "Get-MgDeviceManagementAuditEvent -Top 100 | Select Activity,ActivityDateTime,Actor"
+    evidence_commands:
+      - "Get-MgDeviceManagementAuditEvent -Top 500 | Select Activity,ActivityDateTime,@{N='Actor';E={$_.Actor.UserPrincipalName}} | Export-Csv intune_audit_log.csv"
+
+  - action_id: CCM-002-01
+    signal: manual
+    m365_service: Azure DevOps
+    implementation: Add security impact analysis as required checklist item in Azure DevOps change request work item type
+    portal_path: dev.azure.com > Project settings > Process > Work item types
+    evidence_commands:
+      - "# Export change request templates showing security impact analysis field"
+
+  - action_id: CCM-003-01
+    signal: configure
+    m365_service: Entra ID + Intune
+    implementation: Configure Intune RBAC roles limiting configuration change permissions; restrict Entra ID admin roles for infrastructure changes
+    portal_path: intune.microsoft.com > Tenant administration > Roles
+    powershell:
+      - "Get-MgDeviceManagementRoleDefinition | Select DisplayName,IsBuiltIn"
+      - "Get-MgDeviceManagementRoleAssignment | Select DisplayName,ResourceScopes"
+    evidence_commands:
+      - "Get-MgDeviceManagementRoleAssignment | Select DisplayName,@{N='Members';E={$_.Members}} | Export-Csv intune_role_assignments.csv"
+
+  # =============================================================================
+  # SECURITY MONITORING & LOGGING (SML)
+  # =============================================================================
+
+  - action_id: SML-001-01
+    signal: customize
+    m365_service: Compliance Manager
+    implementation: Document required audit events aligned with CMMC; reference Unified Audit Log event categories
+    evidence_commands:
+      - "# Export audit event policy document"
+      - "Get-AdminAuditLogConfig | Select UnifiedAuditLogIngestionEnabled"
+
+  - action_id: SML-001-02
+    signal: configure
+    m365_service: Microsoft 365 Unified Audit Log + Defender XDR
+    implementation: Enable Unified Audit Log; configure Defender XDR advanced hunting; enable diagnostic logging on all Azure resources
+    portal_path: compliance.microsoft.com > Audit + security.microsoft.com > Advanced hunting
+    powershell:
+      - "Set-AdminAuditLogConfig -UnifiedAuditLogIngestionEnabled $true"
+      - "Get-AdminAuditLogConfig | Select UnifiedAuditLogIngestionEnabled"
+    evidence_commands:
+      - "Get-AdminAuditLogConfig | Select UnifiedAuditLogIngestionEnabled | Export-Csv audit_log_config.csv"
+      - "Search-UnifiedAuditLog -StartDate (Get-Date).AddDays(-1) -EndDate (Get-Date) -ResultSize 10 | Select CreationDate,Operations,UserIds"
+
+  - action_id: SML-001-03
+    signal: configure
+    m365_service: Microsoft Sentinel
+    implementation: Deploy Sentinel workspace; connect M365 Defender, Entra ID, Office 365, and Azure Activity data connectors; set retention to 90+ days
+    portal_path: portal.azure.com > Sentinel > Data connectors
+    powershell:
+      - "Get-AzOperationalInsightsWorkspace | Select Name,RetentionInDays,Sku"
+      - "Get-AzSentinelDataConnector -WorkspaceName {ws} -ResourceGroupName {rg} | Select Name,Kind"
+    evidence_commands:
+      - "Get-AzSentinelDataConnector -WorkspaceName {ws} -ResourceGroupName {rg} | Select Name,Kind | Export-Csv sentinel_connectors.csv"
+      - "Get-AzOperationalInsightsWorkspace | Select Name,RetentionInDays | Export-Csv log_retention.csv"
+
+  - action_id: SML-002-01
+    signal: configure
+    m365_service: Unified Audit Log
+    implementation: Unified Audit Log inherently attributes actions to individual user accounts; verify no shared accounts exist
+    portal_path: compliance.microsoft.com > Audit > Search
+    powershell:
+      - "Search-UnifiedAuditLog -StartDate (Get-Date).AddHours(-24) -EndDate (Get-Date) -ResultSize 25 | Select CreationDate,UserIds,Operations"
+    evidence_commands:
+      - "Search-UnifiedAuditLog -StartDate (Get-Date).AddDays(-7) -EndDate (Get-Date) -ResultSize 1000 | Select CreationDate,UserIds,Operations,ObjectId | Export-Csv audit_trail_sample.csv"
+
+  - action_id: SML-003-01
+    signal: customize
+    m365_service: Microsoft Sentinel
+    implementation: Create Sentinel workbooks for weekly audit log review; schedule recurring review meetings with documented findings
+    portal_path: portal.azure.com > Sentinel > Workbooks > Add workbook
+    evidence_commands:
+      - "# Export Sentinel workbook template JSON"
+      - "Get-AzSentinelBookmark -WorkspaceName {ws} -ResourceGroupName {rg} | Select DisplayName,Created"
+
+  - action_id: SML-004-01
+    signal: customize
+    m365_service: Microsoft Sentinel
+    implementation: Create Sentinel analytics rule alerting on audit log ingestion failures or gaps
+    portal_path: portal.azure.com > Sentinel > Analytics > Create rule
+    powershell:
+      - "# KQL: Heartbeat | summarize LastHeartbeat=max(TimeGenerated) by Computer | where LastHeartbeat < ago(30m)"
+      - "# Create scheduled analytics rule for log gap detection"
+    evidence_commands:
+      - "Get-AzSentinelAlertRule -WorkspaceName {ws} -ResourceGroupName {rg} | Where DisplayName -like '*audit*' | Select DisplayName,Severity,Enabled | Export-Csv audit_failure_alerts.csv"
+
+  - action_id: SML-005-01
+    signal: configure
+    m365_service: Microsoft Sentinel
+    implementation: Configure Sentinel analytics rules correlating sign-in events with file access, privilege changes, and network events
+    portal_path: portal.azure.com > Sentinel > Analytics > Rule templates
+    powershell:
+      - "Get-AzSentinelAlertRule -WorkspaceName {ws} -ResourceGroupName {rg} | Select DisplayName,Severity,Enabled,Kind"
+    evidence_commands:
+      - "Get-AzSentinelAlertRule -WorkspaceName {ws} -ResourceGroupName {rg} | Select DisplayName,Severity,Kind | Export-Csv correlation_rules.csv"
+
+  - action_id: SML-006-01
+    signal: manual
+    m365_service: Microsoft Sentinel
+    implementation: Create Sentinel workbooks and KQL saved queries for audit reduction, trend analysis, and executive reporting
+    portal_path: portal.azure.com > Sentinel > Workbooks + Logs
+    powershell:
+      - "# KQL example for audit summary: SecurityEvent | summarize count() by Activity | top 20 by count_"
+    evidence_commands:
+      - "# Export Sentinel workbook screenshots and saved query list"
+
+  - action_id: SML-007-01
+    signal: manual
+    m365_service: Intune + Azure
+    implementation: Configure Windows NTP settings via Intune Settings Catalog; Azure services use time.windows.com by default
+    portal_path: intune.microsoft.com > Devices > Configuration > Settings catalog > NTP
+    powershell:
+      - "# Intune Settings Catalog: Configure NTP server (time.windows.com or time.nist.gov)"
+    evidence_commands:
+      - "# Verify on endpoints: w32tm /query /status"
+    notes: Azure VMs and M365 services inherently sync with Microsoft time servers
+
+  - action_id: SML-008-01
+    signal: configure
+    m365_service: Microsoft Sentinel
+    implementation: Configure Sentinel workspace RBAC restricting log access to security team; enable immutable storage on Log Analytics
+    portal_path: portal.azure.com > Sentinel workspace > Access control (IAM) + Diagnostic settings
+    powershell:
+      - "Get-AzRoleAssignment -Scope {workspaceResourceId} | Select DisplayName,RoleDefinitionName"
+    evidence_commands:
+      - "Get-AzRoleAssignment -Scope {workspaceResourceId} | Select DisplayName,RoleDefinitionName | Export-Csv sentinel_rbac.csv"
+
+  - action_id: SML-009-01
+    signal: configure
+    m365_service: Microsoft Sentinel
+    implementation: Limit Sentinel contributor and admin roles to designated security personnel only
+    portal_path: portal.azure.com > Sentinel workspace > Access control (IAM)
+    powershell:
+      - "Get-AzRoleAssignment -Scope {workspaceResourceId} | Where RoleDefinitionName -like '*Sentinel*' | Select DisplayName,RoleDefinitionName"
+    evidence_commands:
+      - "Get-AzRoleAssignment -Scope {workspaceResourceId} | Where RoleDefinitionName -like '*Sentinel*' | Export-Csv sentinel_admin_access.csv"
+
+  - action_id: SML-010-01
+    signal: customize
+    m365_service: Defender XDR + Sentinel
+    implementation: Enable Defender XDR for endpoint, identity, email, and cloud apps; connect all to Sentinel for unified monitoring
+    portal_path: security.microsoft.com > Settings > Microsoft Defender XDR > General
+    powershell:
+      - "# KQL: AlertInfo | where Timestamp > ago(24h) | summarize count() by Title, Severity"
+    evidence_commands:
+      - "Get-AzSentinelAlertRule -WorkspaceName {ws} -ResourceGroupName {rg} | Where Enabled -eq $true | Measure-Object | Select Count"
+      - "# Export Defender XDR incident summary from portal"
+
+  - action_id: SML-011-01
+    signal: customize
+    m365_service: Microsoft Sentinel
+    implementation: Create Sentinel analytics rules detecting unauthorized use patterns (off-hours access, impossible travel, unusual data access)
+    portal_path: portal.azure.com > Sentinel > Analytics > Create scheduled rule
+    powershell:
+      - "# KQL: SigninLogs | where TimeGenerated between (datetime(22:00)..datetime(06:00)) | where ResultType == 0 | project UserPrincipalName, IPAddress, TimeGenerated"
+    evidence_commands:
+      - "Get-AzSentinelAlertRule -WorkspaceName {ws} -ResourceGroupName {rg} | Where DisplayName -like '*unauthorized*' | Select DisplayName,Enabled"
+
+  - action_id: SML-012-01
+    signal: manual
+    m365_service: Microsoft Sentinel + Defender XDR
+    implementation: Enable Sentinel UEBA and entity behavior analytics; configure automated investigation in Defender XDR
+    portal_path: portal.azure.com > Sentinel > Entity behavior + security.microsoft.com > Settings > Automated investigation
+    evidence_commands:
+      - "# KQL: BehaviorAnalytics | where TimeGenerated > ago(7d) | summarize count() by ActionType, UserPrincipalName"
+
+  - action_id: SML-013-01
+    signal: configure
+    m365_service: Purview
+    implementation: Configure Purview content search to periodically scan SharePoint, OneDrive, Exchange for unauthorized CUI storage
+    portal_path: compliance.microsoft.com > Content search > New search
+    powershell:
+      - "New-ComplianceSearch -Name 'CUI Storage Scan' -ExchangeLocation All -SharePointLocation All -ContentMatchQuery 'SensitivityLabel:CUI OR (keywords)'"
+    evidence_commands:
+      - "Get-ComplianceSearch | Select Name,Status,Items | Export-Csv content_search_results.csv"
+
+  # =============================================================================
+  # VULNERABILITY & PATCH MANAGEMENT (VPM)
+  # =============================================================================
+
+  - action_id: VPM-001-01
+    signal: configure
+    m365_service: Windows Update for Business + Intune
+    implementation: Configure Windows Update for Business via Intune with update rings for phased deployment
+    portal_path: intune.microsoft.com > Devices > Windows > Update rings for Windows 10 and later
+    powershell:
+      - "Get-MgDeviceManagementDeviceConfiguration -Filter \"contains(displayName,'Update')\" | Select DisplayName"
+    evidence_commands:
+      - "Get-MgDeviceManagementManagedDevice -All | Select DeviceName,OsVersion,LastSyncDateTime | Export-Csv patch_status.csv"
+
+  - action_id: VPM-002-01
+    signal: configure
+    m365_service: Defender for Endpoint
+    implementation: Deploy Defender for Endpoint to all in-scope endpoints via Intune; verify real-time protection enabled
+    portal_path: security.microsoft.com > Endpoints > Device inventory
+    powershell:
+      - "Get-MpComputerStatus | Select AMRunningMode,RealTimeProtectionEnabled,AntivirusEnabled"
+    evidence_commands:
+      - "# KQL: DeviceTvmSoftwareVulnerabilities | summarize count() by DeviceName | top 20 by count_"
+      - "Get-MgDeviceManagementManagedDevice -All | Select DeviceName,@{N='DefenderState';E={$_.DeviceHealthAttestationState}} | Export-Csv defender_coverage.csv"
+
+  - action_id: VPM-003-01
+    signal: configure
+    m365_service: Defender for Endpoint
+    implementation: Verify Defender for Endpoint automatic signature updates enabled; configure cloud-delivered protection
+    portal_path: security.microsoft.com > Settings > Endpoints > Advanced features
+    powershell:
+      - "Get-MpComputerStatus | Select AntivirusSignatureLastUpdated,AntispywareSignatureLastUpdated"
+    evidence_commands:
+      - "Get-MpComputerStatus | Select AntivirusSignatureVersion,AntivirusSignatureLastUpdated | Export-Csv signature_status.csv"
+
+  - action_id: VPM-004-01
+    signal: configure
+    m365_service: Defender for Endpoint
+    implementation: Configure Defender scheduled full scan weekly and real-time file monitoring
+    portal_path: intune.microsoft.com > Endpoint security > Antivirus > Create profile
+    powershell:
+      - "Set-MpPreference -ScanScheduleDay 0 -ScanScheduleQuickScanTime 120 -DisableRealtimeMonitoring $false"
+    evidence_commands:
+      - "Get-MpPreference | Select ScanScheduleDay,ScanScheduleQuickScanTime,DisableRealtimeMonitoring | Export-Csv scan_config.csv"
+
+  - action_id: VPM-005-01
+    signal: manual
+    m365_service: Compliance Manager
+    implementation: Document patch management policy with SLA timelines (critical 72hr, high 7d, medium 30d, low 90d)
+    evidence_commands:
+      - "# Export patch management policy document"
+
+  - action_id: VPM-005-02
+    signal: manual
+    m365_service: Defender Vulnerability Management
+    implementation: Enable Defender Vulnerability Management; configure vulnerability assessment scans
+    portal_path: security.microsoft.com > Vulnerability management > Dashboard
+    powershell:
+      - "# KQL: DeviceTvmSoftwareVulnerabilities | summarize count() by VulnerabilitySeverityLevel"
+    evidence_commands:
+      - "# KQL: DeviceTvmSoftwareVulnerabilities | summarize count() by VulnerabilitySeverityLevel | Export-Csv vuln_summary.csv"
+
+  - action_id: VPM-005-03
+    signal: manual
+    m365_service: Defender Vulnerability Management
+    implementation: Use Defender VM remediation requests and security recommendations workflow with assignee tracking
+    portal_path: security.microsoft.com > Vulnerability management > Remediation
+    evidence_commands:
+      - "# Export remediation activity from Defender VM portal"
+
+  - action_id: VPM-006-01
+    signal: configure
+    m365_service: Defender for Endpoint
+    implementation: Enable Defender for Endpoint EDR with automated investigation; configure network protection and web content filtering
+    portal_path: security.microsoft.com > Settings > Endpoints > Advanced features
+    powershell:
+      - "Get-MpComputerStatus | Select AMRunningMode,BehaviorMonitorEnabled,IoavProtectionEnabled"
+    evidence_commands:
+      - "# KQL: DeviceEvents | where ActionType contains 'Blocked' | summarize count() by ActionType | top 10 by count_"
+
+  - action_id: VPM-007-01
+    signal: customize
+    m365_service: Defender Vulnerability Management + Secure Score
+    implementation: Monitor Defender VM security recommendations and Microsoft Secure Score advisories
+    portal_path: security.microsoft.com > Vulnerability management > Weaknesses + Secure Score
+    powershell:
+      - "# KQL: DeviceTvmSoftwareVulnerabilities | where CveId != '' | summarize count() by CveId | top 20 by count_"
+    evidence_commands:
+      - "# Export Secure Score recommendations"
+      - "Get-MgSecuritySecureScore -Top 5 | Select CreatedDateTime,CurrentScore,MaxScore"
+
+  - action_id: VPM-008-01
+    signal: configure
+    m365_service: Defender for Endpoint
+    implementation: Verify cloud-delivered protection and automatic sample submission enabled for up-to-date protection
+    portal_path: intune.microsoft.com > Endpoint security > Antivirus
+    powershell:
+      - "Get-MpPreference | Select MAPSReporting,SubmitSamplesConsent,CloudBlockLevel"
+    evidence_commands:
+      - "Get-MpPreference | Select MAPSReporting,SubmitSamplesConsent,CloudBlockLevel,SignatureScheduleDay | Export-Csv protection_maintenance.csv"
+
+  - action_id: VPM-009-01
+    signal: customize
+    m365_service: Defender for Endpoint
+    implementation: Configure Defender scheduled full scan plus real-time access scanning via Intune antivirus profile
+    portal_path: intune.microsoft.com > Endpoint security > Antivirus > Create profile
+    evidence_commands:
+      - "Get-MpPreference | Select ScanScheduleDay,DisableRealtimeMonitoring,DisableScanningMappedNetworkDrivesForFullScan | Export-Csv scan_schedule.csv"
+
+  - action_id: VPM-010-01
+    signal: manual
+    m365_service: Defender Vulnerability Management
+    implementation: Configure Defender VM for continuous vulnerability assessment across all onboarded devices
+    portal_path: security.microsoft.com > Vulnerability management > Dashboard
+    evidence_commands:
+      - "# KQL: DeviceTvmSoftwareVulnerabilities | summarize VulnCount=count() by DeviceName | top 20 by VulnCount"
+      - "# Export vulnerability scan results from Defender VM portal"
+
+  - action_id: VPM-011-01
+    signal: manual
+    m365_service: Defender Vulnerability Management
+    implementation: Use Defender VM remediation workflow to track vulnerability fix progress with priority-based timelines
+    portal_path: security.microsoft.com > Vulnerability management > Remediation > Activities
+    evidence_commands:
+      - "# Export remediation tracking report from Defender VM portal"
+
+  - action_id: VPM-012-01
+    signal: manual
+    m365_service: Intune + Windows
+    implementation: Enable Windows Defender Application Control (WDAC) code integrity policies via Intune
+    portal_path: intune.microsoft.com > Endpoint security > Application control
+    evidence_commands:
+      - "# Get-CIPolicy on endpoints to verify active code integrity policy"
+
+  - action_id: VPM-013-01
+    signal: customize
+    m365_service: Intune
+    implementation: Configure WDAC managed installer and Intune compliance to ensure only verified components run
+    portal_path: intune.microsoft.com > Endpoint security > Application control
+    evidence_commands:
+      - "Get-MgDeviceManagementManagedDevice -All | Select DeviceName,ComplianceState | Export-Csv component_compliance.csv"
+
+  - action_id: VPM-014-01
+    signal: customize
+    m365_service: Intune
+    implementation: Configure Autopilot Reset or Intune remote wipe for periodic refresh to known-good state
+    portal_path: intune.microsoft.com > Devices > Windows > Autopilot deployment profiles
+    powershell:
+      - "# Invoke Autopilot Reset: Invoke-MgDeviceManagementManagedDeviceWipe"
+    evidence_commands:
+      - "Get-MgDeviceManagementManagedDevice -All | Select DeviceName,LastSyncDateTime,EnrolledDateTime | Export-Csv device_refresh_status.csv"
+
+  - action_id: VPM-015-01
+    signal: configure
+    m365_service: Microsoft Sentinel
+    implementation: Configure Sentinel threat intelligence connectors and automated response playbooks (Logic Apps) for IOC blocking
+    portal_path: portal.azure.com > Sentinel > Threat intelligence + Automation > Playbooks
+    powershell:
+      - "Get-AzSentinelThreatIntelligenceIndicator -WorkspaceName {ws} -ResourceGroupName {rg} -Top 10 | Select DisplayName,ThreatType"
+    evidence_commands:
+      - "Get-AzSentinelThreatIntelligenceIndicator -WorkspaceName {ws} -ResourceGroupName {rg} | Measure-Object | Select Count"
+
+  - action_id: VPM-016-01
+    signal: configure
+    m365_service: Microsoft Secure Score
+    implementation: Use Secure Score assessments to verify security function correctness; schedule monthly review
+    portal_path: security.microsoft.com > Secure Score
+    powershell:
+      - "Get-MgSecuritySecureScore -Top 1 | Select CurrentScore,MaxScore,@{N='Pct';E={[math]::Round($_.CurrentScore/$_.MaxScore*100,1)}}"
+    evidence_commands:
+      - "Get-MgSecuritySecureScore -Top 12 | Select CreatedDateTime,CurrentScore,MaxScore | Export-Csv secure_score_trend.csv"
+
+  - action_id: VPM-017-01
+    signal: customize
+    m365_service: Microsoft Sentinel
+    implementation: Enable Sentinel Threat Intelligence connector (Microsoft TI, TAXII feeds, or custom) for enriched detection
+    portal_path: portal.azure.com > Sentinel > Data connectors > Threat Intelligence
+    evidence_commands:
+      - "Get-AzSentinelDataConnector -WorkspaceName {ws} -ResourceGroupName {rg} | Where Kind -like '*ThreatIntelligence*' | Select Name,Kind"
+
+  - action_id: VPM-018-01
+    signal: customize
+    m365_service: Microsoft Sentinel
+    implementation: Use Sentinel hunting queries and bookmarks for proactive threat hunting; schedule hunting sessions
+    portal_path: portal.azure.com > Sentinel > Hunting
+    powershell:
+      - "# KQL hunting example: SigninLogs | where RiskLevelDuringSignIn != 'none' | project UserPrincipalName, RiskLevelDuringSignIn, IPAddress"
+    evidence_commands:
+      - "Get-AzSentinelBookmark -WorkspaceName {ws} -ResourceGroupName {rg} | Select DisplayName,Created | Export-Csv hunting_bookmarks.csv"
+
+  - action_id: VPM-019-01
+    signal: customize
+    m365_service: Microsoft Sentinel
+    implementation: Enable Sentinel UEBA, ML-based anomaly detection rules, and Fusion detection for advanced analytics
+    portal_path: portal.azure.com > Sentinel > Analytics > Rule templates (Anomaly + Fusion)
+    evidence_commands:
+      - "Get-AzSentinelAlertRule -WorkspaceName {ws} -ResourceGroupName {rg} | Where Kind -in 'Anomaly','Fusion' | Select DisplayName,Kind,Enabled"
+
+  - action_id: VPM-020-01
+    signal: customize
+    m365_service: Microsoft Secure Score + Compliance Manager
+    implementation: Conduct quarterly review of Secure Score trends and Compliance Manager assessment scores
+    portal_path: security.microsoft.com > Secure Score + compliance.microsoft.com > Compliance Manager
+    evidence_commands:
+      - "Get-MgSecuritySecureScore -Top 30 | Select CreatedDateTime,CurrentScore,MaxScore | Export-Csv effectiveness_trend.csv"
+
+  # =============================================================================
+  # INCIDENT RESPONSE (IRP)
+  # =============================================================================
+
+  - action_id: IRP-001-01
+    signal: manual
+    m365_service: Compliance Manager
+    implementation: Develop IR plan; use Compliance Manager CMMC template for IR control documentation
+    portal_path: compliance.microsoft.com > Compliance Manager > Assessments > IR controls
+    evidence_commands:
+      - "# Export IR plan document from Compliance Manager"
+
+  - action_id: IRP-001-02
+    signal: configure
+    m365_service: Microsoft Sentinel + Defender XDR
+    implementation: Configure Sentinel incident management with custom severity levels, assignment rules, and status tracking
+    portal_path: portal.azure.com > Sentinel > Settings > Incident creation + security.microsoft.com > Incidents
+    powershell:
+      - "Get-AzSentinelIncident -WorkspaceName {ws} -ResourceGroupName {rg} -Top 20 | Select Title,Severity,Status,CreatedTimeUtc"
+    evidence_commands:
+      - "Get-AzSentinelIncident -WorkspaceName {ws} -ResourceGroupName {rg} | Select Title,Severity,Status,Owner | Export-Csv incident_tracking.csv"
+
+  - action_id: IRP-002-01
+    signal: customize
+    m365_service: Microsoft Sentinel
+    implementation: Use Sentinel incidents for classification, tracking, and documentation; configure incident comments and task tracking
+    portal_path: portal.azure.com > Sentinel > Incidents
+    evidence_commands:
+      - "Get-AzSentinelIncident -WorkspaceName {ws} -ResourceGroupName {rg} | Group Status | Select Name,Count | Export-Csv incident_status_summary.csv"
+
+  - action_id: IRP-003-01
+    signal: manual
+    m365_service: Defender XDR
+    implementation: Use Defender XDR attack simulation training and Sentinel sample incident data for tabletop exercises
+    portal_path: security.microsoft.com > Attack simulation training
+    evidence_commands:
+      - "# Export exercise after-action report documentation"
+
+  - action_id: IRP-004-01
+    signal: manual
+    m365_service: Microsoft Sentinel
+    implementation: Configure Sentinel as SOC platform with 24/7 analytics rules, automated playbooks, and on-call rotation
+    portal_path: portal.azure.com > Sentinel > Overview (SOC dashboard)
+    evidence_commands:
+      - "# Export SOC charter and Sentinel workspace configuration"
+
+  - action_id: IRP-005-01
+    signal: manual
+    m365_service: Microsoft Sentinel
+    implementation: Configure Sentinel automation rules and SOAR playbooks (Logic Apps) for CIRT response procedures
+    portal_path: portal.azure.com > Sentinel > Automation > Create automation rule/playbook
+    evidence_commands:
+      - "# Export Sentinel automation rules and Logic App playbook inventory"
+
+  # =============================================================================
+  # PHYSICAL & ENVIRONMENTAL SECURITY (PES)
+  # =============================================================================
+
+  - action_id: PES-001-01
+    signal: manual
+    m365_service: N/A
+    implementation: Physical access controls are non-technical; configure badge reader systems at facility entry points
+    notes: Not directly implementable via M365; physical infrastructure required
+    evidence_commands:
+      - "# Document physical access control system configuration and entry point inventory"
+
+  - action_id: PES-002-01
+    signal: manual
+    m365_service: N/A
+    implementation: Establish visitor management procedures with sign-in/out and escort requirements
+    notes: Non-technical control; document procedurally
+    evidence_commands:
+      - "# Export visitor log samples and management procedure document"
+
+  - action_id: PES-003-01
+    signal: manual
+    m365_service: N/A
+    implementation: Configure physical access badge system logging at all controlled entry points
+    notes: Non-technical control; physical badge system dependent
+    evidence_commands:
+      - "# Export physical access log samples from badge system"
+
+  - action_id: PES-004-01
+    signal: manual
+    m365_service: N/A
+    implementation: Establish process to manage physical access devices (keys, badges, combinations) with inventory tracking
+    notes: Non-technical control
+    evidence_commands:
+      - "# Export physical access device inventory and issuance records"
+
+  - action_id: PES-005-01
+    signal: manual
+    m365_service: N/A
+    implementation: Configure physical access restrictions for server rooms and areas containing organizational systems
+    notes: Non-technical control; physical infrastructure
+    evidence_commands:
+      - "# Export authorized personnel list and access restriction configuration"
+
+  - action_id: PES-006-01
+    signal: manual
+    m365_service: N/A
+    implementation: Install and configure surveillance cameras and environmental sensors in system areas
+    notes: Non-technical control; physical infrastructure
+    evidence_commands:
+      - "# Export camera coverage map and monitoring system configuration"
+
+  - action_id: PES-007-01
+    signal: manual
+    m365_service: N/A
+    implementation: Configure visitor badge system with escort tracking and temporary access
+    notes: Non-technical control
+    evidence_commands:
+      - "# Export visitor badge procedure and escort log samples"
+
+  - action_id: PES-008-01
+    signal: manual
+    m365_service: N/A
+    implementation: Configure physical access audit system with retention per organizational requirements
+    notes: Non-technical control
+    evidence_commands:
+      - "# Export physical access audit trail and retention configuration"
+
+  - action_id: PES-009-01
+    signal: manual
+    m365_service: N/A
+    implementation: Configure centralized physical access device management with badge deactivation capability
+    notes: Non-technical control
+    evidence_commands:
+      - "# Export device management system configuration and revocation procedure"
+
+  - action_id: PES-010-01
+    signal: manual
+    m365_service: Compliance Manager
+    implementation: Document alternate work site security requirements including VPN, disk encryption, and secure workspace
+    evidence_commands:
+      - "# Export alternate site security policy document"
+
+  - action_id: PES-010-02
+    signal: configure
+    m365_service: Intune + Conditional Access
+    implementation: Configure Intune compliance policies for remote devices; require compliant device via Conditional Access for remote work
+    portal_path: intune.microsoft.com > Devices > Compliance policies + entra.microsoft.com > Conditional Access
+    powershell:
+      - "Get-MgDeviceManagementManagedDevice -All | Where {$_.ManagementAgent -eq 'mdm'} | Select DeviceName,ComplianceState,IsEncrypted"
+    evidence_commands:
+      - "Get-MgDeviceManagementManagedDevice -All | Select DeviceName,ComplianceState,IsEncrypted,OperatingSystem | Export-Csv remote_device_compliance.csv"
+
+  # =============================================================================
+  # MEDIA & ASSET PROTECTION (MAP)
+  # =============================================================================
+
+  - action_id: MAP-001-01
+    signal: manual
+    m365_service: Compliance Manager
+    implementation: Document media sanitization and disposal procedures aligned with NIST 800-88
+    evidence_commands:
+      - "# Export media disposal policy document"
+
+  - action_id: MAP-001-02
+    signal: customize
+    m365_service: Intune
+    implementation: Use Intune remote wipe for digital media sanitization; physical media requires approved destruction methods
+    portal_path: intune.microsoft.com > Devices > Device > Wipe
+    powershell:
+      - "# Invoke-MgDeviceManagementManagedDeviceWipe -ManagedDeviceId {id}"
+    evidence_commands:
+      - "Get-MgDeviceManagementManagedDevice -All | Select DeviceName,LastSyncDateTime | Export-Csv device_inventory.csv"
+
+  - action_id: MAP-002-01
+    signal: customize
+    m365_service: BitLocker + Intune
+    implementation: Enable BitLocker on all endpoints via Intune; configure Azure Storage encryption for cloud storage
+    portal_path: intune.microsoft.com > Endpoint security > Disk encryption
+    evidence_commands:
+      - "Get-MgDeviceManagementManagedDevice -All | Select DeviceName,IsEncrypted | Export-Csv media_protection.csv"
+
+  - action_id: MAP-003-01
+    signal: customize
+    m365_service: Intune
+    implementation: Configure Intune device restriction profiles limiting removable media access to authorized users
+    portal_path: intune.microsoft.com > Devices > Configuration > Device restrictions
+    evidence_commands:
+      - "Get-MgDeviceManagementDeviceConfiguration | Where DisplayName -like '*media*' | Select DisplayName"
+
+  - action_id: MAP-004-01
+    signal: manual
+    m365_service: Intune
+    implementation: Use Intune Wipe (factory reset) or Retire (remove company data) for digital media sanitization before disposal/reuse
+    portal_path: intune.microsoft.com > Devices > Device > Wipe/Retire
+    evidence_commands:
+      - "# Export Intune device action history showing wipe completions"
+
+  - action_id: MAP-005-01
+    signal: configure
+    m365_service: Purview Sensitivity Labels
+    implementation: Configure automatic sensitivity labeling rules to mark CUI content in SharePoint, OneDrive, and Exchange
+    portal_path: compliance.microsoft.com > Information protection > Auto-labeling
+    powershell:
+      - "Get-Label | Select DisplayName,Priority,Tooltip"
+      - "Get-AutoSensitivityLabelPolicy | Select Name,Mode,ExchangeLocation"
+    evidence_commands:
+      - "Get-AutoSensitivityLabelPolicy | Select Name,Mode | Export-Csv auto_labeling_policies.csv"
+
+  - action_id: MAP-006-01
+    signal: manual
+    m365_service: N/A
+    implementation: Physical media transport requires tamper-evident packaging and chain-of-custody tracking
+    notes: Non-technical control for physical media transport
+    evidence_commands:
+      - "# Export transport procedure and chain-of-custody records"
+
+  - action_id: MAP-007-01
+    signal: manual
+    m365_service: Intune + Defender for Endpoint
+    implementation: Configure Defender for Endpoint device control policies for granular removable media permissions
+    portal_path: security.microsoft.com > Endpoints > Configuration management > Device control
+    evidence_commands:
+      - "# Export Defender device control policy from portal"
+
+  - action_id: MAP-008-01
+    signal: customize
+    m365_service: Intune
+    implementation: Configure Intune device restriction profile blocking all removable storage; manage exceptions via device control groups
+    portal_path: intune.microsoft.com > Devices > Configuration > Device restrictions
+    evidence_commands:
+      - "Get-MgDeviceManagementDeviceConfiguration -Filter \"contains(displayName,'storage') or contains(displayName,'USB')\" | Select DisplayName | Export-Csv usb_block_config.csv"
+
+  - action_id: MAP-009-01
+    signal: configure
+    m365_service: Azure Backup
+    implementation: Configure Azure Backup with encryption at rest using customer-managed keys in Key Vault; restrict backup access via RBAC
+    portal_path: portal.azure.com > Recovery Services vault > Properties > Encryption
+    powershell:
+      - "Get-AzRecoveryServicesVault | Select Name,@{N='Encryption';E={$_.Properties.Encryption}}"
+    evidence_commands:
+      - "Get-AzRecoveryServicesVault | Select Name | Export-Csv backup_vaults.csv"
+      - "Get-AzRoleAssignment -Scope {vaultResourceId} | Select DisplayName,RoleDefinitionName | Export-Csv backup_access_control.csv"
+
+  # =============================================================================
+  # PERSONNEL SECURITY & TRAINING (PST)
+  # =============================================================================
+
+  - action_id: PST-001-01
+    signal: manual
+    m365_service: Compliance Manager
+    implementation: Document personnel screening requirements; reference Compliance Manager for control tracking
+    evidence_commands:
+      - "# Export screening policy and criteria document"
+
+  - action_id: PST-001-02
+    signal: manual
+    m365_service: N/A
+    implementation: Implement HR screening process before granting system access; integrate with Entra ID provisioning
+    notes: HR process; M365 integration via Lifecycle Workflows triggered by HR system
+    evidence_commands:
+      - "# Export screening completion tracking records"
+
+  - action_id: PST-002-01
+    signal: manual
+    m365_service: Compliance Manager
+    implementation: Document access revocation procedures for transfers/termination; reference Entra ID Lifecycle Workflows
+    evidence_commands:
+      - "# Export termination procedure and access revocation checklist"
+
+  - action_id: PST-002-02
+    signal: configure
+    m365_service: Entra ID
+    implementation: Configure Entra ID Lifecycle Workflows with leaver triggers to automatically disable accounts and revoke sessions
+    portal_path: entra.microsoft.com > Identity > Users > Lifecycle Workflows > Leaver workflow
+    powershell:
+      - "New-MgIdentityGovernanceLifecycleWorkflow -Category 'leaver' -DisplayName 'Offboard Employee' -Tasks @(@{taskDefinitionId='...';displayName='Disable user account'},@{taskDefinitionId='...';displayName='Revoke all refresh tokens'})"
+    evidence_commands:
+      - "Get-MgIdentityGovernanceLifecycleWorkflow | Where Category -eq 'leaver' | Select DisplayName,IsEnabled"
+      - "Get-MgAuditLogDirectoryAudit -Filter \"activityDisplayName eq 'Disable account'\" -Top 50 | Select ActivityDateTime,TargetResources | Export-Csv termination_audit.csv"
+
+  - action_id: PST-003-01
+    signal: manual
+    m365_service: N/A
+    implementation: Implement enhanced background checks for personnel in sensitive/privileged roles
+    notes: HR/administrative process; not directly M365
+    evidence_commands:
+      - "# Export enhanced screening procedure and sensitive role inventory"
+
+  - action_id: PST-004-01
+    signal: configure
+    m365_service: Entra ID
+    implementation: When adverse actions anticipated, immediately disable account and revoke sessions via Entra ID
+    portal_path: entra.microsoft.com > Identity > Users > User > Revoke sessions + Block sign-in
+    powershell:
+      - "Update-MgUser -UserId {id} -AccountEnabled:$false"
+      - "Revoke-MgUserSignInSession -UserId {id}"
+    evidence_commands:
+      - "Get-MgAuditLogDirectoryAudit -Filter \"activityDisplayName eq 'Disable account'\" -Top 20 | Export-Csv adverse_action_log.csv"
+
+  - action_id: PST-005-01
+    signal: manual
+    m365_service: Defender for Office 365
+    implementation: Deploy Attack Simulation Training for security awareness; create phishing campaigns and training assignments
+    portal_path: security.microsoft.com > Attack simulation training > Simulations > Create
+    powershell:
+      - "# Configure via Attack Simulation Training portal"
+    evidence_commands:
+      - "# Export attack simulation training completion reports from portal"
+
+  - action_id: PST-005-02
+    signal: manual
+    m365_service: Viva Learning
+    implementation: Configure Viva Learning with security awareness training courses; set annual completion requirement
+    portal_path: admin.microsoft.com > Viva Learning > Manage content sources
+    evidence_commands:
+      - "# Export Viva Learning training completion dashboard"
+
+  - action_id: PST-006-01
+    signal: manual
+    m365_service: Viva Learning
+    implementation: Create role-specific security training assignments in Viva Learning (admin, developer, user roles)
+    portal_path: admin.microsoft.com > Viva Learning
+    evidence_commands:
+      - "# Export role-based training curriculum and completion records"
+
+  - action_id: PST-007-01
+    signal: manual
+    m365_service: Purview Insider Risk Management
+    implementation: Enable Purview Insider Risk Management awareness training; include insider threat indicators in security training
+    portal_path: compliance.microsoft.com > Insider risk management > Settings
+    evidence_commands:
+      - "# Export insider threat training materials and completion records"
+
+  - action_id: PST-008-01
+    signal: manual
+    m365_service: Defender for Office 365
+    implementation: Create advanced Attack Simulation Training campaigns covering spear-phishing, credential harvesting, and social engineering
+    portal_path: security.microsoft.com > Attack simulation training > Simulations
+    evidence_commands:
+      - "# Export advanced simulation results and training completion from portal"
+
+  - action_id: PST-009-01
+    signal: manual
+    m365_service: Defender for Office 365
+    implementation: Run phishing simulation campaigns and scenario-based tabletop exercises using Attack Simulation Training
+    portal_path: security.microsoft.com > Attack simulation training > Simulations > Create
+    evidence_commands:
+      - "# Export simulation campaign results including click rates and training completion"
+
+  # =============================================================================
+  # RISK ASSESSMENT & COMPLIANCE (RAC)
+  # =============================================================================
+
+  - action_id: RAC-001-01
+    signal: manual
+    m365_service: Compliance Manager
+    implementation: Use Compliance Manager CMMC assessment template; supplement with organizational risk assessment methodology
+    portal_path: compliance.microsoft.com > Compliance Manager > Assessments > Add assessment > CMMC
+    evidence_commands:
+      - "# Export Compliance Manager assessment report"
+
+  - action_id: RAC-001-02
+    signal: manual
+    m365_service: Compliance Manager
+    implementation: Schedule annual risk assessment review cycle in Compliance Manager with improvement actions tracking
+    portal_path: compliance.microsoft.com > Compliance Manager > Improvement actions
+    evidence_commands:
+      - "# Export Compliance Manager improvement actions and timeline"
+
+  - action_id: RAC-002-01
+    signal: manual
+    m365_service: Compliance Manager
+    implementation: Document organizational threat profile in SSP; reference Defender threat analytics for current threat landscape
+    portal_path: security.microsoft.com > Threat analytics
+    evidence_commands:
+      - "# Export threat analytics summary from Defender portal"
+
+  - action_id: RAC-003-01
+    signal: manual
+    m365_service: Compliance Manager
+    implementation: Assess supply chain risks for cloud services and third-party integrations; review Microsoft trust center documentation
+    evidence_commands:
+      - "# Export supply chain risk assessment and vendor risk register"
+
+  - action_id: RAC-004-01
+    signal: manual
+    m365_service: Compliance Manager
+    implementation: Develop SCRM plan documenting supplier risk mitigation for M365 and all third-party components
+    evidence_commands:
+      - "# Export SCRM plan document"
+
+  - action_id: RAC-005-01
+    signal: configure
+    m365_service: Compliance Manager + Secure Score
+    implementation: Use Compliance Manager assessment scores and Secure Score to assess security control effectiveness
+    portal_path: compliance.microsoft.com > Compliance Manager + security.microsoft.com > Secure Score
+    powershell:
+      - "Get-MgSecuritySecureScore -Top 1 | Select CurrentScore,MaxScore"
+    evidence_commands:
+      - "Get-MgSecuritySecureScore -Top 1 | Select CurrentScore,MaxScore,CreatedDateTime | Export-Csv control_assessment.csv"
+
+  - action_id: RAC-006-01
+    signal: manual
+    m365_service: Compliance Manager
+    implementation: Use Compliance Manager improvement actions as POA&M tracking mechanism with assignees and due dates
+    portal_path: compliance.microsoft.com > Compliance Manager > Improvement actions
+    evidence_commands:
+      - "# Export Compliance Manager improvement actions with status and timelines"
+
+  - action_id: RAC-007-01
+    signal: configure
+    m365_service: Microsoft Secure Score + Sentinel
+    implementation: Configure Secure Score monitoring and Sentinel health dashboards for continuous security posture monitoring
+    portal_path: security.microsoft.com > Secure Score + portal.azure.com > Sentinel > Overview
+    powershell:
+      - "Get-MgSecuritySecureScore -Top 30 | Select CreatedDateTime,CurrentScore,MaxScore"
+    evidence_commands:
+      - "Get-MgSecuritySecureScore -Top 30 | Select CreatedDateTime,CurrentScore,MaxScore | Export-Csv continuous_monitoring_trend.csv"
+
+  - action_id: RAC-008-01
+    signal: manual
+    m365_service: Compliance Manager
+    implementation: Develop SSP using Compliance Manager as framework; document all control implementations referencing M365 configurations
+    portal_path: compliance.microsoft.com > Compliance Manager > Assessments
+    evidence_commands:
+      - "# Export comprehensive Compliance Manager assessment as SSP basis"
+
+  - action_id: RAC-008-02
+    signal: manual
+    m365_service: Compliance Manager
+    implementation: Schedule SSP review using Compliance Manager assessment update cycle; document all changes
+    portal_path: compliance.microsoft.com > Compliance Manager > Assessments > Update
+    evidence_commands:
+      - "# Export assessment history and change records"
+
+  - action_id: RAC-009-01
+    signal: manual
+    m365_service: N/A
+    implementation: Engage qualified third-party penetration testing firm; use Defender and Sentinel data to support scope definition
+    notes: External service; M365 supports scope definition and post-test validation
+    evidence_commands:
+      - "# Export pentest report, rules of engagement, and remediation plan"
+
+  # =============================================================================
+  # MAINTENANCE OPERATIONS (MNT)
+  # =============================================================================
+
+  - action_id: MNT-001-01
+    signal: manual
+    m365_service: Compliance Manager
+    implementation: Document maintenance procedures; use Intune and Azure DevOps for scheduling and tracking maintenance activities
+    evidence_commands:
+      - "# Export maintenance procedure, schedule, and records"
+
+  - action_id: MNT-002-01
+    signal: manual
+    m365_service: N/A
+    implementation: Establish physical tool control procedures for maintenance tools brought into facility
+    notes: Non-technical control; document procedurally
+    evidence_commands:
+      - "# Export tool authorization procedure and approved tool list"
+
+  - action_id: MNT-003-01
+    signal: manual
+    m365_service: Intune
+    implementation: Use Intune Wipe before sending devices for external maintenance; verify sanitization completion
+    portal_path: intune.microsoft.com > Devices > Device > Wipe
+    powershell:
+      - "# Invoke-MgDeviceManagementManagedDeviceWipe -ManagedDeviceId {id}"
+    evidence_commands:
+      - "# Export Intune device action history for wipe operations"
+
+  - action_id: MNT-004-01
+    signal: manual
+    m365_service: Defender for Endpoint
+    implementation: Scan all maintenance media with Defender for Endpoint before use on in-scope systems
+    evidence_commands:
+      - "# Export Defender scan results for maintenance media"
+
+  - action_id: MNT-005-01
+    signal: configure
+    m365_service: Azure Bastion + PIM
+    implementation: Configure Azure Bastion for secure remote maintenance access; require PIM JIT activation for maintenance roles
+    portal_path: portal.azure.com > Bastion > Create + entra.microsoft.com > PIM
+    powershell:
+      - "Get-AzBastion | Select Name,DnsName,ProvisioningState"
+    evidence_commands:
+      - "Get-AzBastion | Select Name,ProvisioningState | Export-Csv bastion_config.csv"
+      - "Get-MgAuditLogDirectoryAudit -Filter \"activityDisplayName eq 'Add member to role completed (PIM activation)'\" | Export-Csv maintenance_auth_logs.csv"
+
+  - action_id: MNT-006-01
+    signal: manual
+    m365_service: N/A
+    implementation: Establish supervision procedures for maintenance by non-cleared personnel; log all supervised activities
+    notes: Non-technical control; document procedurally
+    evidence_commands:
+      - "# Export supervision procedure and supervision records"
+
+  # =============================================================================
+  # FOUNDATION & GOVERNANCE (FGV)
+  # =============================================================================
+
+  - action_id: FGV-001-01
+    signal: manual
+    m365_service: Compliance Manager
+    implementation: Define assessment boundary using Compliance Manager; inventory CUI assets, security protection assets, and ESPs
+    portal_path: compliance.microsoft.com > Compliance Manager > Assessments
+    evidence_commands:
+      - "# Export boundary definition document and Compliance Manager asset scope"
+
+  - action_id: FGV-001-02
+    signal: manual
+    m365_service: Purview
+    implementation: Document CUI/FCI data flows using Purview Data Map and content explorer findings
+    portal_path: compliance.microsoft.com > Data classification > Content explorer
+    evidence_commands:
+      - "# Export Purview content explorer summary showing CUI locations and flows"
+
+  - action_id: FGV-001-03
+    signal: manual
+    m365_service: Compliance Manager
+    implementation: Verify SSP exists and is current using Compliance Manager assessment status
+    portal_path: compliance.microsoft.com > Compliance Manager > Assessments
+    powershell:
+      - "# Export Compliance Manager assessment completion percentage"
+    evidence_commands:
+      - "# Export Compliance Manager assessment summary showing SSP status"
+
+  - action_id: FGV-002-01
+    signal: manual
+    m365_service: Azure
+    implementation: Implement architecture changes (network redesign, microsegmentation, zero trust) based on threat analysis findings
+    portal_path: portal.azure.com - various services based on architecture changes
+    evidence_commands:
+      - "# Export architecture change records and threat analysis documentation"

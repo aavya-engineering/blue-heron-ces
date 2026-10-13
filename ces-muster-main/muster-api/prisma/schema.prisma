@@ -1,0 +1,291 @@
+// SPDX-FileCopyrightText: Blue Heron Defense LLC and its licensors. All rights reserved.
+// SPDX-License-Identifier: LicenseRef-BHD-Proprietary
+// CONFIDENTIAL - TRADE SECRET. Unpublished work. Provided solely to perform work for Blue Heron Defense LLC at its direction.
+// Any other use, copying, disclosure, or reuse, in whole or in part, is prohibited.
+// Changes made to this file for Blue Heron Defense LLC are made on its behalf; it claims all rights in them.
+// Submitting a change to this repository means you accept TERMS.md.
+// Removing or altering this notice is prohibited (17 U.S.C. 1202). Ref: BHD-CES-MUSTER-2026A
+// See LICENSE and TERMS.md.
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  prime
+  sub
+  bhd_operator
+  assessor_read_only
+}
+
+enum EngagementKind {
+  prime_and_subs
+  individual_contractor
+}
+
+enum OnPremOt {
+  yes
+  no
+  unsure
+}
+
+enum SessionStatus {
+  in_progress
+  complete
+}
+
+enum NudgeType {
+  t3
+  t7
+  t14
+  stall
+  escalation
+}
+
+enum DispositionState {
+  ready
+  validate
+  convert_to_enclave
+  schedule_reassessment
+  abandoned
+  opted_out
+  escalated
+  complete
+}
+
+enum PartyLifecycle {
+  invited
+  in_progress
+  stalled
+  complete
+  ready
+  validate
+  convert_to_enclave
+  reassessment_due
+}
+
+model Tenant {
+  id         String   @id @default(uuid())
+  name       String
+  created_at DateTime @default(now())
+
+  users       User[]
+  engagements Engagement[]
+  parties     Party[]
+
+  @@map("tenants")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  tenant_id     String
+  party_id      String?
+  email         String   @unique
+  password_hash String
+  role          Role
+  created_at    DateTime @default(now())
+
+  tenant       Tenant        @relation(fields: [tenant_id], references: [id])
+  dispositions Disposition[] @relation("SetByUser")
+
+  @@map("users")
+}
+
+model Engagement {
+  id              String         @id @default(uuid())
+  tenant_id       String
+  engagement_kind EngagementKind
+  created_at      DateTime       @default(now())
+
+  // FC-MU-2 (MU-03/MU-06 live): the per-engagement live-tenant flag. OFF by
+  // default; only an explicit PUT /api/live/engagements/:id/access turns it on
+  // (who + when recorded). live_consent is the customer's device-code consent
+  // (who, when, scopes, tenant) � written ONLY on a granted consent.
+  live_access_enabled Boolean   @default(false)
+  live_access_set_by  String?
+  live_access_set_at  DateTime?
+  live_consent        Json?
+  // FC-MU-3: the Exchange / Purview / Azure device-code consents, keyed by area
+  // (the Graph consent stays in live_consent). Written ONLY on a granted consent.
+  live_area_consents  Json?
+
+  tenant       Tenant        @relation(fields: [tenant_id], references: [id])
+  parties      Party[]
+  contracts    Contract[]
+  nudge_events NudgeEvent[]
+  dispositions Disposition[]
+
+  @@map("engagements")
+}
+
+model Party {
+  id            String   @id @default(uuid())
+  tenant_id     String
+  engagement_id String
+  name          String
+  uei           String?
+  cage          String?
+  on_prem_ot       OnPremOt
+  lifecycle        PartyLifecycle @default(invited)
+  last_activity_at DateTime?
+  created_at       DateTime       @default(now())
+
+  tenant             Tenant             @relation(fields: [tenant_id], references: [id])
+  engagement         Engagement         @relation(fields: [engagement_id], references: [id])
+  interview_sessions InterviewSession[]
+  contracts          Contract[]
+  nudge_events       NudgeEvent[]
+  dispositions       Disposition[]
+
+  @@map("parties")
+}
+
+model InterviewSession {
+  id                     String        @id @default(uuid())
+  party_id               String
+  status                 SessionStatus
+  facts                  Json
+  timing_segments        Json
+  selected_stacks        String[]
+  current_question_index Int?
+  created_at             DateTime      @default(now())
+  completed_at           DateTime?
+
+  party Party @relation(fields: [party_id], references: [id])
+
+  @@map("interview_sessions")
+}
+
+model Contract {
+  id                  String    @id @default(uuid())
+  party_id            String
+  engagement_id       String
+  contract_number     String
+  program_name        String
+  cage_code           String?
+  uei                 String?
+  contracting_office  String?
+  co_name             String?
+  award_date          DateTime?
+  pop_start           DateTime?
+  pop_end             DateTime?
+  cmmc_level_required Int
+  cui_categories      Json
+  created_at          DateTime  @default(now())
+
+  party      Party      @relation(fields: [party_id], references: [id])
+  engagement Engagement @relation(fields: [engagement_id], references: [id])
+
+  @@map("contracts")
+}
+
+model NudgeEvent {
+  id            String    @id @default(uuid())
+  party_id      String
+  engagement_id String
+  nudge_type    NudgeType
+  sent_at       DateTime  @default(now())
+  channel       String
+  payload       Json?
+
+  party      Party      @relation(fields: [party_id], references: [id])
+  engagement Engagement @relation(fields: [engagement_id], references: [id])
+
+  @@map("nudge_events")
+}
+
+model Disposition {
+  id             String           @id @default(uuid())
+  party_id       String
+  engagement_id  String
+  state          DispositionState
+  set_by_user_id String
+  set_at         DateTime         @default(now())
+  notes          String?
+
+  party      Party      @relation(fields: [party_id], references: [id])
+  engagement Engagement @relation(fields: [engagement_id], references: [id])
+  set_by     User       @relation("SetByUser", fields: [set_by_user_id], references: [id])
+
+  @@map("dispositions")
+}
+
+model HilItem {
+  id                  String    @id @default(uuid())
+  tenant_id           String
+  party_id            String
+  session_id          String?
+  question_id         String
+  reason              String
+  fact                Json
+  created_at          DateTime  @default(now())
+  resolved_at         DateTime?
+  resolved_by_user_id String?
+  advisor_minutes     Float?
+
+  @@map("hil_items")
+}
+
+model TouchEvent {
+  id            String   @id @default(uuid())
+  tenant_id     String
+  engagement_id String
+  mode          String
+  kind          String
+  minutes       Float    @default(0)
+  created_at    DateTime @default(now())
+
+  @@map("touch_events")
+}
+
+// ── GP-MUSTER-2 M2: delivery portal (result-handling-policy.md is normative) ──
+
+model DeliveryArtifact {
+  id            String    @id @default(uuid())
+  tenant_id     String
+  engagement_id String
+  kind          String // readiness_result | readiness_report | capture
+  filename      String
+  content       Bytes // zeroed on purge; encryption at rest = enclave volume (policy rule 8)
+  content_sha256 String
+  delivered_at  DateTime  @default(now())
+  purged_at     DateTime?
+  purge_reason  String?
+
+  @@map("delivery_artifacts")
+}
+
+model DeliveryGrant {
+  id            String    @id @default(uuid())
+  tenant_id     String
+  engagement_id String
+  grantee_name  String
+  grantee_email String
+  issued_by     String // operator user id
+  token_hash    String    @unique // sha256 of the capability token; plaintext never stored
+  expires_at    DateTime
+  revoked_at    DateTime?
+  created_at    DateTime  @default(now())
+
+  @@map("delivery_grants")
+}
+
+model DeliveryAuditEntry {
+  id            String   @id @default(uuid())
+  tenant_id     String
+  engagement_id String
+  artifact_id   String?
+  grant_id      String?
+  actor         String
+  action        String // grant_issued | grant_revoked | artifact_registered | pull | denied | purge
+  outcome       String // ok | denied reason
+  detail        String?
+  created_at    DateTime @default(now())
+
+  @@map("delivery_audit_entries")
+}

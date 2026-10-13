@@ -1,0 +1,69 @@
+Blue Heron Diagram Flow Discussion
+October 08, 2026
+Attendees: Daryl Wilkerson, Kunal Khanwilkar, Mark Sutton, Sunny Kumrawat, Vaibhav Pathak, Vaibhav Pathak
+
+Overview
+
+The participants discussed the functional flow, technical architecture, and future roadmap of the Blue Heron platform to achieve CMMC compliance automation.
+
+System Overview
+Mark explained that the current system is built with TypeScript, React, and Tailwind, and is designed to automate the heavy lifting of cybersecurity compliance. The core logic revolves around four main modules:
+* Muster: A second-generation discovery tool that automates finding configuration gaps to generate a mission plan.
+* Stamper: An execution engine that takes the mission plan and automatically configures a tenant (specifically focusing on the Microsoft GCC stack for now) to bridge gaps between state A and B.
+* Admin Ops (AO): A module for day-to-day operations intended to prevent configuration drift and ensure ongoing compliance.
+* Evidence Ops (EO): A tool designed to present audit-ready evidence to assessors at a moment's notice.
+
+Sunny confirmed their understanding of this workflow, noting that they had already derived requirements from the provided PRD.
+
+Development Strategy
+Kunal outlined a vision where the platform evolves into an agentic marketplace, utilizing AI agents to guide customers through different certification stages, supplemented by human experts when necessary. This approach aims to reduce costs by replacing intensive manual professional services with technology.
+
+To facilitate this transition, several technical priorities were identified:
+* Providing the code base to Sunny, Vaibhav, and their team for deep analysis and reverse engineering via AI.
+* Utilizing Playwright for automated testing and validation of security guardrails within configured tenants like the one belonging to Daryl.
+* Addressing gaps in deployment architecture, specifically determining whether components like Stamper, Muster, AO, and EO should reside on central servers or be delivered as obfuscated packages to customers.
+
+Technical Challenges
+Several open questions remain regarding implementation and deployment. Is there a defined strategy for how each module will be deployed across public versus private clouds? How can the team ensure high levels of automation while maintaining enough "human handholding" for users who lack deep cybersecurity knowledge? Additionally, how will the team effectively manage non-digital requirements—such as physical security logs—within a purely digital application framework?
+
+Action Items
+
+- Provide the existing CES code base to the team so they can review the implemented modules and work from the current system.
+- Analyze the code base and its structure within a couple of days of receiving access, then identify the next enhancements and required engineering resources.
+
+Outline
+
+Meeting Objectives and Requirements
+
+- Sunny Kumrawat expressed that while the PRD overview is clear, the team needs to dive into functional requirements for features like CES shared, plan bundles, and readiness records.
+- The team seeks clarification on the logic for benchmarking 110 CMMC requirements and wants to know if UI mockups will be provided or if they should design them.
+- Mark Sutton clarified that the system is already fully implemented with a functional UI, so mockups are not required.
+- Mark noted that providing the code base will be essential for the team to understand the existing implementation through reverse engineering.
+
+System Overview and Module Functions
+
+- Mark explained that the system was reverse-engineered from a code base to meet 110 CMMC controls, noting that roughly 30 of these involve real-world physical security rather than digital configurations.
+- Sunny shared a diagram illustrating the workflow involving tenant registration, contract discovery, benchmarking, gap analysis, and remediation plans.
+- Mark described Muster as a second-generation discovery tool designed to automate finding customer configuration gaps and outputting a "mission plan."
+- Stamper serves as the execution module that uses the mission plan to automatically configure tenants between their current state and a compliant state.
+
+Operational Modules and Drift Prevention
+
+- Admin Ops (AO) allows customers to make changes in a CMMC-compliant manner to prevent configuration drift during daily operations.
+- Evidence Ops (EO) provides assessors with ready-to-use documentation and evidence at their fingertips to simplify audits.
+- The primary goal of these modules is to transform what is currently a services-heavy engagement into an automated process.
+
+Future Vision and Agentic Marketplace
+
+- Kunal proposed evolving the platform into an agentic marketplace where specialized AI agents assist users through various stages of certification.
+- This vision involves using agents as a first line of support, supplemented by Subject Matter Experts (SMEs) only when complex situations arise.
+- Mark agreed with this approach, suggesting that agents could eventually drive Stamper or provide first-line defense for day-to-day operations support.
+
+Next Steps and Technical Execution
+
+- Kunal outlined immediate next steps including gaining access to the code base, analyzing its structure, and identifying areas for enhancement.
+- Mark emphasized the need for human validation within configured tenants like Velour Forge to ensure security guardrails are effective against bad actors.
+- The team discussed deployment architecture challenges regarding whether modules like Stamper or Muster should reside on internal servers or be delivered as obfuscated packages to customers.
+- Vaibhav was identified as a key resource for handling deployment strategies across public and private clouds based on his previous experience with high-stakes deployments.
+
+Generated by https://otter.ai

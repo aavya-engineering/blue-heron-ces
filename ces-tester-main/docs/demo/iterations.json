@@ -1,0 +1,288 @@
+{
+  "goal": "GP-DEMO-1",
+  "rubric_axes": [
+    "demo_flawlessness",
+    "demo_value_clarity",
+    "demo_fidelity",
+    "talktrack_buyer_relevance",
+    "talktrack_flow_objections"
+  ],
+  "rubric_max": 25,
+  "convergence_rule": "combined delta < 1 AND zero P0/P1 for 3 consecutive iterations",
+  "iterations": [
+    {
+      "id": 0,
+      "date": "2026-07-27",
+      "iteration_goal": "Read-only baseline: map the CES-wide demo across all modules, draft talk-track v0, adversarially critique.",
+      "findings": [
+        "P0-1 no integrated one-command run/reset (4 servers, 5 idioms)",
+        "P0-2 Stamper rotating verify-fail (~9-12/110, worse under load)",
+        "P0-3 cumulative honesty tax collapses takeaway to 'all simulated'",
+        "P1-4 SPRS before->after never shown as one artifact",
+        "P1-5 ~10 Stamper sim-fidelity false-FAILs",
+        "P1-6 EO live path unrehearsed beyond connect+assess",
+        "P1-7 build-freshness across 3 dist/ modules unguarded",
+        "P1-8 port contention / stray listeners across 4390/5173/3000/4002",
+        "P1-9 EO env fragility + ~75s boot dead-air",
+        "P1-10 fear-forward framing, no 'why does this transfer to my tenant' rebuttal"
+      ],
+      "fixes": [],
+      "scores": {
+        "demo_flawlessness": 2,
+        "demo_value_clarity": 3,
+        "demo_fidelity": 3,
+        "talktrack_buyer_relevance": 4,
+        "talktrack_flow_objections": 4
+      },
+      "combined": 16,
+      "delta": null,
+      "score_source": "adversarial-critique (read-only estimate)"
+    },
+    {
+      "id": 1,
+      "date": "2026-07-27",
+      "iteration_goal": "Land the deterministic harness foundation (critique's #1 fix): one-command spine + pre-flight + skip-list + unified reset, fully tested.",
+      "findings": [
+        "run-all spine excluded EO + SPRS surface (confirmed) — EO leg + unified dashboard correctly STAGED, not silently missing",
+        "tenant-stacksim + ces-stamper dist/ measured fresh at build time (preflight live-verified)"
+      ],
+      "fixes": [
+        "ces-tester: src/demo/preflight.ts — build-freshness + port-free pre-flight (attacks P1-7, P1-8)",
+        "ces-tester: src/demo/known-false-fails.ts — REQ core-9 registry + partition (attacks P1-5, de-risks P0-2)",
+        "ces-tester: src/demo/reset.ts — unified do-no-harm reset (attacks P1-8, M1 'one to reset')",
+        "ces-tester: src/cli/demo-command.ts + index.ts — demo:preflight | demo:reset | demo:run [--plan] (attacks P0-1)"
+      ],
+      "scores": {
+        "demo_flawlessness": 3,
+        "demo_value_clarity": 3,
+        "demo_fidelity": 3,
+        "talktrack_buyer_relevance": 4,
+        "talktrack_flow_objections": 4
+      },
+      "combined": 17,
+      "delta": 1,
+      "score_source": "provisional (self-estimate) — to be confirmed by an adversarial critic re-run against the working harness next iteration",
+      "tests": "85/85 vitest (was 64; +21: known-false-fails 5, preflight 10, reset 6), tsc clean, build clean, mojibake 0",
+      "open": [
+        "P0-1 not fully closed: EO leg (Beat 3) + unified before->after SPRS dashboard STAGED for iteration 2 (need live rehearsal)",
+        "P0-2 upstream (GP-STAMPER-1) — harness now annotates, does not fix",
+        "P0-3 honesty-tax narrative reframe = next iteration's highest-value fix",
+        "No proven flawless live end-to-end run yet — demo:run live path unrehearsed"
+      ]
+    },
+    {
+      "id": 2,
+      "date": "2026-07-27",
+      "iteration_goal": "Prove the live pipeline runs; reframe the talk track (P0-3/P1-10); wire the tenant reset. First adversarial-critic-measured score.",
+      "findings": [
+        "LIVE PIPELINE PROVEN: real run-m2 (stacksim seed -> real Muster wizard via Playwright -> real Stamper execute -> verify) passed end-to-end, exit 0, 3/3 assertions, 0 diverged, all 4 ports cleaned up after (quiet machine)",
+        "critic CLOSED P0-3 (honesty-tax reframe), P1-7 (build-freshness), P1-10 (transfer rebuttal)",
+        "NEW-P1 found + fixed same iteration: resetTenant shipped unwired (demo:reset couldn't restore Beat-0 posture)"
+      ],
+      "fixes": [
+        "ces-tester: docs/demo/TALK-TRACK.md v1 — P0-3 five-concessions->one-frame reframe + sim->tenant bridge as opening promise + P1-10 transfer rebuttal (905c7cd)",
+        "ces-tester: src/cli/demo-command.ts — wired resetDemoTenant into demo:reset via stacksim's demo:reset contract; live-verified DONE (was skipped)",
+        "verification: proved the live spine; confirmed do-no-harm port cleanup"
+      ],
+      "scores": {
+        "demo_flawlessness": 3,
+        "demo_value_clarity": 3,
+        "demo_fidelity": 3,
+        "talktrack_buyer_relevance": 5,
+        "talktrack_flow_objections": 4
+      },
+      "combined": 18,
+      "delta": 1,
+      "score_source": "adversarial-critic (measured, 2 hostile lenses)",
+      "tests": "85/85 vitest, tsc clean, build clean; demo:reset live-verified (tenant re-materialized)",
+      "open": [
+        "P0-2 upstream + UNPROVEN UNDER LOAD (biggest live threat) — a demo machine is a loaded machine",
+        "P0-1 (partial) full 5-beat demo:run never run end-to-end (only run-m2 spine slice)",
+        "P1-6 EO deliverables still shown pre-generated (canned)",
+        "P1-4 unified before->after SPRS dashboard absent (the payoff)",
+        "P1-8 (partial) reset re-materializes tenant now but ports still report-only (not freed)",
+        "P1-9 EO env fragility + ~75s boot dead-air",
+        "P1-5 (partial) known-false-FAIL registry not yet re-measured against a live full execute"
+      ]
+    },
+    {
+      "id": 3,
+      "date": "2026-07-27",
+      "iteration_goal": "Fix P0-2 at the source (founder ruling): diagnose the core-9, fix the real gaps in tenant-stacksim, live-confirm, shrink the registry honestly.",
+      "findings": [
+        "core-9 was STALE: 5 already round-tripped green (pre-existing sim fixes), 4 real tenant-stacksim gaps, 0 ces-stamper template bugs",
+        "live run-all confirms the 4 fixes with NO regression: exo-protection (anti-phish/malware/safe-attach) + audit-logging PASS; only reds = deliberate zz-fail + pre-existing PENDING-LIVE remote-maintenance",
+        "NEW finding: remote-maintenance CA write->read gap (pipeline-created conditionalAccess policy absent from collection read-back) — same class as member-add, next fix-at-source candidate"
+      ],
+      "fixes": [
+        "tenant-stacksim (gp-demo-1-stacksim-p02): 56ae777 dlp-policy (honor -Identity + natural-id keying), 495e9be malware+anti-phish (creationDefaults), 75b84ef member-add (@odata.id) — 144/144 sim tests",
+        "ces-tester a4893ac: known-false-FAIL registry shrunk to empty (9 resolved: 5 pre-existing + 4 fixed-at-source); partitionFailures now reports any live red as UNEXPECTED (non-masking)",
+        "ces-tester: docs/demo/P0-2-SOURCE-WORKLIST.md diagnosis artifact"
+      ],
+      "scores": {
+        "demo_flawlessness": 4,
+        "demo_value_clarity": 3,
+        "demo_fidelity": 4,
+        "talktrack_buyer_relevance": 5,
+        "talktrack_flow_objections": 4
+      },
+      "combined": 20,
+      "delta": 2,
+      "score_source": "adversarial-critic (measured)",
+      "tests": "ces-tester 86/86; tenant-stacksim 144/144; both tsc clean; live run-all confirms",
+      "closed": [
+        "P0-2 (fixed at source, registry empty/non-masking, commit- + live-verified)"
+      ],
+      "open": [
+        "P0-1 full 5-beat demo:run never run end-to-end (EO leg + unified dashboard not built)",
+        "P1-4 unified before->after SPRS dashboard (the payoff) — not built",
+        "P1-6 EO leg (Beat 3) still shown pre-generated",
+        "P1-9 EO env fragility + boot dead-air",
+        "NEW CA write->read gap (remote-maintenance) — honest loud red, not a mask"
+      ]
+    },
+    {
+      "id": 4,
+      "date": "2026-07-28",
+      "iteration_goal": "Build + integrate the last two demo pieces — unified before->after SPRS dashboard (P1-4) and the live EO leg (P1-6) — and wire demo:run to span all 5 beats as one command (P0-1).",
+      "findings": [
+        "EO leg LIVE-VERIFIED against served demo-dib-small: 106 live assessments, 38 met / 35 not_met / 37 not_assessed (EO detail SPRS -89) — matches known-good reference b1ae8ee; ports cleaned up (P1-9 env fragility beaten)",
+        "full 5-beat demo:run runs end-to-end as one command (preflight -> spine -> live EO -> unified dashboard)",
+        "HONEST: live needle is FLAT (buildUnifiedFromEo before==after==0) — no fabricated movement; real before->after needs Muster headline + Stamper remediation on demo-dib-small (iter5)",
+        "beat-plan text overstates vs run-all proxy (critic catch); remote-maintenance CA gap keeps demo:run exit non-zero"
+      ],
+      "fixes": [
+        "ces-tester 0429bf3: src/results/unified-dashboard.ts + demo:dashboard (P1-4, offline self-contained)",
+        "ces-tester 59fe862: src/demo/eo-leg.ts — live EO connect+assess, P1-9 env scrub, self-gating/graceful (P1-6)",
+        "ces-tester 8e780da: demo:run Beat 3 (live EO) + Beat 4 (unified dashboard) wiring; buildUnifiedFromEo honest mapping (P0-1)",
+        "ces-tester c78a3f4: run-all --exclude; demo:run skips zz-deliberate-fail self-test (demo flawlessness)"
+      ],
+      "scores": {
+        "demo_flawlessness": 4,
+        "demo_value_clarity": 4,
+        "demo_fidelity": 4,
+        "talktrack_buyer_relevance": 5,
+        "talktrack_flow_objections": 4
+      },
+      "combined": 21,
+      "delta": 1,
+      "score_source": "adversarial-critic (measured)",
+      "tests": "ces-tester 102/102 (+16 across dashboard/eo-leg/wiring); tsc + build clean; full 5-beat rehearsal ran end-to-end, ports freed",
+      "closed": [
+        "P0-1 (one command, all beats)",
+        "P1-4 (unified dashboard built)",
+        "P1-6 (EO live in-run, real)"
+      ],
+      "open": [
+        "remediation-needle gap: live before==after==0 — the real SPRS movement (Muster headline before + Stamper remediation + EO after on demo-dib-small) is iter5, the emotional payoff",
+        "remote-maintenance CA write->read gap — demo:run exits non-zero; next fix-at-source",
+        "beat-plan text vs run-all-proxy mismatch — align narration or build the dedicated demo-dib-small Muster+Stamper pipeline (iter5)"
+      ]
+    },
+    {
+      "id": 5,
+      "date": "2026-07-28",
+      "iteration_goal": "Build the REAL before->after needle (remediate demo-dib-small for genuine movement) + fix the remote-maintenance CA gap.",
+      "findings": [
+        "REAL remediation pipeline works: reset->serve->EO before->Muster(Playwright)->Stamper execute->EO after, live end-to-end",
+        "CRITICAL (critic-caught): the needle is NON-DETERMINISTIC. Two live runs, same pipeline: 38->46 (+8) and 38->28 (-10 REGRESSION). BOTH Stamper executes were 'partial'. I over-claimed '+8 the needle moves' from one lucky run and baked it into the dashboard — corrected.",
+        "root cause = load-induced Stamper execute instability (REQ-STAMPER-ROTATING-VERIFY-FAIL tail): a partial apply under load is non-reproducible and can break previously-passing controls",
+        "remote-maintenance scenario asserted wrong state (real command is report-only) + wrong ledger objectType — corrected to match real behavior"
+      ],
+      "fixes": [
+        "ces-tester 24e2640: needle-run.ts (runNeedleRemediation + buildUnifiedFromNeedleRun) — the real pipeline + honest 3-branch mapper",
+        "tenant-stacksim 5702bd7: New-MgIdentityConditionalAccessPolicy write->read parity (CA gap; generalizes to 4 more CA controls); 145 tests",
+        "ces-tester 5924327: remote-maintenance scenario assertions corrected -> run-scenario PASS (last spine red closed)",
+        "ces-tester 94001b5: HONESTY GUARD — needle shows a real delta ONLY on a live+complete+non-regressing run; else real-before + honestly-staged after. Regression can never reach the screen. Dashboard regenerated honestly (removed baked +8)."
+      ],
+      "scores": {
+        "demo_flawlessness": 3,
+        "demo_value_clarity": 4,
+        "demo_fidelity": 3,
+        "talktrack_buyer_relevance": 5,
+        "talktrack_flow_objections": 4
+      },
+      "combined": 19,
+      "delta": -2,
+      "score_source": "adversarial-critic (measured)",
+      "tests": "ces-tester 111/111; tenant-stacksim 145/145; tsc/build clean",
+      "closed": [
+        "flat-needle -> real remediation plumbing + honest no-fabricate/no-regress guard",
+        "remote-maintenance CA gap (fixed at source, generalizes)",
+        "last non-deliberate spine red (scenario assertions corrected)"
+      ],
+      "open": [
+        "P1 (dominant): Stamper execute is PARTIAL/non-deterministic under load -> the reliable before->after needle is BLOCKED until the execute completes deterministically (Stamper-side; the real REQ-STAMPER-ROTATING-VERIFY-FAIL load tail). This is the true next fix.",
+        "P2 per-control findings detail empty (mapControlDetail returned [] live)",
+        "P2 headline SPRS shown is EO detail (labeled), not Muster's certified headline",
+        "P3 ~5-min live needle dead-air"
+      ],
+      "note": "iter5 REGRESSED 21->19: traded the flat needle for a non-deterministic one, then added the honesty guard so it degrades truthfully. Loop is NOT converging; the payoff needle needs a deterministic Stamper execute."
+    },
+    {
+      "id": 6,
+      "date": "2026-07-28",
+      "iteration_goal": "Founder-directed recalibration: the demo bar is ONE clean run. Re-examine evidence, recalibrate the guard, validate with a demo-condition run.",
+      "findings": [
+        "iter5 verification runs were effectively LOAD TESTS (orchestration churn was the load); the -10 regression came from the loaded box",
+        "quiet-box runs consistently improve: +8 and (validation run bd18kxc34) +18: 38->56 met, EO detail SPRS -89->-33, 97/110 applied, 325s, ports clean",
+        "failure set = stable core (~9-10) + small drifting tail even quiet; HONEST CORRECTION: stable core includes iter3-\"resolved\" tasks — isolated round-trips pass but live in-execute evidence validation fails (Stamper-side diagnosis)",
+        "CES canon confirmed in-pipeline: Muster -> Stamper (sole writer) -> EO proves; serial; AO absent by design; EO||AO only sanctioned concurrency"
+      ],
+      "fixes": [
+        "ces-tester 837d825: guard recalibrated — needle renders when after live AND not regressed, failure split printed transparently (N known-set + M under diagnosis, drifters named); regression/missing-report still stages",
+        "known-false-fails registry re-populated from live evidence (stable 10) with the honest correction note",
+        "dashboard rendered from the REAL demo-condition run"
+      ],
+      "scores": null,
+      "combined": null,
+      "delta": null,
+      "score_source": "not re-scored — loop closed by founder at iter5; iter6 is founder-directed recalibration, validated by a live demo-condition run rather than a critic pass",
+      "tests": "ces-tester 112/112; tsc/build clean; demo-condition live run validated (+18)",
+      "closed": [
+        "the payoff needle SHIPS under the one-run bar (real +18 shown, residual failures named on screen)"
+      ],
+      "open": [
+        "GP-STAMPER-1: live-vs-isolated evidence-validation discrepancy on the stable core",
+        "GP-STAMPER-1: execute load-sensitivity (only matters if the demo box is loaded — do not load it)",
+        "P2 per-control findings detail still empty; P2 Muster certified headline SPRS not yet on the unified screen"
+      ]
+    },
+    {
+      "id": 7,
+      "date": "2026-08-29",
+      "iteration_goal": "GP-DEMO-3: end-to-end demo with the AdminOps beat — demo:e2e (Beats 0-5, all four UIs Playwright-driven), a config parameter, --watch, a reusable PROMPT artifact, and a live run judged by a nine-clause success predicate.",
+      "findings": [
+        "Beat 5 (AO) proves the honest claim: A-18 applied live through AO's own GUI leaves an adminops_evidence row (stateChanged + commandExecuted + sha256Hash) AND a stacksim ledger mutate. It must NOT claim pre-state capture — AO's pre/post reads are stubs (REQ-AO-GETTHENSET-PRESTATE-IS-STUB).",
+        "EO needle held on every run that reached it: 38/110 -> 56/110 met, 106 live assessments both sides (+18, matching GP-DEMO-1's best quiet-box run). Discovery stayed 11/11 probes with ledger delta 0 (read-only proved).",
+        "SIBLING DEFECT: EO's /api/assessment was a permanent 500 — AssessmentStore.loadLatest() sorts over foreign scope-pointer records in the shared ces.db (REQ-EO-ASSESSMENT-SCOPE-POINTER-CRASH, HIGH; also breaks the older demo:run EO leg on an aged box).",
+        "HARNESS DEFECT (ours): pre-flight's port probe was IPv4-only, so an orphaned ces-muster vite dev server holding ::1:5173 read as FREE and the Muster leg drove the WRONG product's SPA.",
+        "SIBLING DEFECT: captures do not run for evidence-only or idempotently-skipped sub-commands, and a completed producer's capture does not always reach a later consumer (REQ-STAMPER-SUBCOMMAND-CAPTURES-NOT-RUN).",
+        "The translated plan is under-specified in LAYERS: 22 variables that no capture produces. Each fix reached one layer deeper until the remaining gap was enumerated from the Stamper registries instead of discovered a run at a time.",
+        "Only re-translation-stable ids can be pinned: a plan task_id carries a per-translation suffix. Failure identity is now entry-id -> control-id -> task-id."
+      ],
+      "fixes": [
+        "ces-tester ce1ada5: per-EO-beat run-scoped CES_PIPELINE_ROOT + EO server log capture; probePort now probes both loopback families (+ REQ-EO-ASSESSMENT-SCOPE-POINTER-CRASH filed)",
+        "ces-tester b109c78: THE PIN — clause 5 calibrated from the live taxonomy by classification (10 ours -> seeded, 9 theirs -> pinned by cause, 0 unclassifiable); parser gained the AZ-<AREA>-<NNN> entry-id space and a control-id fallback (+ REQ-STAMPER-SUBCOMMAND-CAPTURES-NOT-RUN filed)",
+        "ces-tester 5e2b22d / 174cbd6 / 6fb69c5: the newly-reachable residue — 19 more seeded variables (15 of them enumerated from the registries) and 5 more cause-matched pins",
+        "docs/demo/PROMPT-E2E-AO-DEMO.md: the reusable prompt artifact, amended with measured durations, the detached-launch pattern and the pin procedure"
+      ],
+      "scores": null,
+      "combined": null,
+      "delta": null,
+      "score_source": "not scored — this ledger's rubric is GP-DEMO-1's five-axis demo/talk-track score; GP-DEMO-3 is a capability goal (a new beat plus a single entry point) validated by a live run against its own success predicate, not by a critic pass. Recorded here because the live run is this ledger's unit of record.",
+      "tests": "ces-tester 307/307 across 36 files; tsc clean at every commit; six live runs, evidence retained under runs/e2e/m7-run*",
+      "closed": [
+        "demo:e2e ships: one command, six beats, all four UIs Playwright-driven, evidence retained",
+        "the AdminOps beat ships with an artifact-judged, honestly-scoped claim",
+        "clause 5 is calibrated by classification, with every pinned id traceable to a demonstrated sibling cause"
+      ],
+      "open": [
+        "REQ-EO-ASSESSMENT-SCOPE-POINTER-CRASH (HIGH) and REQ-STAMPER-SUBCOMMAND-CAPTURES-NOT-RUN — filed, not actioned; six more REQs stand from M0",
+        "GP-STAMPER-1: the rotating verify-fail class is now measured on the GUI leg too — every pinned command passes in tenant-stacksim's own coverage report yet fails Stamper's in-execute verification",
+        "two sim certificates remain in Cert:\\CurrentUser\\My (2F91... from M0, 976D... from M7) — founder cleanup at demo close",
+        "TALK-TRACK.md has no Beat 5 narration yet; the AO beat's wording lives in the code and the PROMPT artifact"
+      ]
+    }
+  ]
+}

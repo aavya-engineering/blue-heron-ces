@@ -1,0 +1,52 @@
+{
+  "config_id": "eval-fresh-gap",
+  "description": "Config 2 eval-fresh-gap (docs/demo/SIMSTACK-CONFIGS-SPEC.md §2.2) — a brand-new, competently-built CUI enclave. Block-untrusted-locations (P2) and admin-MFA (P3) were configured correctly and CMMC-named on day one, but the two policies teams most often forget — idle session termination (P1 AC.L2-3.1.11) and non-local maintenance MFA (P5 MA.L2-3.7.5) — were never stood up, so both read unknown at seed. No drift, no decoys: the confounder-free control that isolates the unknown->met flip mechanic. Mirror of Config 1 (decoy-maze asks does Muster OVER-credit?; this asks does Muster UNDER-credit?). caPolicies:2 holds exactly the two correctly-named policies; user-5 disabled so PS.L2-3.9.2 reads met on both the eq-filter-honored and passthrough paths; default users (5) and cross-tenant policy (1) kept so IA.L2-3.5.5/6 (P7) and AC.L1-3.1.20 (P9) read met and the plan's user-2/group-1 captures resolve. BEFORE-truth carried in expected_discovery; the calibrated AFTER-truth (P1/P5 flip to met, all gated probes met except N1/N2) is a live-calibrated inline map owned by the Integrate phase in e2e-configs.ts, never hand-authored here.",
+  "stacksim_seed": {
+    "stance": "m365_azure",
+    "countOverrides": {
+      "caPolicies": 2
+    },
+    "steps": [
+      {
+        "kind": "uri",
+        "method": "PATCH",
+        "uri": "/v1.0/identity/conditionalAccess/policies/caPolicy-1",
+        "body": {
+          "displayName": "CMMC-BlockUntrustedLocations"
+        },
+        "note": "P2 AC.L2-3.1.14 / SC.L2-3.13.7 block-untrusted CA -> met BEFORE (correctly named on day one; verbatim name from t2/t4)"
+      },
+      {
+        "kind": "uri",
+        "method": "PATCH",
+        "uri": "/v1.0/identity/conditionalAccess/policies/caPolicy-2",
+        "body": {
+          "displayName": "CMMC-AdminMFA-PhishingResistant"
+        },
+        "note": "P3 AC.L2-3.1.15 admin-MFA CA -> met BEFORE (correctly named on day one; verbatim name from t2/t4)"
+      },
+      {
+        "kind": "uri",
+        "method": "PATCH",
+        "uri": "/v1.0/users/user-5",
+        "body": {
+          "accountEnabled": false
+        },
+        "note": "P6 PS.L2-3.9.2 disabled-account present -> met (user-5 is last of the default 5; t3/t4/t5 pattern)"
+      }
+    ]
+  },
+  "expected_discovery": {
+    "AC.L2-3.1.11": "unknown",
+    "AC.L2-3.1.14": "met",
+    "SC.L2-3.13.7": "met",
+    "AC.L2-3.1.15": "met",
+    "MA.L2-3.7.5": "unknown",
+    "PS.L2-3.9.2": "met",
+    "IA.L2-3.5.5": "met",
+    "IA.L2-3.5.6": "met",
+    "AC.L1-3.1.20": "met",
+    "AC.L2-3.1.12": "unknown",
+    "IA.L2-3.5.4": "unknown"
+  }
+}

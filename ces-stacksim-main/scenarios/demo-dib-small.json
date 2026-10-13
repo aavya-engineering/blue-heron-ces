@@ -1,0 +1,255 @@
+{
+  "name": "demo-dib-small",
+  "description": "GP-STACKSIM-1 M4 demo profile: Ridgeline Fabrication (FICTIONAL), a 13-seat DoD machine-shop subcontractor. Realistic staff, groups, and devices built through the real resolver path, with deliberate findable gaps: MFA stuck in report-only, an unencrypted non-compliant shared shop-floor kiosk, a shared login account, and the IT contractor's daily-driver admin account. Re-running this scenario IS the reset (deterministic wipe + rebuild).",
+  "stance": "m365_azure",
+  "countOverrides": {
+    "users": 13
+  },
+  "steps": [
+    {
+      "kind": "uri",
+      "method": "PATCH",
+      "uri": "/v1.0/users/user-1",
+      "body": {
+        "displayName": "Dana Okafor",
+        "userPrincipalName": "dana.okafor@ridgelinefab.onmicrosoft.us",
+        "jobTitle": "President / Owner",
+        "department": "Executive"
+      },
+      "note": "Owner - signs the DoD contracts, wants the SPRS number fixed"
+    },
+    {
+      "kind": "uri",
+      "method": "PATCH",
+      "uri": "/v1.0/users/user-2",
+      "body": {
+        "displayName": "Marcus Bell",
+        "userPrincipalName": "marcus.bell@ridgelinefab.onmicrosoft.us",
+        "jobTitle": "Programs Manager / FSO",
+        "department": "Programs"
+      },
+      "note": "Handles the CUI contracts day to day"
+    },
+    {
+      "kind": "uri",
+      "method": "PATCH",
+      "uri": "/v1.0/users/user-3",
+      "body": {
+        "displayName": "Priya Raman",
+        "userPrincipalName": "priya.raman@ridgelinefab.onmicrosoft.us",
+        "jobTitle": "Quality Manager",
+        "department": "Quality"
+      },
+      "note": "AS9100 quality lead; touches CUI drawings"
+    },
+    {
+      "kind": "uri",
+      "method": "PATCH",
+      "uri": "/v1.0/users/user-4",
+      "body": {
+        "displayName": "Tom Kowalski",
+        "userPrincipalName": "tom.kowalski@ridgelinefab.onmicrosoft.us",
+        "jobTitle": "Shop Supervisor",
+        "department": "Shop Floor"
+      },
+      "note": "Runs the floor"
+    },
+    {
+      "kind": "uri",
+      "method": "PATCH",
+      "uri": "/v1.0/users/user-5",
+      "body": {
+        "displayName": "Aiko Tanaka",
+        "userPrincipalName": "aiko.tanaka@ridgelinefab.onmicrosoft.us",
+        "jobTitle": "Design Engineer",
+        "department": "Engineering"
+      },
+      "note": "CAD/CAM - works CUI models daily"
+    },
+    {
+      "kind": "uri",
+      "method": "PATCH",
+      "uri": "/v1.0/users/user-6",
+      "body": {
+        "displayName": "Luis Herrera",
+        "userPrincipalName": "luis.herrera@ridgelinefab.onmicrosoft.us",
+        "jobTitle": "CNC Machinist",
+        "department": "Shop Floor"
+      },
+      "note": ""
+    },
+    {
+      "kind": "uri",
+      "method": "PATCH",
+      "uri": "/v1.0/users/user-7",
+      "body": {
+        "displayName": "Sam Whitaker",
+        "userPrincipalName": "sam.whitaker@ridgelinefab.onmicrosoft.us",
+        "jobTitle": "CNC Machinist",
+        "department": "Shop Floor"
+      },
+      "note": ""
+    },
+    {
+      "kind": "uri",
+      "method": "PATCH",
+      "uri": "/v1.0/users/user-8",
+      "body": {
+        "displayName": "Jenny Tran",
+        "userPrincipalName": "jenny.tran@ridgelinefab.onmicrosoft.us",
+        "jobTitle": "CNC Machinist",
+        "department": "Shop Floor"
+      },
+      "note": ""
+    },
+    {
+      "kind": "uri",
+      "method": "PATCH",
+      "uri": "/v1.0/users/user-9",
+      "body": {
+        "displayName": "Bill Mercer",
+        "userPrincipalName": "bill.mercer@ridgelinefab.onmicrosoft.us",
+        "jobTitle": "Manual Machinist / Welder",
+        "department": "Shop Floor"
+      },
+      "note": ""
+    },
+    {
+      "kind": "uri",
+      "method": "PATCH",
+      "uri": "/v1.0/users/user-10",
+      "body": {
+        "displayName": "Carol Jenkins",
+        "userPrincipalName": "carol.jenkins@ridgelinefab.onmicrosoft.us",
+        "jobTitle": "Office Manager",
+        "department": "Front Office"
+      },
+      "note": "Bookkeeping, HR, shipping docs"
+    },
+    {
+      "kind": "uri",
+      "method": "PATCH",
+      "uri": "/v1.0/users/user-11",
+      "body": {
+        "displayName": "Frank Osei",
+        "userPrincipalName": "frank.osei@ridgelinefab.onmicrosoft.us",
+        "jobTitle": "Estimator / Purchasing",
+        "department": "Front Office"
+      },
+      "note": "Receives CUI in RFQ packages"
+    },
+    {
+      "kind": "uri",
+      "method": "PATCH",
+      "uri": "/v1.0/users/user-12",
+      "body": {
+        "displayName": "Ray Dominguez",
+        "userPrincipalName": "ray.dominguez@ridgelinefab.onmicrosoft.us",
+        "jobTitle": "IT Administrator (MSP contract)",
+        "department": "IT"
+      },
+      "note": "GAP (story): Ray's everyday account holds Global Admin - no separate privileged account (iam-003 interview answer: no)"
+    },
+    {
+      "kind": "uri",
+      "method": "PATCH",
+      "uri": "/v1.0/users/user-13",
+      "body": {
+        "displayName": "Shop Floor (shared)",
+        "userPrincipalName": "shop@ridgelinefab.onmicrosoft.us",
+        "jobTitle": "Shared kiosk login",
+        "department": "Shop Floor"
+      },
+      "note": "GAP: shared account for the shop-floor kiosk - violates individual identification (IA.L2-3.5.1/3.5.2 story beat); visible in any user listing"
+    },
+    {
+      "kind": "uri",
+      "method": "PATCH",
+      "uri": "/v1.0/groups/group-1",
+      "body": {
+        "description": "Staff authorized for CUI contract folders"
+      },
+      "note": "displayName stays the seeded 'CUI-Authorized-Users' - EO's fetchGroupMembership filters on that exact name; renaming it would re-open the eo:cuiGroup gap in the demo tenant"
+    },
+    {
+      "kind": "uri",
+      "method": "PATCH",
+      "uri": "/v1.0/groups/group-2",
+      "body": {
+        "displayName": "Shop Floor",
+        "description": "Production floor staff"
+      },
+      "note": ""
+    },
+    {
+      "kind": "uri",
+      "method": "PATCH",
+      "uri": "/v1.0/groups/group-3",
+      "body": {
+        "displayName": "Ridgeline All Staff",
+        "description": "Everyone"
+      },
+      "note": ""
+    },
+    {
+      "kind": "uri",
+      "method": "PATCH",
+      "uri": "/v1.0/deviceManagement/managedDevices/managedDevice-1",
+      "body": {
+        "deviceName": "RIDGE-ENG-01"
+      },
+      "note": "Aiko's CAD workstation - compliant, encrypted"
+    },
+    {
+      "kind": "uri",
+      "method": "PATCH",
+      "uri": "/v1.0/deviceManagement/managedDevices/managedDevice-2",
+      "body": {
+        "deviceName": "RIDGE-QC-01"
+      },
+      "note": "Quality lab PC"
+    },
+    {
+      "kind": "uri",
+      "method": "PATCH",
+      "uri": "/v1.0/deviceManagement/managedDevices/managedDevice-3",
+      "body": {
+        "deviceName": "RIDGE-FRONT-01"
+      },
+      "note": "Front-office PC"
+    },
+    {
+      "kind": "uri",
+      "method": "PATCH",
+      "uri": "/v1.0/deviceManagement/managedDevices/managedDevice-4",
+      "body": {
+        "deviceName": "RIDGE-SHOP-KIOSK",
+        "complianceState": "noncompliant",
+        "isEncrypted": false
+      },
+      "note": "GAP: shared shop-floor kiosk - enrolled in MDM but non-compliant and unencrypted; shows up red in any managed-device read"
+    },
+    {
+      "kind": "uri",
+      "method": "PATCH",
+      "uri": "/v1.0/identity/conditionalAccess/policies/caPolicy-1",
+      "body": {
+        "displayName": "Require MFA - all users",
+        "state": "enabledForReportingButNotEnforced",
+        "grantControls": {
+          "operator": "OR",
+          "builtInControls": [
+            "mfa"
+          ]
+        }
+      },
+      "note": "GAP (the headline): the MSP set up an MFA policy six months ago in report-only mode and never flipped it to enforced - iam-001/iam-004 read 'no'; Stamper's stamp closes it live during the demo"
+    }
+  ],
+  "expectedFacts": {
+    "iam-001": "no",
+    "iam-004": "no",
+    "ep-001": "yes",
+    "ep-002": "yes"
+  }
+}

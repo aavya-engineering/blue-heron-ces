@@ -1,0 +1,149 @@
+{
+  "scenario:audit-logging-baseline": {
+    "summary": "Verify audit log retention and unified-audit-log health on a seeded M365 tenant"
+  },
+  "scenario:clean-tenant-mfa-baseline": {
+    "summary": "M1/M2 baseline: seed a tenant, run Muster readiness, Stamper remediation, verify MFA enforcement"
+  },
+  "scenario:exo-protection-baseline": {
+    "summary": "Exchange Online protection rules: ATP safe links/attachments, anti-phish, anti-spam baseline"
+  },
+  "scenario:remote-maintenance-mfa-baseline": {
+    "summary": "Remote maintenance scenario: MFA baseline for admin sessions over VPN/RDP"
+  },
+  "scenario:teams-external-baseline": {
+    "summary": "Teams external access and guest policies: verify federation, guest invite, and sharing controls"
+  },
+  "scenario:zz-deliberate-fail-atp": {
+    "summary": "Designed-to-fail self-test: asserts a failure so the harness's fail path is exercised",
+    "tags": [
+      "deliberate-fail",
+      "self-test"
+    ]
+  },
+  "scenario:eval/eval-decoy-maze": {
+    "summary": "Full-chain eval: five CA policies, all decoy-named, most-configured tenant earns least credit"
+  },
+  "scenario:eval/eval-fresh-gap": {
+    "summary": "Full-chain eval: competently-built CUI enclave, only P1/P5 missing, confounder-free mirror of decoy-maze"
+  },
+  "scenario:eval/eval-scope-boundary": {
+    "summary": "Full-chain eval: two fixable gaps (P1/P5) plus a structural governance gap (P9) the plan cannot fix"
+  },
+  "scenario:eval/t1-eval-bare": {
+    "summary": "Eval-only: bare tenant with no CUI infrastructure, all probes unknown"
+  },
+  "scenario:eval/t2-eval-identity-first": {
+    "summary": "Eval-only: identity-first tenant, MFA and CA configured, nothing else"
+  },
+  "scenario:eval/t3-eval-half-configured": {
+    "summary": "Eval-only: half-configured tenant, some probes met, some unknown"
+  },
+  "scenario:eval/t4-eval-mostly-hardened": {
+    "summary": "Eval-only: mostly hardened, only one or two probes left unknown"
+  },
+  "scenario:eval/t5-eval-decoys": {
+    "summary": "Eval-only: decoy-heavy tenant, tests that decoy names earn no credit"
+  },
+  "deck:acts-showcase": {
+    "summary": "All 15 demo-acts in-pane showcase: exercises every act group end to end",
+    "audience": "internal"
+  },
+  "deck:ces-smoke-e2e": {
+    "summary": "Quick smoke: one op per module (stacksim, muster, ao, eo, stamper) plus teardown — self-cleaning",
+    "audience": "internal",
+    "tags": ["smoke", "e2e"]
+  },
+  "deck:ces-core-complete": {
+    "summary": "Complete CES core story: the full pain-to-resolution narrative with all tools"
+  },
+  "deck:ces-full-run": {
+    "summary": "Full CES run: every tool driven live, end to end, longest deck"
+  },
+  "deck:ces-overview": {
+    "summary": "Short tool-by-tool walk: the loader fixture and column contract exercise",
+    "audience": "internal"
+  },
+  "deck:ces-pain-story": {
+    "summary": "The deck you present: pain-removal story from fear to evidence"
+  },
+  "deck:ces-pain-story-v2": {
+    "summary": "Pain story v2: refined narrative with hub-spoke and promises-kept arcs"
+  },
+  "deck:ces-prime-subs": {
+    "summary": "Prime + subs demo: rollup across sub-organizations"
+  },
+  "deck:mini-muster-gui": {
+    "summary": "Mini deck: Muster GUI walkthrough only (connect, analyze, attest)"
+  },
+  "deck:mini-sim-muster": {
+    "summary": "Mini deck: simstack seed then Muster readiness"
+  },
+  "deck:muster-readiness-demo": {
+    "summary": "Muster readiness demo: the CLI readiness walk imported into the SPA"
+  },
+  "deck:ridgeline-run": {
+    "summary": "Ridgeline run: the GP-DEMO-1 needle spine as a presented deck"
+  },
+  "deck:streamgui-execute-warm": {
+    "summary": "StreamGUI execute warm: Stamper translate + execute as warm backstage ops"
+  },
+  "deck:streamgui-proof": {
+    "summary": "StreamGUI proof: verifies the stream-GUI architecture works end to end"
+  },
+  "act:muster-readiness": {
+    "summary": "Muster CLI readiness walk imported into the SPA, ending on the boundary panel"
+  },
+  "act:ao-registry": {
+    "summary": "AO registry browse + command selection (warm then live)"
+  },
+  "act:ao-make-change": {
+    "summary": "AO governed remediation change: run A-18 default user permission lockdown"
+  },
+  "act:eo-review": {
+    "summary": "EO assessment: warm hydrates, live walks the result to evidence"
+  },
+  "act:eo-verify-evidence": {
+    "summary": "Cross-act chain: AO executes, then EO assesses and lands on the Evidence Explorer"
+  },
+  "act:eo-show-change-captured": {
+    "summary": "Loop-closes proof: EO before, AO remediates, EO re-assesses and compares"
+  },
+  "act:simstack-create": {
+    "summary": "Readout: stacksim answers, registry record is usable, report-only gap is present"
+  },
+  "act:simstack-destroy": {
+    "summary": "Teardown: remove sim registry record, keep run evidence"
+  },
+  "act:muster-gui": {
+    "summary": "Five Muster SPA acts in one group: connect, auto-analysis, consent, interview, generate"
+  },
+  "act:stamper": {
+    "summary": "Stamper translate + execute as warm backstage ops",
+    "retired": false
+  },
+  "pipeline:demo-needle": {
+    "summary": "GP-DEMO-1 needle: seed → Muster → Stamper → EO before/after spine"
+  },
+  "pipeline:demo-eval": {
+    "summary": "GP-DEMO-2 evaluation mode: Muster discovery against 5 ground-truth tenant configs"
+  },
+  "pipeline:demo-e2e": {
+    "summary": "GP-DEMO-3 end-to-end: Beats 0-5, all four legs Playwright-driven, AO evidence last"
+  },
+  "pipeline:run-all": {
+    "summary": "Run all scenarios serially (M3): every scenarios/*.json through the M2 lifecycle"
+  },
+  "pipeline:run-m1": {
+    "summary": "M1 single-scenario smoke test: the original clean-tenant-mfa-baseline run"
+  },
+  "pipeline:run-m2": {
+    "summary": "M2 scenario-file-backed run: one scenario through the full lifecycle"
+  },
+  "pipeline:demo-preflight": {
+    "summary": "Demo preflight: checks that all sibling tools are reachable and ports are free"
+  },
+  "pipeline:demo-reset": {
+    "summary": "Reset demo state: wipe sim tenant, clear caches, prepare for a fresh run"
+  }
+}

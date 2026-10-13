@@ -1,0 +1,44 @@
+{
+  "scenario_id": "remote-maintenance-mfa-baseline",
+  "description": "T1/PROTECT coverage for MA.L2-3.7.5 (nonlocal maintenance MFA): the pipeline creates a Conditional Access policy 'CMMC-RemoteMaintenance-MFA' via New-MgIdentityConditionalAccessPolicy -DisplayName 'CMMC-RemoteMaintenance-MFA' -State 'enabled' (inventory item stamper:MA.L2-3.7.5.remote-mfa:set; MA.L2-3.7.5 is 'implement' in the standard L2/CUI mission plan and New-MgIdentityConditionalAccessPolicy is a confirmed mutate in retained ledgers -> objectType identityConditionalAccessPolicy). Asserts the created policy's state via GET /v1.0/identity/conditionalAccess/policies with a select on displayName. PENDING-LIVE-SMOKE: this is the first scenario to assert a pipeline-CREATED (not seeded) CA policy through the GET /policies read path; confirm the create-write objectType (identityConditionalAccessPolicy) surfaces in the read collection (caPolicies) with displayName/state before treating a red here as a real regression rather than a write->read collection-parity gap. Grounded and schema-valid now; live read-parity is the open dependency.",
+  "target_level": "L2",
+  "lanes": ["sim"],
+  "stacksim_seed": {
+    "stance": "m365_azure",
+    "countOverrides": {},
+    "steps": []
+  },
+  "muster": {
+    "answer_map": {
+      "G-01": { "wizard": "sit", "answer_type": "enum", "value": "L2" },
+      "G-02": { "wizard": "sit", "answer_type": "enum", "value": "cui_present" },
+      "G-07": { "wizard": "sit", "answer_type": "enum", "value": "single_enclave" },
+      "TCP.LIC.001": { "wizard": "tcp", "answer_type": "single_select", "value": "Microsoft 365 G5" }
+    },
+    "mid_pipeline_assertions": [
+      {
+        "path": "outputs.human_readable_mission_plan.control_directives[?(@.control_id=='MA.L2-3.7.5')]",
+        "assert": "exists",
+        "array_path": "outputs.human_readable_mission_plan.control_directives",
+        "match_field": "control_id",
+        "match_value": "MA.L2-3.7.5"
+      }
+    ]
+  },
+  "stamper": { "execution_mode": "auto" },
+  "fault_injection": [],
+  "expected_state": {
+    "checks": [
+      {
+        "description": "Remote-maintenance MFA Conditional Access policy created in report-only mode (matches the registry command's -State 'enabledForReportingButNotEnforced')",
+        "request": { "kind": "uri", "method": "GET", "uri": "/v1.0/identity/conditionalAccess/policies" },
+        "select": { "field": "displayName", "equals": "CMMC-RemoteMaintenance-MFA" },
+        "path": "state",
+        "assert": "equals",
+        "value": "enabledForReportingButNotEnforced",
+        "ledger_object_type": "caPolicies"
+      }
+    ]
+  },
+  "expected_evidence": []
+}

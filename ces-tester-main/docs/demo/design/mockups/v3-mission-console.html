@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<!--
+  SPDX-FileCopyrightText: Blue Heron Defense LLC and its licensors. All rights reserved.
+  SPDX-License-Identifier: LicenseRef-BHD-Proprietary
+  CONFIDENTIAL - TRADE SECRET. Unpublished work. Provided solely to perform work for Blue Heron Defense LLC at its direction.
+  Any other use, copying, disclosure, or reuse, in whole or in part, is prohibited.
+  Changes made to this file for Blue Heron Defense LLC are made on its behalf; it claims all rights in them.
+  Submitting a change to this repository means you accept TERMS.md.
+  Removing or altering this notice is prohibited (17 U.S.C. 1202). Ref: BHD-CES-TESTER-2026A
+  See LICENSE and TERMS.md.
+-->
+
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>V3 — Mission Console — BHD slide window mockup</title>
+<style>
+/* ============================================================================
+   V3 — MISSION CONSOLE
+   Mockup of the demo:show slide window. Self-contained, offline, no CDNs.
+
+   UNIT RULE — every size is a multiple of --u, one hundredth of the 16:9
+   stage's WIDTH (the same mechanic as src/demo/show/slide-render.ts). The
+   research canvas is 1920x1080, so u = px / 19.2. Conversions used below:
+     28px floor      = 1.46u      36px body       = 1.88u
+     24px eyebrow    = 1.25u      48px subhead    = 2.50u
+     72px title      = 3.75u      96px hero       = 5.00u
+     3px prog rail   = 0.16u      32px logo       = 1.67u   (72px = 3.75u)
+     13px kbd pill   = 0.68u      154px h-margin  = 8.00u
+                                  76px v-margin   = 3.96u
+   Audience-facing copy never drops below 1.46u (28px). Operator chrome and
+   telemetry readouts sit below that deliberately — they are for the driver,
+   not the room.
+
+   ELEVATION RULE — no panel fills. #243244 on #1a2332 is 1.21:1 and vanishes
+   on a projector. Every separation in this file is a 1px rgba(255,255,255,.10)
+   hairline. No gradients, no soft shadows, no pure black.
+
+   GOLD BUDGET — <=3 gold elements per state, never gold body copy:
+     state 1  logo rule . the key number "5" . active progress segment
+     state 2  eyebrow rule . op pill (warm) . active progress segment
+     state 3  op pill (running) . dwell ring . active progress segment
+     state 4  op pill (running) . dwell bar . active progress segment
+   Everything else is the neutral text ramp.
+   ========================================================================= */
+
+:root{
+  /* --u is pure viewport math, so it is defined at the root and inherited by
+     the stage AND by the mockup-only corner caption outside it. */
+  --u:calc(min(100vw, 177.78vh) / 100);
+
+  /* BHD-BRAND.md palette */
+  --navy:#1a2332;
+  --navy-deep:#0f1923;
+  --gold:#f5b74a;
+
+  /* text ramp — computed WCAG on #1a2332 (RESEARCH_SUMMARY 4) */
+  --t1:#e8edf2;   /* 13.40:1 */
+  --t2:#c9d4e0;   /* 10.51:1 */
+  --t3:#8fa3b8;   /*  6.09:1 */
+  --t4:#7d8fa3;   /*  4.76:1 — the floor, nothing dimmer */
+
+  --pass:#4ade80;
+  --warn:#ffb454; /* fail is AMBER, never red — red reads as "broken" to a room */
+
+  --hair:rgba(255,255,255,.10);
+  --hair-soft:rgba(255,255,255,.06);
+  --kbd-line:rgba(255,255,255,.18);
+
+  /* the two easings, kept distinct on purpose */
+  --ease-slide:cubic-bezier(.16,1,.3,1);   /* deck motion, 280ms */
+  --ease-brand:cubic-bezier(.4,0,.2,1);    /* BHD chrome micro-interactions, 300ms */
+}
+
+*{box-sizing:border-box;}
+[hidden]{display:none !important;}
+html,body{
+  margin:0;padding:0;height:100%;
+  background:var(--navy-deep);
+  overflow:hidden;
+  user-select:none;
+}
+body{
+  color:var(--t1);
+  font-family:'Roboto', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+  font-weight:400;
+}
+body.cursor-idle{cursor:none;}
+
+/* --- the stage: fixed 16:9, letterboxed into whatever window it gets ------ */
+.stage{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:min(100vw, 177.78vh);
+  height:min(56.25vw, 100vh);
+  background:var(--navy);
+  overflow:hidden;
+  display:flex;flex-direction:column;
+  font-size:calc(1*var(--u));
+}
+
+/* --- console texture: grid + scanline, decorative only ------------------- */
+/* Never encodes meaning. Held at 2-3% so a lifted-black projector cannot
+   turn it into visible banding. */
+.texture{
+  position:absolute;inset:0;pointer-events:none;z-index:1;
+  background-image:
+    repeating-linear-gradient(0deg,   rgba(255,255,255,.028) 0 1px, transparent 1px calc(4*var(--u))),
+    repeating-linear-gradient(90deg,  rgba(255,255,255,.028) 0 1px, transparent 1px calc(4*var(--u))),
+    repeating-linear-gradient(0deg,   rgba(255,255,255,.016) 0 1px, transparent 1px 3px);
+}
+.vignette{
+  position:absolute;inset:0;pointer-events:none;z-index:1;
+  box-shadow:inset 0 0 calc(12*var(--u)) rgba(10,16,24,.45);
+}
+
+/* ========================================================================== */
+/* PROGRESS RAIL — the whole deck, always visible, across the top            */
+/* ========================================================================== */
+.progress{
+  position:relative;z-index:3;flex:0 0 auto;
+  display:flex;gap:calc(.34*var(--u));
+  padding:0 calc(8*var(--u));
+  margin-top:calc(1.6*var(--u));
+}
+.seg{
+  flex:1;height:max(2px, calc(.16*var(--u)));
+  background:rgba(255,255,255,.10);
+  transition:background 280ms var(--ease-slide), opacity 280ms var(--ease-slide);
+}
+.seg.done{background:rgba(255,255,255,.28);}
+.seg.now{background:var(--gold);}                       /* GOLD 1 of 3 */
+
+/* ========================================================================== */
+/* STATE STACK — 280ms opacity + translateY(14px), the only slide motion      */
+/* ========================================================================== */
+.deck{position:relative;z-index:2;flex:1;min-height:0;}
+.state{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  padding:calc(2.6*var(--u)) calc(8*var(--u)) calc(1.4*var(--u));
+  opacity:0;transform:translateY(14px);
+  pointer-events:none;
+  transition:opacity 280ms var(--ease-slide), transform 280ms var(--ease-slide);
+}
+.state.on{opacity:1;transform:translateY(0);pointer-events:auto;}
+
+/* fragments — 180ms, 70ms stagger (100ms reads as an accident, not intent) */
+.frag{
+  opacity:0;transform:translateY(8px);
+  transition:opacity 180ms var(--ease-slide), transform 180ms var(--ease-slide);
+}
+.state.on .frag{
+  opacity:1;transform:translateY(0);
+  transition-delay:calc(var(--i,0) * 70ms + 120ms);
+}
+
+/* ========================================================================== */
+/* SHARED SLIDE FURNITURE                                                     */
+/* ========================================================================== */
+.eyebrow{
+  display:flex;align-items:center;gap:calc(1.1*var(--u));
+  font-size:calc(1.25*var(--u));
+  text-transform:uppercase;letter-spacing:.14em;font-weight:700;
+  color:var(--t3);
+}
+.eyebrow .num{font-variant-numeric:tabular-nums;color:var(--t2);}
+.rule{
+  width:calc(3.2*var(--u));height:max(2px, calc(.16*var(--u)));
+  background:var(--t4);
+}
+.rule.gold{background:var(--gold);}                     /* GOLD (states 1,2) */
+
+.chips{display:inline-flex;gap:calc(.6*var(--u));}
+.chip{
+  border:1px solid var(--hair);
+  border-radius:calc(.3*var(--u));
+  padding:calc(.16*var(--u)) calc(.8*var(--u));
+  font-size:calc(1.05*var(--u));
+  letter-spacing:.10em;color:var(--t3);font-weight:500;
+}
+
+h1{
+  margin:calc(1.5*var(--u)) 0 0;
+  font-size:calc(3.75*var(--u));      /* 72px */
+  line-height:1.1;font-weight:700;letter-spacing:-.012em;
+  color:var(--t1);
+  max-width:16ch;
+}
+h1.hero{font-size:calc(5*var(--u));max-width:14ch;}      /* 96px */
+
+.lede{
+  margin:calc(1.4*var(--u)) 0 0;
+  font-size:calc(1.88*var(--u));      /* 36px */
+  line-height:1.45;font-weight:400;color:var(--t2);
+  max-width:38ch;                     /* inside the 28-45 char band */
+}
+.impact{
+  margin:0;font-size:calc(1.88*var(--u));line-height:1.45;
+  color:var(--t2);max-width:40ch;
+}
+.impact .k{
+  display:block;
+  font-size:calc(1.05*var(--u));text-transform:uppercase;letter-spacing:.16em;
+  color:var(--t4);font-weight:700;margin-bottom:calc(.5*var(--u));
+}
+.impact + .impact{margin-top:calc(1.9*var(--u));}
+
+.logo-mark svg{display:block;height:calc(1.67*var(--u));width:auto;}
+.logo-mark.big svg{height:calc(3.75*var(--u));}
+.logo-corner{
+  position:absolute;right:calc(8*var(--u));bottom:calc(1.4*var(--u));
+  opacity:.8;
+}
+
+/* ========================================================================== */
+/* TELEMETRY RAIL — ties the slide to the live app pane                       */
+/* ========================================================================== */
+.slide-grid{flex:1;min-height:0;display:flex;gap:calc(3*var(--u));}
+.rail{
+  flex:0 0 calc(15*var(--u));
+  border-right:1px solid var(--hair);
+  padding-right:calc(2*var(--u));
+  display:flex;flex-direction:column;
+}
+.rail-label{
+  font-size:calc(.92*var(--u));text-transform:uppercase;letter-spacing:.20em;
+  color:var(--t4);font-weight:700;
+  padding-bottom:calc(1.1*var(--u));
+  border-bottom:1px solid var(--hair-soft);
+}
+
+/* tell -> show -> tell, as instrument stops */
+.stops{margin-top:calc(1.6*var(--u));position:relative;}
+.stops::before{
+  content:'';position:absolute;left:calc(.42*var(--u));top:calc(.9*var(--u));bottom:calc(.9*var(--u));
+  width:1px;background:var(--hair);
+}
+.stop{
+  position:relative;padding-left:calc(2.1*var(--u));
+  margin-bottom:calc(1.5*var(--u));
+}
+.stop::before{
+  content:'';position:absolute;left:0;top:calc(.42*var(--u));
+  width:calc(.85*var(--u));height:calc(.85*var(--u));border-radius:50%;
+  background:var(--navy);border:1px solid var(--t4);
+  transition:background 240ms var(--ease-brand), border-color 240ms var(--ease-brand);
+}
+.stop.active::before{background:var(--t1);border-color:var(--t1);}
+.stop .s-kind{
+  display:block;font-size:calc(.95*var(--u));font-weight:700;
+  text-transform:uppercase;letter-spacing:.16em;color:var(--t4);
+  transition:color 240ms var(--ease-brand);
+}
+.stop.active .s-kind{color:var(--t1);}
+.stop .s-what{
+  display:block;font-size:calc(1.0*var(--u));color:var(--t4);
+  line-height:1.35;margin-top:calc(.25*var(--u));
+}
+.stop.active .s-what{color:var(--t3);}
+
+.readouts{
+  margin-top:auto;padding-top:calc(1.3*var(--u));
+  border-top:1px solid var(--hair-soft);
+}
+.ro{
+  display:flex;justify-content:space-between;align-items:baseline;
+  font-size:calc(1.0*var(--u));padding:calc(.3*var(--u)) 0;
+}
+.ro .k{color:var(--t4);text-transform:uppercase;letter-spacing:.12em;font-size:calc(.88*var(--u));font-weight:700;}
+.ro .v{color:var(--t2);font-variant-numeric:tabular-nums;}
+.ro .v.ok{color:var(--pass);}
+
+.main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.main-body{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;}
+
+/* --- "what you're seeing now" caption ----------------------------------- */
+.now{
+  margin-top:calc(1.6*var(--u));
+  display:inline-flex;align-items:center;gap:calc(.9*var(--u));
+  align-self:flex-start;
+  border:1px solid var(--hair);border-radius:calc(2*var(--u));
+  padding:calc(.5*var(--u)) calc(1.3*var(--u));
+  font-size:calc(1.46*var(--u));      /* 28px — audience-facing floor */
+  color:var(--t2);
+  transition:opacity 200ms var(--ease-slide);
+}
+.now .lbl{
+  font-size:calc(1.0*var(--u));text-transform:uppercase;letter-spacing:.16em;
+  color:var(--t4);font-weight:700;
+}
+.now .eye{
+  width:calc(.7*var(--u));height:calc(.7*var(--u));border-radius:50%;
+  background:var(--t2);
+  animation:breathe 1.6s var(--ease-brand) infinite;
+}
+@keyframes breathe{0%,100%{opacity:.4}50%{opacity:1}}
+
+/* ========================================================================== */
+/* STATE 1 — opening / title                                                  */
+/* ========================================================================== */
+.title-state{justify-content:center;}
+.title-head{display:flex;align-items:center;gap:calc(2*var(--u));}
+.title-rule{
+  flex:0 0 calc(6*var(--u));height:max(2px, calc(.16*var(--u)));
+  background:var(--gold);                                /* GOLD 2 of 3 */
+}
+.title-org{
+  font-size:calc(1.25*var(--u));text-transform:uppercase;letter-spacing:.20em;
+  color:var(--t3);font-weight:700;
+}
+.stat-row{
+  margin-top:calc(2.6*var(--u));
+  display:flex;align-items:baseline;gap:calc(1.2*var(--u));
+  font-size:calc(1.46*var(--u));color:var(--t3);
+  text-transform:uppercase;letter-spacing:.14em;font-weight:500;
+}
+.stat-row .big{
+  font-size:calc(3.4*var(--u));font-weight:700;line-height:1;
+  color:var(--gold);                                     /* GOLD 3 of 3 */
+  font-variant-numeric:tabular-nums;letter-spacing:0;
+}
+.stat-row .sep{color:var(--t4);}
+
+/* ========================================================================== */
+/* DWELL — depleting, LINEAR, constant colour, gold at 40%. No red, no pulse, */
+/* no acceleration: those are what make a countdown stressful in a room.      */
+/* ========================================================================== */
+.dwell{
+  display:flex;align-items:center;gap:calc(1.4*var(--u));
+  margin-top:calc(1.8*var(--u));
+}
+.ring{position:relative;width:calc(7.4*var(--u));height:calc(7.4*var(--u));flex:0 0 auto;}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg);}
+.ring circle{fill:none;stroke-width:4;stroke-linecap:butt;}
+.ring .track{stroke:rgba(255,255,255,.10);}
+.ring .fill{
+  stroke:rgba(245,183,74,.40);                           /* GOLD, 40% */
+  stroke-dasharray:276.46;
+  animation:deplete 90s linear -28s forwards;
+}
+@keyframes deplete{from{stroke-dashoffset:0}to{stroke-dashoffset:276.46}}
+.ring .cd{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+}
+.ring .cd b{
+  font-size:calc(1.7*var(--u));font-weight:500;color:var(--t2);
+  font-variant-numeric:tabular-nums;line-height:1;
+}
+.ring .cd span{
+  font-size:calc(.8*var(--u));text-transform:uppercase;letter-spacing:.16em;
+  color:var(--t4);margin-top:calc(.3*var(--u));
+}
+.dwell-note{font-size:calc(1.1*var(--u));color:var(--t4);line-height:1.4;max-width:26ch;}
+.paused .ring .fill{animation-play-state:paused;}
+.paused .now .eye{animation-play-state:paused;}
+
+/* ========================================================================== */
+/* STATE 4 — HOLD CARD (the >2.5s rung of the ladder)                         */
+/* ========================================================================== */
+.hold-state{justify-content:center;align-items:flex-start;}
+.hold-kicker{
+  display:flex;align-items:center;gap:calc(1.1*var(--u));
+  font-size:calc(1.25*var(--u));text-transform:uppercase;letter-spacing:.16em;
+  color:var(--t3);font-weight:700;
+}
+.hold-line{
+  margin:calc(2.4*var(--u)) 0 0;
+  font-size:calc(2.5*var(--u));      /* 48px subhead */
+  line-height:1.3;font-weight:400;color:var(--t1);
+  max-width:26ch;
+  animation:holdPulse 2s ease-in-out infinite;
+}
+@keyframes holdPulse{0%,100%{opacity:1}50%{opacity:.62}}
+.hold-foot{
+  margin-top:calc(2.6*var(--u));
+  font-size:calc(1.46*var(--u));color:var(--t3);
+}
+.hold-bar{
+  margin-top:calc(1.4*var(--u));
+  width:calc(34*var(--u));height:max(2px, calc(.16*var(--u)));
+  background:rgba(255,255,255,.10);position:relative;overflow:hidden;
+}
+.hold-bar i{
+  position:absolute;inset:0 auto 0 0;
+  background:rgba(245,183,74,.40);                       /* GOLD, 40% */
+  animation:drain 90s linear -47s forwards;
+}
+@keyframes drain{from{right:0}to{right:100%}}
+.ladder{
+  margin-top:calc(2.2*var(--u));
+  display:flex;gap:calc(1.4*var(--u));align-items:center;
+  font-size:calc(.95*var(--u));text-transform:uppercase;letter-spacing:.14em;
+  color:var(--t4);
+}
+.ladder b{color:var(--t3);font-weight:700;}
+.ladder .arrow{color:var(--t4);opacity:.6;}
+
+/* ========================================================================== */
+/* CHROME — status is first-class UI, not a footnote                          */
+/* ========================================================================== */
+.chrome{
+  position:relative;z-index:3;flex:0 0 auto;
+  border-top:1px solid var(--hair);
+  padding:calc(1.0*var(--u)) calc(8*var(--u));
+  display:flex;align-items:center;gap:calc(1.6*var(--u));
+  font-size:calc(1.05*var(--u));color:var(--t3);
+}
+.chrome .grow{flex:1;}
+.pos{font-variant-numeric:tabular-nums;opacity:.4;letter-spacing:.08em;}
+
+.pill{
+  display:inline-flex;align-items:center;gap:calc(.6*var(--u));
+  height:calc(1.35*var(--u));
+  border:1px solid var(--hair);border-radius:999px;
+  padding:0 calc(1.0*var(--u));
+  font-size:calc(.88*var(--u));text-transform:uppercase;letter-spacing:.08em;
+  font-weight:700;color:var(--t3);
+  transition:color 240ms var(--ease-brand), border-color 240ms var(--ease-brand);
+}
+.pill .dot{width:calc(.5*var(--u));height:calc(.5*var(--u));border-radius:50%;background:currentColor;}
+.pill.idle{color:var(--t4);}
+.pill.warm{color:var(--gold);border-color:rgba(245,183,74,.35);}       /* GOLD */
+.pill.running{color:var(--gold);border-color:rgba(245,183,74,.35);}    /* GOLD */
+.pill.running .dot{animation:breathe 1.6s var(--ease-brand) infinite;}
+.pill.done{color:var(--pass);border-color:rgba(74,222,128,.35);}
+.pill.failed{color:var(--warn);border-color:rgba(255,180,84,.35);}     /* amber, never red */
+.paused .pill.running .dot{animation-play-state:paused;}
+
+.hints{
+  display:flex;align-items:center;gap:calc(.9*var(--u));
+  opacity:1;transition:opacity 300ms var(--ease-brand);
+}
+.hints.dim{opacity:0;}
+kbd{
+  font-family:inherit;font-size:calc(.68*var(--u));
+  padding:calc(.16*var(--u)) calc(.36*var(--u));
+  border:1px solid var(--kbd-line);border-radius:calc(.26*var(--u));
+  color:var(--t2);line-height:1.4;
+}
+.hint-txt{font-size:calc(.88*var(--u));color:var(--t4);letter-spacing:.06em;}
+
+/* ========================================================================== */
+/* PRESENTER BAND — 't'. Never audience-facing; it lives below the deck.       */
+/* ========================================================================== */
+.presenter{
+  position:relative;z-index:3;flex:0 0 auto;
+  border-top:1px solid var(--hair);
+  padding:calc(1.3*var(--u)) calc(8*var(--u));
+  max-height:24%;overflow:hidden;
+  transition:opacity 280ms var(--ease-slide), transform 280ms var(--ease-slide);
+}
+.presenter .p-label{
+  font-size:calc(.9*var(--u));text-transform:uppercase;letter-spacing:.20em;
+  color:var(--t4);font-weight:700;margin-bottom:calc(.7*var(--u));
+}
+.presenter p{
+  margin:0;font-size:calc(1.35*var(--u));line-height:1.45;color:var(--t2);
+  max-width:88ch;
+}
+.presenter.hidden{display:none;}
+
+/* --- mockup-only corner caption ----------------------------------------- */
+.mock-caption{
+  position:fixed;top:calc(.8*var(--u));right:calc(1.2*var(--u));z-index:9;
+  font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--t4);opacity:.75;
+  font-family:'Roboto', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+}
+.mock-caption b{color:var(--t3);font-weight:700;}
+
+/* ========================================================================== */
+@media (prefers-reduced-motion: reduce){
+  .state,.frag,.now,.pill,.seg,.stop::before,.stop .s-kind,.presenter{
+    transition-duration:120ms !important;
+    transition-property:opacity !important;
+    transition-delay:0ms !important;
+  }
+  .state,.frag{transform:none !important;}
+  .ring .fill,.hold-bar i{animation-duration:90s;}
+  .hold-line,.now .eye,.pill.running .dot{animation:none;opacity:1;}
+}
+</style>
+</head>
+<body>
+
+<div class="stage" id="stage">
+  <div class="texture"></div>
+  <div class="vignette"></div>
+
+  <!-- deck progress rail: eight slides, always visible -->
+  <div class="progress" id="progress"></div>
+
+  <div class="deck">
+
+    <!-- ==================================================================== -->
+    <!-- STATE 1 — opening / title                                            -->
+    <!-- ==================================================================== -->
+    <section class="state title-state on" data-state="1" data-slide="1" data-op="idle">
+      <div class="title-head">
+        <div class="logo-mark big">
+          <svg xmlns="http://www.w3.org/2000/svg" width="200" height="60" viewBox="0 0 200 60">
+            <rect width="200" height="60" rx="8" fill="transparent"/>
+            <text x="100" y="37" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="700" fill="#ffffff" text-anchor="middle">BHD</text>
+          </svg>
+        </div>
+        <span class="title-rule"></span>
+        <span class="title-org">Blue Heron Defense &middot; CES</span>
+      </div>
+
+      <h1 class="hero frag" style="--i:0">CES in one run</h1>
+
+      <p class="lede frag" style="--i:1">Orchestrates five tools end to end against a live tenant.</p>
+
+      <div class="stat-row frag" style="--i:2">
+        <span class="big">5</span><span>tools</span>
+        <span class="sep">/</span><span>8 stops</span>
+        <span class="sep">/</span><span>one ledger</span>
+      </div>
+
+      <div class="chips frag" style="--i:3; margin-top:calc(2.4*var(--u));">
+        <span class="chip">stacksim</span>
+        <span class="chip">muster</span>
+        <span class="chip">stamper</span>
+        <span class="chip">ao</span>
+        <span class="chip">eo</span>
+      </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- STATE 2 — content slide, telemetry rail, warm/done op                -->
+    <!-- ==================================================================== -->
+    <section class="state" data-state="2" data-slide="6" data-op="warm">
+      <div class="slide-grid">
+
+        <aside class="rail">
+          <div class="rail-label">Telemetry</div>
+          <div class="stops">
+            <div class="stop active">
+              <span class="s-kind">Tell</span>
+              <span class="s-what">What it is, and why it exists</span>
+            </div>
+            <div class="stop">
+              <span class="s-kind">Show</span>
+              <span class="s-what">AdminOps registry, app pane</span>
+            </div>
+            <div class="stop">
+              <span class="s-kind">Tell</span>
+              <span class="s-what">The so-what</span>
+            </div>
+          </div>
+          <div class="readouts">
+            <div class="ro"><span class="k">Op</span><span class="v">ao-registry</span></div>
+            <div class="ro"><span class="k">Prewarm</span><span class="v ok">done &middot; 1.4s</span></div>
+            <div class="ro"><span class="k">Tenant</span><span class="v">stacksim-01</span></div>
+            <div class="ro"><span class="k">Ledger</span><span class="v">0 writes</span></div>
+          </div>
+        </aside>
+
+        <div class="main">
+          <div class="eyebrow">
+            <span class="rule gold"></span>
+            <span class="num">06 / 08</span>
+            <span class="chips"><span class="chip">ao</span></span>
+          </div>
+
+          <div class="main-body">
+            <h1 class="frag" style="--i:0">AdminOps</h1>
+            <p class="lede frag" style="--i:1">A tiered command registry for day-two administrative operations.</p>
+
+            <div style="margin-top:calc(2.4*var(--u));border-top:1px solid var(--hair);padding-top:calc(2.0*var(--u));">
+              <p class="impact frag" style="--i:2">
+                <span class="k">Benefit</span>
+                Routine tenant changes stop being ad-hoc scripts on somebody&rsquo;s laptop.
+              </p>
+              <p class="impact frag" style="--i:3">
+                <span class="k">Differentiator</span>
+                Tier gating plus auto-collected evidence on every single execution.
+              </p>
+            </div>
+          </div>
+
+          <div class="now frag" style="--i:4">
+            <span class="eye"></span>
+            <span class="lbl">Now</span>
+            <span>The registry is warming in the app pane beside this slide.</span>
+          </div>
+        </div>
+      </div>
+      <div class="logo-corner logo-mark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="60" viewBox="0 0 200 60">
+          <rect width="200" height="60" rx="8" fill="transparent"/>
+          <text x="100" y="37" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="700" fill="#ffffff" text-anchor="middle">BHD</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- STATE 3 — live op running, dwell ring holding calmly                 -->
+    <!-- ==================================================================== -->
+    <section class="state" data-state="3" data-slide="7" data-op="running">
+      <div class="slide-grid">
+
+        <aside class="rail">
+          <div class="rail-label">Telemetry</div>
+          <div class="stops">
+            <div class="stop">
+              <span class="s-kind">Tell</span>
+              <span class="s-what">Registry, tier gating</span>
+            </div>
+            <div class="stop active">
+              <span class="s-kind">Show</span>
+              <span class="s-what">Tier-1 command executing</span>
+            </div>
+            <div class="stop">
+              <span class="s-kind">Tell</span>
+              <span class="s-what">The so-what</span>
+            </div>
+          </div>
+          <div class="readouts">
+            <div class="ro"><span class="k">Op</span><span class="v">ao-registry</span></div>
+            <div class="ro"><span class="k">Tier</span><span class="v">1</span></div>
+            <div class="ro"><span class="k">Tenant</span><span class="v">stacksim-01</span></div>
+            <div class="ro"><span class="k">Ledger</span><span class="v">14 writes</span></div>
+            <div class="ro"><span class="k">Elapsed</span><span class="v" id="elapsed">00:28</span></div>
+          </div>
+        </aside>
+
+        <div class="main">
+          <div class="eyebrow">
+            <span class="rule"></span>
+            <span class="num">07 / 08</span>
+            <span class="chips"><span class="chip">ao</span></span>
+          </div>
+
+          <div class="main-body">
+            <h1 class="frag" style="--i:0">Live command execution</h1>
+            <p class="lede frag" style="--i:1">Browse the registry, open a Tier-1 command, execute it against the tenant.</p>
+
+            <div class="dwell frag" style="--i:2">
+              <div class="ring">
+                <svg viewBox="0 0 100 100" aria-hidden="true">
+                  <circle class="track" cx="50" cy="50" r="44"></circle>
+                  <circle class="fill"  cx="50" cy="50" r="44"></circle>
+                </svg>
+                <div class="cd"><b id="countdown">62</b><span>sec</span></div>
+              </div>
+              <div class="dwell-note">
+                Dwell depletes linearly at constant colour &mdash; <kbd>P</kbd> holds it.
+              </div>
+            </div>
+          </div>
+
+          <div class="now frag" style="--i:3">
+            <span class="eye"></span>
+            <span class="lbl">Now</span>
+            <span>A Tier-1 command is executing against the tenant.</span>
+          </div>
+        </div>
+      </div>
+      <div class="logo-corner logo-mark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="60" viewBox="0 0 200 60">
+          <rect width="200" height="60" rx="8" fill="transparent"/>
+          <text x="100" y="37" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="700" fill="#ffffff" text-anchor="middle">BHD</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- STATE 4 — HOLD CARD (>2.5s rung: promote the differentiator)         -->
+    <!-- ==================================================================== -->
+    <section class="state hold-state" data-state="4" data-slide="7" data-op="running">
+      <div class="hold-kicker">
+        <span class="rule"></span>
+        <span>Holding &middot; ao-registry &middot; 00:47</span>
+      </div>
+
+      <p class="hold-line">
+        The evidence is collected by the tool, not assembled afterwards by the human.
+      </p>
+
+      <div class="hold-foot frag" style="--i:0">The op is still running in the app pane.</div>
+      <div class="hold-bar frag" style="--i:1"><i></i></div>
+
+      <div class="ladder frag" style="--i:2">
+        <span>0&ndash;800ms <b>silent</b></span>
+        <span class="arrow">&rarr;</span>
+        <span>0.8&ndash;2.5s <b>status pill</b></span>
+        <span class="arrow">&rarr;</span>
+        <span><b>&gt;2.5s hold card</b></span>
+      </div>
+
+      <div class="logo-corner logo-mark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="60" viewBox="0 0 200 60">
+          <rect width="200" height="60" rx="8" fill="transparent"/>
+          <text x="100" y="37" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="700" fill="#ffffff" text-anchor="middle">BHD</text>
+        </svg>
+      </div>
+    </section>
+
+  </div><!-- /.deck -->
+
+  <!-- ==================================================================== -->
+  <!-- CHROME                                                                -->
+  <!-- ==================================================================== -->
+  <div class="chrome">
+    <span class="pill" id="opPill"><span class="dot"></span><span id="opText">staged</span></span>
+    <span class="pill done" id="prewarmPill" hidden><span class="dot"></span>prewarm done</span>
+    <span class="grow"></span>
+    <span class="hints" id="hints">
+      <kbd>&larr;</kbd><kbd>&rarr;</kbd><span class="hint-txt">state</span>
+      <kbd>T</kbd><span class="hint-txt">talk track</span>
+      <kbd>P</kbd><span class="hint-txt">hold</span>
+      <kbd>?</kbd><span class="hint-txt">hints</span>
+    </span>
+    <span class="pos" id="pos">01 / 08</span>
+  </div>
+
+  <div class="presenter hidden" id="presenter">
+    <div class="p-label">Talk track &mdash; presenter only</div>
+    <p id="presenterText"></p>
+  </div>
+
+</div><!-- /.stage -->
+
+<div class="mock-caption"><b>V3</b> &mdash; Mission Console &middot; <span id="stateName">opening</span></div>
+
+<script>
+(function(){
+  var SLIDE_COUNT = 8;
+  var states = Array.prototype.slice.call(document.querySelectorAll('.state'));
+  var progress = document.getElementById('progress');
+  var opPill = document.getElementById('opPill');
+  var opText = document.getElementById('opText');
+  var prewarmPill = document.getElementById('prewarmPill');
+  var posEl = document.getElementById('pos');
+  var hints = document.getElementById('hints');
+  var presenter = document.getElementById('presenter');
+  var presenterText = document.getElementById('presenterText');
+  var stateName = document.getElementById('stateName');
+  var stage = document.getElementById('stage');
+  var countdown = document.getElementById('countdown');
+
+  // Real talk-track rows from the starter deck (never audience-facing).
+  var TALK = {
+    1: 'Welcome. CES turns a CMMC assessment from a six-week consulting engagement into a repeatable run that leaves evidence behind.',
+    2: 'AdminOps is the day-two surface. We warm it up now so it is ready the moment we need it.',
+    3: 'Here it is live — the real AdminOps GUI, driven exactly the way an operator drives it.',
+    4: 'Long op. Let it breathe — land the differentiator, then come back to the pane.'
+  };
+  var OP_LABEL = { idle:'staged', warm:'ao-registry · warm', running:'ao-registry · running' };
+  var NAME = { 1:'opening', 2:'content + caption rail', 3:'live op running', 4:'hold card' };
+
+  var current = 1;
+  var presenterOn = false;
+  var paused = false;
+
+  // --- progress rail: one segment per deck slide -------------------------
+  var segs = [];
+  for (var i = 1; i <= SLIDE_COUNT; i++){
+    var s = document.createElement('span');
+    s.className = 'seg';
+    progress.appendChild(s);
+    segs.push(s);
+  }
+
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+
+  function show(n){
+    current = n;
+    var el = states[n - 1];
+    var slide = parseInt(el.getAttribute('data-slide'), 10);
+    var op = el.getAttribute('data-op');
+
+    states.forEach(function(s){ s.classList.remove('on'); });
+    // Force a reflow so fragment transitions re-run on re-entry.
+    void el.offsetWidth;
+    el.classList.add('on');
+
+    segs.forEach(function(seg, i){
+      seg.className = 'seg' + (i + 1 < slide ? ' done' : (i + 1 === slide ? ' now' : ''));
+    });
+
+    opPill.className = 'pill ' + op;
+    opText.textContent = OP_LABEL[op];
+    prewarmPill.hidden = (op !== 'warm');
+
+    posEl.textContent = pad(slide) + ' / ' + SLIDE_COUNT;
+    stateName.textContent = NAME[n];
+
+    presenterText.textContent = TALK[n];
+    presenter.className = 'presenter' + (presenterOn ? '' : ' hidden');
+  }
+
+  // --- dwell countdown: linear, constant colour, pausable ----------------
+  var remaining = 62;
+  setInterval(function(){
+    // Clamps at 0 to stay in step with the ring, which is `forwards`. A dwell
+    // that reaches zero simply holds — it never restarts or accelerates.
+    if (paused || current !== 3 || remaining === 0) return;
+    remaining -= 1;
+    countdown.textContent = remaining;
+  }, 1000);
+
+  // --- keyboard hints: auto-show 4s on launch, then fade; '?' toggles ----
+  var hintTimer = setTimeout(function(){ hints.classList.add('dim'); }, 4000);
+
+  document.addEventListener('keydown', function(e){
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === 'ArrowRight'){ show(current < states.length ? current + 1 : 1); }
+    else if (e.key === 'ArrowLeft'){ show(current > 1 ? current - 1 : states.length); }
+    else if (e.key === 't' || e.key === 'T'){
+      presenterOn = !presenterOn;
+      presenter.className = 'presenter' + (presenterOn ? '' : ' hidden');
+    }
+    else if (e.key === 'p' || e.key === 'P'){
+      paused = !paused;
+      stage.classList.toggle('paused', paused);
+    }
+    else if (e.key === '?'){
+      clearTimeout(hintTimer);
+      hints.classList.toggle('dim');
+    }
+    else return;
+    e.preventDefault();
+  });
+
+  document.addEventListener('click', function(e){
+    show(e.clientX < window.innerWidth / 4
+      ? (current > 1 ? current - 1 : states.length)
+      : (current < states.length ? current + 1 : 1));
+  });
+
+  // --- cursor auto-hide at 2500ms (5000 is too long for a demo) ----------
+  var cursorTimer;
+  function wake(){
+    document.body.classList.remove('cursor-idle');
+    clearTimeout(cursorTimer);
+    cursorTimer = setTimeout(function(){ document.body.classList.add('cursor-idle'); }, 2500);
+  }
+  document.addEventListener('mousemove', wake);
+  wake();
+
+  document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+
+  show(1);
+})();
+</script>
+</body>
+</html>

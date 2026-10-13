@@ -1,0 +1,23 @@
+{
+  "name": "muster-mfa-disabled",
+  "description": "Edge case for MFA state detection: a CA policy CARRIES the mfa grant control but its state is 'disabled' — a naive detector that checks grantControls without checking state would wrongly report MFA as enforced.",
+  "stance": "m365_azure",
+  "steps": [
+    {
+      "kind": "uri",
+      "method": "PATCH",
+      "uri": "/v1.0/identity/conditionalAccess/policies/caPolicy-1",
+      "body": {
+        "state": "disabled",
+        "grantControls": { "operator": "OR", "builtInControls": ["mfa"] }
+      },
+      "note": "MFA grant present but policy disabled -> iam-001/iam-004 must stay 'no'"
+    }
+  ],
+  "expectedFacts": {
+    "iam-001": "no",
+    "iam-004": "no",
+    "ep-001": "yes",
+    "ep-002": "yes"
+  }
+}

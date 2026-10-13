@@ -1,0 +1,249 @@
+$schema: http://json-schema.org/draft-07/schema#
+title: Microsoft Technical Reference Guide for CMMC L2 - Structured
+description: 110 NIST SP 800-171 controls decomposed by Microsoft service with preserved hyperlinks. Extracted from the Microsoft
+  Technical Reference Guide for CMMC L2 - Preview Sept 2024.
+type: object
+required:
+- document_title
+- total_controls
+- control_families
+- service_to_control_mapping
+properties:
+  document_title:
+    type: string
+  total_controls:
+    type: integer
+    const: 110
+  control_families:
+    type: array
+    minItems: 14
+    maxItems: 14
+    items:
+      $ref: '#/definitions/control_family'
+  service_to_control_mapping:
+    $ref: '#/definitions/service_mapping'
+definitions:
+  control_family:
+    type: object
+    required:
+    - abbreviation
+    - name
+    - control_count
+    - controls
+    properties:
+      abbreviation:
+        type: string
+        enum:
+        - AC
+        - AT
+        - AU
+        - CM
+        - IA
+        - IR
+        - MA
+        - MP
+        - PE
+        - PS
+        - RA
+        - CA
+        - SC
+        - SI
+      name:
+        type: string
+        enum:
+        - Access Control
+        - Awareness and Training
+        - Audit and Accountability
+        - Configuration Management
+        - Identification and Authentication
+        - Incident Response
+        - Maintenance
+        - Media Protection
+        - Physical Protection
+        - Personnel Security
+        - Risk Assessment
+        - Security Assessment
+        - Systems and Communications Protection
+        - System and Information Integrity
+      control_count:
+        type: integer
+      controls:
+        type: array
+        items:
+          $ref: '#/definitions/control'
+  control:
+    type: object
+    required:
+    - control_id
+    - family
+    - cmmc_level
+    - nist_sp_800_171_ref
+    - nist_sp_800_53_mapping
+    - practice
+    - assessment_objectives
+    - primary_services
+    - secondary_services
+    - implementation_by_service
+    properties:
+      control_id:
+        type: string
+        pattern: ^[A-Z]{2}\.L[1-3]-\d+\.\d+\.\d+$
+        description: CMMC control identifier (e.g. AC.L1-3.1.1)
+      family:
+        type: string
+        enum:
+        - AC
+        - AT
+        - AU
+        - CM
+        - IA
+        - IR
+        - MA
+        - MP
+        - PE
+        - PS
+        - RA
+        - CA
+        - SC
+        - SI
+      cmmc_level:
+        type: integer
+        enum:
+        - 1
+        - 2
+      nist_sp_800_171_ref:
+        type: string
+        pattern: ^\d+\.\d+\.\d+$
+        description: NIST SP 800-171 section reference (e.g. 3.1.1)
+      nist_sp_800_53_mapping:
+        type: string
+        description: Comma-separated NIST SP 800-53 control IDs (e.g. AC-2, AC-3, AC-17)
+      practice:
+        type: string
+        description: The control requirement statement
+      assessment_objectives:
+        type: array
+        description: Lettered sub-objectives. Empty for IA.L2-3.5.11 (omitted in source doc).
+        items:
+          $ref: '#/definitions/assessment_objective'
+      primary_services:
+        type: array
+        description: Microsoft services that directly meet the control. Empty for 17 controls where source doc lists none.
+        items:
+          type: string
+      secondary_services:
+        type: array
+        description: Microsoft services that support the primary services
+        items:
+          type: string
+      implementation_by_service:
+        type: array
+        description: Implementation guidance decomposed by Microsoft service. Each entry is a service section containing paragraphs
+          with preserved hyperlinks.
+        items:
+          $ref: '#/definitions/service_section'
+      azure_policies:
+        type: array
+        description: Azure Policy definitions for this control. Present only where applicable.
+        items:
+          $ref: '#/definitions/link'
+      customer_responsibilities:
+        type: object
+        description: Customer responsibility statements by cloud environment. Present only where applicable.
+        properties:
+          azure:
+            type: array
+            description: Customer responsibilities in Azure Commercial
+            items:
+              $ref: '#/definitions/paragraph'
+          gcch:
+            type: array
+            description: Customer responsibilities in GCC High
+            items:
+              $ref: '#/definitions/paragraph'
+      note:
+        type: string
+        description: Present only on 5 CSP-managed PE controls (3.10.1-3.10.5) not in source doc body.
+  service_section:
+    type: object
+    required:
+    - service_name
+    - paragraphs
+    properties:
+      service_name:
+        type: string
+        description: Microsoft service or feature name that heads this section. '_general' for intro text before the first
+          named service.
+        examples:
+        - Microsoft Entra ID
+        - Intune/Intune Suite
+        - Azure Firewall
+        - Microsoft Purview
+        - _general
+      paragraphs:
+        type: array
+        description: Ordered paragraphs of implementation guidance for this service
+        items:
+          $ref: '#/definitions/paragraph'
+  paragraph:
+    type: object
+    required:
+    - text
+    - text_with_links
+    - links
+    properties:
+      text:
+        type: string
+        description: Plain text content of the paragraph
+      text_with_links:
+        type: string
+        description: 'Paragraph text with inline markdown-style hyperlinks: [label](url)'
+      links:
+        type: array
+        description: All hyperlinks extracted from this paragraph
+        items:
+          $ref: '#/definitions/link'
+  link:
+    type: object
+    required:
+    - text
+    - url
+    properties:
+      text:
+        type: string
+        description: Display text of the hyperlink
+      url:
+        type: string
+        format: uri
+        description: Target URL
+  assessment_objective:
+    type: object
+    required:
+    - id
+    - text
+    properties:
+      id:
+        type: string
+        pattern: ^[a-z]$
+        description: Single letter identifier (a, b, c, ...)
+      text:
+        type: string
+        description: Objective statement
+  service_mapping:
+    type: object
+    required:
+    - description
+    - total_services
+    - services
+    properties:
+      description:
+        type: string
+      total_services:
+        type: integer
+      services:
+        type: object
+        description: Map of service name → sorted list of control IDs
+        additionalProperties:
+          type: array
+          items:
+            type: string

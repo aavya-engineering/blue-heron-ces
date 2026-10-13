@@ -1,0 +1,212 @@
+Speaker 1  00:02
+Hey, hi Mark. Good morning.
+
+Mark Sutton  00:04
+Hello, how you doing? Hey,
+
+Kunal  00:06
+I'm doing good. How are you doing?
+
+Mark Sutton  00:08
+Yeah, very well, thank you.
+
+sunny.kumrawat@aavya.com  00:11
+Hey, Mark.
+
+Speaker 1  00:13
+Hello. How's it going?
+
+sunny.kumrawat@aavya.com  00:16
+All good. Good.
+
+Mark Sutton  00:21
+Where are you guys located?
+
+Kunal  00:24
+Basically, we are from from Indore, India.
+
+sunny.kumrawat@aavya.com  00:30
+Yeah, I'm too.
+
+Mark Sutton  00:33
+Very nice. Hopefully, it's not too terribly late for you.
+
+sunny.kumrawat@aavya.com  00:37
+No, no, all good. All good, all good.
+
+Mark Sutton  00:47
+Well, Daryl has told me that he's going to be a few minutes late. He's wrapping up another meeting, and looks like Kunal's assistant is here, but I don't know that Kunal is in the meeting yet?
+
+sunny.kumrawat@aavya.com  01:05
+I think let's wait for him. He's going to join within one to two minutes.
+
+Mark Sutton  01:09
+Okay, very good. Have you guys had a chance to work with the information we've sent over? Not very much.
+
+sunny.kumrawat@aavya.com  01:21
+Yeah, I have gone through that particular PRD that I have received from the Kunal. So, like requirements at the PRD level are like clear. I can say I have derived them. Let me open that particular documentation with me. Summary documentation. that I have created.
+
+Speaker 1  01:47
+Good.
+
+Mark Sutton  01:51
+And what are you gentlemen hoping to get out of this meeting?
+
+sunny.kumrawat@aavya.com  01:58
+See, as per the PRD, like the overview of the project is very much clear. We are good on that, but particularly if we go to the functional requirement documentation, where actually we are going to go in the depth of each and every say feature that we are having. Say maybe the first one is CES shared, so where actually. we are having the multiple topics under it, like the plan bundle, the readiness record, the execution results. I can say the evidence record. So, like suppose if I want to have a plan bundle, so say if I want to discuss which are the properties under which I'm going to create that? Similarly, for the other features that are listed under it, and what are the logics on the basis of which, like we are going to benchmark the context also for the 110 requirements that we are having. So that particular logics also we need to write up and like we need to agree on them. So mostly means what we are looking for here in this particular meeting is the functional requirement documentation, and another thing is that like we want to also want to go with the mock designs, so just we want to know like, are you people going to provide us the mockups of the application, or like we are going to get it designed and get it reviewed from you? So we want to also clarify the roles and responsibilities that we are going to play, and you people are going to play in this particular project, so I think this is the agenda for this meeting today.
+
+Mark Sutton  03:46
+So the system is almost fully implemented at this point in time. We don't need UI mockups. We have a nice UI. Not saying it couldn't be better, but it's certainly functional and it's largely consistent across the four main modules. What you guys don't have yet is the code base, and I think once we get you the code base, I think things will make a tremendous more amount of sense.
+
+Speaker 1  04:26
+Yeah,
+
+Mark Sutton  04:27
+because you'll be able to AI against that code base and see you know what's there. So what the PRD is right now is really I reverse engineered that PRD off the code base, matching it with the needs of CMMC, right? Which is our overarching objective to achieve. What are those those 110 controls that CMMC prescribes that we have to be able to configure for our customers. Now, the interesting there thing there is that out of those 110 controls, about 30 of them, give or take. I don't remember exactly, but give or take, are not digital kinds of things. They're real-world things, like maintain a visitor log, and and have physical security, and so on and so forth. So there's a there's a set of things that are really outside the scope of an application, but what I've tried to do is build as much support into the existing functionality as we can to support those things. So there'll be a class of of operations that are like that. Do you guys kind of are you comfortable with the purpose of the four main modules?
+
+sunny.kumrawat@aavya.com  06:15
+Yeah, I think so. Let me share my screen, and I will show you how like
+
+Mark Sutton  06:21
+who built the the diagram that was shared? That who generated that?
+
+sunny.kumrawat@aavya.com  06:29
+So this from our side only. Like we have generated as per our standing. Like what the muster muster is like for say we are having the tenant registration here, or say the engagement we are having through that particular say the contract, and then we are going to do the discovery of that particular contract on the basis of like what the requirements we are having. The benchmarking I can say by a couple of asking the questions also in that particular thing. See, this is all. Maybe you find some of the assumptions also in here because, like in the PRD, we are having the requirements in two to three lines description only, and then on the basis of the benchmarking that we are going to do, we are going to create a gap analysis, and on that particular gap analysis, we are going to do a remediation plan, and then actually, yeah,
+
+Mark Sutton  07:25
+yeah, that's that's the high level flow for Mustar for sure. Muster, by the way, is a second generation module. I built I built one called Planner ahead of it, but Planner was. planners got a lot of good stuff in it, but it asked rotely. It asked hundreds of questions, and it was very tedious.
+
+sunny.kumrawat@aavya.com  07:55
+Okay.
+
+Mark Sutton  07:56
+And we wanted to get a new way, a better way, Of finding out where a particular customer's configuration is right now today, it's easy when we start with a brand new stack or a brand new tenant and a brand new Microsoft GCC tenant. Very very easy. Let me see if I can let these Guys, in excuse me, it's coming off.
+
+Speaker 1  08:30
+Yeah,
+
+Mark Sutton  08:33
+I think I got him. Looks like, yep, look like looks like he's coming. So, um. after we made some progress in some other areas, I realized that I could use some of that progress to automate large chunks of the discovery. Hey, Kunal, I realized so I invented muster to take that on. I also realized from some prior work that I did in my career that we could we could start with discovery, automated discovery, and we could populate those results into the system. We could hydrate it with that information, and then we could use adaptive technology to ask important questions that would dictate other answers to other questions. So if if A, then X, Y, and Z must also be true, right?
+
+Speaker 1  09:41
+Yeah,
+
+Mark Sutton  09:42
+and in that manner, reduce the workload upfront, the manual question answering significantly. And and that's that's the goal. That's the goal there in Muster. And so what what Muster then does at the at the end of the day, is output what I call the mission plan, and that mission plan is meant to accommodate a bunch of things. First and foremost, it's a it's a specification for how we must com. What's what are the gaps? What must we still configure in that tenant to make it compliant? But it's also a pivot, an interface point where we can later add in support for more architectures other than just the Microsoft GCC stack. So we could do AWS, we could do the IBM stack, we could do miscellaneous stacks, but right now we're just going to focus on Microsoft GCC. So that gives us a clean interface for doing that kind of stuff because what that's the input to Stamper,
+
+Speaker 1  10:55
+right?
+
+Mark Sutton  10:56
+And Stamper is the thing that configures the tenant based on where it is right now and where it needs to be. So Stamper automates all that sysadmin work in between A and B to make sure that the configuration of the tenant is Correct.
+
+Speaker 1  11:23
+Okay,
+
+Mark Sutton  11:23
+I'll start there.
+
+sunny.kumrawat@aavya.com  11:26
+You got it. I think we we got the same understanding from the sample also. Yeah, in just the plan bundle, connect the tenant, execute the changes, automated configuration. Also, we can include under it, like it all depends on the experience. Like as you said, like we are having the multiple questions. Also, how we can automate them and like verify the changes, and then we have to configure the evidence also under it. I think.
+
+Mark Sutton  11:59
+Right, and then at a high level, the admin ops is there so that the customers personnel can make changes from a CMMC perspective to their tenant. But what the value it's intended to add is that those changes can only be made in a CMMC compliant way. So this prevents drift, right? So drift would be when we'd get it configured, we'd walk away, and then the customer would do things in our absence that make it depart from the CMMC configuration it's supposed to be in, such that when the you know down the road when the assessor comes in and checks on everything, they find oh no it's not configured properly, and admin ops is supposed to prevent that from happening.
+
+sunny.kumrawat@aavya.com  13:04
+Okay.
+
+Mark Sutton  13:05
+It also generates evidence as those operations occur, so it's meant to. The whole idea here is to automate what is today a very services-heavy engagement.
+
+sunny.kumrawat@aavya.com  13:19
+Okay.
+
+Mark Sutton  13:21
+And then evidence ops is there so that when the assessor shows up, everything is at the assessor's fingertip, and it's all presented in a way that is assessor friendly, and and will please them, and make them be more prone to giving good scores.
+
+sunny.kumrawat@aavya.com  13:42
+Okay,
+
+Mark Sutton  13:46
+but that's kind of the high-level idea. Kumal, Kunal, is there a place you wanted to start? I know Daryl's on his way still.
+
+Kunal  13:56
+Yeah. So, so actually, Knal, that was the idea, and that's why, like you know, I brought Sunny and Vaibhav because after last time we spoke, what I did, I asked Sunny and Vabhav to like you know get into the details of like how exactly the flow of the platform will be. And once we are clear with the flow of the platform, the next thing is the architecture of the platform. The good thing is most of the initial work you already have.
+
+Speaker 1  15:06
+For me, there are two things that you know what you already have done because you already put a lot of cardboard, so you have to capitalize it as much as possible in order to take it to the best. I realize that there is a time is into this whole equation. Faster we will take it to the next level where we start talking about the
+
+Kunal  15:37
+AI side of the equation, and Sunny is more onto the solutioning and validation part of the equation, so I thought like I will start with these two, and as we understand the requirements and the need plus the roadmap, we will then create the right set of people around it because these are not tools. People I throw them onto the random tasks, and then they can tell me that hey, okay, I understand what you want us to do, and this is how we need to structure the team delivery mechanism and everything else. Sure. So that is the discovery we started, Mark. But I believe, with given the time sense, I really want to do something before we close this year. We should have something which we can, like you know, start focusing in marketing to our potential customers.
+
+Mark Sutton  16:23
+Sure. So, a couple thoughts on all that. If that sounds good, hey Daryl.
+
+Daryl Wilkerson  16:28
+Hello.
+
+Mark Sutton  16:30
+Couple thoughts on all that. The system is largely built. It's TypeScript, React, Tailwind. It's operational. We've configured a tenant already. The Bellerforge tenant was configured by what I call the CES, the CMMC execution system, which is the body of code we're talking about. The four main modules and and the shared subsystem, which is up to a software engineer exactly what it sounds like. It's all those six shared modules between the code bases. I think I think what we need to do is get you guys the code base, so that you can work from that and see exactly what's there. And you know, by all means, we can evolve and change and and throw it out if we need to. But there's a lot there that is built and works. From an FDE perspective, the vision that I had from the beginning was that discovery or muster and Kunal. I would explain how muster is kind of a second generation discovery tool, second generation already, even though we haven't deployed in proper. But Musker is a second generation discovery tool that meant my vision was to be run maybe with some handholding by an FDE, probably with handhold virtual handholding by an FDE. Ideally, hopefully, we can get to a point where that handholding is minimal, right? We need a little TLC, tender loving care, upfront to get people started. I think, but hopefully, we can get that thing squared away to where it's clear enough to to do the job on its own. It was always my vision that Stamper would be something that we owned and ran by ourselves. We're not going to let the customer stamp out their and stamp out their own tenant, right? Thus, the name Stamper. We would collect all the discovery info. The mission plan would get generated and be the deliverable out of discovery. Mission plan feeds Stamper, and then Stamper is just a run. It's an execution. If everything goes right, it should take one to two hours to execute and fully configure the stack, the the new tenant or the half configured tenant. So, boom. Now we have we've done deep discovery. We know exactly the gaps. We told Scamper what the gaps are. Scamper cleared all those gaps. Now they have a wonderful environment in which to work. Admin ops and evidence ops, in my vision, are end user tools To carry the day and to do day-to-day operations in an ongoing way. Again, to prevent drift and to one of the big problems in the CMMC world. Anytime you have audits, I'm sure you guys have run into this too. Anytime you have an audit, what happens? It's a fire drill, right? Yes. The whole organization panics. They divert all their attention. They stop doing their normal work. Everybody scurries around. It's chaos, and you know everybody's biting nails and and gnashing teeth until the assessors leave. We aim to do away with that. The goal of this system is we're always ready. An assessor could walk in in the next second, and we'd say, "Oh, here, press this button, and here's your your everything you need to make sure that we're compliant. That's the goal. We take all that chaos up and think about how powerful that's going to be from a sales mission perspective. Yes. So,
+
+Kunal  20:51
+Mark, sorry, I think there is one thing I wanted to clarify. When I said forward a product engineer, I was considering more from the perspective that he comes from the background where he can develop things using cloud and Opening, and he carried the the title of our display for Cloud and Open X Tag App Application Development. Not for yeah, not for because our customer
+
+Speaker 1  21:11
+apps. That's fine too. Yeah, yeah, that was
+
+Daryl Wilkerson  21:19
+fine. Big handholding. I experienced that when I did like the stocks reporting for cybersecurity at AT and T, we had every single automated system and we had 150 people supporting it. So I think you know you guys started marching down the road of next steps, right? You know, Mark has developed a huge code base, right? But the idea is to to finish up, take no offense, Mark. Did a lot of good work. Finish up, and then put a good wrapper around it, where we can start selling and supporting teams. And a lot of these folks, you know, I'm gonna take my sister. She's in government work, and she has a company, construction company, but she doesn't know anything about CMMC, so there will be some handholding in there, even though it's automated, and there'll be support, and there'll be like, okay, what do I do? So there'll be a lot of questions from that standpoint. Will be from a support standpoint, but yeah. Go ahead, go sorry.
+
+Kunal  22:14
+Good, good, good, good.
+
+Daryl Wilkerson  22:16
+That that thing is like, yeah, no, I jumped in late and apologized. That is like, so what's kind of like the the you know both you guys alluding to next step to get you know so I'll I'll do
+
+Kunal  22:27
+I'll do two things one is the next steps like we'll we'll come to the next steps because that's what we were discussing when we joined in but one important thing which I wanted to put Mark like I was thinking more about this platform in last seven desert what could be more differentiating factors along with what we already are trying to build, because of course there are things like you are already trying to make a de facto solution for somebody who is getting into the certifications. That is part A. Part B is, of course, which is not something which we can do in next, I would say, couple of months, but which we should be aiming towards, is beyond the basic configurations and deployment. I want it to be a platform which is run by which is which is being run by agents more than like you know the handholders which we were talking about. So the perception of getting into the process, getting into the certification end-to-end journey. I'm just imagining that we will end up having at least five to 10 different agents helping people onto different stages, so that every time when the agent change, the the customer will also feel that okay, I am promoted or I am like you know on a next step, and then I am a next step, then I am a next step. So there is a person or there is an agent who is helping him, and behind an agent, if there are some gaps, then we will put somebody who is an SME or expert in order to help them out into the specific situation. But my my idea was that this defecto platform should become a defective de facto agentic marketplace for certifications as well, for CMMC certifications as well. So that is where I wanted. I mean, it's too much North Star to be very honest. We have to start from very, I would say, to ensure that all the basic things are in in place. But I was just imagining that when when we go and talk to the people, we should start seeing or people should see us as the people who are trying to leverage the technology as much as possible, rather than trying to tell people that hey, you know, we have this platform, we have the process, but now take my people to to walk you through from one one end to another end. We'll say that we have an agent, you can use them, and then we have an SMEs. If it's still not going the way you want it to, then we will chime in. So that is that
+
+Mark Sutton  24:38
+sounds yeah yeah that's Good, yeah, absolutely, and I can I can see muster working real nicely that way right now. Again, Stamper is probably going to be something we drive, or once we get it solid enough, it'll be something an agent could drive for us for sure. We could punch a button and say go, and and that would be fine. I think the day-to-day operations stuff. Yeah, we could build a we could build support agents to support that and be our first line of defense. I like that idea a lot. I have not put any effort into that yet, but that's certainly something you guys could could handle. I'm sure.
+
+Kunal  25:20
+100%
+
+Mark Sutton  25:22
+Yeah. So basically, what we just talked about was let's let's automate as much of the customer-facing support as possible, right, Kunal? Yes. Yes. Totally agree. Totally agree. And to Daryl's point, I'm not sure we'll get 100% away there, and I think you alluded to that too, Kunal. I just like to bring everything up to the surface and and get it on the elements.
+
+Speaker 1  25:46
+Yes,
+
+Mark Sutton  25:47
+yes, yeah, yeah, yeah. Okay, great. So because
+
+Kunal  25:49
+and that's that's where I said like we cannot do 100% That's where the SMEs will kick in. It's just like a comforting layer where people will feel that okay, we are not trying to sell them people for the process. We are trying to tell them that a platform and SME,
+
+Mark Sutton  26:04
+and and that's a primary business principle, right? Behind this this idea is we want to take the the professional sort of we want to take the professional the people out of it. We want to take the and and that takes the cost out of it, right? And and a lot of the complexity from the customer's perspective. Yes. Yeah, I think we're philosophically aligned on that.
+
+Kunal  26:32
+Great. Okay. So so then then I think the important aspect which will come mark is the the next steps where we can like you know first is efforts to get the take the access of the code base and once we have it maybe like you know couple of days we need to analyze what we have and the structure which is there and after that like we can figure out what are the next enhancements from where we can start putting people. I would say, I mean, weapons, and you can start working. And if they think they need somebody else, they will just let us know, and we can we can add that that particular engineer for that duration.
+
+Mark Sutton  27:11
+Yeah, and I can I can tell you from from where I'm at. One of the next big things we need to do is get a human to go into one of the configured tenants, so like the Velour Forge, like Daryl's tenant that we have already configured, yes, and just confirm that it's behaving as it needs to behave, right? So the whole goal of this thing is to set up a tenant so that people can do project work in it without letting their classified information be at risk, right? So we're we're trying to lock down the tenant so that no bad actors can get in it and no mistakes happen. Really, so hard anything
+
+Kunal  27:58
+and guardrails is something which we we need to add like with this person we will find the gaps, but then with I would say with with our rest of the team we will try to like you know put the harness around those particular pieces as much as possible so that for our actual commercial tenants we should be able to hide those information.
+
+Mark Sutton  28:19
+And and there's a good start there too. I'm I've been using Playwright. Are you guys familiar with Playwright? Yes. Yeah. So there's hundreds and hundreds of Playwright cases, test cases that attempt to do that, and they're all passing. Which is I love loops and slash bowl and all that. That's boom. Walk away. Do it. Yay. But yeah. So there's already
+
+Kunal  28:46
+for most of our customers, we are we are using Playwright as our core automation, our reference nowadays for the validation. Now going forward, I think that will be again our one of the best platform which everybody would love to have when they are testing and validating the the overall I would say efforts in in a customer environment or a delivery. So playwright is one of the best choice for today, Mark, for sure.
+
+Mark Sutton  29:11
+Good, good, good. And one of the other big things that needs to get done is like a deployment architecture. I have. I've thought about it. I thought about it up front, and I tried to do the best I could. But I'm sure there's some stuff we're going to have to figure out, like where does Stamper live? Where? How do we deploy Muster? How do we deploy Evidence ops, which I call EO, and admin ops, which call AO. How best do we deploy those things? Do they stand on our server? Do we give a obfuscated package to the customer? We got to figure that out.
+
+Kunal  29:57
+So, Mark, on a lighter note, from in last 10 years, Vaibhav has actually ensured that before my demo, he has killed at least three or four of my instances right before demo because he was the guy responsible for all the deployments. But then he ensured that those those are back again as well. What I'm trying to say that that the deployment I would say strategy and deployment. What do I say? Architecture and those pieces. Now we we have him on the call. He can like ensure, compare, give us the best one considering public cloud versus private cloud, and he has been hands-on. So I trust him for that. That whatever he will come back to us with will be something you know we can rely on.
+
+
+Transcribed by https://otter.ai

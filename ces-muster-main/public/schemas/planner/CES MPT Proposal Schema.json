@@ -1,0 +1,719 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/ces-proposal-package.schema.json",
+  "title": "CES Proposal Package Schema (Cost Proposal + SOW)",
+  "type": "object",
+  "required": [
+    "ces",
+    "inputs",
+    "proposal"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "ces": {
+      "type": "object",
+      "required": [
+        "artifact",
+        "version",
+        "generated_on",
+        "intent"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "artifact": {
+          "type": "string",
+          "const": "proposal_package"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "generated_on": {
+          "type": "string",
+          "format": "date"
+        },
+        "intent": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "inputs": {
+      "$ref": "#/$defs/inputs_block"
+    },
+    "proposal": {
+      "$ref": "#/$defs/proposal_block"
+    }
+  },
+  "$defs": {
+    "level_enum": {
+      "type": "string",
+      "enum": [
+        "L1",
+        "L2",
+        "L3"
+      ]
+    },
+    "plan_mode_enum": {
+      "type": "string",
+      "enum": [
+        "build_new",
+        "harden_existing",
+        "migrate",
+        "hybrid"
+      ]
+    },
+    "pricing_model_enum": {
+      "type": "string",
+      "enum": [
+        "fixed_price",
+        "t&m",
+        "hybrid",
+        "subscription"
+      ]
+    },
+    "currency_enum": {
+      "type": "string",
+      "enum": [
+        "USD"
+      ]
+    },
+    "rate_type_enum": {
+      "type": "string",
+      "enum": [
+        "hourly",
+        "daily",
+        "weekly",
+        "monthly",
+        "per_unit",
+        "one_time"
+      ]
+    },
+    "li_type_enum": {
+      "type": "string",
+      "enum": [
+        "labor",
+        "license",
+        "service",
+        "hardware",
+        "other"
+      ]
+    },
+    "contract_vehicle_enum": {
+      "type": "string",
+      "enum": [
+        "direct",
+        "prime_sub",
+        "gsa_masis",
+        "sewp",
+        "other",
+        "unknown"
+      ]
+    },
+    "source_ref": {
+      "type": "object",
+      "required": [
+        "id",
+        "title"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "government",
+            "nist",
+            "vendor",
+            "internal"
+          ]
+        },
+        "version": {
+          "type": "string"
+        },
+        "published_date": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "inputs_block": {
+      "type": "object",
+      "required": [
+        "si_baseline_ref",
+        "readiness_posture_ref",
+        "mission_plan_ref",
+        "authoritative_sources"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "si_baseline_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "readiness_posture_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mission_plan_ref": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Pointer to manual or executable mission plan used as basis for scope/price."
+        },
+        "authoritative_sources": {
+          "type": "object",
+          "required": [
+            "government",
+            "nist"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "government": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/source_ref"
+              }
+            },
+            "nist": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/source_ref"
+              }
+            },
+            "vendor": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/source_ref"
+              }
+            }
+          }
+        }
+      }
+    },
+    "proposal_block": {
+      "type": "object",
+      "required": [
+        "proposal_id",
+        "customer",
+        "offeror",
+        "pricing_model",
+        "currency",
+        "period_of_performance",
+        "target_level",
+        "plan_mode",
+        "assumptions",
+        "exclusions",
+        "line_items",
+        "totals",
+        "sow"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "proposal_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "customer": {
+          "$ref": "#/$defs/party"
+        },
+        "offeror": {
+          "$ref": "#/$defs/party"
+        },
+        "contract_vehicle": {
+          "$ref": "#/$defs/contract_vehicle_enum"
+        },
+        "pricing_model": {
+          "$ref": "#/$defs/pricing_model_enum"
+        },
+        "currency": {
+          "$ref": "#/$defs/currency_enum"
+        },
+        "period_of_performance": {
+          "$ref": "#/$defs/pop"
+        },
+        "target_level": {
+          "$ref": "#/$defs/level_enum"
+        },
+        "plan_mode": {
+          "$ref": "#/$defs/plan_mode_enum"
+        },
+        "assumptions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "exclusions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "line_items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/line_item"
+          }
+        },
+        "totals": {
+          "$ref": "#/$defs/totals"
+        },
+        "sow": {
+          "$ref": "#/$defs/sow"
+        },
+        "infrastructure_model": {
+          "type": "string",
+          "enum": ["m365_only", "m365_sentinel", "m365_azure"]
+        },
+        "license_tier": {
+          "type": "string",
+          "enum": ["business_premium", "g3", "g5"]
+        },
+        "user_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "boundary_compliance": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "CUI boundary and BTC compliance context"
+        }
+      }
+    },
+    "party": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "address": {
+          "type": "string"
+        },
+        "poc_name": {
+          "type": "string"
+        },
+        "poc_email": {
+          "type": "string",
+          "format": "email"
+        },
+        "poc_phone": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "pop": {
+      "type": "object",
+      "required": [
+        "start_date",
+        "end_date"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "start_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "end_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "milestones": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pop_milestone"
+          }
+        }
+      }
+    },
+    "pop_milestone": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "target_date",
+        "acceptance_criteria"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "acceptance_criteria": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "line_item": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "type",
+        "qty",
+        "unit",
+        "rate_type",
+        "unit_price",
+        "extended_price",
+        "mapping"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "$ref": "#/$defs/li_type_enum"
+        },
+        "qty": {
+          "type": "number",
+          "minimum": 0
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rate_type": {
+          "$ref": "#/$defs/rate_type_enum"
+        },
+        "unit_price": {
+          "type": "number",
+          "minimum": 0
+        },
+        "extended_price": {
+          "type": "number",
+          "minimum": 0
+        },
+        "mapping": {
+          "$ref": "#/$defs/mapping"
+        },
+        "labor_category": {
+          "type": "string"
+        },
+        "deliverable_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "control_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "notes": {
+          "type": "string"
+        },
+        "domain": {
+          "type": "string",
+          "description": "CMMC domain (e.g. AC, AU, CM)"
+        },
+        "requirement_id": {
+          "type": "string",
+          "description": "CMMC requirement identifier (e.g. AC.L2-3.1.1)"
+        },
+        "requirement_title": {
+          "type": "string",
+          "description": "Human-readable requirement title"
+        },
+        "dev_loe_hours": {
+          "type": "number",
+          "minimum": 0,
+          "description": "One-time hours to build automation tooling"
+        },
+        "config_manual_hours": {
+          "type": "number",
+          "minimum": 0,
+          "description": "One-time hours to implement manually"
+        },
+        "config_automated_hours": {
+          "type": "number",
+          "minimum": 0,
+          "description": "One-time hours to implement with automation"
+        },
+        "recurring_manual_hours_yr": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Annual hours for manual evidence maintenance"
+        },
+        "recurring_automated_hours_yr": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Annual hours for automated evidence maintenance"
+        }
+      }
+    },
+    "mapping": {
+      "type": "object",
+      "required": [
+        "milestones",
+        "steps",
+        "controls"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "milestones": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "controls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "totals": {
+      "type": "object",
+      "required": [
+        "subtotal",
+        "tax",
+        "other_fees",
+        "total"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "subtotal": {
+          "type": "number",
+          "minimum": 0
+        },
+        "tax": {
+          "type": "number",
+          "minimum": 0
+        },
+        "other_fees": {
+          "type": "number",
+          "minimum": 0
+        },
+        "total": {
+          "type": "number",
+          "minimum": 0
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "sow": {
+      "type": "object",
+      "required": [
+        "overview",
+        "scope",
+        "deliverables",
+        "acceptance_criteria",
+        "roles_responsibilities",
+        "schedule",
+        "security",
+        "out_of_scope",
+        "customer_dependencies",
+        "change_control",
+        "pricing_terms"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "overview": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "deliverables": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "acceptance_criteria": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "roles_responsibilities": {
+          "$ref": "#/$defs/roles"
+        },
+        "schedule": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "security": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "out_of_scope": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "customer_dependencies": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "change_control": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "pricing_terms": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "deliverable_artifacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/deliverable_artifact"
+          }
+        }
+      }
+    },
+    "roles": {
+      "type": "object",
+      "required": [
+        "customer",
+        "offeror"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "customer": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "offeror": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "deliverable_artifact": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "description",
+        "format",
+        "acceptance"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "format": {
+          "type": "string",
+          "minLength": 1
+        },
+        "acceptance": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

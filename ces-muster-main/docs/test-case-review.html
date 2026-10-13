@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<!--
+  SPDX-FileCopyrightText: Blue Heron Defense LLC and its licensors. All rights reserved.
+  SPDX-License-Identifier: LicenseRef-BHD-Proprietary
+  CONFIDENTIAL - TRADE SECRET. Unpublished work. Provided solely to perform work for Blue Heron Defense LLC at its direction.
+  Any other use, copying, disclosure, or reuse, in whole or in part, is prohibited.
+  Changes made to this file for Blue Heron Defense LLC are made on its behalf; it claims all rights in them.
+  Submitting a change to this repository means you accept TERMS.md.
+  Removing or altering this notice is prohibited (17 U.S.C. 1202). Ref: BHD-CES-MUSTER-2026A
+  See LICENSE and TERMS.md.
+-->
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Muster P0 — Test Case Review (pre-filled)</title>
+<!-- Instrument tokens from the canonical stylesheet. This page is opened straight
+     off disk (docs/ is not served by vite), so the path is relative to public/. -->
+<link rel="stylesheet" href="../public/ces-ui.css">
+<script>
+  // Restore saved theme before first paint (same contract as ces-theme-toggle.js
+  // and index.html: localStorage["ces-theme"], data-theme on <html>).
+  (function () {
+    if (localStorage.getItem('ces-theme') !== 'light') {  // dark = suite default (2026-09-07)
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  })();
+</script>
+<style>
+  /* Token alias shim — local names resolve to canonical --co-* tokens, so this
+     page inherits light/dark theming instead of carrying its own palette. */
+  :root {
+    --bg:   var(--co-bg);
+    --card: var(--co-surface);
+    --ink:  var(--co-text);
+    --mut:  var(--co-text-muted);
+    --acc:  var(--co-primary);
+    --ok:   var(--co-compliant);
+    --warn: var(--co-risk);
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:var(--co-font-sans); font-size:15px; line-height:1.5; background:var(--bg); color:var(--ink); padding:24px; }
+  h1 { font-family:var(--co-font-display); text-transform:uppercase; letter-spacing:.03em; font-size:26px; margin:0 0 4px; }
+  h2 { font-size:16px; color:var(--acc); margin:0 0 10px; }
+  .sub { color:var(--mut); margin-bottom:20px; font-size:13px; }
+  .card { background:var(--card); border:1px solid var(--co-border); border-radius:var(--co-radius); padding:16px 18px; margin-bottom:14px; border-left:4px solid var(--co-designation); }
+  .card.synth { border-left-color:var(--warn); }
+  .row { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:8px; }
+  .field { flex:1 1 220px; }
+  .field.wide { flex:1 1 100%; }
+  label { display:block; font-family:var(--co-font-display); font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--mut); margin-bottom:2px; }
+  input[type=text], textarea, select { width:100%; background:var(--co-bg-console); color:var(--ink); border:1px solid var(--co-border-strong); border-radius:var(--co-radius); padding:6px 8px; font-family:var(--co-font-sans); font-size:13px; }
+  textarea { resize:vertical; min-height:38px; }
+  .approve { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--ok); white-space:nowrap; }
+  .approve input { width:18px; height:18px; accent-color:var(--ok); }
+  .head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; gap:10px; }
+  .head .id { font-family:var(--co-font-mono); font-weight:600; color:var(--acc); }
+  .bar { position:sticky; top:0; background:var(--bg); padding:10px 0 12px; z-index:5; display:flex; gap:10px; align-items:center; border-bottom:1px solid var(--co-border); margin-bottom:18px; }
+  button { background:var(--co-primary); color:#ffffff; border:0; border-radius:var(--co-radius); padding:10px 18px; font-family:var(--co-font-sans); font-weight:600; font-size:14px; line-height:1; cursor:pointer; }
+  /* Dark mode: --co-primary is a light text tint; filled buttons take the deep ink
+     fill, exactly as ces-ui.css does for [data-theme="dark"] .btn-primary. */
+  [data-theme="dark"] button { background:#2a4370; color:#ffffff; }
+  button.ghost { background:transparent; color:var(--co-primary); border:1.5px solid var(--co-primary); }
+  [data-theme="dark"] button.ghost { background:transparent; color:var(--co-primary); }
+  .note { font-size:12px; color:var(--mut); }
+  .pill { font-size:11px; background:var(--co-bg-elevated); border:1px solid var(--co-border); border-radius:var(--co-radius); padding:2px 10px; color:var(--mut); }
+</style>
+</head>
+<body>
+<h1>Muster P0 — Test Case Review</h1>
+<div class="sub">Everything is <b>pre-filled with proposed values</b>. Adjust anything, untick what you don't want, add notes, then hit <b>Export approved cases</b> (downloads <code>test-cases-approved.json</code> — drop it in <code>ces-muster/docs/</code> or just send it back). Cases marked <span class="pill">connector-run</span> will be executed live through the Chrome connector against http://localhost:5173. Synthetic sessions (amber) generate practice data only — they do <b>not</b> count toward PHASE0_GATE_EVIDENCE (that needs real subs).</div>
+
+<div class="bar">
+  <button onclick="exportJson()">⬇ Export approved cases</button>
+  <button class="ghost" onclick="toggleAll(true)">Approve all</button>
+  <button class="ghost" onclick="toggleAll(false)">Clear all</button>
+  <button class="ghost" id="themeBtn" onclick="toggleTheme()" title="Toggle light/dark theme">☾ Theme</button>
+  <span class="note" id="count"></span>
+</div>
+
+<div id="cases"></div>
+
+<script>
+const D = {
+  meta: { app:"ces-muster P0 concierge MVP", url:"http://localhost:5173", exported:null, reviewer:"Mark" },
+  cases: [
+    { id:"EU-1", kind:"journey", title:"Prime-and-subs full happy path", approve:true,
+      inputs:{ engagement_name:"Acme Prime FY26 Cohort", engagement_kind:"prime_and_subs",
+        roster_csv:"name,uei,cage,poc_email\nDelta Machining,ABC123DEF456,1XYZ9,poc@deltamach.com\nOrion Composites,QRS789TUV012,2ABC1,ops@orioncomp.com",
+        on_prem_ot:"no", answer_strategy:"Mostly compliant M365 GCC High shop; answer affirmatively where the tile set covers it; 2 questions answered 'I'm not sure'" },
+      expected:{ outcome:"Roster shows 2 subs after import; interview completes; conservative score displayed with FCA disclaimer; StatusPayload downloads and validates; rollup shows RAG row(s); pending-subs CSV contains 'Delta Machining'" } },
+    { id:"EU-2", kind:"journey", title:"Individual-contractor variant (no roster, no rollup)", approve:true,
+      inputs:{ engagement_name:"Solo Contractor — Beacon Tool & Die", engagement_kind:"individual_contractor",
+        roster_csv:"(none — roster UI must not exist)", on_prem_ot:"unsure",
+        answer_strategy:"Small shop, modest stack; several 'I'm not sure' answers" },
+      expected:{ outcome:"No roster section rendered, no roll-up nav; interview + score + export work; export carries on_prem_ot='unsure'" } },
+    { id:"EU-3", kind:"journey", title:"Resume after mid-interview reload (Dexie persistence)", approve:true,
+      inputs:{ engagement_name:"Acme Prime FY26 Cohort", engagement_kind:"prime_and_subs",
+        answer_strategy:"Answer exactly 3 questions, hard-reload the browser tab" },
+      expected:{ outcome:"After reload the interview resumes at question 4 — no lost answers, no restart" } },
+    { id:"EU-4", kind:"negative", title:"Export with no completed session", approve:true,
+      inputs:{ engagement_name:"(fresh engagement, interview not run)", engagement_kind:"prime_and_subs", answer_strategy:"Click Export immediately after setup" },
+      expected:{ outcome:"Export is disabled or a clear error message appears — never a broken/empty download" } },
+    { id:"EU-5", kind:"negative", title:"Malformed roster CSV rejected", approve:true,
+      inputs:{ engagement_name:"Acme Prime FY26 Cohort", engagement_kind:"prime_and_subs",
+        roster_csv:"this,is,not\na,valid;;roster\n,,,,", answer_strategy:"Import the malformed CSV" },
+      expected:{ outcome:"Error banner shown; zero sub rows created; app stays usable" } },
+    { id:"EU-6", kind:"guardrail", title:"All-unknown answers → conservative floor + disclaimer", approve:true,
+      inputs:{ engagement_name:"Unknowns Test", engagement_kind:"individual_contractor",
+        answer_strategy:"Answer EVERY question 'I'm not sure'" },
+      expected:{ outcome:"No objective passes (unknown never passes); conservative score floor; FCA disclaimer text visible verbatim: 'Self-assessed indicator — not a certification, not an SPRS submission, and not a quote-binding gap report.'" } },
+    { id:"EU-7", kind:"guardrail", title:"on-prem/OT answer surfaces in exported payload", approve:true,
+      inputs:{ engagement_name:"OnPrem Test", engagement_kind:"prime_and_subs", on_prem_ot:"yes",
+        answer_strategy:"Normal run; scope-lite on-prem/OT answered 'yes'" },
+      expected:{ outcome:"Downloaded StatusPayload JSON contains on_prem_ot='yes' (this is the field the >30% Approach-C gate is measured from)" } },
+    { id:"CS-1", kind:"synthetic", title:"Synthetic concierge session — strong sub", approve:true,
+      inputs:{ party:"Delta Machining (synthetic)", engagement_kind:"prime_and_subs", on_prem_ot:"no",
+        answer_strategy:"GCC High + PreVeil declared; ~90% affirmative, 1 unsure; timer segments recorded realistically (setup 5m, interview 45m, verify 15m, review 10m)" },
+      expected:{ outcome:"Mid-to-upper conservative score; timing segments present in export; RAG green/amber on rollup" } },
+    { id:"CS-2", kind:"synthetic", title:"Synthetic concierge session — messy sub", approve:true,
+      inputs:{ party:"Orion Composites (synthetic)", engagement_kind:"prime_and_subs", on_prem_ot:"yes",
+        answer_strategy:"Thin stack, ~40% unsure, several negatives; timer segments recorded (setup 10m, interview 70m, verify 20m, review 15m)" },
+      expected:{ outcome:"Low conservative score, RAG red; on_prem_ot='yes' in payload; session still completes within mode-(b) flow" } },
+    { id:"CS-3", kind:"synthetic", title:"Synthetic session — individual contractor", approve:true,
+      inputs:{ party:"Beacon Tool & Die (synthetic)", engagement_kind:"individual_contractor", on_prem_ot:"unsure",
+        answer_strategy:"Middling answers, 3 unsure; no roster/rollup interaction" },
+      expected:{ outcome:"Score + export complete; no roster UI anywhere in the journey" } }
+  ]
+};
+
+function esc(s){ return String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
+function render(){
+  document.getElementById("cases").innerHTML = D.cases.map((c,i)=>`
+  <div class="card ${c.kind==="synthetic"?"synth":""}">
+    <div class="head">
+      <div><span class="id">${c.id}</span> — <b>${esc(c.title)}</b> <span class="pill">connector-run</span> <span class="pill">${c.kind}</span></div>
+      <label class="approve"><input type="checkbox" ${c.approve?"checked":""} onchange="D.cases[${i}].approve=this.checked;count()"> run this case</label>
+    </div>
+    <div class="row">
+      ${Object.entries(c.inputs).map(([k,v])=>`
+        <div class="field ${String(v).length>60?"wide":""}">
+          <label>${k.replace(/_/g," ")}</label>
+          ${String(v).includes("\n")||String(v).length>90
+            ? `<textarea onchange="D.cases[${i}].inputs['${k}']=this.value">${esc(v)}</textarea>`
+            : `<input type="text" value="${esc(v)}" onchange="D.cases[${i}].inputs['${k}']=this.value">`}
+        </div>`).join("")}
+      <div class="field wide">
+        <label>expected response</label>
+        <textarea onchange="D.cases[${i}].expected.outcome=this.value">${esc(c.expected.outcome)}</textarea>
+      </div>
+      <div class="field wide">
+        <label>your notes (optional)</label>
+        <input type="text" value="${esc(c.notes||"")}" onchange="D.cases[${i}].notes=this.value" placeholder="anything to change about how I run or judge this case">
+      </div>
+    </div>
+  </div>`).join("");
+  count();
+}
+function count(){ document.getElementById("count").textContent = D.cases.filter(c=>c.approve).length + " of " + D.cases.length + " cases approved"; }
+function toggleAll(v){ D.cases.forEach(c=>c.approve=v); render(); }
+// Same contract as ces-theme-toggle.js: localStorage["ces-theme"] + data-theme on <html>.
+function toggleTheme(){
+  const h = document.documentElement;
+  const next = h.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  if (next === 'dark') h.setAttribute('data-theme','dark'); else h.removeAttribute('data-theme');
+  localStorage.setItem('ces-theme', next);
+  themeLabel();
+}
+function themeLabel(){
+  document.getElementById('themeBtn').textContent =
+    (document.documentElement.getAttribute('data-theme') === 'dark' ? '☀' : '☾') + ' Theme';
+}
+function exportJson(){
+  D.meta.exported = new Date().toISOString();
+  const blob = new Blob([JSON.stringify(D,null,2)],{type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = "test-cases-approved.json"; a.click();
+}
+render();
+themeLabel();
+</script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+{
+  "config_id": "eval-decoy-maze",
+  "description": "Config 1 eval-decoy-maze (docs/demo/SIMSTACK-CONFIGS-SPEC.md 2.1) — the full-chain successor to T5. A busy shop two years in has stood up FIVE Conditional Access policies, but every one carries an internal/project name, not the assessor-required CMMC name, so it looks the MOST configured and earns the LEAST credit. The 11-key BEFORE map is identical to T5: every CA-backed probe (P1-P5) reads unknown despite five policies present (presence != credit); user-5 disabled plus default users and cross-tenant policy still read met (P6/P7/P9). Its novelty over T5 is the 5-decoy seed (T5 has 3), the hostile most-configured-earns-least story, and that it is FULL-CHAIN: the ONE plan later flips only P1 (CMMC-SessionTimeout) and P5 (CMMC-RemoteMaintenance-MFA), leaving P2/P3 open (pinned honest-open) so remediation != completeness. No decoy displayName begins with CMMC- (P5's filter is a PREFIX match), so no decoy collides with a plan-created name.",
+  "stacksim_seed": {
+    "stance": "m365_azure",
+    "countOverrides": {
+      "caPolicies": 5
+    },
+    "steps": [
+      {
+        "kind": "uri",
+        "method": "PATCH",
+        "uri": "/v1.0/identity/conditionalAccess/policies/caPolicy-1",
+        "body": {
+          "displayName": "Legacy-MFA"
+        },
+        "note": "decoy — T5-proven, not a CMMC-named policy → no CA-probe credit"
+      },
+      {
+        "kind": "uri",
+        "method": "PATCH",
+        "uri": "/v1.0/identity/conditionalAccess/policies/caPolicy-2",
+        "body": {
+          "displayName": "Pilot-CA"
+        },
+        "note": "decoy — T5-proven, not a CMMC-named policy → no CA-probe credit"
+      },
+      {
+        "kind": "uri",
+        "method": "PATCH",
+        "uri": "/v1.0/identity/conditionalAccess/policies/caPolicy-3",
+        "body": {
+          "displayName": "Block-Old-TLS"
+        },
+        "note": "decoy — T5-proven, not a CMMC-named policy → no CA-probe credit"
+      },
+      {
+        "kind": "uri",
+        "method": "PATCH",
+        "uri": "/v1.0/identity/conditionalAccess/policies/caPolicy-4",
+        "body": {
+          "displayName": "MDM-Rollout-Ring1"
+        },
+        "note": "decoy — new, no CMMC- prefix (safe against P5 PREFIX filter)"
+      },
+      {
+        "kind": "uri",
+        "method": "PATCH",
+        "uri": "/v1.0/identity/conditionalAccess/policies/caPolicy-5",
+        "body": {
+          "displayName": "Maint-Window-VPN"
+        },
+        "note": "decoy — new, no CMMC- prefix (safe against P5 PREFIX filter)"
+      },
+      {
+        "kind": "uri",
+        "method": "PATCH",
+        "uri": "/v1.0/users/user-5",
+        "body": {
+          "accountEnabled": false
+        },
+        "note": "P6 PS.L2-3.9.2 -> met (user-5 is last of default 5; unrelated to the CA decoy trap)"
+      }
+    ]
+  },
+  "expected_discovery": {
+    "AC.L2-3.1.11": "unknown",
+    "AC.L2-3.1.14": "unknown",
+    "SC.L2-3.13.7": "unknown",
+    "AC.L2-3.1.15": "unknown",
+    "MA.L2-3.7.5": "unknown",
+    "PS.L2-3.9.2": "met",
+    "IA.L2-3.5.5": "met",
+    "IA.L2-3.5.6": "met",
+    "AC.L1-3.1.20": "met",
+    "AC.L2-3.1.12": "unknown",
+    "IA.L2-3.5.4": "unknown"
+  }
+}

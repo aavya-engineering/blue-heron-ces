@@ -1,0 +1,120 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "StatusPayload",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "engagement_kind",
+    "party",
+    "on_prem_ot",
+    "interview_facts",
+    "posture_summary",
+    "timing_segments"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": ["1.0.0"]
+    },
+    "engagement_kind": {
+      "type": "string",
+      "enum": ["prime_and_subs", "individual_contractor"]
+    },
+    "party": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "uei": { "type": "string" },
+        "cage": { "type": "string" }
+      }
+    },
+    "on_prem_ot": {
+      "type": "string",
+      "enum": ["yes", "no", "unsure"]
+    },
+    "profile": {
+      "type": "object",
+      "description": "G-MUSTER-PL-1 C3: the three AssessmentPage profile answers. Optional; each field present only when answered.",
+      "additionalProperties": false,
+      "properties": {
+        "employee_count": { "type": "string", "enum": ["<50", "50-250", "250+"] },
+        "has_ssp": { "type": "string", "enum": ["yes", "no", "unsure"] },
+        "covers_m365": { "type": "string", "enum": ["yes", "no"] }
+      }
+    },
+    "interview_facts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["question_id", "question_text", "answer", "provenance", "confidence", "recorded_at"],
+        "additionalProperties": false,
+        "properties": {
+          "question_id": { "type": "string", "minLength": 1 },
+          "question_text": { "type": "string", "minLength": 1 },
+          "answer": { "type": "string" },
+          "provenance": { "type": "string" },
+          "confidence": {
+            "type": "string",
+            "enum": ["high", "medium", "low", "unknown"]
+          },
+          "recorded_at": { "type": "string" },
+          "attestation": {
+            "type": "object",
+            "description": "GO-2 M4: named-human confirmation of a resolver-drafted fact. Unconfirmed drafts never appear in this payload (export excludes them); a present attestation is always the full record.",
+            "required": ["drafted_by", "confirmed_by", "confirmed_on"],
+            "additionalProperties": false,
+            "properties": {
+              "drafted_by": { "type": "string", "minLength": 1 },
+              "confirmed_by": { "type": "string", "minLength": 1 },
+              "confirmed_on": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    "posture_summary": {
+      "type": "object",
+      "required": ["conservative_score", "control_status_summary"],
+      "additionalProperties": false,
+      "properties": {
+        "conservative_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "control_status_summary": {
+          "type": "object",
+          "required": ["level", "met", "partial", "not_met", "unknown"],
+          "additionalProperties": false,
+          "properties": {
+            "level": { "type": "string" },
+            "met": { "type": "number" },
+            "partial": { "type": "number" },
+            "not_met": { "type": "number" },
+            "unknown": { "type": "number" }
+          }
+        }
+      }
+    },
+    "timing_segments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["segment", "started_at"],
+        "additionalProperties": false,
+        "properties": {
+          "segment": {
+            "type": "string",
+            "enum": ["setup", "interview", "verification", "review"]
+          },
+          "started_at": { "type": "string" },
+          "stopped_at": { "type": "string" },
+          "duration_ms": { "type": "number" }
+        }
+      }
+    }
+  }
+}

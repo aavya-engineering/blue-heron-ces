@@ -1,0 +1,573 @@
+schema_version: '1.0'
+module: CUI_Boundary_Definition
+purpose: Declarative scope definition of where CUI can and cannot exist; drives tenant manifest, BTC activation, policy scaffolding, evidence
+  scope, and assessor defensibility.
+metadata:
+  created_utc: '2026-02-19T22:08:03Z'
+  owner: CES
+  notes: Comprehensive CUI Boundary question bank, faithful to the previously provided structured list.
+sections:
+- id: CUI-01
+  name: CUI Classification & Contract Scope
+  questions:
+  - id: CUI.CAT.001
+    section: CUI Classification & Contract Scope
+    prompt: What CUI categories apply to this organization?
+    answer_type: multi_select
+    options:
+    - Controlled Technical Information (CTI)
+    - Technical drawings / engineering data
+    - Source code
+    - Program/project documentation
+    - Security / IT artifacts containing CUI
+    - Contract deliverables containing CUI
+    - Export-controlled data (ITAR)
+    - Export-controlled data (EAR)
+    - Other (specify)
+    required: true
+    help: Select all that apply. If 'Other', specify the category and source (contract, prime, internal).
+    recommended:
+    - Controlled Technical Information (CTI)
+    roles:
+      primary_respondents:
+      - Contracts Officer
+      - Program Manager
+      validators:
+      - Executive Sponsor
+    bindings:
+      manifest:
+        cui_categories: answer
+      policy:
+        cui_classification_matrix: answer
+    risk_flags:
+    - export_control_in_scope_if_selected
+  - id: CUI.CONTRACT.001
+    section: CUI Classification & Contract Scope
+    prompt: List all active contracts containing DFARS 7012/7019/7020/7021 or prime-specific CUI clauses.
+    answer_type: list
+    options: []
+    required: true
+    help: Provide contract identifiers, prime/customer, and relevant clauses/addenda references.
+    roles:
+      primary_respondents:
+      - Contracts Officer
+      validators:
+      - Executive Sponsor
+    bindings:
+      policy:
+        contract_scope: answer
+      evidence:
+        contract_clause_repository: answer
+    risk_flags: []
+- id: CUI-02
+  name: CUI Generation Model
+  questions:
+  - id: CUI.GEN.001
+    section: CUI Generation Model
+    prompt: Is CUI generated internally?
+    answer_type: single_select
+    options:
+    - No – only received
+    - Yes – generated internally
+    - Both
+    required: true
+    help: Internal generation typically implies engineering outputs, analyses, code, or deliverables created inside the boundary.
+    roles:
+      primary_respondents:
+      - Program Manager
+      validators:
+      - Contracts Officer
+    bindings:
+      manifest:
+        cui_generation_mode: answer
+    risk_flags:
+    - internal_generation_requires_devops_review
+  - id: CUI.GEN.002
+    section: CUI Generation Model
+    prompt: Which internal functions generate CUI?
+    answer_type: multi_select
+    options:
+    - Engineering
+    - DevOps
+    - Program Management
+    - Executive
+    - Security/IT
+    - Other
+    required: false
+    help: If 'Other', specify function/team and example artifacts.
+    recommended:
+    - Engineering
+    - Program Management
+    roles:
+      primary_respondents:
+      - Program Manager
+      - Engineering Lead
+      validators:
+      - IT Director
+    bindings:
+      manifest:
+        cui_generating_functions: answer
+    risk_flags: []
+- id: CUI-03
+  name: Data Lifecycle (Ingress, Storage, Processing, Egress, Retention)
+  questions:
+  - id: CUI.LC.ING.001
+    section: Data Lifecycle
+    prompt: How is CUI received?
+    answer_type: multi_select
+    options:
+    - Encrypted email
+    - Prime/customer portal
+    - Secure file transfer (SFTP/FTPS)
+    - Teams/SharePoint sharing
+    - API integration
+    - Physical media
+    - Other
+    required: true
+    help: Select all channels used in normal operations; include exceptional paths (e.g., ad-hoc file shares).
+    recommended:
+    - Encrypted email
+    - Teams/SharePoint sharing
+    roles:
+      primary_respondents:
+      - Program Manager
+      - IT Architect
+      validators:
+      - Security Lead
+    bindings:
+      manifest:
+        cui_ingress_channels: answer
+    risk_flags: []
+  - id: CUI.LC.STO.001
+    section: Data Lifecycle
+    prompt: Where is CUI stored?
+    answer_type: multi_select
+    options:
+    - SharePoint Online (GCC High)
+    - OneDrive (GCC High)
+    - Exchange mailboxes
+    - Teams file libraries
+    - Azure Storage
+    - On-prem file server
+    - Git repositories
+    - External SaaS (specify)
+    required: true
+    help: Select all repositories where CUI can persist at rest. If 'External SaaS', specify vendor and tenancy/region.
+    recommended:
+    - SharePoint Online (GCC High)
+    - OneDrive (GCC High)
+    - Exchange mailboxes
+    roles:
+      primary_respondents:
+      - IT Architect
+      - Program Manager
+      validators:
+      - Security Lead
+    bindings:
+      manifest:
+        cui_storage_locations: answer
+    risk_flags:
+    - external_storage_if_selected
+  - id: CUI.LC.PROC.001
+    section: Data Lifecycle
+    prompt: Which tools/processes actively process CUI?
+    answer_type: list
+    options: []
+    required: true
+    help: List tools (e.g., CAD/EDA, IDEs, analytics tools, document tools) and processing activities (edit, compile, analyze).
+    roles:
+      primary_respondents:
+      - Program Manager
+      - Engineering Lead
+      - DevOps Lead
+      validators:
+      - IT Architect
+    bindings:
+      manifest:
+        cui_processing_tools: answer
+    risk_flags: []
+  - id: CUI.LC.EGR.001
+    section: Data Lifecycle
+    prompt: Is CUI transmitted outside the enclave?
+    answer_type: single_select
+    options:
+    - 'No'
+    - Yes – controlled external sharing
+    - Yes – subcontractor access
+    - Yes – vendor/MSP access
+    required: true
+    help: If yes, identify intended recipients and control methods (guest access, portals, encryption, etc.).
+    roles:
+      primary_respondents:
+      - Program Manager
+      - Security Lead
+      validators:
+      - Contracts Officer
+    bindings:
+      manifest:
+        external_sharing_model: answer
+    risk_flags:
+    - third_party_cui_flow_if_yes
+  - id: CUI.LC.RET.001
+    section: Data Lifecycle
+    prompt: What is the CUI retention and destruction model?
+    answer_type: single_select
+    options:
+    - Standard retention schedule
+    - Contract-specific retention
+    - Legal hold dependent
+    - Undefined
+    required: true
+    help: Choose the primary retention driver. If undefined, BTC/RP should flag for immediate remediation.
+    roles:
+      primary_respondents:
+      - Compliance Officer
+      - Security Lead
+      validators:
+      - Executive Sponsor
+    bindings:
+      policy:
+        retention_model: answer
+    risk_flags: []
+- id: CUI-04
+  name: User & Identity Scope
+  questions:
+  - id: CUI.USR.001
+    section: User & Identity Scope
+    prompt: Which user roles require access to CUI?
+    answer_type: multi_select
+    options:
+    - Engineers
+    - DevOps
+    - Program Managers
+    - Executives
+    - IT Admins
+    - Security Team
+    - Contractors
+    - Subcontractors
+    required: true
+    help: Select roles that access, process, administer, or can exfiltrate CUI.
+    recommended:
+    - Engineers
+    - Program Managers
+    - IT Admins
+    - Security Team
+    roles:
+      primary_respondents:
+      - Program Manager
+      - Executive Sponsor
+      validators:
+      - Compliance Officer
+    bindings:
+      manifest:
+        cui_user_roles: answer
+    risk_flags: []
+  - id: CUI.USR.002
+    section: User & Identity Scope
+    prompt: Approximate number of CUI users?
+    answer_type: number
+    options: []
+    required: true
+    help: Use expected steady-state headcount in the enclave. Include contractors if they have access.
+    roles:
+      primary_respondents:
+      - Executive Sponsor
+      - Program Manager
+      validators:
+      - IT Director
+    bindings:
+      manifest:
+        cui_user_count: answer
+    risk_flags: []
+  - id: CUI.ID.001
+    section: User & Identity Scope
+    prompt: Is CUI processed in a dedicated GCC High tenant?
+    answer_type: single_select
+    options:
+    - Yes – fully isolated tenant
+    - Shared tenant
+    - Planned but not yet implemented
+    required: true
+    help: A dedicated tenant generally reduces boundary complexity and assessor scrutiny, but increases operational overhead.
+    roles:
+      primary_respondents:
+      - IT Director
+      - Executive Sponsor
+      validators:
+      - Compliance Officer
+    bindings:
+      manifest:
+        tenant_separation: answer
+    risk_flags: []
+  - id: CUI.ID.002
+    section: User & Identity Scope
+    prompt: Is identity shared between commercial and CUI environments?
+    answer_type: single_select
+    options:
+    - 'No'
+    - 'Yes'
+    - Partially
+    required: true
+    help: Shared identity increases boundary enforcement and evidence needs; BTC will increase verification depth if yes/partial.
+    roles:
+      primary_respondents:
+      - Identity Admin
+      - IT Director
+      validators:
+      - Security Lead
+    bindings:
+      manifest:
+        shared_identity: answer
+    risk_flags:
+    - cross_tenant_identity_risk_if_yes
+- id: CUI-05
+  name: Device Model
+  questions:
+  - id: CUI.DEV.001
+    section: Device Model
+    prompt: Are only managed devices allowed to access CUI?
+    answer_type: single_select
+    options:
+    - Yes – managed only
+    - BYOD via VDI/Cloud PC
+    - BYOD direct access allowed
+    - Unknown
+    required: true
+    help: Choose the actual intended operating model. BYOD direct access typically drives high boundary risk and assessor scrutiny.
+    roles:
+      primary_respondents:
+      - Endpoint Admin
+      - IT Director
+      validators:
+      - Security Lead
+    bindings:
+      manifest:
+        device_model: answer
+    risk_flags:
+    - direct_byod_boundary_risk
+  - id: CUI.DEV.002
+    section: Device Model
+    prompt: Are privileged admin workstations isolated (PAW/SAW)?
+    answer_type: single_select
+    options:
+    - 'Yes'
+    - Planned
+    - 'No'
+    - Unknown
+    required: true
+    help: PAW/SAW isolation reduces credential theft and is frequently requested by assessors for privileged roles.
+    recommended: 'Yes'
+    roles:
+      primary_respondents:
+      - Security Lead
+      - IT Director
+      validators:
+      - Compliance Officer
+    bindings:
+      manifest:
+        admin_workstation_model: answer
+    risk_flags: []
+- id: CUI-06
+  name: DevOps Scope
+  questions:
+  - id: CUI.DEVOPS.001
+    section: DevOps Scope
+    prompt: Is DevOps involved in generating, storing, or processing CUI?
+    answer_type: single_select
+    options:
+    - 'No'
+    - Yes – fully in scope
+    - Yes – partially
+    required: true
+    help: If DevOps touches CUI, CI/CD, repos, artifacts, and secrets become in-scope boundary elements.
+    roles:
+      primary_respondents:
+      - DevOps Lead
+      - Program Manager
+      validators:
+      - Security Lead
+    bindings:
+      manifest:
+        devops_in_scope: answer
+    risk_flags: []
+  - id: CUI.DEVOPS.002
+    section: DevOps Scope
+    prompt: Where are repositories containing CUI located?
+    answer_type: multi_select
+    options:
+    - Azure DevOps (GCC High)
+    - GitHub Enterprise (Gov)
+    - Commercial GitHub
+    - Commercial Azure DevOps
+    - Other
+    required: false
+    help: If commercial platforms are selected, BTC must validate boundary controls and likely drive remediation/relocation.
+    recommended:
+    - Azure DevOps (GCC High)
+    roles:
+      primary_respondents:
+      - DevOps Lead
+      validators:
+      - Compliance Officer
+    bindings:
+      manifest:
+        cui_repo_locations: answer
+    risk_flags:
+    - repo_outside_boundary_if_selected
+- id: CUI-07
+  name: Interconnections & Integrations
+  questions:
+  - id: CUI.INT.001
+    section: Interconnections & Integrations
+    prompt: List all third-party systems integrated with in-scope systems.
+    answer_type: list
+    options: []
+    required: true
+    help: Include ticketing, CI/CD, backup, SIEM, identity apps, reporting tools, and any API-connected services.
+    roles:
+      primary_respondents:
+      - IT Architect
+      - DevOps Lead
+      validators:
+      - Security Lead
+    bindings:
+      manifest:
+        external_integrations: answer
+    risk_flags: []
+  - id: CUI.INT.002
+    section: Interconnections & Integrations
+    prompt: Is email forwarding enabled for in-scope users?
+    answer_type: single_select
+    options:
+    - 'No'
+    - Yes – restricted
+    - Yes – unrestricted
+    required: true
+    help: Email forwarding is a common exfiltration path; if 'No', BTC should require configuration proof.
+    recommended: 'No'
+    roles:
+      primary_respondents:
+      - Security Lead
+      - Messaging Admin
+      validators:
+      - Compliance Officer
+    bindings:
+      manifest:
+        email_forwarding_posture: answer
+    risk_flags:
+    - email_egress_risk
+  - id: CUI.INT.003
+    section: Interconnections & Integrations
+    prompt: Are service principals / API tokens used to move CUI?
+    answer_type: single_select
+    options:
+    - 'No'
+    - 'Yes'
+    - Unknown
+    required: true
+    help: If yes, identify systems, service accounts, and data flows for BTC verification.
+    recommended: 'No'
+    roles:
+      primary_respondents:
+      - IT Architect
+      - DevOps Lead
+      validators:
+      - Security Lead
+    bindings:
+      manifest:
+        api_tokens_move_cui: answer
+    risk_flags: []
+- id: CUI-08
+  name: Backup & Data Resiliency
+  questions:
+  - id: CUI.BKP.001
+    section: Backup & Data Resiliency
+    prompt: How are backups handled?
+    answer_type: single_select
+    options:
+    - M365 native only
+    - Third-party backup (in scope)
+    - Third-party backup (out of scope)
+    required: true
+    help: If backups are out of scope, boundary controls and compensating controls must be explicit.
+    recommended: M365 native only
+    roles:
+      primary_respondents:
+      - IT Director
+      validators:
+      - Security Lead
+    bindings:
+      manifest:
+        backup_model: answer
+    risk_flags:
+    - backup_outside_boundary_if_selected
+- id: CUI-09
+  name: Out-of-Scope Declaration
+  questions:
+  - id: CUI.OOS.001
+    section: Out-of-Scope Declaration
+    prompt: List systems explicitly declared out of scope.
+    answer_type: list
+    options: []
+    required: true
+    help: List systems and services excluded from the CUI boundary; include rationale and owner.
+    roles:
+      primary_respondents:
+      - IT Architect
+      - Compliance Officer
+      validators:
+      - Executive Sponsor
+    bindings:
+      manifest:
+        out_of_scope_systems: answer
+    risk_flags: []
+  - id: CUI.OOS.002
+    section: Out-of-Scope Declaration
+    prompt: What technical controls prevent CUI from entering out-of-scope systems?
+    answer_type: text
+    options: []
+    required: true
+    help: 'Describe boundary controls: Conditional Access, DLP, sensitivity labels, segregation, external sharing restrictions, etc.'
+    roles:
+      primary_respondents:
+      - Security Lead
+      - IT Architect
+      validators:
+      - Compliance Officer
+    bindings:
+      policy:
+        boundary_controls: answer
+    risk_flags: []
+- id: CUI-10
+  name: Boundary Enforcement Model
+  questions:
+  - id: CUI.ENF.001
+    section: Boundary Enforcement Model
+    prompt: Which enforcement mechanisms are intended to protect the boundary?
+    answer_type: multi_select
+    options:
+    - Conditional Access
+    - Intune compliance enforcement
+    - DLP policies
+    - Sensitivity labels
+    - External sharing restrictions
+    - Defender policies
+    - Network segmentation
+    - Other
+    required: true
+    help: Select the mechanisms you intend to rely on; BTC will confirm they are actually configured and functioning.
+    recommended:
+    - Conditional Access
+    - Intune compliance enforcement
+    - DLP policies
+    - Sensitivity labels
+    roles:
+      primary_respondents:
+      - Security Lead
+      - IT Architect
+      validators:
+      - Compliance Officer
+    bindings:
+      manifest:
+        boundary_enforcement_controls: answer
+    risk_flags: []
