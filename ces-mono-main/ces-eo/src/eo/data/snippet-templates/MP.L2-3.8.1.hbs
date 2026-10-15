@@ -1,0 +1,47 @@
+## Control {{controlId}}: Protect System Media Containing CUI, Both Paper and Digital
+
+**Implementation Status:** {{status}}
+
+This organization protects system media containing CUI within the {{tenantName}} M365 GCC High tenant through BitLocker encryption, sensitivity labels, and application protection policies managed by {{variables.systemAdministrator}}.
+
+{{#if bitLockerEnforced}}
+**Digital Media Encryption:**
+BitLocker Drive Encryption protects CUI at rest on {{deviceCount}} managed endpoints, ensuring data confidentiality on physical media even in cases of device loss or theft.
+{{/if}}
+
+{{#if dlpLabelsConfigured}}
+**Sensitivity Label Protection:**
+{{dlpLabelsCount}} sensitivity labels enforce automated protection on digital media:
+{{#each labels}}
+- **{{name}}**{{#if isActive}} (Active){{else}} (Inactive){{/if}} — Priority: {{priority}}
+{{/each}}
+
+Labels apply encryption, access restrictions, and visual markings to documents stored on digital media across M365 workloads.
+{{else}}
+Sensitivity labels have not been configured for digital media protection.
+{{/if}}
+
+{{#if appProtectionsActive}}
+**Mobile Media Protection:**
+{{appProtectionsCount}} application protection policies prevent CUI from being saved to unprotected media locations:
+{{#if policies}}
+{{#each policies}}
+- **{{displayName}}** ({{platformType}}) — {{#if isAssigned}}Assigned{{else}}Not Assigned{{/if}} — Protection: {{protectionLevel}}
+{{/each}}
+{{/if}}
+{{/if}}
+
+**Paper Media:** CUI in paper form is stored in locked containers in controlled access areas. Paper media handling follows procedures documented in "Media Protection Policy v1.0."
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine BitLocker deployment reports, sensitivity label configurations, application protection policies, and paper media storage procedures.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

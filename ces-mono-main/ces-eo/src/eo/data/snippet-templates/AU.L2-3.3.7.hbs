@@ -1,0 +1,37 @@
+## Control {{controlId}}: Provide a System Capability That Compares and Synchronizes Internal System Clocks
+
+**Implementation Status:** {{status}}
+
+This organization synchronizes system clocks with authoritative time sources within the {{tenantName}} M365 GCC High tenant to ensure accurate audit record timestamps, managed by {{variables.systemAdministrator}}.
+
+**Time Synchronization Architecture:**
+All M365 GCC High services synchronize with Microsoft-managed NTP (Network Time Protocol) infrastructure that chains to NIST and USNO authoritative time sources:
+- **Cloud Services:** Azure infrastructure automatically synchronizes all M365 service clocks with stratum-1 time sources via Windows Time Service (W32Time)
+- **Audit Timestamps:** All audit records (sign-in logs, directory audits, mailbox audits) use UTC timestamps from synchronized service clocks
+- **Correlation Accuracy:** Sub-second time accuracy ensures audit records from different M365 services can be correlated reliably
+
+{{#if bitLockerEnforced}}
+**Managed Endpoint Synchronization:**
+{{deviceCount}} managed endpoints synchronize clocks through:
+- Domain-joined devices: W32Time syncs with domain controllers, which chain to external NTP sources
+- Entra ID-joined devices: Windows Time Service syncs with time.windows.com (stratum-2)
+- Mobile devices: iOS/Android native NTP synchronization with carrier and platform time sources
+{{/if}}
+
+{{#if securityAlertsActive}}
+**Time-Based Alert Correlation:**
+Accurate timestamps enable {{securityAlertsCount}} security alert rules to correlate events across services with reliable temporal ordering.
+{{/if}}
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine NTP configuration on managed endpoints, Azure time synchronization documentation, audit record timestamp accuracy, and cross-service correlation timestamp alignment.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

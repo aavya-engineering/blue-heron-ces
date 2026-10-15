@@ -1,0 +1,71 @@
+controlId: "CM.L2-3.4.1"
+relatedControlIds:
+  - "CM.L2-3.4.3"
+  - "SI.L1-3.14.1"
+practiceStatement: Establish and maintain baseline configurations and inventories of organizational systems throughout the
+  respective system development life cycles.
+useCaseId: B-02
+useCaseTitle: "Compliance Policy Gap Report"
+domain: Device & Endpoint Management
+priority: P2 High
+trigger: 'SCHEDULE: Monthly compliance review cycle'
+sodTier: Tier 1 -- Read-Only Audit
+entraRolesRequired:
+- Security Reader
+- Reports Reader
+approvalRequired: false
+services:
+- name: Microsoft Intune
+  purpose: managed device inventory, compliance policy status
+- name: Microsoft Graph API
+  purpose: deviceManagement/managedDevices endpoint
+- name: Entra ID
+  purpose: device identity correlation
+configurationSteps:
+  portalPath: https://intune.microsoft.us
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes DeviceManagementManagedDevices.Read.All
+  - cmdlet: Get-MgDeviceManagementManagedDevice
+    parameters:
+    - -MgDeviceManagementManagedDevice
+    - -All
+    - -Property
+    - -Object
+    - -Property
+  - cmdlet: Get-MgDeviceManagementManagedDeviceCompliancePolicyState
+    parameters:
+    - -MgDeviceManagementManagedDeviceCompliancePolicyState
+    - -ManagedDeviceId
+    - -Object
+    - -Table
+    - -AutoSize
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/deviceManagement/managedDevices?$select=id,deviceName,complianceState,operatingSystem,osVersion,userPrincipalName,lastSyncDateTime&$filter=complianceState
+  graphApiPayloadExample: {}
+  requiredPermissions:
+  - DeviceManagementManagedDevices.Read.All
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-b-device/B-02/{year}/{month}/
+  format: CSV (device compliance export), JSON (Graph API response)
+  filenamePattern: B-02_ComplianceGapReport_{YYYYMMDD}_{HHmmss}_AllDevices.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://graph.microsoft.us
+  - https://intune.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: The `deviceManagement/managedDevices` Graph endpoint is fully available in GCC High at `https://graph.microsoft.us`.
+    The `$filter` OData parameter supports compliance state filtering. Intune reporting in GCC High may have a data freshness
+    delay of up to 24 hours compared to the live compliance evaluation; use `lastSyncDateTime` to assess data currency. Export
+    functionality in the Intune Admin Center portal at `https://intune.microsoft.us` works identically to commercial.
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

@@ -1,0 +1,103 @@
+controlId: "AC.L1-3.1.2"
+relatedControlIds:
+  - "AC.L1-3.1.1"
+  - "AC.L2-3.1.5"
+
+practiceStatement: "Limit system access to authorized users, processes acting on behalf of users, and devices."
+
+useCaseId: "A-11"
+useCaseTitle: "Stale Account Detection"
+domain: "Identity & Access Management"
+priority: "P2 High"
+trigger: "SCHEDULE: Monthly (every 30 days)"
+
+sodTier: "Tier 1 -- Read-Only Audit (detection), Tier 2 -- Config Manager (disable), Tier 3 -- Privileged Admin (delete)"
+entraRolesRequired:
+  - "Security Reader (detection)"
+  - "User Administrator (disable)"
+  - "Global Administrator via PIM (delete)"
+
+approvalRequired: false
+
+services:
+  - name: "Entra ID"
+    purpose: "User sign-in activity data, account management"
+  - name: "Microsoft Graph PowerShell"
+    modules:
+      - "Microsoft.Graph.Users"
+  - name: "Microsoft Graph API"
+    purpose: "Beta endpoint may be required for signInActivity property in some cases"
+
+configurationSteps:
+  portalPath: "https://entra.microsoft.us > Identity > Users > All users"
+
+  powershellCmdlets:
+    - cmdlet: "Connect-MgGraph"
+      parameters:
+        - "-Environment USGov"
+        - "-Scopes AuditLog.Read.All,User.ReadWrite.All,Directory.ReadWrite.All"
+    - cmdlet: "Get-MgUser"
+      parameters:
+        - "-All"
+        - "-Property id,displayName,userPrincipalName,accountEnabled,signInActivity"
+        - "-Filter userType eq 'Member'"
+    - cmdlet: "Update-MgUser"
+      parameters:
+        - "-UserId"
+        - "-AccountEnabled"
+    - cmdlet: "Remove-MgUser"
+      parameters:
+        - "-UserId"
+
+  graphApiEndpoint: "GET https://graph.microsoft.us/v1.0/users"
+  graphApiPayloadExample:
+    $select: "id,displayName,userPrincipalName,accountEnabled,signInActivity"
+    $filter: "userType eq 'Member'"
+
+  requiredPermissions:
+    - "AuditLog.Read.All"
+    - "User.Read.All"
+    - "User.ReadWrite.All"
+
+evidenceArtifacts:
+  - type: "CSV"
+    retentionPeriod: "7 years"
+    storageLocation: "evidence-store/domain-a-identity/A-11/{year}/{month}/"
+    format: "Stale account list with UPN, last sign-in date, action taken"
+    filenamePattern: "A-11_StaleAccountReport_{YYYYMMDD}_{HHmmss}_Monthly.csv"
+  - type: "JSON"
+    retentionPeriod: "7 years"
+    storageLocation: "evidence-store/domain-a-identity/A-11/{year}/{month}/"
+    format: "Disable/delete confirmations"
+    hashAlgorithm: "SHA-256"
+
+gccHighSpecifics:
+  endpoints:
+    - "https://graph.microsoft.us"
+    - "https://entra.microsoft.us"
+  complianceBoundary: "FedRAMP High + CMMC L2"
+  endpointValidation: "All endpoints use .microsoft.us or .usgovcloudapi.net domains"
+  notes: "The signInActivity property requires Entra ID P1 or higher and AuditLog.Read.All permission. In some GCC High tenants, signInActivity may only be available on beta endpoint. Test v1.0 first, fall back to beta if needed. Exclude break-glass accounts and service accounts from stale detection logic."
+
+relatedPolicies:
+  - "AC-001 Access Control Policy"
+  - "IA-002 Identification and Authentication Policy"
+
+odpValues:
+  - odpId: "AC.L2-3.1.1_ODP_01"
+    description: "Stale account threshold"
+    value: "90 days for disable, 180 days for delete"
+    rationale: "Two-threshold approach provides buffer for intermittent access patterns while removing unmonitored access paths"
+    enforcementMechanism: "Monthly scheduled detection via Graph API signInActivity property"
+
+dependencies:
+  hardDependencies: []
+  softDependencies:
+    - useCaseId: "A-02"
+      reason: "Offboarding process should handle expected departures; this use case catches accounts that bypassed offboarding"
+    - useCaseId: "A-03"
+      reason: "Accounts disabled here may flow to hard delete process"
+    - useCaseId: "E-09"
+      reason: "Stale account reports feed C3PAO evidence"
+
+notes: "Stale accounts represent unmonitored access paths that attackers can exploit without triggering behavioral anomaly alerts. Monthly sweep reduces attack surface. Review each identified account to verify it is not a service account, shared mailbox, or break-glass account before disabling or deleting. Two-person approval required for deletion at 180 days."

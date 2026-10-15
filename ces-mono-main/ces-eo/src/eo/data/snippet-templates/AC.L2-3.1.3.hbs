@@ -1,0 +1,42 @@
+## Control {{controlId}}: Control CUI Flow per Approved Authorizations
+
+**Implementation Status:** {{status}}
+
+This organization controls the flow of CUI in accordance with approved authorizations within the {{tenantName}} M365 GCC High tenant. Information flow enforcement is implemented through SharePoint sharing restrictions, sensitivity labels, data loss prevention policies, and Conditional Access policies that prevent unauthorized data movement between security domains.
+
+{{#if sharepointConfigured}}
+SharePoint Online sharing capability is set to "{{sharepointSharingCapability}}", restricting CUI flow to authorized recipients only. Sensitivity labels applied to CUI documents enforce encryption and prevent forwarding, copying, or printing outside approved boundaries. Data loss prevention (DLP) policies monitor and block CUI transmission through email, Teams, and SharePoint to unauthorized external domains.
+{{else}}
+SharePoint external sharing restrictions have not been configured. CUI flow controls are not enforced beyond default M365 settings, pending DLP and sharing policy implementation.
+{{/if}}
+
+{{#if cuiGroupExists}}
+Only members of the "{{groupDisplayName}}" security group ({{memberCount}} members) are authorized to access and transmit CUI. Unauthorized users are blocked from receiving CUI through automated DLP policy enforcement.
+{{/if}}
+
+{{#if policies}}
+Conditional Access policies enforce flow control boundaries:
+{{#each policies}}
+- **{{displayName}}** ({{state}}): Restricts CUI access requiring {{#each grantControls.builtInControls}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}.
+{{/each}}
+{{/if}}
+
+{{#if infraResources}}
+Supporting infrastructure:
+{{#each infraResources}}
+- {{resourceType}} "{{name}}"{{#if properties.retention_days}} (retention: {{properties.retention_days}} days){{/if}}
+{{/each}}
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Review SharePoint sharing settings, sensitivity label configurations, DLP policy rules, and information flow audit logs.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

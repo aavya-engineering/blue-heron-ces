@@ -1,0 +1,38 @@
+## Control {{controlId}}: Session Lock with Pattern-Hiding Displays
+
+**Implementation Status:** {{status}}
+
+This organization uses session lock with pattern-hiding displays to prevent access and viewing of data after a period of inactivity within the {{tenantName}} M365 GCC High tenant. Session lock enforcement is implemented through Intune device configuration policies, Conditional Access session controls, and Windows Group Policy settings that activate screen locks with pattern-hiding after the organization-defined inactivity timeout.
+
+{{#if deviceConfigurationsActive}}
+Intune enforces session lock through {{deviceConfigurationsCount}} device configuration policies. Policies configure automatic screen lock activation after the defined inactivity period, requiring re-authentication to resume the session. Pattern-hiding is enforced through lock screen display settings that conceal previously visible information with a blank screen or organizational logo overlay. Windows devices apply local Group Policy settings for screen saver timeout and password-protected resume.
+{{else}}
+Intune device configuration policies for session lock have not been configured. Session lock relies on default Windows settings pending policy deployment.
+{{/if}}
+
+{{#if policies}}
+Conditional Access policies enforce session timeout controls:
+{{#each policies}}
+- **{{displayName}}** ({{state}}): Enforces session controls with {{#each grantControls.builtInControls}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}.
+{{/each}}
+{{/if}}
+
+{{#if infraResources}}
+Supporting infrastructure:
+{{#each infraResources}}
+- {{resourceType}} "{{name}}"{{#if properties.retention_days}} (retention: {{properties.retention_days}} days){{/if}}
+{{/each}}
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Review Intune device configuration policies for screen lock timeout settings, pattern-hiding display configurations, and device compliance reports.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

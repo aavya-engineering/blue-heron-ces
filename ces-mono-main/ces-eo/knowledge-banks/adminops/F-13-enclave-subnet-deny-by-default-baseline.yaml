@@ -1,0 +1,36 @@
+# W4-EO2: minimal entry generated from the AO registry; procedure not yet authored.
+controlId: SC.L1-3.13.1
+relatedControlIds:
+  - SC.L2-3.13.6
+practiceStatement: >-
+  Monitor, control and protect organizational communications (e.g., information transmitted or received by
+  organizational information systems) at the external boundaries and key internal boundaries of the information systems.
+useCaseId: F-13
+useCaseTitle: Enclave Subnet Deny-by-Default Baseline
+domain: Security Configuration & Posture
+priority: P2 High
+trigger: CONFIG
+sodTier: Tier 3
+entraRolesRequired: []
+approvalRequired: false
+services: []
+configurationSteps:
+  portalPath: ''
+  powershellCmdlets: []
+  graphApiEndpoint: ''
+  requiredPermissions: []
+evidenceArtifacts: []
+gccHighSpecifics:
+  endpoints: []
+  complianceBoundary: ''
+  endpointValidation: ''
+relatedPolicies: []
+dependencies: {}
+notes: >-
+  Generated from ces-ao ao-commands.registry.json on 2026-09-27 (W4-EO2). AO overview: Applies the no-firewall boundary
+  posture to every non-platform subnet of a VNet (G-FW-ALT Phase 1): ensures each subnet has an NSG (creates one if
+  missing) carrying Allow-VNet in/out at priority 4000 and explicit Deny-All in/out at 4096, associates a 0.0.0.0/0 ->
+  None blackhole route table, and enables privateEndpointNetworkPolicies so NSG rules evaluate on Private Endpoint
+  traffic. Idempotent - existing rules/associations are left in place. Remediates UC-H findings F-NET-1/2/3
+  (SC.L2-3.13.1[e][f][h], SC.L2-3.13.6[a][b]). Procedure details (roles, cmdlets, endpoints, evidence) are not yet
+  authored in this knowledge bank.

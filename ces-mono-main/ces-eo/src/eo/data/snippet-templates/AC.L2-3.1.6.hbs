@@ -1,0 +1,35 @@
+## Control {{controlId}}: Use Non-Privileged Accounts for Non-Security Functions
+
+**Implementation Status:** {{status}}
+
+This organization requires that users of organizational information systems use non-privileged accounts or roles when accessing non-security functions within the {{tenantName}} M365 GCC High tenant. Administrative personnel are required to maintain separate standard user accounts for daily operations and use privileged access workstation (PAW) accounts exclusively for security-related functions.
+
+{{#if roleAssignmentsConfigured}}
+Azure AD role assignments enforce account separation with {{roleAssignmentsCount}} active assignments across {{directoryRolesCount}} directory roles. Administrative users maintain two distinct accounts: a standard user account (e.g., user@{{primaryDomain}}) for email, Teams, and document collaboration, and a privileged account (e.g., admin-user@{{primaryDomain}}) exclusively for security and administrative operations. Conditional Access policies restrict privileged account usage to approved privileged access workstations.
+{{else}}
+Azure AD role assignment separation has not been configured. Administrative account segmentation relies on procedural controls pending technical enforcement.
+{{/if}}
+
+{{#if pimConfigured}}
+Privileged Identity Management ensures administrative roles are activated only when needed, reinforcing the separation between standard and privileged operations through time-bound elevation and approval workflows.
+{{/if}}
+
+{{#if infraResources}}
+Supporting infrastructure:
+{{#each infraResources}}
+- {{resourceType}} "{{name}}"{{#if properties.retention_days}} (retention: {{properties.retention_days}} days){{/if}}
+{{/each}}
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Review Azure AD account inventory for separate standard/administrative accounts, Conditional Access PAW restrictions, and PIM activation patterns confirming privileged accounts are not used for routine operations.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

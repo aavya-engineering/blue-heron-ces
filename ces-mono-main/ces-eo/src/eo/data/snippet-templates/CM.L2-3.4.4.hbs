@@ -1,0 +1,40 @@
+## Control {{controlId}}: Analyze the Security Impact of Changes Prior to Implementation
+
+**Implementation Status:** {{status}}
+
+This organization analyzes the security impact of changes prior to implementation within the {{tenantName}} M365 GCC High tenant through documented risk assessment procedures described in "Security Impact Analysis Policy v1.0" maintained by {{variables.systemAdministrator}}.
+
+All proposed changes to the CUI environment undergo security impact analysis before implementation:
+
+**Security Impact Analysis Process:**
+- **Scope Assessment:** Identify system components, data flows, and security controls affected by the proposed change
+- **Risk Evaluation:** Assess potential impacts to confidentiality, integrity, and availability of CUI using NIST SP 800-30 risk assessment methodology
+- **Control Mapping:** Verify that modified configurations maintain compliance with CMMC L2 control requirements
+- **Testing Requirements:** Determine pre-implementation testing needs (sandbox validation, staged rollout, regression testing)
+- **Approval Gate:** Changes with security impact require ISSO sign-off before implementation proceeds
+
+**Analysis Documentation:**
+Each change request includes a Security Impact Assessment (SIA) form documenting:
+- Affected CMMC controls and assessment objectives
+- Risk level (Low/Moderate/High) with justification
+- Mitigation measures for identified risks
+- Rollback procedures if adverse impacts are detected
+
+**Operational Procedure:**
+- **Action:** Security impact analysis completed for all change requests before CAB approval
+- **Frequency:** Per change request, continuous
+- **Responsible Party:** {{variables.systemAdministrator}}
+- **Documentation:** Security Impact Analysis Policy v1.0, SIA Form CM-004
+
+**Review Frequency:** Quarterly review of SIA process effectiveness by ISSO
+
+**Verification Method:** Examine security impact analysis forms, change request risk assessments, ISSO approval records, and post-implementation review reports.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** Review SIA forms per procedure CM-004. No automated evidence collection available for this procedural control. {{evidenceArtifactUrl}}
+{{/if}}

@@ -1,0 +1,39 @@
+## Control {{controlId}}: Monitor and Control Remote Access Sessions
+
+**Implementation Status:** {{status}}
+
+This organization monitors and controls remote access sessions within the {{tenantName}} M365 GCC High tenant. Remote access monitoring is implemented through Conditional Access policies, named location definitions, sign-in log analysis, and Microsoft Sentinel SIEM correlation that provides continuous visibility into remote authentication activity.
+
+{{#if conditionalAccessActive}}
+Conditional Access policies across {{caPoliciesTotalCount}} configurations enforce remote access controls. All remote sessions require multi-factor authentication and device compliance verification before granting access. Policies differentiate between corporate network locations and external access points, applying stricter controls for sessions originating outside trusted boundaries.
+{{else}}
+Conditional Access policies for remote access monitoring have not been configured. Remote access relies on standard Azure AD authentication pending enhanced policy deployment.
+{{/if}}
+
+{{#if namedLocationsConfigured}}
+{{namedLocationsCount}} named locations define trusted network boundaries for remote access classification. Sessions from untrusted locations trigger additional authentication requirements and enhanced logging for security monitoring.
+{{/if}}
+
+{{#if signInLogsAvailable}}
+Sign-in logs capture {{signInLogsCount}} authentication events, providing audit trail for all remote access sessions including source IP, device compliance status, and authentication method used.
+{{/if}}
+
+{{#if infraResources}}
+Supporting infrastructure:
+{{#each infraResources}}
+- {{resourceType}} "{{name}}"{{#if properties.retention_days}} (retention: {{properties.retention_days}} days){{/if}}
+{{/each}}
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Review Conditional Access location-based policies, named location definitions, sign-in logs for remote sessions, and SIEM alert rules for anomalous remote access patterns.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

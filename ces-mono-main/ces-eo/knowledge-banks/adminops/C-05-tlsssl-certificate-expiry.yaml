@@ -1,0 +1,58 @@
+controlId: "SC.L2-3.13.8"
+relatedControlIds:
+  - "SC.L2-3.13.10"
+  - "SC.L2-3.13.11"  # [VERIFY] mapping not yet confirmed
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: C-05
+useCaseTitle: "TLS/SSL Certificate Expiry"
+domain: Credential & Secret Management
+priority: P4 Standard
+trigger: 'SCHEDULE: Weekly scan (every Wednesday 06:00 UTC); or EXPIRY: Certificate within 30-day window'
+sodTier: Tier 1 (Read-Only Audit)
+entraRolesRequired:
+- Security Reader
+- Reader (Azure RBAC on App Service
+- Application Gateway
+- Key Vault)
+approvalRequired: true
+services:
+- name: Azure App Service
+  purpose: TLS bindings
+- name: Azure Application Gateway
+  purpose: HTTPS listeners, SSL certificates
+- name: Azure Key Vault
+  purpose: Certificates
+- name: Azure Resource Graph
+  purpose: cross-resource inventory
+- name: Microsoft Sentinel
+  purpose: expiry alerting
+configurationSteps:
+  portalPath: //portal.azure.us > Key Vaults > select vault > Certificates. Review expiry dates for all stored certificates.
+  powershellCmdlets: []
+  graphApiEndpoint: ''
+  graphApiPayloadExample: {}
+  requiredPermissions:
+  - Reader (Azure RBAC at subscription scope)
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-c-credential/C-05/2026/03/
+  format: 'CSV (columns: Source, ResourceName, CertName, ExpiryDate, DaysRemaining, Severity)'
+  filenamePattern: C-05_TLSCertExpiry_{YYYYMMDD}_{HHmmss}_AllResources.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: Azure App Service, Application Gateway, and Key Vault are all fully available in Azure Government regions. The Azure
+    Resource Graph endpoint is `management.usgovcloudapi.net`. Application Gateway SSL certificates that reference Key Vault
+    certificates use the Key Vault data plane endpoint `https://{vault-name}.vault.usgovcloudapi.net`. Ensure the Application
+    Gateway managed identity has Key Vault Secrets User role on the vault for auto-renewal scenarios.
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

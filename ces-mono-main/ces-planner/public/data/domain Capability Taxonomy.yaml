@@ -1,0 +1,749 @@
+# CES Capability Taxonomy & Practice Mapping
+# Maps CMMC practices to canonical security capabilities and implementation patterns.
+# Used during Mission Plan generation to produce actionable, vendor-specific instructions.
+#
+# Each capability represents a functional security area that an organization implements
+# using specific tools, configurations, and processes. Multiple CMMC domains map to
+# the same capability (e.g., AC + IA both map to Identity & Access Management).
+
+ces:
+  artifact: capability_taxonomy
+  version: "1.0.0"
+  generated_on: "2026-02-07"
+
+capabilities:
+
+  # ---------------------------------------------------------------------------
+  # 1. IDENTITY & ACCESS MANAGEMENT
+  # Core identity lifecycle: user provisioning, authentication, authorization,
+  # session management, privilege control.
+  # ---------------------------------------------------------------------------
+  - id: identity_access_management
+    name: Identity & Access Management
+    abbreviation: IAM
+    description: >
+      User identity lifecycle, authentication, authorization, session management,
+      and privilege controls. Covers who can access what, how they prove identity,
+      and how access is enforced and reviewed.
+    cmmc_domains: [AC, IA]
+    vendor_stack_components:
+      microsoft_365: [Entra ID, Conditional Access, PIM, RBAC]
+    practices:
+      # -- Access Control (authorization, session, privilege) --
+      - id: AC.L1-3.1.1
+        title: Authorized Access Control
+        capability_role: Restrict system access to authorized users
+      - id: AC.L1-3.1.2
+        title: Transaction & Function Control
+        capability_role: Limit access to authorized transactions and functions
+      - id: AC.L2-3.1.1
+        title: Account Management
+        capability_role: Manage user accounts and access lifecycle
+      - id: AC.L2-3.1.2
+        title: Privileged Access Control
+        capability_role: Limit system access to authorized privileged users
+      - id: AC.L2-3.1.4
+        title: Separation of Duties
+        capability_role: Separate duties to reduce risk of malicious activity
+      - id: AC.L2-3.1.5
+        title: Least Privilege
+        capability_role: Employ principle of least privilege
+      - id: AC.L2-3.1.6
+        title: Non-Privileged Account Use
+        capability_role: Use non-privileged accounts for non-security functions
+      - id: AC.L2-3.1.7
+        title: Privileged Functions
+        capability_role: Prevent non-privileged users from executing privileged functions
+      - id: AC.L2-3.1.8
+        title: Unsuccessful Logon Attempts
+        capability_role: Limit unsuccessful logon attempts
+      - id: AC.L2-3.1.9
+        title: System Use Notification
+        capability_role: Provide privacy and security notices at logon
+      - id: AC.L2-3.1.10
+        title: Session Lock
+        capability_role: Lock sessions after inactivity
+      - id: AC.L2-3.1.11
+        title: Session Termination
+        capability_role: Terminate sessions after defined conditions
+      - id: AC.L3-3.1.1e
+        title: Dual Authorization
+        capability_role: Require dual authorization for critical operations
+      # -- Identification & Authentication --
+      - id: IA.L1-3.5.1
+        title: Identification
+        capability_role: Identify system users and processes
+      - id: IA.L1-3.5.2
+        title: Authentication
+        capability_role: Authenticate users and processes before access
+      - id: IA.L2-3.5.1
+        title: User Identification
+        capability_role: Identify system users, processes, and devices
+      - id: IA.L2-3.5.2
+        title: Device Identification
+        capability_role: Authenticate devices before connection
+      - id: IA.L2-3.5.3
+        title: Multifactor Authentication
+        capability_role: Use MFA for local and network access
+      - id: IA.L2-3.5.4
+        title: Replay-Resistant Authentication
+        capability_role: Employ replay-resistant authentication
+      - id: IA.L2-3.5.5
+        title: Identifier Reuse Prevention
+        capability_role: Prevent reuse of identifiers
+      - id: IA.L2-3.5.6
+        title: Identifier Disablement
+        capability_role: Disable identifiers after inactivity period
+      - id: IA.L2-3.5.7
+        title: Password Complexity
+        capability_role: Enforce minimum password complexity
+      - id: IA.L2-3.5.8
+        title: Password Reuse Prevention
+        capability_role: Prohibit password reuse
+      - id: IA.L2-3.5.9
+        title: Temporary Passwords
+        capability_role: Manage temporary password lifecycle
+      - id: IA.L2-3.5.10
+        title: Cryptographic Password Protection
+        capability_role: Store and transmit only protected passwords
+      - id: IA.L2-3.5.11
+        title: Authenticator Feedback Obscuring
+        capability_role: Obscure authentication feedback
+      - id: IA.L3-3.5.1e
+        title: Enhanced System Authentication
+        capability_role: Authenticate systems and components
+      - id: IA.L3-3.5.2e
+        title: Automated Authenticator Management
+        capability_role: Automate authenticator generation and protection
+      - id: IA.L3-3.5.3e
+        title: Prohibited Authenticator Prevention
+        capability_role: Prevent use of compromised authenticators
+
+  # ---------------------------------------------------------------------------
+  # 2. NETWORK & BOUNDARY PROTECTION
+  # Network architecture, segmentation, boundary defense, remote access,
+  # wireless security, and communications protection.
+  # ---------------------------------------------------------------------------
+  - id: network_boundary_protection
+    name: Network & Boundary Protection
+    abbreviation: NBP
+    description: >
+      Network architecture, segmentation, boundary defense, remote access controls,
+      wireless security, and network monitoring. Protects CUI in transit and
+      controls network-level access paths.
+    cmmc_domains: [AC, SC]
+    vendor_stack_components:
+      microsoft_365: [Azure Firewall, NSGs, VPN Gateway, Private Link, Defender for Cloud]
+    practices:
+      # -- Remote access --
+      - id: AC.L1-3.1.20
+        title: External System Connections
+        capability_role: Verify and control external system connections
+      - id: AC.L2-3.1.12
+        title: Remote Access Monitoring
+        capability_role: Monitor and control remote access sessions
+      - id: AC.L2-3.1.13
+        title: Remote Access Encryption
+        capability_role: Encrypt remote access sessions
+      - id: AC.L2-3.1.14
+        title: Remote Access Routing
+        capability_role: Route remote access through managed access control points
+      - id: AC.L2-3.1.15
+        title: Privileged Remote Access
+        capability_role: Authorize remote execution of privileged commands
+      - id: AC.L2-3.1.20
+        title: External System Verification
+        capability_role: Verify and limit external system connections
+      # -- Wireless --
+      - id: AC.L2-3.1.16
+        title: Wireless Access Authorization
+        capability_role: Authorize wireless access prior to connection
+      - id: AC.L2-3.1.17
+        title: Wireless Access Protection
+        capability_role: Protect wireless access using authentication and encryption
+      # -- Boundary and communications --
+      - id: SC.L1-3.13.1
+        title: Boundary Protection
+        capability_role: Monitor and protect communications at boundaries
+      - id: SC.L1-3.13.5
+        title: Public-Access System Separation
+        capability_role: Separate public-facing systems from internal networks
+      - id: SC.L2-3.13.1
+        title: Boundary Monitoring
+        capability_role: Monitor, control, and protect boundary communications
+      - id: SC.L2-3.13.2
+        title: Security Architecture
+        capability_role: Employ security engineering principles in architecture
+      - id: SC.L2-3.13.3
+        title: Application Partitioning
+        capability_role: Separate user functionality from system management
+      - id: SC.L2-3.13.4
+        title: Shared Resource Control
+        capability_role: Prevent unauthorized information transfer via shared resources
+      - id: SC.L2-3.13.5
+        title: Network Segmentation
+        capability_role: Implement subnetworks for publicly accessible components
+      - id: SC.L2-3.13.6
+        title: Default Deny
+        capability_role: Deny network traffic by default
+      - id: SC.L2-3.13.7
+        title: Split Tunneling Prevention
+        capability_role: Prevent remote devices from establishing non-remote connections
+      - id: SC.L2-3.13.9
+        title: Network Disconnect
+        capability_role: Terminate network connections at end of session
+      - id: SC.L2-3.13.12
+        title: Collaborative Computing Control
+        capability_role: Prohibit unauthorized remote activation of collaborative devices
+      - id: SC.L2-3.13.14
+        title: VoIP Protection
+        capability_role: Control and monitor Voice over IP usage
+      - id: SC.L2-3.13.15
+        title: Session Authenticity
+        capability_role: Protect the authenticity of communications sessions
+      - id: SC.L3-3.13.1e
+        title: System Diversity
+        capability_role: Create diversity in system components
+      - id: SC.L3-3.13.5e
+        title: Function Relocation
+        capability_role: Distribute and relocate system functions
+
+  # ---------------------------------------------------------------------------
+  # 3. DATA PROTECTION & CLASSIFICATION
+  # CUI flow control, encryption at rest and in transit, data labeling,
+  # public information control, portable storage restrictions.
+  # ---------------------------------------------------------------------------
+  - id: data_protection
+    name: Data Protection & Classification
+    abbreviation: DPC
+    description: >
+      CUI identification, classification, labeling, flow control, encryption
+      at rest and in transit, and controls on data sharing and public posting.
+    cmmc_domains: [AC, MP, SC]
+    vendor_stack_components:
+      microsoft_365: [Purview Information Protection, Sensitivity Labels, DLP, Azure Information Protection]
+    practices:
+      - id: AC.L1-3.1.22
+        title: Public Information Control
+        capability_role: Control information posted to public systems
+      - id: AC.L2-3.1.3
+        title: CUI Flow Control
+        capability_role: Control the flow of CUI
+      - id: AC.L2-3.1.22
+        title: CUI Public Posting Control
+        capability_role: Control CUI posted to publicly accessible systems
+      - id: AC.L3-3.1.2e
+        title: Restricted System Access
+        capability_role: Restrict access to systems and components
+      - id: AC.L3-3.1.3e
+        title: Secure Information Transfer
+        capability_role: Employ secure information transfer solutions
+      - id: SC.L2-3.13.16
+        title: CUI Confidentiality at Rest
+        capability_role: Protect confidentiality of CUI at rest
+      - id: SC.L2-3.13.13
+        title: Mobile Code Control
+        capability_role: Control and monitor mobile code usage
+      - id: SC.L3-3.13.3e
+        title: Exfiltration Prevention
+        capability_role: Employ means to prevent data exfiltration
+      - id: SC.L3-3.13.4e
+        title: Obfuscation Techniques
+        capability_role: Employ obfuscation and concealment techniques
+
+  # ---------------------------------------------------------------------------
+  # 4. CRYPTOGRAPHIC PROTECTION
+  # Key management, FIPS validation, encryption for CUI in transit and at rest.
+  # ---------------------------------------------------------------------------
+  - id: cryptographic_protection
+    name: Cryptographic Protection
+    abbreviation: CRY
+    description: >
+      Cryptographic key management, FIPS 140-validated cryptography, encryption
+      of CUI in transit and at rest, and cryptographic protocol enforcement.
+    cmmc_domains: [SC]
+    vendor_stack_components:
+      microsoft_365: [Azure Key Vault, BitLocker, TLS configuration, Purview Encryption]
+    practices:
+      - id: SC.L2-3.13.8
+        title: CUI Transmission Encryption
+        capability_role: Encrypt CUI during transmission
+      - id: SC.L2-3.13.10
+        title: Key Management
+        capability_role: Establish and manage cryptographic keys
+      - id: SC.L2-3.13.11
+        title: FIPS-Validated Cryptography
+        capability_role: Employ FIPS-validated cryptographic modules
+      - id: AC.L2-3.1.19
+        title: Mobile Device CUI Encryption
+        capability_role: Encrypt CUI on mobile devices
+      - id: MP.L2-3.8.6
+        title: Media Transport Encryption
+        capability_role: Encrypt CUI on media during transport
+
+  # ---------------------------------------------------------------------------
+  # 5. ENDPOINT MANAGEMENT
+  # Device compliance, mobile device management, baseline configurations,
+  # portable storage controls.
+  # ---------------------------------------------------------------------------
+  - id: endpoint_management
+    name: Endpoint Management
+    abbreviation: EPM
+    description: >
+      Endpoint device compliance, mobile device management, BYOD controls,
+      portable storage restrictions, and device configuration baselines.
+    cmmc_domains: [AC, CM]
+    vendor_stack_components:
+      microsoft_365: [Intune, Defender for Endpoint, Autopilot, Windows Update for Business]
+    practices:
+      - id: AC.L2-3.1.18
+        title: Mobile Device Connection Control
+        capability_role: Control connection of mobile devices
+      - id: AC.L2-3.1.21
+        title: Portable Storage Restriction
+        capability_role: Limit use of portable storage devices
+      - id: CM.L2-3.4.1
+        title: Baseline Configuration
+        capability_role: Establish and maintain baseline configurations
+      - id: CM.L2-3.4.2
+        title: Security Configuration Settings
+        capability_role: Enforce security configuration settings
+      - id: CM.L2-3.4.6
+        title: Least Functionality
+        capability_role: Configure systems to provide only essential capabilities
+      - id: CM.L2-3.4.7
+        title: Nonessential Function Restriction
+        capability_role: Restrict, disable, or prevent nonessential functions
+      - id: CM.L2-3.4.8
+        title: Deny-by-Exception Policy
+        capability_role: Apply deny-by-exception for software execution
+      - id: CM.L2-3.4.9
+        title: User-Installed Software Control
+        capability_role: Control and monitor user-installed software
+      - id: CM.L3-3.4.1e
+        title: Authoritative Configuration Source
+        capability_role: Maintain authoritative configuration source and repository
+      - id: CM.L3-3.4.2e
+        title: Automated Misconfiguration Detection
+        capability_role: Detect misconfigured or unauthorized components
+      - id: CM.L3-3.4.3e
+        title: Automated Discovery
+        capability_role: Employ automated discovery and management tools
+
+  # ---------------------------------------------------------------------------
+  # 6. CONFIGURATION & CHANGE MANAGEMENT
+  # Change control processes, security impact analysis, access restrictions
+  # for configuration changes.
+  # ---------------------------------------------------------------------------
+  - id: configuration_change_management
+    name: Configuration & Change Management
+    abbreviation: CCM
+    description: >
+      Change control processes, configuration change tracking, security impact
+      analysis, and access restrictions for system configuration changes.
+    cmmc_domains: [CM]
+    vendor_stack_components:
+      microsoft_365: [Azure DevOps, Change Tracking, Intune Configuration Profiles]
+    practices:
+      - id: CM.L2-3.4.3
+        title: Configuration Change Control
+        capability_role: Track, review, and approve configuration changes
+      - id: CM.L2-3.4.4
+        title: Security Impact Analysis
+        capability_role: Analyze security impact of changes before implementation
+      - id: CM.L2-3.4.5
+        title: Change Access Restrictions
+        capability_role: Define and enforce access restrictions for changes
+
+  # ---------------------------------------------------------------------------
+  # 7. SECURITY MONITORING & LOGGING
+  # Audit logging, log review, correlation, protection, alerting, timestamps.
+  # ---------------------------------------------------------------------------
+  - id: security_monitoring_logging
+    name: Security Monitoring & Logging
+    abbreviation: SML
+    description: >
+      Audit event logging, log review and correlation, log protection,
+      alerting on audit failures, time synchronization, and system monitoring.
+    cmmc_domains: [AU, SI]
+    vendor_stack_components:
+      microsoft_365: [Microsoft Sentinel, Unified Audit Log, Defender XDR, Azure Monitor]
+    practices:
+      - id: AU.L2-3.3.1
+        title: Event Logging
+        capability_role: Create and retain system audit logs
+      - id: AU.L2-3.3.2
+        title: User Accountability
+        capability_role: Ensure individual actions can be traced
+      - id: AU.L2-3.3.3
+        title: Audit Review and Update
+        capability_role: Review and update logged events
+      - id: AU.L2-3.3.4
+        title: Audit Failure Alerting
+        capability_role: Alert on audit logging process failure
+      - id: AU.L2-3.3.5
+        title: Audit Correlation
+        capability_role: Correlate audit records for investigation
+      - id: AU.L2-3.3.6
+        title: Audit Reduction
+        capability_role: Provide audit record reduction and report generation
+      - id: AU.L2-3.3.7
+        title: Time Stamps
+        capability_role: Synchronize system clocks for audit accuracy
+      - id: AU.L2-3.3.8
+        title: Audit Information Protection
+        capability_role: Protect audit information from unauthorized access
+      - id: AU.L2-3.3.9
+        title: Audit Management Restriction
+        capability_role: Limit management of audit logging to authorized users
+      - id: SI.L2-3.14.6
+        title: System Monitoring
+        capability_role: Monitor organizational systems for anomalies
+      - id: SI.L2-3.14.7
+        title: Unauthorized Use Detection
+        capability_role: Identify unauthorized system use
+      - id: SI.L3-3.14.2e
+        title: Enhanced Monitoring
+        capability_role: Monitor systems and components on an ongoing basis
+      - id: SI.L3-3.14.5e
+        title: Persistent Storage Review
+        capability_role: Review persistent storage locations for unauthorized data
+
+  # ---------------------------------------------------------------------------
+  # 8. VULNERABILITY & PATCH MANAGEMENT
+  # Vulnerability scanning, flaw remediation, malware protection, system scanning.
+  # ---------------------------------------------------------------------------
+  - id: vulnerability_patch_management
+    name: Vulnerability & Patch Management
+    abbreviation: VPM
+    description: >
+      Vulnerability scanning, flaw remediation, patch management, malware
+      protection, and malicious code signature updates.
+    cmmc_domains: [RA, SI]
+    vendor_stack_components:
+      microsoft_365: [Defender Vulnerability Management, Windows Update, Defender Antivirus]
+    practices:
+      - id: SI.L1-3.14.1
+        title: Flaw Remediation
+        capability_role: Identify, report, and correct system flaws
+      - id: SI.L1-3.14.2
+        title: Malicious Code Protection
+        capability_role: Provide malware protection at system entry/exit points
+      - id: SI.L1-3.14.4
+        title: Malware Signature Updates
+        capability_role: Update malicious code protection mechanisms
+      - id: SI.L1-3.14.5
+        title: System Scanning
+        capability_role: Perform periodic scans and real-time scanning
+      - id: SI.L2-3.14.1
+        title: Flaw Identification and Correction
+        capability_role: Identify, report, and correct information system flaws
+      - id: SI.L2-3.14.2
+        title: Malware Protection at Entry Points
+        capability_role: Provide malware protection at designated locations
+      - id: SI.L2-3.14.3
+        title: Security Alert Monitoring
+        capability_role: Monitor system security alerts and advisories
+      - id: SI.L2-3.14.4
+        title: Malware Protection Updates
+        capability_role: Update malicious code protection mechanisms
+      - id: SI.L2-3.14.5
+        title: System and File Scanning
+        capability_role: Perform periodic and real-time scans
+      - id: RA.L2-3.11.2
+        title: Vulnerability Scanning
+        capability_role: Scan for vulnerabilities in organizational systems
+      - id: RA.L2-3.11.3
+        title: Vulnerability Remediation
+        capability_role: Remediate vulnerabilities per risk assessments
+      - id: SI.L3-3.14.1e
+        title: Integrity Verification
+        capability_role: Verify integrity of security-critical software
+      - id: SI.L3-3.14.3e
+        title: Sandboxing
+        capability_role: Ensure systems use verified and secure components
+      - id: SI.L3-3.14.4e
+        title: System Refresh
+        capability_role: Refresh systems to known good state periodically
+      - id: SI.L3-3.14.6e
+        title: Threat Indicator Response
+        capability_role: Use threat indicators and mitigations effectively
+      - id: SI.L3-3.14.7e
+        title: Security Function Verification
+        capability_role: Verify correctness of security functions
+      - id: RA.L3-3.11.1e
+        title: Threat Intelligence
+        capability_role: Employ threat intelligence sources
+      - id: RA.L3-3.11.2e
+        title: Threat Hunting
+        capability_role: Conduct proactive cyber threat hunting
+      - id: RA.L3-3.11.3e
+        title: Advanced Analytics
+        capability_role: Employ advanced automation and analytics
+      - id: RA.L3-3.11.5e
+        title: Security Effectiveness Assessment
+        capability_role: Assess effectiveness of security solutions
+
+  # ---------------------------------------------------------------------------
+  # 9. INCIDENT RESPONSE
+  # IR planning, incident tracking, IR testing, security operations.
+  # ---------------------------------------------------------------------------
+  - id: incident_response
+    name: Incident Response
+    abbreviation: IRP
+    description: >
+      Incident response planning, incident tracking and reporting, IR capability
+      testing, security operations center establishment.
+    cmmc_domains: [IR]
+    vendor_stack_components:
+      microsoft_365: [Sentinel SOAR, Defender XDR Incidents, IR Playbooks]
+    practices:
+      - id: IR.L2-3.6.1
+        title: Incident Response Plan
+        capability_role: Establish operational incident response capability
+      - id: IR.L2-3.6.2
+        title: Incident Tracking
+        capability_role: Track, document, and report incidents
+      - id: IR.L2-3.6.3
+        title: Incident Response Testing
+        capability_role: Test incident response capability
+      - id: IR.L3-3.6.1e
+        title: Security Operations Center
+        capability_role: Establish and maintain a SOC
+      - id: IR.L3-3.6.2e
+        title: Cyber Incident Response Team
+        capability_role: Establish and maintain a CIRT
+
+  # ---------------------------------------------------------------------------
+  # 10. PHYSICAL & ENVIRONMENTAL SECURITY
+  # Physical access control, visitor management, facility protection.
+  # ---------------------------------------------------------------------------
+  - id: physical_security
+    name: Physical & Environmental Security
+    abbreviation: PES
+    description: >
+      Physical access controls, visitor escort and monitoring, physical access
+      logging, facility protection, and alternate work site safeguards.
+    cmmc_domains: [PE]
+    vendor_stack_components:
+      microsoft_365: []
+    practices:
+      - id: PE.L1-3.10.1
+        title: Physical Access Limitation
+        capability_role: Limit physical access to authorized individuals
+      - id: PE.L1-3.10.3
+        title: Visitor Escort
+        capability_role: Escort visitors and monitor visitor activity
+      - id: PE.L1-3.10.4
+        title: Physical Access Logs
+        capability_role: Maintain audit logs of physical access
+      - id: PE.L1-3.10.5
+        title: Physical Access Management
+        capability_role: Manage physical access devices
+      - id: PE.L2-3.10.1
+        title: Physical Access Control
+        capability_role: Limit physical access to organizational systems
+      - id: PE.L2-3.10.2
+        title: Facility Protection
+        capability_role: Protect and monitor the physical facility
+      - id: PE.L2-3.10.3
+        title: Visitor Control
+        capability_role: Escort visitors and monitor visitor activity
+      - id: PE.L2-3.10.4
+        title: Physical Access Audit
+        capability_role: Maintain audit logs of physical access
+      - id: PE.L2-3.10.5
+        title: Physical Access Devices
+        capability_role: Control and manage physical access devices
+      - id: PE.L2-3.10.6
+        title: Alternate Work Site Security
+        capability_role: Enforce safeguards at alternate work sites
+
+  # ---------------------------------------------------------------------------
+  # 11. MEDIA & ASSET PROTECTION
+  # Media handling, sanitization, marking, transport, removable media,
+  # backup protection.
+  # ---------------------------------------------------------------------------
+  - id: media_asset_protection
+    name: Media & Asset Protection
+    abbreviation: MAP
+    description: >
+      Physical and digital media protection, media sanitization and disposal,
+      media marking, transport controls, removable media restrictions, and
+      backup confidentiality.
+    cmmc_domains: [MP]
+    vendor_stack_components:
+      microsoft_365: [BitLocker, Azure Backup, Intune Removable Storage Policy]
+    practices:
+      - id: MP.L1-3.8.3
+        title: Media Disposal
+        capability_role: Sanitize or destroy media before disposal
+      - id: MP.L2-3.8.1
+        title: Media Protection
+        capability_role: Protect system media containing CUI
+      - id: MP.L2-3.8.2
+        title: Media Access Limitation
+        capability_role: Limit access to CUI on system media
+      - id: MP.L2-3.8.3
+        title: Media Sanitization
+        capability_role: Sanitize or destroy media before disposal or reuse
+      - id: MP.L2-3.8.4
+        title: Media Marking
+        capability_role: Mark media with required CUI markings
+      - id: MP.L2-3.8.5
+        title: Media Transport Access Control
+        capability_role: Control access to media during transport
+      - id: MP.L2-3.8.7
+        title: Removable Media Control
+        capability_role: Control the use of removable media
+      - id: MP.L2-3.8.8
+        title: Removable Media Prohibition
+        capability_role: Prohibit use of portable storage without owner approval
+      - id: MP.L2-3.8.9
+        title: Backup Confidentiality
+        capability_role: Protect backup confidentiality at storage locations
+
+  # ---------------------------------------------------------------------------
+  # 12. PERSONNEL SECURITY & TRAINING
+  # Personnel screening, security awareness training, role-based training,
+  # personnel transfer/termination procedures.
+  # ---------------------------------------------------------------------------
+  - id: personnel_security_training
+    name: Personnel Security & Training
+    abbreviation: PST
+    description: >
+      Personnel screening before access, security awareness and role-based
+      training, personnel transfer and termination procedures.
+    cmmc_domains: [PS, AT]
+    vendor_stack_components:
+      microsoft_365: [Viva Learning, Compliance Manager Training]
+    practices:
+      - id: PS.L2-3.9.1
+        title: Personnel Screening
+        capability_role: Screen individuals prior to system access
+      - id: PS.L2-3.9.2
+        title: Personnel Actions
+        capability_role: Protect systems during personnel actions
+      - id: PS.L3-3.9.1e
+        title: Enhanced Screening
+        capability_role: Conduct enhanced personnel screening
+      - id: PS.L3-3.9.2e
+        title: Enhanced Personnel Protection
+        capability_role: Protect systems for adverse personnel actions
+      - id: AT.L2-3.2.1
+        title: Security Awareness Training
+        capability_role: Ensure managers and users are security aware
+      - id: AT.L2-3.2.2
+        title: Role-Based Training
+        capability_role: Train personnel on security responsibilities
+      - id: AT.L2-3.2.3
+        title: Insider Threat Awareness
+        capability_role: Provide awareness training on insider threats
+      - id: AT.L3-3.2.1e
+        title: Advanced Threat Awareness
+        capability_role: Provide advanced threat awareness training
+      - id: AT.L3-3.2.2e
+        title: Practical Exercises
+        capability_role: Include practical exercises in awareness training
+
+  # ---------------------------------------------------------------------------
+  # 13. RISK ASSESSMENT & COMPLIANCE
+  # Risk assessments, security assessments, POA&M management, SSP maintenance,
+  # continuous monitoring, supply chain risk.
+  # ---------------------------------------------------------------------------
+  - id: risk_assessment_compliance
+    name: Risk Assessment & Compliance
+    abbreviation: RAC
+    description: >
+      Risk assessments, security control assessments, Plan of Action and
+      Milestones management, system security plan maintenance, continuous
+      monitoring, and supply chain risk management.
+    cmmc_domains: [RA, CA]
+    vendor_stack_components:
+      microsoft_365: [Compliance Manager, Purview Audit, Secure Score]
+    practices:
+      - id: RA.L2-3.11.1
+        title: Risk Assessment
+        capability_role: Periodically assess organizational risk
+      - id: RA.L3-3.11.4e
+        title: Threat Profile Documentation
+        capability_role: Document threat profiles in system security plan
+      - id: RA.L3-3.11.6e
+        title: Supply Chain Risk Assessment
+        capability_role: Assess and monitor supply chain risks
+      - id: RA.L3-3.11.7e
+        title: Supply Chain Risk Plan
+        capability_role: Develop supply chain risk management plan
+      - id: CA.L2-3.12.1
+        title: Security Assessments
+        capability_role: Periodically assess security controls
+      - id: CA.L2-3.12.2
+        title: Plan of Action and Milestones
+        capability_role: Develop and implement POA&M
+      - id: CA.L2-3.12.3
+        title: Continuous Monitoring
+        capability_role: Monitor security controls on ongoing basis
+      - id: CA.L2-3.12.4
+        title: System Security Plan
+        capability_role: Develop, document, and update SSP
+      - id: CA.L3-3.12.1e
+        title: Penetration Testing
+        capability_role: Conduct periodic penetration testing
+
+  # ---------------------------------------------------------------------------
+  # 14. MAINTENANCE OPERATIONS
+  # System maintenance, maintenance tools, equipment sanitization, nonlocal
+  # maintenance, maintenance personnel supervision.
+  # ---------------------------------------------------------------------------
+  - id: maintenance_operations
+    name: Maintenance Operations
+    abbreviation: MNT
+    description: >
+      Controlled system maintenance, maintenance tool management, equipment
+      sanitization, nonlocal maintenance authentication, and maintenance
+      personnel supervision.
+    cmmc_domains: [MA]
+    vendor_stack_components:
+      microsoft_365: [Intune Remote Actions, Azure Bastion, PIM Just-in-Time]
+    practices:
+      - id: MA.L2-3.7.1
+        title: System Maintenance
+        capability_role: Perform controlled system maintenance
+      - id: MA.L2-3.7.2
+        title: Maintenance Tool Control
+        capability_role: Control maintenance tools brought into facility
+      - id: MA.L2-3.7.3
+        title: Equipment Sanitization
+        capability_role: Sanitize equipment removed for off-site maintenance
+      - id: MA.L2-3.7.4
+        title: Media Inspection
+        capability_role: Check media with diagnostic programs for malicious code
+      - id: MA.L2-3.7.5
+        title: Nonlocal Maintenance
+        capability_role: Require MFA for nonlocal maintenance sessions
+      - id: MA.L2-3.7.6
+        title: Maintenance Personnel
+        capability_role: Supervise maintenance activities of non-cleared personnel
+
+  # ---------------------------------------------------------------------------
+  # 15. FOUNDATION & GOVERNANCE
+  # Scoping, boundary definition, data flows, SSP — cross-cutting foundation.
+  # ---------------------------------------------------------------------------
+  - id: foundation_governance
+    name: Foundation & Governance
+    abbreviation: FGV
+    description: >
+      Assessment boundary definition, asset inventory, CUI/FCI data flow
+      documentation, System Security Plan existence and currency. These are
+      cross-cutting foundation activities required before any practice
+      implementation.
+    cmmc_domains: [FOUNDATION, SC]
+    vendor_stack_components:
+      microsoft_365: []
+    practices:
+      - id: FOUNDATION
+        title: SSP and Scoping Foundation
+        capability_role: Define boundary, inventory assets, confirm SSP
+      - id: SC.L3-3.13.2e
+        title: System Changes for Security
+        capability_role: Implement changes to disrupt attack patterns

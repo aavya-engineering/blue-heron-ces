@@ -1,0 +1,45 @@
+## Control {{controlId}}: Establish an Operational Incident-Handling Capability
+
+**Implementation Status:** {{status}}
+
+This organization establishes operational incident-handling capability within the {{tenantName}} M365 GCC High tenant through Microsoft Defender incident management, documented procedures, and response testing managed by {{variables.systemAdministrator}}.
+
+{{#if securityAlertsActive}}
+**Incident Detection:**
+{{securityAlertsCount}} security alerts provide automated incident detection:
+{{#if alerts}}
+{{#each alerts}}
+- **{{title}}** — Severity: {{severity}} — Status: {{status}} — {{createdDateTime}}
+{{/each}}
+{{/if}}
+
+Microsoft Defender automatically correlates related alerts into incidents, providing unified investigation views with affected entities, evidence, and recommended actions.
+{{else}}
+Automated incident detection has not been confirmed through security alert configuration.
+{{/if}}
+
+**Incident Response Phases:**
+- **Preparation:** Incident response plan documented, roles assigned, communication channels established, playbooks maintained
+- **Detection & Analysis:** Microsoft Defender alerts trigger investigation; severity assessed per organizational criteria
+- **Containment:** Compromised accounts disabled, affected devices isolated, malicious content quarantined
+- **Eradication:** Root cause identified and eliminated; malware removed, vulnerabilities patched
+- **Recovery:** Systems restored to normal operations; monitoring enhanced for recurrence
+- **Post-Incident:** After-action review, lessons learned documented, plan updated
+
+{{#if attackSimulationsActive}}
+**Incident Preparedness:**
+{{attackSimulationsCount}} attack simulations validate user readiness and incident reporting procedures.
+{{/if}}
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine incident response plan, Defender incident records, containment action logs, and after-action review documentation.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

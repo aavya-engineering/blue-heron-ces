@@ -1,0 +1,124 @@
+schema_version: '1.0'
+
+glossary:
+  - term: PAW/SAW
+    definition: 'Privileged Access Workstation / Secure Admin Workstation — a dedicated hardened device for privileged admin operations, isolated from general use.'
+    highlight_in_prompts: true
+  - term: PIM
+    definition: 'Privileged Identity Management — Entra feature providing just-in-time, time-bound privileged role activation with approval workflows.'
+    highlight_in_prompts: true
+  - term: BYOD
+    definition: 'Bring Your Own Device — personal devices used to access organizational resources, requiring additional boundary controls.'
+    highlight_in_prompts: true
+  - term: CUI
+    definition: 'Controlled Unclassified Information — government-created or -owned information that requires safeguarding per 32 CFR Part 2002.'
+    highlight_in_prompts: false
+  - term: SIEM
+    definition: 'Security Information and Event Management — centralized log collection and correlation platform (e.g., Microsoft Sentinel).'
+    highlight_in_prompts: true
+  - term: Conditional Access
+    definition: 'Entra ID policy engine that enforces access decisions based on user, device, location, risk, and app context.'
+    highlight_in_prompts: true
+  - term: break-glass
+    definition: 'Emergency access account excluded from normal Conditional Access policies, used only when standard admin access fails.'
+    highlight_in_prompts: true
+  - term: sensitivity labels
+    definition: 'Microsoft Purview classification tags applied to documents and emails to enforce encryption, access, and DLP rules.'
+    highlight_in_prompts: true
+  - term: DLP
+    definition: 'Data Loss Prevention — policies that detect and block unauthorized sharing or exfiltration of sensitive data.'
+    highlight_in_prompts: true
+  - term: GCC High
+    definition: 'Microsoft Government Community Cloud High — FedRAMP High-authorized M365/Azure environment for CUI and ITAR workloads.'
+    highlight_in_prompts: true
+  - term: ITAR
+    definition: 'International Traffic in Arms Regulations — US export controls on defense articles requiring US-person-only access.'
+    highlight_in_prompts: true
+  - term: EAR
+    definition: 'Export Administration Regulations — US export controls on dual-use commercial/military items.'
+    highlight_in_prompts: true
+  - term: DFARS
+    definition: 'Defense Federal Acquisition Regulation Supplement — contract clauses (7012/7019/7020/7021) imposing cybersecurity and reporting requirements.'
+    highlight_in_prompts: true
+  - term: Unified Audit Log
+    definition: 'M365 centralized audit trail capturing user and admin activities across Exchange, SharePoint, Teams, and Entra.'
+    highlight_in_prompts: true
+  - term: Sentinel
+    definition: 'Microsoft Sentinel — cloud-native SIEM/SOAR platform for security monitoring, detection, and automated response.'
+    highlight_in_prompts: true
+  - term: Intune
+    definition: 'Microsoft Intune — cloud-based endpoint management service for device compliance, configuration, and app deployment.'
+    highlight_in_prompts: true
+  - term: Entra
+    definition: 'Microsoft Entra ID (formerly Azure AD) — cloud identity and access management platform.'
+    highlight_in_prompts: false
+  - term: CTI
+    definition: 'Controlled Technical Information — engineering drawings, specifications, manuals, and technical data marked under CUI.'
+    highlight_in_prompts: true
+  - term: SFTP
+    definition: 'Secure File Transfer Protocol — encrypted file transfer mechanism for moving data between systems.'
+    highlight_in_prompts: true
+  - term: FTPS
+    definition: 'FTP over TLS/SSL — encrypted variant of the File Transfer Protocol.'
+    highlight_in_prompts: true
+  - term: service principal
+    definition: 'An Entra identity used by applications and automation (not humans) to authenticate and access resources.'
+    highlight_in_prompts: true
+  - term: tamper protection
+    definition: 'Defender feature preventing unauthorized modification or disabling of security settings and telemetry.'
+    highlight_in_prompts: true
+  - term: eDiscovery
+    definition: 'Microsoft Purview capability for legal hold, search, and export of organizational content for compliance or litigation.'
+    highlight_in_prompts: true
+  - term: Purview
+    definition: 'Microsoft Purview — unified data governance and compliance platform covering DLP, labels, retention, audit, and eDiscovery.'
+    highlight_in_prompts: true
+  - term: compensating control
+    definition: 'An alternative security measure implemented when a primary control cannot be met, documented with justification and risk acceptance.'
+    highlight_in_prompts: true
+  - term: enclave
+    definition: 'A logically or physically isolated network segment containing systems that process CUI, with controlled boundary entry/exit points.'
+    highlight_in_prompts: true
+  - term: CI/CD
+    definition: 'Continuous Integration / Continuous Deployment — automated build, test, and release pipelines for software delivery.'
+    highlight_in_prompts: true
+  - term: VDI
+    definition: 'Virtual Desktop Infrastructure — centrally hosted virtual desktops streamed to endpoints, enabling BYOD without local CUI storage.'
+    highlight_in_prompts: true
+  - term: Cloud PC
+    definition: 'Windows 365 Cloud PC — a Microsoft-managed virtual desktop streamed from Azure, similar to VDI but fully SaaS.'
+    highlight_in_prompts: true
+
+risk_flag_labels:
+  export_control_in_scope_if_selected: 'Export-controlled data selected — triggers ITAR/EAR boundary hardening and US-person access restrictions.'
+  internal_generation_requires_devops_review: 'Internal CUI generation declared — DevOps pipelines, repos, and build artifacts enter scope.'
+  external_storage_if_selected: 'External SaaS storage selected — requires vendor assessment, data residency confirmation, and boundary extension.'
+  third_party_cui_flow_if_yes: 'CUI flows to third parties — requires external sharing controls, guest access governance, and contractual safeguards.'
+  cross_tenant_identity_risk_if_yes: 'Shared identity across commercial and CUI tenants — increases credential theft risk and evidence burden.'
+  direct_byod_boundary_risk: 'Direct BYOD access to CUI — highest boundary risk; assessors will scrutinize device compliance and data isolation.'
+  repo_outside_boundary_if_selected: 'CUI repositories on commercial platforms — likely requires relocation or compensating controls with documented risk acceptance.'
+  email_egress_risk: 'Email forwarding enabled — common data exfiltration vector requiring transport rules and DLP enforcement proof.'
+  backup_outside_boundary_if_selected: 'Backup storage outside boundary — requires boundary extension or compensating controls with explicit risk acceptance.'
+  unexpected_global_admin_if_false: 'Undeclared Global Admins detected — mismatched scope could indicate privilege sprawl or unauthorized access.'
+  privilege_sprawl_if_yes: 'Unexpected privileged roles found — review for over-provisioned accounts and persistent assignments.'
+  guest_misalignment_if_not_aligned: 'Guest accounts not aligned to boundary policy — external identities may have uncontrolled CUI access.'
+  no_breakglass_if_no: 'No break-glass accounts configured — risk of permanent lockout during emergency; assessors expect documented emergency access.'
+  unmanaged_cui_access_if_no: 'CUI users without compliant managed devices — gap in device trust model must be remediated.'
+  unmanaged_access_if_yes: 'Unmanaged devices accessing CUI detected — boundary integrity failure requiring immediate investigation.'
+  no_paw_if_no: 'Privileged admin devices not isolated — credential theft risk for highest-privilege accounts.'
+  no_audit_log_if_no: 'Unified Audit Log disabled — no visibility into user/admin activities; fundamental compliance gap.'
+  no_siem_ingestion_if_no: 'Sentinel not ingesting required sources — detection and response capabilities are degraded.'
+  retention_mismatch_if_no: 'Log retention does not match declared policy — may fail assessor evidence requirements.'
+  log_tamper_risk_if_no: 'Log tamper protection not enabled — audit trail integrity cannot be guaranteed.'
+  cui_repo_outside_boundary_if_yes: 'CUI repositories outside declared boundary — code/artifacts containing CUI are unprotected.'
+  pipeline_outside_boundary_if_no: 'CI/CD pipelines outside boundary — build runners, artifacts, and logs may leak CUI.'
+  artifact_leak_risk_if_no: 'Build artifacts not properly stored — CUI in compiled outputs or packages may be exposed.'
+  unknown_integrations_if_not_all: 'Unapproved external integrations detected — unknown data flows may bypass boundary controls.'
+  spn_sprawl_if_no: 'Service principals not inventoried or over-privileged — automated CUI access without governance.'
+  email_egress_risk_if_no: 'Email forwarding restrictions not enforced — declared policy does not match actual configuration.'
+  backup_outside_boundary_if_some: 'Some backup storage outside boundary — CUI at rest in uncontrolled locations.'
+  no_exception_register_if_no: 'No exception register — boundary deviations are undocumented and untracked.'
+  no_comp_controls_if_no: 'No compensating controls for exceptions — gaps exist without mitigation or accountability.'
+  unapproved_risk_if_no: 'Risk acceptance not formally recorded — residual risks exist without executive sign-off.'
+  weak_change_governance_if_no: 'Change governance weak or absent — unauthorized changes could degrade boundary integrity.'
+  ca_not_enforcing_device_compliance_if_not_enforced: 'Conditional Access not enforcing device compliance — unmanaged devices can access CUI resources.'

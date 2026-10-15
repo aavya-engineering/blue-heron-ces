@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/ces-capability-taxonomy.schema.json",
+  "title": "CES Capability Taxonomy & Practice Mapping Schema",
+  "description": "Maps CMMC practices to canonical security capabilities. Used during Mission Plan generation to produce actionable, vendor-specific instructions.",
+  "type": "object",
+  "required": ["ces", "capabilities"],
+  "additionalProperties": false,
+  "properties": {
+    "ces": {
+      "$ref": "#/$defs/ces_meta"
+    },
+    "capabilities": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/capability"
+      }
+    }
+  },
+  "$defs": {
+    "ces_meta": {
+      "type": "object",
+      "required": ["artifact", "version", "generated_on"],
+      "additionalProperties": false,
+      "properties": {
+        "artifact": {
+          "type": "string",
+          "const": "capability_taxonomy"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "generated_on": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "capability": {
+      "type": "object",
+      "required": ["id", "name", "abbreviation", "description", "cmmc_domains", "vendor_stack_components", "practices"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]+$",
+          "description": "Snake_case capability identifier"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "abbreviation": {
+          "type": "string",
+          "pattern": "^[A-Z]{2,4}$",
+          "description": "2-4 uppercase letter abbreviation"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cmmc_domains": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/cmmc_domain_enum"
+          }
+        },
+        "vendor_stack_components": {
+          "type": "object",
+          "description": "Map of vendor stack name to list of product/service components",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "practices": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/practice"
+          }
+        }
+      }
+    },
+    "practice": {
+      "type": "object",
+      "required": ["id", "title", "capability_role"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "CMMC practice ID or FOUNDATION",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "capability_role": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What this practice contributes to the capability"
+        }
+      }
+    },
+    "cmmc_domain_enum": {
+      "type": "string",
+      "enum": ["AC", "AT", "AU", "CA", "CM", "IA", "IR", "MA", "MP", "PE", "PS", "RA", "SC", "SI", "FOUNDATION"]
+    }
+  }
+}

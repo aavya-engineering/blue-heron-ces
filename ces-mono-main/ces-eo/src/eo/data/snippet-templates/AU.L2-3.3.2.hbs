@@ -1,0 +1,52 @@
+## Control {{controlId}}: Ensure Actions of Individual System Users Can Be Uniquely Traced
+
+**Implementation Status:** {{status}}
+
+This organization ensures individual user accountability within the {{tenantName}} M365 GCC High tenant through unique identity attribution in all audit logs managed by {{variables.systemAdministrator}}.
+
+{{#if signInLogsAvailable}}
+**User-Attributed Sign-In Events:**
+{{signInLogsCount}} sign-in events uniquely identify each user by User Principal Name (UPN):
+{{#if logs}}
+{{#each logs}}
+- **{{userPrincipalName}}** — App: {{appDisplayName}} — Status: {{status}} — {{createdDateTime}}
+{{/each}}
+{{/if}}
+
+Every authentication event is attributed to a unique Entra ID identity, enabling full traceability of user access to CUI resources.
+{{else}}
+Sign-in event attribution has not been confirmed.
+{{/if}}
+
+{{#if directoryAuditsAvailable}}
+**User-Attributed Administrative Actions:**
+{{directoryAuditsCount}} directory changes traced to individual actors:
+{{#if audits}}
+{{#each audits}}
+- **{{activityDisplayName}}** by {{actorUserPrincipalName}} ��� {{activityDateTime}}
+{{/each}}
+{{/if}}
+
+Administrative actions (role assignments, configuration changes, group modifications) are attributed to the authenticated user who initiated the action, with service principal attribution for automated processes.
+{{else}}
+Directory audit attribution has not been confirmed.
+{{/if}}
+
+**Accountability Controls:**
+- Shared accounts are prohibited; each user has a unique UPN
+- Service accounts use managed identities with individual attribution
+- MFA prevents credential sharing, ensuring audit trail reflects actual user actions
+- Session tokens include user identity, ensuring in-session actions are attributable
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine sign-in logs for unique user attribution, directory audit logs for actor identification, shared account policy documentation, and MFA enforcement records.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

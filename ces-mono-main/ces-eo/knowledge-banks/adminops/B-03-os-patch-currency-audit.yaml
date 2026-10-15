@@ -1,0 +1,65 @@
+controlId: "SI.L1-3.14.1"
+relatedControlIds:
+  - "SI.L1-3.14.2"
+  - "CM.L2-3.4.1"  # [VERIFY] mapping not yet confirmed
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: B-03
+useCaseTitle: "OS Patch Currency Audit"
+domain: Device & Endpoint Management
+priority: P2 High
+trigger: 'SCHEDULE: Monthly (aligned with Patch Tuesday + 7 days) and on-demand after critical MSRC advisories'
+sodTier: Tier 1 -- Read-Only Audit (inventory phase); Tier 2 -- Config Manager (expedited patching phase)
+entraRolesRequired:
+- Security Reader (inventory); Intune Administrator (expedited patching)
+approvalRequired: true
+services:
+- name: Microsoft Intune
+  purpose: managed device OS version inventory, Windows Update for Business expedited quality updates
+- name: Microsoft Graph API
+  purpose: deviceManagement/managedDevices endpoint -- osVersion property
+- name: MSRC Security Update Guide
+  purpose: reference for latest security update versions
+- name: Windows Update for Business
+  purpose: expedited update deployment rings
+configurationSteps:
+  portalPath: https://intune.microsoft.us
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes DeviceManagementManagedDevices.Read.All
+  - cmdlet: Get-MgDeviceManagementManagedDevice
+    parameters:
+    - -MgDeviceManagementManagedDevice
+    - -All
+    - -Filter
+    - -Property
+    - -Object
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/deviceManagement/managedDevices?$filter=operatingSystem
+  graphApiPayloadExample: {}
+  requiredPermissions:
+  - DeviceManagementManagedDevices.Read.All
+  - DeviceManagementConfiguration.ReadWrite.All
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-b-device/B-03/{year}/{month}/
+  format: CSV (device OS version report), JSON (Graph API response)
+  filenamePattern: B-03_PatchCurrencyAudit_{YYYYMMDD}_{HHmmss}_AllWindows.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://intune.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: Windows Update for Business is fully supported in GCC High. Expedited quality update profiles are available through
+    the Intune Admin Center at `https://intune.microsoft.us`. The MSRC Security Update Guide is a publicly accessible resource
+    and does not differ between commercial and GCC High environments. Windows Update for Business reports in Intune GCC High
+    may have a 24-48 hour reporting delay. For organizations requiring faster patch compliance visibility, query device OS
+    versions directly via Graph API rather than relying on update compliance reports.
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

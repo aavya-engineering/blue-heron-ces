@@ -1,0 +1,53 @@
+controlId: "AU.L2-3.3.1"
+relatedControlIds:
+  - "AU.L2-3.3.2"
+practiceStatement: Create and retain system audit logs and records to the extent needed to enable the monitoring, analysis,
+  investigation, and reporting of unlawful or unauthorized system activity.
+useCaseId: E-01
+useCaseTitle: "Audit Log Retention"
+domain: Audit & Logging
+priority: P2 High
+trigger: 'SCHEDULE: Monthly'
+sodTier: Tier 1
+entraRolesRequired:
+- Security Reader
+- Reports Reader
+approvalRequired: false
+services:
+- name: Microsoft Purview Audit
+  purpose: Premium) -- Unified Audit Log retention policies
+- name: Microsoft Sentinel -- Log Analytics workspace data retention and archival
+  purpose: ''
+- name: Azure Immutable Blob Storage -- WORM time-based retention policy
+  purpose: ''
+- name: Azure Monitor -- workspace retention configuration
+  purpose: ''
+configurationSteps:
+  portalPath: //compliance.microsoft.us > Audit > Audit retention policies.
+  powershellCmdlets: []
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/security/auditLog/queries
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-e-audit/E-01/{year}/{month}/
+  format: JSON (retention policy export), PNG (portal screenshots of workspace retention and WORM policy)
+  filenamePattern: E-01_AuditRetentionCheck_{YYYYMMDD}_{HHmmss}_PolicyExport.json
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |-
+    - Audit (Premium) 10-year retention is available in GCC High with the M365 G5 license. The Purview Compliance Portal at `compliance.microsoft.us` manages these policies.
+    - Log Analytics workspace archive tier (up to 12 years) is available in Azure Government regions. Ensure archive queries use the `search` command with time range specification, as archived data has higher query latency.
+    - WORM immutability policies in Azure Government Blob Storage function identically to commercial. Ensure the policy is in `Locked` state (not `Unlocked`) to prevent accidental shortening of retention.
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

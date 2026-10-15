@@ -1,0 +1,106 @@
+controlId: "AC.L1-3.1.2"
+relatedControlIds:
+  - "AC.L1-3.1.1"
+  - "PS.L2-3.9.2"
+  - "AC.L2-3.1.7"
+
+practiceStatement: "Limit system access to authorized users, processes acting on behalf of users, and devices."
+
+useCaseId: "A-02"
+useCaseTitle: "User Offboarding -- Disable"
+domain: "Identity & Access Management"
+priority: "P1 Critical"
+trigger: "PERSONNEL: Termination notification from HR/HRIS system"
+
+sodTier: "Tier 2 -- Config Manager"
+entraRolesRequired:
+  - "User Administrator"
+  - "Exchange Administrator"
+
+approvalRequired: false
+
+services:
+  - name: "Entra ID"
+    purpose: "Account disable, session revocation"
+  - name: "Exchange Online"
+    purpose: "Shared mailbox conversion, litigation hold"
+  - name: "Microsoft Graph PowerShell"
+    modules:
+      - "Microsoft.Graph.Users"
+  - name: "Exchange Online Management Shell"
+    purpose: "Mailbox operations"
+  - name: "Purview Compliance"
+    purpose: "Litigation hold enforcement"
+  - name: "Intune"
+    purpose: "Device compliance state change"
+
+configurationSteps:
+  portalPath: "https://entra.microsoft.us > Identity > Users > All users > search user > Properties > Edit > Account enabled: toggle to No"
+
+  powershellCmdlets:
+    - cmdlet: "Connect-MgGraph"
+      parameters:
+        - "-Environment USGov"
+        - "-Scopes User.ReadWrite.All,Directory.ReadWrite.All"
+    - cmdlet: "Update-MgUser"
+      parameters:
+        - "-UserId"
+        - "-AccountEnabled $false"
+    - cmdlet: "Revoke-MgUserSignInSession"
+      parameters:
+        - "-UserId"
+    - cmdlet: "Connect-ExchangeOnline"
+      parameters:
+        - "-ExchangeEnvironmentName O365USGovGCCHigh"
+    - cmdlet: "Set-Mailbox"
+      parameters:
+        - "-Identity"
+        - "-Type Shared"
+        - "-LitigationHoldEnabled $true"
+        - "-LitigationHoldDuration 2555"
+
+  graphApiEndpoint: "PATCH https://graph.microsoft.us/v1.0/users/{userId}"
+  graphApiPayloadExample:
+    accountEnabled: false
+
+  requiredPermissions:
+    - "User.ReadWrite.All"
+    - "Directory.ReadWrite.All"
+
+evidenceArtifacts:
+  - type: "Azure AD Audit Logs"
+    retentionPeriod: "7 years"
+    storageLocation: "evidence-store/domain-a-identity/A-02/{year}/{month}/"
+    query: "Activity: Disable account, Revoke sessions"
+  - type: "Stamper Execution Evidence"
+    hashAlgorithm: "SHA-256"
+    storageLocation: "evidence-store/domain-a-identity/A-02/{year}/{month}/"
+    format: "JSON (account disable confirmation, session revocation result, litigation hold status)"
+    filenamePattern: "A-02_UserDisabled_{YYYYMMDD}_{HHmmss}_{UPN}.json"
+
+gccHighSpecifics:
+  endpoints:
+    - "https://graph.microsoft.us"
+    - "https://entra.microsoft.us"
+    - "https://admin.exchange.microsoft.us"
+  complianceBoundary: "FedRAMP High + CMMC L2"
+  endpointValidation: "All endpoints use .microsoft.us domains"
+  notes: "Session revocation takes effect within approximately 1 hour for cached tokens. Litigation hold is fully available in GCC High Exchange Online."
+
+relatedPolicies:
+  - "AC-001 Access Control Policy"
+  - "PS-001 Personnel Security Policy"
+
+odpValues: []
+
+dependencies:
+  hardDependencies: []
+  softDependencies:
+    - useCaseId: "A-01"
+      reason: "The user must have been provisioned through standard process"
+    - useCaseId: "B-05"
+      reason: "Terminated-user device wipe follows offboarding"
+    - useCaseId: "A-03"
+      reason: "Hard delete after retention period"
+
+notes: "First phase of two-phase offboarding. Litigation hold preserves CUI communications for compliance and eDiscovery. Shared mailbox conversion maintains business continuity."

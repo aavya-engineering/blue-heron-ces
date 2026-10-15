@@ -1,0 +1,92 @@
+controlId: "AC.L2-3.1.5"
+relatedControlIds:
+  - "AC.L1-3.1.20"
+  - "AC.L2-3.1.6"
+  - "AC.L2-3.1.7"
+  - "AC.L2-3.1.4"
+
+practiceStatement: "Control information flows between security domains on internal and external information systems."
+
+useCaseId: "A-10"
+useCaseTitle: "Standing Privilege Elimination"
+domain: "Identity & Access Management"
+priority: "P4 Standard"
+trigger: "CHANGE: Initial PIM deployment or privilege audit finding"
+
+sodTier: "Tier 3 -- Privileged Admin"
+entraRolesRequired:
+  - "Global Administrator"
+  - "Privileged Role Administrator"
+
+approvalRequired: true
+
+services:
+  - name: "Entra ID PIM"
+    purpose: "Role assignment conversion"
+  - name: "Microsoft Graph PowerShell"
+    modules:
+      - "Microsoft.Graph.Identity.Governance"
+
+configurationSteps:
+  portalPath: "https://entra.microsoft.us > Identity Governance > Privileged Identity Management > Entra roles > Roles"
+
+  powershellCmdlets:
+    - cmdlet: "Connect-MgGraph"
+      parameters:
+        - "-Environment USGov"
+        - "-Scopes RoleManagement.ReadWrite.Directory,Directory.ReadWrite.All"
+    - cmdlet: "Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance"
+      parameters:
+        - "-All"
+    - cmdlet: "New-MgRoleManagementDirectoryRoleAssignmentScheduleRequest"
+      parameters:
+        - "-BodyParameter"
+    - cmdlet: "New-MgRoleManagementDirectoryRoleEligibilityScheduleRequest"
+      parameters:
+        - "-BodyParameter"
+
+  graphApiEndpoint: "GET https://graph.microsoft.us/v1.0/roleManagement/directory/roleAssignmentScheduleInstances"
+  graphApiPayloadExample: {}
+
+  requiredPermissions:
+    - "RoleManagement.ReadWrite.Directory"
+    - "Directory.ReadWrite.All"
+
+evidenceArtifacts:
+  - type: "Azure AD Audit Logs"
+    retentionPeriod: "7 years"
+    storageLocation: "evidence-store/domain-a-identity/A-10/{year}/{month}/"
+    query: "Activity: Remove active role assignment, Add eligible role assignment"
+  - type: "Stamper Execution Evidence"
+    hashAlgorithm: "SHA-256"
+    storageLocation: "evidence-store/domain-a-identity/A-10/{year}/{month}/"
+    format: "JSON (before-state active assignments, after-state eligible assignments, PIM role settings)"
+    filenamePattern: "A-10_StandingPrivElimination_{YYYYMMDD}_{HHmmss}_AllRoles.json"
+
+gccHighSpecifics:
+  endpoints:
+    - "https://graph.microsoft.us"
+    - "https://entra.microsoft.us"
+  complianceBoundary: "FedRAMP High + CMMC L2"
+  endpointValidation: "All endpoints use .microsoft.us domains"
+  notes: "PIM role assignment APIs function identically in GCC High. Use graph.microsoft.us for all role management Graph calls."
+
+relatedPolicies:
+  - "AC-001 Access Control Policy"
+
+odpValues:
+  - odpId: "AC.L2-3.1.5_ODP_01"
+    description: "Maximum duration for privileged role activation"
+    value: "8 hours"
+    rationale: "Limits privileged access exposure window"
+    enforcementMechanism: "PIM role settings - Activation maximum duration"
+
+dependencies:
+  hardDependencies:
+    - useCaseId: "A-15"
+      reason: "Break-glass accounts must be created and excluded before converting permanent roles, to avoid lockout"
+  softDependencies:
+    - useCaseId: "A-17"
+      reason: "Admin account separation should be in place before converting roles"
+
+notes: "Converts all permanent (active) privileged role assignments to PIM-eligible assignments, requiring just-in-time activation with justification, MFA, and approval. Eliminates standing administrative access that persists 24/7. Break-glass accounts retain permanent Global Administrator assignment as emergency access mechanism."

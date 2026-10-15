@@ -1,0 +1,126 @@
+controlId: "AC.L2-3.1.5"
+relatedControlIds:
+  - "AC.L2-3.1.4"
+  - "AC.L2-3.1.6"
+  - "AC.L2-3.1.7"
+
+practiceStatement: "Separate the duties of individuals to reduce the risk of malevolent activity without collusion."
+
+useCaseId: "A-17"
+useCaseTitle: "Admin Account Separation"
+domain: "Identity & Access Management"
+priority: "P4 Standard"
+trigger: "ONBOARDING: Initial tenant hardening or new admin personnel onboarding"
+
+sodTier: "Tier 3 -- Privileged Admin"
+entraRolesRequired:
+  - "Global Administrator (PIM-activated)"
+
+approvalRequired: true
+
+services:
+  - name: "Entra ID"
+    purpose: "Cloud-only account creation, license assignment"
+  - name: "PIM"
+    purpose: "Eligible role assignment"
+  - name: "Conditional Access"
+    purpose: "Admin-specific policies"
+  - name: "Microsoft Graph PowerShell"
+    modules:
+      - "Microsoft.Graph.Users"
+      - "Microsoft.Graph.Identity.Governance"
+
+configurationSteps:
+  portalPath: "https://entra.microsoft.us > Identity > Users > All users > New user > Create new user"
+
+  powershellCmdlets:
+    - cmdlet: "Connect-MgGraph"
+      parameters:
+        - "-Environment USGov"
+        - "-Scopes User.ReadWrite.All,Group.ReadWrite.All,RoleManagement.ReadWrite.Directory,Directory.ReadWrite.All"
+    - cmdlet: "New-MgUser"
+      parameters:
+        - "-DisplayName"
+        - "-UserPrincipalName"
+        - "-MailNickname"
+        - "-AccountEnabled"
+        - "-PasswordProfile"
+        - "-UsageLocation US"
+    - cmdlet: "Add-MgGroupMember"
+      parameters:
+        - "-GroupId"
+        - "-DirectoryObjectId"
+    - cmdlet: "Set-MgUserLicense"
+      parameters:
+        - "-UserId"
+        - "-BodyParameter"
+    - cmdlet: "New-MgRoleManagementDirectoryRoleEligibilityScheduleRequest"
+      parameters:
+        - "-BodyParameter"
+
+  graphApiEndpoint: "POST https://graph.microsoft.us/v1.0/users"
+  graphApiPayloadExample:
+    accountEnabled: true
+    displayName: "Admin - {displayName}"
+    mailNickname: "adm-{firstName}.{lastName}"
+    userPrincipalName: "adm-{firstName}.{lastName}@{tenantName}.onmicrosoft.us"
+    usageLocation: "US"
+    passwordProfile:
+      forceChangePasswordNextSignIn: true
+      password: "{strongTemporaryPassword}"
+
+  requiredPermissions:
+    - "User.ReadWrite.All"
+    - "Group.ReadWrite.All"
+    - "RoleManagement.ReadWrite.Directory"
+    - "Directory.ReadWrite.All"
+
+evidenceArtifacts:
+  - type: "JSON"
+    retentionPeriod: "7 years"
+    storageLocation: "evidence-store/domain-a-identity/A-17/{year}/{month}/"
+    format: "Account creation confirmation, license assignment, PIM eligible role assignment, CA policy targeting"
+    filenamePattern: "A-17_AdminAccountCreated_{YYYYMMDD}_{HHmmss}_{AdminUPN}.json"
+    hashAlgorithm: "SHA-256"
+
+gccHighSpecifics:
+  endpoints:
+    - "https://graph.microsoft.us"
+    - "https://entra.microsoft.us"
+  complianceBoundary: "FedRAMP High + CMMC L2"
+  endpointValidation: "All endpoints use .microsoft.us or .usgovcloudapi.net domains"
+  notes: "Cloud-only admin accounts must use {tenant}.onmicrosoft.us UPN suffix to ensure account not dependent on custom domain DNS or federation, providing resilience during infrastructure failures. In GCC High, not assigning Exchange Online license prevents mailbox creation. Verify account has no mailbox by running Get-Mailbox -Identity $adminUPN in Exchange Online PowerShell and confirming not found result. Admin accounts should be placed in admin-specific organizational unit or group for CA policy targeting and monitoring. PIM-only role assignment works identically in GCC High. Consider assigning Entra ID P2 license from M365 G5 pool if standalone Entra ID P2 SKUs not available; selectively disable Exchange, SharePoint, and Teams service plans within G5 license."
+
+relatedPolicies:
+  - "AC-001 Access Control Policy"
+  - "IA-002 Identification and Authentication Policy"
+
+odpValues:
+  - odpId: "AC.L2-3.1.4_ODP_01"
+    description: "Admin account naming convention"
+    value: "adm-{firstname}.{lastname}@{tenant}.onmicrosoft.us using cloud-only suffix"
+    rationale: "Ensures clear separation from productivity accounts and resilience during infrastructure failures"
+    enforcementMechanism: "Mandatory naming convention enforced during admin onboarding"
+  - odpId: "AC.L2-3.1.5_ODP_01"
+    description: "Admin account privilege model"
+    value: "PIM-only eligible assignments with 365-day expiration, no standing privilege"
+    rationale: "Ensures admin accounts only have privilege when explicitly needed, time-limited activation"
+    enforcementMechanism: "PIM configuration prevents permanent active assignments"
+
+dependencies:
+  hardDependencies:
+    - useCaseId: "A-10"
+      reason: "Standing privilege elimination must be in place so admin accounts use PIM"
+  softDependencies:
+    - useCaseId: "A-07"
+      reason: "MFA enforcement must cover admin accounts"
+    - useCaseId: "A-15"
+      reason: "Break-glass accounts should be in place before creating admin accounts"
+    - useCaseId: "A-03"
+      reason: "Tier 3 operations use admin accounts"
+    - useCaseId: "A-09"
+      reason: "Admin accounts are subject to privileged role review"
+    - useCaseId: "H-02"
+      reason: "Admin accounts are used for incident containment"
+
+notes: "Creates dedicated cloud-only administrative accounts distinct from day-to-day productivity accounts. Admin accounts have no mailbox (no Exchange license), cannot receive email (eliminating phishing vector), and have all privileged role assignments managed exclusively through PIM eligible assignments. Separation ensures compromise of productivity account does not automatically compromise administrative access. Two-person approval required. Do NOT create permanent active assignment except for break-glass accounts per A-15. Configure CA policy for admin accounts requiring phishing-resistant MFA method and compliant device."

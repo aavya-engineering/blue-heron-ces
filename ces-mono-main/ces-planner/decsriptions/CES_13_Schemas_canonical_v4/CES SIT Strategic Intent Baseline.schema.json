@@ -1,0 +1,456 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/ces-si-baseline-output.schema.json",
+  "title": "CES Strategic Intent Baseline Output Schema",
+  "type": "object",
+  "required": [
+    "ces",
+    "si_baseline"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "ces": {
+      "type": "object",
+      "required": [
+        "artifact",
+        "version",
+        "generated_on",
+        "intent"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "artifact": {
+          "type": "string",
+          "const": "si_baseline_output"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "generated_on": {
+          "type": "string",
+          "format": "date"
+        },
+        "intent": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "si_baseline": {
+      "type": "object",
+      "required": [
+        "target",
+        "assessment",
+        "scope",
+        "operations",
+        "evidence",
+        "dependencies",
+        "risk_acceptance",
+        "governance"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "target": {
+          "$ref": "#/$defs/target_block"
+        },
+        "assessment": {
+          "$ref": "#/$defs/assessment_block"
+        },
+        "scope": {
+          "$ref": "#/$defs/scope_block"
+        },
+        "operations": {
+          "$ref": "#/$defs/operations_block"
+        },
+        "evidence": {
+          "$ref": "#/$defs/evidence_block"
+        },
+        "dependencies": {
+          "$ref": "#/$defs/dependencies_block"
+        },
+        "risk_acceptance": {
+          "$ref": "#/$defs/risk_block"
+        },
+        "governance": {
+          "$ref": "#/$defs/governance_block"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "level_enum": {
+      "type": "string",
+      "enum": [
+        "L1",
+        "L2",
+        "L3"
+      ]
+    },
+    "assessment_route_enum": {
+      "type": "string",
+      "enum": [
+        "self",
+        "certification",
+        "unknown_contract_dependent"
+      ]
+    },
+    "tenant_model_enum": {
+      "type": "string",
+      "enum": [
+        "commercial_only",
+        "gcc",
+        "gcc_high",
+        "dod_il5",
+        "dod_il6",
+        "hybrid",
+        "unknown"
+      ]
+    },
+    "cui_presence_enum": {
+      "type": "string",
+      "enum": [
+        "no_cui",
+        "fci_only",
+        "cui_present",
+        "cui_plus_other_sensitive",
+        "unknown"
+      ]
+    },
+    "data_types": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "time_goal": {
+      "type": "object",
+      "required": [
+        "goal_type"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "goal_type": {
+          "type": "string",
+          "enum": [
+            "by_date",
+            "within_days",
+            "asap",
+            "unknown"
+          ]
+        },
+        "by_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "within_days": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "driver": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "target_block": {
+      "type": "object",
+      "required": [
+        "target_cmmc_level",
+        "cui_presence",
+        "cui_types",
+        "regulated_data_notes"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "target_cmmc_level": {
+          "$ref": "#/$defs/level_enum"
+        },
+        "cui_presence": {
+          "$ref": "#/$defs/cui_presence_enum"
+        },
+        "cui_types": {
+          "$ref": "#/$defs/data_types"
+        },
+        "regulated_data_notes": {
+          "type": "string"
+        }
+      }
+    },
+    "assessment_block": {
+      "type": "object",
+      "required": [
+        "assessment_route",
+        "assessment_body",
+        "certification_timing_goal",
+        "affirmation_obligations"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "assessment_route": {
+          "$ref": "#/$defs/assessment_route_enum"
+        },
+        "assessment_body": {
+          "type": "string",
+          "minLength": 1
+        },
+        "certification_timing_goal": {
+          "$ref": "#/$defs/time_goal"
+        },
+        "affirmation_obligations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "scope_block": {
+      "type": "object",
+      "required": [
+        "boundary_strategy",
+        "deployment_posture",
+        "external_service_providers",
+        "specialized_assets_present",
+        "in_scope_users_estimate",
+        "in_scope_endpoints_estimate"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "boundary_strategy": {
+          "type": "string",
+          "enum": [
+            "single_enclave",
+            "multiple_enclaves",
+            "hybrid_boundary",
+            "unknown"
+          ]
+        },
+        "deployment_posture": {
+          "type": "string",
+          "enum": [
+            "cloud_only",
+            "hybrid",
+            "on_prem",
+            "unknown"
+          ]
+        },
+        "external_service_providers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/esp"
+          }
+        },
+        "specialized_assets_present": {
+          "type": "boolean"
+        },
+        "in_scope_users_estimate": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "in_scope_endpoints_estimate": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "esp": {
+      "type": "object",
+      "required": [
+        "name",
+        "service_type",
+        "fedramp_posture",
+        "in_scope_dependency"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "service_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fedramp_posture": {
+          "type": "string",
+          "minLength": 1
+        },
+        "in_scope_dependency": {
+          "type": "string",
+          "enum": [
+            "yes",
+            "no",
+            "unknown"
+          ]
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "operations_block": {
+      "type": "object",
+      "required": [
+        "collaboration_mode",
+        "byod_posture",
+        "devops_touches_cui"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "collaboration_mode": {
+          "type": "string",
+          "enum": [
+            "teams_first",
+            "email_first",
+            "mixed",
+            "unknown"
+          ]
+        },
+        "byod_posture": {
+          "type": "string",
+          "enum": [
+            "not_allowed",
+            "allowed_vdi_only",
+            "allowed_mdm",
+            "unknown"
+          ]
+        },
+        "devops_touches_cui": {
+          "type": "boolean"
+        }
+      }
+    },
+    "evidence_block": {
+      "type": "object",
+      "required": [
+        "evidence_posture_target",
+        "evidence_collection_mode",
+        "retention_target_days"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "evidence_posture_target": {
+          "type": "string",
+          "enum": [
+            "l2_self_ready",
+            "c3pao_ready",
+            "continuous_compliance",
+            "unknown"
+          ]
+        },
+        "evidence_collection_mode": {
+          "type": "string",
+          "enum": [
+            "manual",
+            "assisted",
+            "automated",
+            "unknown"
+          ]
+        },
+        "retention_target_days": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "dependencies_block": {
+      "type": "object",
+      "required": [
+        "tenant_model_preference",
+        "budget_constraints",
+        "schedule_constraints"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tenant_model_preference": {
+          "$ref": "#/$defs/tenant_model_enum"
+        },
+        "infrastructure_model": {
+          "type": "string",
+          "enum": ["m365_only", "m365_sentinel", "m365_azure"]
+        },
+        "license_tier": {
+          "type": "string",
+          "enum": ["business_premium", "g3", "g5"]
+        },
+        "user_count": {
+          "type": "number",
+          "minimum": 1
+        },
+        "budget_constraints": {
+          "type": "string"
+        },
+        "schedule_constraints": {
+          "type": "string"
+        }
+      }
+    },
+    "risk_block": {
+      "type": "object",
+      "required": [
+        "poam_policy_intent",
+        "risk_acceptance_authority",
+        "known_risk_tolerances"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "poam_policy_intent": {
+          "type": "string",
+          "enum": [
+            "no_poam",
+            "poam_if_allowed",
+            "unknown"
+          ]
+        },
+        "risk_acceptance_authority": {
+          "type": "string",
+          "minLength": 1
+        },
+        "known_risk_tolerances": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "governance_block": {
+      "type": "object",
+      "required": [
+        "affirming_official",
+        "evidence_owner_roles",
+        "change_control_owner",
+        "audit_interface_owner"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "affirming_official": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_owner_roles": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "change_control_owner": {
+          "type": "string",
+          "minLength": 1
+        },
+        "audit_interface_owner": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

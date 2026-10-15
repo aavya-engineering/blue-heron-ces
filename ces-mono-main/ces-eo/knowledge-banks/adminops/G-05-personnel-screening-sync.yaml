@@ -1,0 +1,93 @@
+controlId: "PS.L2-3.9.1"
+relatedControlIds:
+  - "PS.L2-3.9.2"
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: G-05
+useCaseTitle: "Personnel Screening Sync"
+domain: Personnel Security
+priority: P4 Standard
+trigger: 'PERSONNEL: New hire screening completed, clearance status changed, or annual re-investigation completed in HR/clearance
+  system'
+sodTier: Tier 2 (Config Manager)
+entraRolesRequired:
+- User Administrator
+- Compliance Administrator
+approvalRequired: true
+services:
+- name: Entra ID -- user directory, security groups
+  purpose: '`screening-noncompliant`, `screening-cleared`), Conditional Access'
+- name: HR / Personnel Security System
+  purpose: vendor-agnostic) -- screening status data source
+- name: Power Automate or Azure Logic Apps -- CSV import and sync automation
+  purpose: ''
+- name: Azure Immutable Blob Storage -- evidence retention
+  purpose: ''
+configurationSteps:
+  portalPath: //entra.microsoft.us) > Groups > All groups.
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes User.Read.All
+  - cmdlet: Get-MgGroup
+    parameters:
+    - -MgGroup
+    - -Filter
+    - -noncompliant
+    - -MgGroup
+    - -Filter
+  - cmdlet: Get-MgUser
+    parameters:
+    - -MgUser
+    - -Filter
+    - -Property
+    - -All
+    - -noncompliant
+  - cmdlet: Get-MgGroupMember
+    parameters:
+    - -MgGroupMember
+    - -GroupId
+    - -All
+    - -MgGroupMemberByRef
+    - -GroupId
+  - cmdlet: Remove-MgGroupMemberByRef
+    parameters:
+    - -MgGroupMemberByRef
+    - -GroupId
+    - -DirectoryObjectId
+    - -Object
+    - -eq
+  - cmdlet: New-MgGroupMemberByRef
+    parameters:
+    - -MgGroupMemberByRef
+    - -GroupId
+    - -BodyParameter
+    - -Date
+    - -Format
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/users?$filter=accountEnabled
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-g-personnel/G-05/{year}/{month}/
+  format: CSV (screening sync report), JSON (CA policy snapshot), CSV (group membership delta)
+  filenamePattern: G-05_PersonnelScreening_{YYYYMMDD}_{HHmmss}_{Context}.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: All Entra ID group management and Conditional Access features are fully available in GCC High. The HR/clearance system
+    is external to the M365 tenant. Ensure that the CSV transfer mechanism (SFTP, encrypted email, or direct API integration)
+    meets CMMC SC.L2-3.13.8 requirements for CUI in transit. If using Power Automate for the sync, the Power Automate environment
+    must be in GCC High. The screening CSV contains Personally Identifiable Information (PII) and potentially classified personnel
+    metadata; handle it according to the organization's data handling procedures and never store it in commerc
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

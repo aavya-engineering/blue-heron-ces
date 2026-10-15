@@ -1,0 +1,42 @@
+## Control {{controlId}}: Terminate User Sessions After Defined Conditions
+
+**Implementation Status:** {{status}}
+
+This organization automatically terminates a user session after organization-defined conditions or trigger events within the {{tenantName}} M365 GCC High tenant. Session termination is enforced through Conditional Access sign-in frequency controls, token lifetime policies, and device configuration idle timeout settings that disconnect inactive or non-compliant sessions.
+
+{{#if conditionalAccessActive}}
+Conditional Access policies enforce session termination through {{caPoliciesTotalCount}} configured policies with sign-in frequency controls. Sessions are terminated upon: exceeding the organization-defined inactivity timeout, device compliance status change to non-compliant, user risk level elevation, or token expiration. Re-authentication is required to establish a new session after termination.
+{{else}}
+Conditional Access session termination policies have not been configured. Session management relies on default Azure AD token lifetime settings pending policy implementation.
+{{/if}}
+
+{{#if policies}}
+The following policies enforce session termination conditions:
+{{#each policies}}
+- **{{displayName}}** ({{state}}): Enforces session lifetime controls with {{#each grantControls.builtInControls}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}.
+{{/each}}
+{{/if}}
+
+{{#if deviceConfigurationsActive}}
+Intune device configuration policies ({{deviceConfigurationsCount}} policies) enforce local idle timeout and screen lock settings that complement cloud session termination controls.
+{{/if}}
+
+{{#if infraResources}}
+Supporting infrastructure:
+{{#each infraResources}}
+- {{resourceType}} "{{name}}"{{#if properties.retention_days}} (retention: {{properties.retention_days}} days){{/if}}
+{{/each}}
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Review Conditional Access sign-in frequency configurations, token lifetime policies, and session termination audit logs.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

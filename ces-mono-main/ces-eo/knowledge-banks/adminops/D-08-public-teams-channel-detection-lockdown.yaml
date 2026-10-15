@@ -1,0 +1,78 @@
+controlId: "AC.L1-3.1.20"
+relatedControlIds:
+  - "AC.L1-3.1.1"
+  - "AC.L2-3.1.3"
+  - "AC.L1-3.1.22"
+  - "SC.L1-3.13.1"  # [VERIFY] mapping not yet confirmed
+practiceStatement: Limit system access to authorized users, processes acting on behalf of users, and devices.
+useCaseId: D-08
+useCaseTitle: "Public Teams Detection"
+domain: Data Protection & Information Management
+priority: P4 Standard
+trigger: 'SCHEDULE: Weekly'
+sodTier: Tier 2 -- Config Manager
+entraRolesRequired:
+- Teams Administrator
+- Compliance Administrator
+approvalRequired: false
+services:
+- name: Microsoft Teams Admin Center
+  purpose: '`https://admin.teams.microsoft.us`) [VERIFY]'
+- name: Microsoft Graph API
+  purpose: Teams endpoints
+- name: Microsoft Teams PowerShell module
+  purpose: ''
+- name: Entra ID
+  purpose: group visibility attribute
+- name: Microsoft Purview
+  purpose: sensitivity label container settings
+configurationSteps:
+  portalPath: //admin.teams.microsoft.us [VERIFY] > **Teams** > **Manage teams**.
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes Group.ReadWrite.All
+  - cmdlet: Get-MgGroup
+    parameters:
+    - -MgGroup
+    - -Filter
+    - -All
+    - -Property
+    - -Object
+  - cmdlet: Update-MgGroup
+    parameters:
+    - -MgGroup
+    - -GroupId
+    - -Visibility
+    - -MgGroup
+    - -Filter
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/groups?$filter=resourceProvisioningOptions/Any(x:x
+  graphApiPayloadExample: {}
+  requiredPermissions:
+  - Group.ReadWrite.All
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-d-dataprotection/D-08/2026/03/
+  format: CSV (teams inventory, public teams list), JSON (remediation report)
+  filenamePattern: D-08_PublicTeams_{YYYYMMDD}_{HHmmss}_Weekly.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://admin.teams.microsoft.us
+  - https://graph.microsoft.us
+  - https://compliance.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |-
+    - Teams Admin Center in GCC High uses `https://admin.teams.microsoft.us` [VERIFY] -- confirm the exact URL in your tenant.
+    - Microsoft Graph Teams endpoints use `https://graph.microsoft.us/v1.0/groups` with the `resourceProvisioningOptions` filter, which is available in GCC High.
+    - Sensitivity label container settings (enforcing Private visibility on CUI-labeled teams) are available in GCC High when labels are configured in `https://compliance.microsoft.us` > **Information protection** > **Labels** > container settings.
+    - The `Update-MgGroup -Visibility` cmdlet functions in GCC High with `-Env
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

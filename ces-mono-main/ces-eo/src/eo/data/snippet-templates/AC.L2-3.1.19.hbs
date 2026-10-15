@@ -1,0 +1,44 @@
+## Control {{controlId}}: Encrypt CUI on Mobile Devices
+
+**Implementation Status:** {{status}}
+
+This organization employs cryptographic mechanisms to protect the confidentiality of CUI stored on mobile devices within the {{tenantName}} M365 GCC High tenant. Mobile device encryption is enforced through Intune compliance policies requiring BitLocker (Windows), FileVault (macOS), and native device encryption (iOS/Android) on all managed devices accessing CUI resources.
+
+{{#if bitLockerEnforced}}
+Intune compliance policies enforce device encryption across {{deviceCount}} managed devices. Encryption requirements include:
+{{#if devices}}
+{{#each devices}}
+- **{{displayName}}** ({{operatingSystem}}): {{#if isCompliant}}Compliant - encryption verified{{else}}Non-compliant - encryption remediation required{{/if}}
+{{/each}}
+{{#if (gt deviceCount 10)}}
+(Showing first 10 of {{deviceCount}} managed devices)
+{{/if}}
+{{/if}}
+BitLocker encryption with TPM 2.0 is enforced on Windows devices. iOS and Android devices require native device encryption enabled and verified through Intune compliance checks before CUI access is granted.
+{{else}}
+Intune device encryption policies have not been configured. Mobile device encryption relies on device-level settings pending compliance policy deployment.
+{{/if}}
+
+{{#if appProtectionsActive}}
+App protection policies provide additional encryption for CUI data at the application layer, encrypting data at rest within managed applications independent of device-level encryption.
+{{/if}}
+
+{{#if infraResources}}
+Supporting infrastructure:
+{{#each infraResources}}
+- {{resourceType}} "{{name}}"{{#if properties.retention_days}} (retention: {{properties.retention_days}} days){{/if}}
+{{/each}}
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Review Intune device compliance reports for encryption status, BitLocker recovery key escrow records, and device encryption compliance percentages.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

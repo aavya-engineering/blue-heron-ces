@@ -1,0 +1,912 @@
+﻿{
+    "tenant":  "vfsgov",
+    "startedAt":  "2026-07-03T15:14:16.3069401Z",
+    "summary":  "PASS=18 INCONCLUSIVE=10 FAIL=6 SKIPPED=2",
+    "results":  [
+                    {
+                        "CaseId":  "UC-01",
+                        "CaseName":  "Sign in to M365 with MFA",
+                        "Personas":  [
+                                         "P1",
+                                         "P2",
+                                         "P3",
+                                         "P6",
+                                         "P8"
+                                     ],
+                        "Practices":  [
+                                          "IA.L2-3.5.1",
+                                          "IA.L2-3.5.3"
+                                      ],
+                        "Test":  "CA policy requires MFA for all users",
+                        "Tier":  "T1",
+                        "Verdict":  "PASS",
+                        "Detail":  "enabled CA policy requiring MFA for All users: \u0027CA-01: Require MFA - All Users\u0027",
+                        "Evidence":  [
+                                         {
+                                             "id":  null,
+                                             "displayName":  null,
+                                             "state":  null
+                                         }
+                                     ]
+                    },
+                    {
+                        "CaseId":  "UC-01",
+                        "CaseName":  "Sign in to M365 with MFA",
+                        "Personas":  [
+                                         "P1",
+                                         "P2",
+                                         "P3",
+                                         "P6",
+                                         "P8"
+                                     ],
+                        "Practices":  [
+                                          "IA.L2-3.5.1",
+                                          "IA.L2-3.5.3"
+                                      ],
+                        "Test":  "Weak MFA methods (SMS/voice) disabled",
+                        "Tier":  "T1",
+                        "Verdict":  "PASS",
+                        "Detail":  "SMS and Voice authentication methods are disabled",
+                        "Evidence":  [
+                                         {
+                                             "id":  null,
+                                             "state":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "state":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "state":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "state":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "state":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "state":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "state":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "state":  null
+                                         }
+                                     ]
+                    },
+                    {
+                        "CaseId":  "UC-01",
+                        "CaseName":  "Sign in to M365 with MFA",
+                        "Personas":  [
+                                         "P1",
+                                         "P2",
+                                         "P3",
+                                         "P6",
+                                         "P8"
+                                     ],
+                        "Practices":  [
+                                          "IA.L2-3.5.1",
+                                          "IA.L2-3.5.3"
+                                      ],
+                        "Test":  "Recent interactive sign-ins satisfied MFA",
+                        "Tier":  "T2",
+                        "Verdict":  "INCONCLUSIVE",
+                        "Detail":  "sample of 2 sign-in(s) is all CA-not-applied (admin-portal/service accounts) - no representative end-user sign-ins to evidence MFA enforcement",
+                        "Evidence":  null
+                    },
+                    {
+                        "CaseId":  "UC-02",
+                        "CaseName":  "Work in a CUI library (authorized users, labeled, compliant device)",
+                        "Personas":  [
+                                         "P1",
+                                         "P2"
+                                     ],
+                        "Practices":  [
+                                          "AC.L2-3.1.1",
+                                          "MP.L2-3.8.1",
+                                          "AC.L2-3.1.18"
+                                      ],
+                        "Test":  "CUI-authorized group exists and is populated",
+                        "Tier":  "T1",
+                        "Verdict":  "FAIL",
+                        "Detail":  "CUI group \u0027sg-cui-users\u0027 not found in tenant - near-match exists: \u0027cui-users-sg\u0027 (tenant-config cui_group_name drift?)",
+                        "Evidence":  {
+                                         "nearMatches":  [
+                                                             "cui-users-sg"
+                                                         ]
+                                     }
+                    },
+                    {
+                        "CaseId":  "UC-02",
+                        "CaseName":  "Work in a CUI library (authorized users, labeled, compliant device)",
+                        "Personas":  [
+                                         "P1",
+                                         "P2"
+                                     ],
+                        "Practices":  [
+                                          "AC.L2-3.1.1",
+                                          "MP.L2-3.8.1",
+                                          "AC.L2-3.1.18"
+                                      ],
+                        "Test":  "CUI sensitivity label is published",
+                        "Tier":  "T1",
+                        "Verdict":  "SKIPPED",
+                        "Detail":  "sensitivity-label publishing not verifiable via app-only Graph (needs Security \u0026 Compliance PS / IPPS channel - same gap as UC-03 DLP)",
+                        "Evidence":  null
+                    },
+                    {
+                        "CaseId":  "UC-02",
+                        "CaseName":  "Work in a CUI library (authorized users, labeled, compliant device)",
+                        "Personas":  [
+                                         "P1",
+                                         "P2"
+                                     ],
+                        "Practices":  [
+                                          "AC.L2-3.1.1",
+                                          "MP.L2-3.8.1",
+                                          "AC.L2-3.1.18"
+                                      ],
+                        "Test":  "Compliant-device CA policy enabled",
+                        "Tier":  "T1",
+                        "Verdict":  "PASS",
+                        "Detail":  "enabled CA policy requires compliant device: \u0027CMMC-MobileDeviceAccess\u0027",
+                        "Evidence":  [
+                                         {
+                                             "id":  null,
+                                             "displayName":  null
+                                         }
+                                     ]
+                    },
+                    {
+                        "CaseId":  "UC-03",
+                        "CaseName":  "Protected mail flow to external primes",
+                        "Personas":  [
+                                         "P1",
+                                         "P2"
+                                     ],
+                        "Practices":  [
+                                          "SC.L2-3.13.8",
+                                          "AC.L2-3.1.3"
+                                      ],
+                        "Test":  "Protection transport rules enabled (IRM/OME/encryption)",
+                        "Tier":  "T1",
+                        "Verdict":  "FAIL",
+                        "Detail":  "no enabled transport rules at all",
+                        "Evidence":  null
+                    },
+                    {
+                        "CaseId":  "UC-03",
+                        "CaseName":  "Protected mail flow to external primes",
+                        "Personas":  [
+                                         "P1",
+                                         "P2"
+                                     ],
+                        "Practices":  [
+                                          "SC.L2-3.13.8",
+                                          "AC.L2-3.1.3"
+                                      ],
+                        "Test":  "DLP policies protect CUI content",
+                        "Tier":  "T1",
+                        "Verdict":  "SKIPPED",
+                        "Detail":  "DLP policy read requires the Security \u0026 Compliance PS channel (IPPS session) - not yet in harness; add as a fourth choke-point channel",
+                        "Evidence":  null
+                    },
+                    {
+                        "CaseId":  "UC-03",
+                        "CaseName":  "Protected mail flow to external primes",
+                        "Personas":  [
+                                         "P1",
+                                         "P2"
+                                     ],
+                        "Practices":  [
+                                          "SC.L2-3.13.8",
+                                          "AC.L2-3.1.3"
+                                      ],
+                        "Test":  "Mail flow evidence (message trace)",
+                        "Tier":  "T2",
+                        "Verdict":  "INCONCLUSIVE",
+                        "Detail":  "no mail flow in last 48h (quiet tenant) - cannot evidence protected delivery",
+                        "Evidence":  null
+                    },
+                    {
+                        "CaseId":  "UC-05",
+                        "CaseName":  "External sharing restricted to existing guests or off",
+                        "Personas":  [
+                                         "P1",
+                                         "P2"
+                                     ],
+                        "Practices":  [
+                                          "AC.L2-3.1.20"
+                                      ],
+                        "Test":  "SharePoint tenant sharing capability restricted",
+                        "Tier":  "T1",
+                        "Verdict":  "PASS",
+                        "Detail":  "tenant sharingCapability = \u0027disabled\u0027 (new external invitations blocked)",
+                        "Evidence":  {
+                                         "sharingDomainRestrictionMode":  "none",
+                                         "sharingCapability":  "disabled"
+                                     }
+                    },
+                    {
+                        "CaseId":  "UC-05",
+                        "CaseName":  "External sharing restricted to existing guests or off",
+                        "Personas":  [
+                                         "P1",
+                                         "P2"
+                                     ],
+                        "Practices":  [
+                                          "AC.L2-3.1.20"
+                                      ],
+                        "Test":  "\"Anyone\" links unavailable",
+                        "Tier":  "T1",
+                        "Verdict":  "PASS",
+                        "Detail":  "anonymous \u0027Anyone\u0027 links impossible at capability \u0027disabled\u0027",
+                        "Evidence":  null
+                    },
+                    {
+                        "CaseId":  "UC-06",
+                        "CaseName":  "Non-CUI staff excluded from CUI authorization",
+                        "Personas":  [
+                                         "P3"
+                                     ],
+                        "Practices":  [
+                                          "AC.L2-3.1.1"
+                                      ],
+                        "Test":  "CUI group is a strict subset of users (boundary exists)",
+                        "Tier":  "T1",
+                        "Verdict":  "FAIL",
+                        "Detail":  "CUI group \u0027sg-cui-users\u0027 not found - near-match exists: \u0027cui-users-sg\u0027 (tenant-config cui_group_name drift?)",
+                        "Evidence":  {
+                                         "nearMatches":  [
+                                                             "cui-users-sg"
+                                                         ]
+                                     }
+                    },
+                    {
+                        "CaseId":  "UC-07",
+                        "CaseName":  "Location-aware access (named locations + geo CA)",
+                        "Personas":  [
+                                         "P8"
+                                     ],
+                        "Practices":  [
+                                          "AC.L2-3.1.12"
+                                      ],
+                        "Test":  "Named locations defined",
+                        "Tier":  "T1",
+                        "Verdict":  "PASS",
+                        "Detail":  "2 named location(s) defined",
+                        "Evidence":  [
+                                         {
+                                             "id":  null,
+                                             "displayName":  null,
+                                             "@odata.type":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null,
+                                             "@odata.type":  null
+                                         }
+                                     ]
+                    },
+                    {
+                        "CaseId":  "UC-07",
+                        "CaseName":  "Location-aware access (named locations + geo CA)",
+                        "Personas":  [
+                                         "P8"
+                                     ],
+                        "Practices":  [
+                                          "AC.L2-3.1.12"
+                                      ],
+                        "Test":  "A CA policy conditions on location",
+                        "Tier":  "T1",
+                        "Verdict":  "PASS",
+                        "Detail":  "enabled location-conditioned CA policy: \u0027CMMC-BlockUntrustedLocations\u0027",
+                        "Evidence":  [
+                                         {
+                                             "id":  null,
+                                             "displayName":  null
+                                         }
+                                     ]
+                    },
+                    {
+                        "CaseId":  "UC-07",
+                        "CaseName":  "Location-aware access (named locations + geo CA)",
+                        "Personas":  [
+                                         "P8"
+                                     ],
+                        "Practices":  [
+                                          "AC.L2-3.1.12"
+                                      ],
+                        "Test":  "CA blocks observed in sign-in logs",
+                        "Tier":  "T2",
+                        "Verdict":  "INCONCLUSIVE",
+                        "Detail":  "no CA-blocked sign-ins in the last 2 records (nothing tried to violate policy - not evidence of absence)",
+                        "Evidence":  null
+                    },
+                    {
+                        "CaseId":  "UC-08",
+                        "CaseName":  "Non-compliant/personal devices blocked",
+                        "Personas":  [
+                                         "P1",
+                                         "P2",
+                                         "P3",
+                                         "P8"
+                                     ],
+                        "Practices":  [
+                                          "AC.L2-3.1.18",
+                                          "CM.L2-3.4.1"
+                                      ],
+                        "Test":  "Intune device compliance policy exists",
+                        "Tier":  "T1",
+                        "Verdict":  "FAIL",
+                        "Detail":  "no Intune device compliance policies defined",
+                        "Evidence":  null
+                    },
+                    {
+                        "CaseId":  "UC-08",
+                        "CaseName":  "Non-compliant/personal devices blocked",
+                        "Personas":  [
+                                         "P1",
+                                         "P2",
+                                         "P3",
+                                         "P8"
+                                     ],
+                        "Practices":  [
+                                          "AC.L2-3.1.18",
+                                          "CM.L2-3.4.1"
+                                      ],
+                        "Test":  "CA requires compliant device for access",
+                        "Tier":  "T1",
+                        "Verdict":  "PASS",
+                        "Detail":  "enabled CA policy requires compliantDevice: \u0027CMMC-MobileDeviceAccess\u0027",
+                        "Evidence":  [
+                                         {
+                                             "id":  null,
+                                             "displayName":  null
+                                         }
+                                     ]
+                    },
+                    {
+                        "CaseId":  "UC-08",
+                        "CaseName":  "Non-compliant/personal devices blocked",
+                        "Personas":  [
+                                         "P1",
+                                         "P2",
+                                         "P3",
+                                         "P8"
+                                     ],
+                        "Practices":  [
+                                          "AC.L2-3.1.18",
+                                          "CM.L2-3.4.1"
+                                      ],
+                        "Test":  "Non-compliant device blocks observed",
+                        "Tier":  "T2",
+                        "Verdict":  "INCONCLUSIVE",
+                        "Detail":  "no non-compliant-device attempts in window (nothing to block - not evidence of absence)",
+                        "Evidence":  null
+                    },
+                    {
+                        "CaseId":  "UC-09",
+                        "CaseName":  "Application control on corporate devices",
+                        "Personas":  [
+                                         "P1",
+                                         "P3"
+                                     ],
+                        "Practices":  [
+                                          "CM.L2-3.4.7"
+                                      ],
+                        "Test":  "App-control configuration deployed (WDAC/AppLocker/endpoint protection)",
+                        "Tier":  "T1",
+                        "Verdict":  "PASS",
+                        "Detail":  "101 app-control/endpoint-protection profile(s): CMMC-AppControl-Policy; CMMC-BitLocker-Policy; CMMC-Defender-AntivirusPolicy",
+                        "Evidence":  [
+                                         {
+                                             "id":  null,
+                                             "displayName":  null,
+                                             "@odata.type":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null,
+                                             "@odata.type":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null,
+                                             "@odata.type":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null,
+                                             "@odata.type":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null,
+                                             "@odata.type":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null,
+                                             "@odata.type":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null,
+                                             "@odata.type":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null,
+                                             "@odata.type":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null,
+                                             "@odata.type":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null,
+                                             "@odata.type":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null,
+                                             "@odata.type":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null,
+                                             "@odata.type":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null,
+                                             "@odata.type":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null,
+                                             "@odata.type":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null,
+                                             "@odata.type":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null,
+                                             "@odata.type":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null,
+                                             "@odata.type":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null,
+                                             "@odata.type":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null,
+                                             "@odata.type":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null,
+                                             "@odata.type":  null
+                                         }
+                                     ]
+                    },
+                    {
+                        "CaseId":  "UC-10",
+                        "CaseName":  "Password policy (banned list, lockout)",
+                        "Personas":  [
+                                         "P1",
+                                         "P2",
+                                         "P3"
+                                     ],
+                        "Practices":  [
+                                          "IA.L2-3.5.7"
+                                      ],
+                        "Test":  "Banned-password + lockout settings configured",
+                        "Tier":  "T1",
+                        "Verdict":  "INCONCLUSIVE",
+                        "Detail":  "no custom Password Rule Settings object - Entra cloud defaults apply (global banned list + smart lockout are always-on for cloud accounts, but the CES-configured custom list is not verifiable). NOTE: 14-char minimum length is not enforceable/verifiable via cloud policy for cloud-only accounts.",
+                        "Evidence":  null
+                    },
+                    {
+                        "CaseId":  "UC-11",
+                        "CaseName":  "Onboarding: Autopilot, BitLocker, training gate",
+                        "Personas":  [
+                                         "P4",
+                                         "P6"
+                                     ],
+                        "Practices":  [
+                                          "CM.L2-3.4.1",
+                                          "AT.L2-3.2.2"
+                                      ],
+                        "Test":  "Autopilot deployment profile exists",
+                        "Tier":  "T1",
+                        "Verdict":  "FAIL",
+                        "Detail":  "no Autopilot deployment profiles - devices not provisioned to spec",
+                        "Evidence":  null
+                    },
+                    {
+                        "CaseId":  "UC-11",
+                        "CaseName":  "Onboarding: Autopilot, BitLocker, training gate",
+                        "Personas":  [
+                                         "P4",
+                                         "P6"
+                                     ],
+                        "Practices":  [
+                                          "CM.L2-3.4.1",
+                                          "AT.L2-3.2.2"
+                                      ],
+                        "Test":  "BitLocker enforcement configured",
+                        "Tier":  "T1",
+                        "Verdict":  "PASS",
+                        "Detail":  "19 device configuration(s) cover encryption: CMMC-BitLocker-Policy; CMMC-Defender-AntivirusPolicy",
+                        "Evidence":  [
+                                         {
+                                             "id":  null,
+                                             "displayName":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null
+                                         }
+                                     ]
+                    },
+                    {
+                        "CaseId":  "UC-11",
+                        "CaseName":  "Onboarding: Autopilot, BitLocker, training gate",
+                        "Personas":  [
+                                         "P4",
+                                         "P6"
+                                     ],
+                        "Practices":  [
+                                          "CM.L2-3.4.1",
+                                          "AT.L2-3.2.2"
+                                      ],
+                        "Test":  "Training gate (CA withholds access until training complete)",
+                        "Tier":  "T1",
+                        "Verdict":  "INCONCLUSIVE",
+                        "Detail":  "no CA policy identifiable as a training gate by name - gate may be implemented via group membership without a naming convention the probe can detect",
+                        "Evidence":  null
+                    },
+                    {
+                        "CaseId":  "UC-12",
+                        "CaseName":  "Offboarding: disable, revoke, wipe capabilities",
+                        "Personas":  [
+                                         "P5",
+                                         "P6"
+                                     ],
+                        "Practices":  [
+                                          "AC.L2-3.1.2",
+                                          "MP.L2-3.8.3"
+                                      ],
+                        "Test":  "AO registry provides the offboarding command set (local check)",
+                        "Tier":  "T1",
+                        "Verdict":  "PASS",
+                        "Detail":  "all offboarding commands present in AO registry: A-02, A-11, B-05, B-06",
+                        "Evidence":  {
+                                         "A-02":  "User Offboarding -- Disable",
+                                         "B-05":  "Terminated-User Device Wipe",
+                                         "A-11":  "Stale Account Detection",
+                                         "B-06":  "Lost/Stolen Device Wipe"
+                                     }
+                    },
+                    {
+                        "CaseId":  "UC-12",
+                        "CaseName":  "Offboarding: disable, revoke, wipe capabilities",
+                        "Personas":  [
+                                         "P5",
+                                         "P6"
+                                     ],
+                        "Practices":  [
+                                          "AC.L2-3.1.2",
+                                          "MP.L2-3.8.3"
+                                      ],
+                        "Test":  "Offboarding activity evidence in directory audits",
+                        "Tier":  "T2",
+                        "Verdict":  "INCONCLUSIVE",
+                        "Detail":  "no offboarding events among last 14 audit records (no recent departure - not evidence of absence)",
+                        "Evidence":  null
+                    },
+                    {
+                        "CaseId":  "UC-14",
+                        "CaseName":  "Privileged access: no standing GA, PIM, break-glass",
+                        "Personas":  [
+                                         "P6"
+                                     ],
+                        "Practices":  [
+                                          "AC.L2-3.1.4",
+                                          "AC.L2-3.1.5",
+                                          "AC.L2-3.1.7"
+                                      ],
+                        "Test":  "No standing Global Admins except break-glass",
+                        "Tier":  "T1",
+                        "Verdict":  "FAIL",
+                        "Detail":  "standing GA beyond break-glass: admin@vfsgov.us",
+                        "Evidence":  {
+                                         "upn":  "admin@vfsgov.us"
+                                     }
+                    },
+                    {
+                        "CaseId":  "UC-14",
+                        "CaseName":  "Privileged access: no standing GA, PIM, break-glass",
+                        "Personas":  [
+                                         "P6"
+                                     ],
+                        "Practices":  [
+                                          "AC.L2-3.1.4",
+                                          "AC.L2-3.1.5",
+                                          "AC.L2-3.1.7"
+                                      ],
+                        "Test":  "PIM eligible assignments exist (JIT model in use)",
+                        "Tier":  "T1",
+                        "Verdict":  "PASS",
+                        "Detail":  "2 PIM-eligible role assignment(s) - JIT elevation model active",
+                        "Evidence":  {
+                                         "eligibleCount":  2
+                                     }
+                    },
+                    {
+                        "CaseId":  "UC-14",
+                        "CaseName":  "Privileged access: no standing GA, PIM, break-glass",
+                        "Personas":  [
+                                         "P6"
+                                     ],
+                        "Practices":  [
+                                          "AC.L2-3.1.4",
+                                          "AC.L2-3.1.5",
+                                          "AC.L2-3.1.7"
+                                      ],
+                        "Test":  "Break-glass account excluded from CA policies",
+                        "Tier":  "T1",
+                        "Verdict":  "PASS",
+                        "Detail":  "break-glass excluded from all 5 enabled all-user CA policies",
+                        "Evidence":  {
+                                         "breakGlassId":  "10c831ac-959b-4819-9d8f-8db645367550"
+                                     }
+                    },
+                    {
+                        "CaseId":  "UC-15",
+                        "CaseName":  "Guest invitations and permissions restricted",
+                        "Personas":  [
+                                         "P7",
+                                         "P2"
+                                     ],
+                        "Practices":  [
+                                          "AC.L2-3.1.20",
+                                          "AC.L2-3.1.3"
+                                      ],
+                        "Test":  "Guest invitation policy restricted",
+                        "Tier":  "T1",
+                        "Verdict":  "PASS",
+                        "Detail":  "guest invitations restricted: allowInvitesFrom=\u0027adminsAndGuestInviters\u0027",
+                        "Evidence":  {
+                                         "allowInvitesFrom":  "adminsAndGuestInviters"
+                                     }
+                    },
+                    {
+                        "CaseId":  "UC-15",
+                        "CaseName":  "Guest invitations and permissions restricted",
+                        "Personas":  [
+                                         "P7",
+                                         "P2"
+                                     ],
+                        "Practices":  [
+                                          "AC.L2-3.1.20",
+                                          "AC.L2-3.1.3"
+                                      ],
+                        "Test":  "Guest role is restricted (not member-equivalent)",
+                        "Tier":  "T1",
+                        "Verdict":  "PASS",
+                        "Detail":  "guest directory role: limited guest",
+                        "Evidence":  {
+                                         "guestUserRoleId":  "10dae51f-b6af-4016-8d66-8c2a99b929b3",
+                                         "meaning":  "limited guest"
+                                     }
+                    },
+                    {
+                        "CaseId":  "UC-16",
+                        "CaseName":  "Audit pipeline: retention and freshness",
+                        "Personas":  [
+                                         "P1",
+                                         "P2",
+                                         "P3",
+                                         "P6"
+                                     ],
+                        "Practices":  [
+                                          "AU.L2-3.3.1"
+                                      ],
+                        "Test":  "Log Analytics workspace retention \u003e= 90 days",
+                        "Tier":  "T1",
+                        "Verdict":  "PASS",
+                        "Detail":  "LAW \u0027vfsgov-law-prod\u0027 retention = 90 days (\u003e= 90)",
+                        "Evidence":  {
+                                         "workspace":  "vfsgov-law-prod",
+                                         "retentionInDays":  90,
+                                         "sku":  "PerGB2018"
+                                     }
+                    },
+                    {
+                        "CaseId":  "UC-16",
+                        "CaseName":  "Audit pipeline: retention and freshness",
+                        "Personas":  [
+                                         "P1",
+                                         "P2",
+                                         "P3",
+                                         "P6"
+                                     ],
+                        "Practices":  [
+                                          "AU.L2-3.3.1"
+                                      ],
+                        "Test":  "Directory audit records exist and are fresh",
+                        "Tier":  "T2",
+                        "Verdict":  "INCONCLUSIVE",
+                        "Detail":  "newest audit record is 5.4 days old (quiet tenant or stalled pipeline)",
+                        "Evidence":  {
+                                         "newest":  "\/Date(1782608064298)\/"
+                                     }
+                    },
+                    {
+                        "CaseId":  "UC-17",
+                        "CaseName":  "Update rings assigned; device fleet compliant",
+                        "Personas":  [
+                                         "P1",
+                                         "P3"
+                                     ],
+                        "Practices":  [
+                                          "SI.L2-3.14.1",
+                                          "CM.L2-3.4.2"
+                                      ],
+                        "Test":  "Windows Update ring configuration exists",
+                        "Tier":  "T1",
+                        "Verdict":  "PASS",
+                        "Detail":  "2 update ring configuration(s)",
+                        "Evidence":  [
+                                         {
+                                             "id":  null,
+                                             "displayName":  null
+                                         },
+                                         {
+                                             "id":  null,
+                                             "displayName":  null
+                                         }
+                                     ]
+                    },
+                    {
+                        "CaseId":  "UC-17",
+                        "CaseName":  "Update rings assigned; device fleet compliant",
+                        "Personas":  [
+                                         "P1",
+                                         "P3"
+                                     ],
+                        "Practices":  [
+                                          "SI.L2-3.14.1",
+                                          "CM.L2-3.4.2"
+                                      ],
+                        "Test":  "Managed device fleet compliance rate",
+                        "Tier":  "T2",
+                        "Verdict":  "INCONCLUSIVE",
+                        "Detail":  "no managed devices enrolled yet - compliance rate unmeasurable",
+                        "Evidence":  null
+                    },
+                    {
+                        "CaseId":  "UC-18",
+                        "CaseName":  "Sentinel analytics + incident flow",
+                        "Personas":  [
+                                         "P6"
+                                     ],
+                        "Practices":  [
+                                          "IR.L2-3.6.1"
+                                      ],
+                        "Test":  "Sentinel analytics rules enabled",
+                        "Tier":  "T1",
+                        "Verdict":  "PASS",
+                        "Detail":  "5 of 5 Sentinel analytics rule(s) enabled",
+                        "Evidence":  {
+                                         "total":  5,
+                                         "enabled":  5
+                                     }
+                    },
+                    {
+                        "CaseId":  "UC-18",
+                        "CaseName":  "Sentinel analytics + incident flow",
+                        "Personas":  [
+                                         "P6"
+                                     ],
+                        "Practices":  [
+                                          "IR.L2-3.6.1"
+                                      ],
+                        "Test":  "Incident flow present",
+                        "Tier":  "T2",
+                        "Verdict":  "INCONCLUSIVE",
+                        "Detail":  "zero incidents recorded (quiet tenant or rules never matched - not evidence pipeline is broken)",
+                        "Evidence":  null
+                    }
+                ]
+}

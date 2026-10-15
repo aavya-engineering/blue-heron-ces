@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/ces-tenant-manifest.schema.json",
+  "title": "CES Tenant Manifest Schema (Canonical)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "ces",
+    "tenant_manifest"
+  ],
+  "properties": {
+    "ces": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact",
+        "version",
+        "generated_on",
+        "intent"
+      ],
+      "properties": {
+        "artifact": {
+          "type": "string",
+          "const": "tenant_manifest"
+        },
+        "version": {
+          "type": "string"
+        },
+        "generated_on": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "intent": {
+          "type": "string"
+        },
+        "inputs": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "tenant_manifest": {
+      "type": "object",
+      "required": [
+        "manifest_id",
+        "tech_stack_id",
+        "normative_controls",
+        "assets",
+        "config_intents",
+        "evidence_monitors",
+        "drift_policies"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "manifest_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tech_stack_id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "normative_controls": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/normative_control"
+          }
+        },
+        "assets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/asset"
+          }
+        },
+        "config_intents": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/config_intent"
+          }
+        },
+        "evidence_monitors": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/evidence_monitor"
+          }
+        },
+        "drift_policies": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/drift_policy"
+          }
+        }
+      }
+    }
+  }
+}

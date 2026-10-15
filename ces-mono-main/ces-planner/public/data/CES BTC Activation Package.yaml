@@ -1,0 +1,156 @@
+schema_version: '1.0'
+package: CES_BTC_Activation_Package
+metadata:
+  created_utc: '2026-02-19T20:52:26Z'
+  author: ChatGPT
+  notes: Rules activate BTC verification depth based on SI and CUI outputs.
+inputs:
+  si:
+    __contract_ref: Strategic_Intent_Output_Contract
+  cui:
+    __contract_ref: CUI_Boundary_Output_Contract
+btc_bank_ref:
+  module: Boundary_Topology_Confirmation
+  schema_version: '1.0'
+  path: SIT_BTC_Bank.yaml
+rules:
+- id: BTC-RULE-DEVOPS-SCOPE
+  description: Activate DevOps topology verification only when DevOps is in the declared CUI boundary.
+  priority: 90
+  when:
+    all:
+    - source: cui
+      path: devops_in_scope
+      op: eq
+      value: 'Yes'
+  then:
+    actions:
+    - type: enable_section
+      target: DV-04
+      mode: full
+- id: BTC-RULE-DEVOPS-NOT-IN-SCOPE
+  description: If DevOps is out of scope, reduce DevOps section to minimal confirmation or skip.
+  priority: 80
+  when:
+    all:
+    - source: cui
+      path: devops_in_scope
+      op: in
+      value:
+      - 'No'
+      - Unknown
+  then:
+    actions:
+    - type: set_question_mode
+      target: DV-04
+      mode: minimal
+- id: BTC-RULE-SHARED-IDENTITY
+  description: If identity is shared/partial, increase identity and access verification depth and add risk flag.
+  priority: 85
+  when:
+    all:
+    - source: cui
+      path: shared_identity
+      op: in
+      value:
+      - 'Yes'
+      - Partially
+  then:
+    actions:
+    - type: enable_section
+      target: DV-01
+      mode: full
+    - type: add_risk_flag
+      target: DV-01
+      risk_flag: shared_identity_increases_assessor_scrutiny
+- id: BTC-RULE-NO-GUESTS
+  description: If guests are not allowed, require confirmation that guest access is disabled and no guests exist.
+  priority: 70
+  when:
+    all:
+    - source: cui
+      path: guest_access_policy
+      op: eq
+      value: 'No'
+  then:
+    actions:
+    - type: require_question
+      target: BTC.ID.003
+      mode: full
+- id: BTC-RULE-BYOD-DIRECT
+  description: If BYOD direct access is allowed, elevate device + CA/logging verification and flag boundary risk.
+  priority: 95
+  when:
+    all:
+    - source: cui
+      path: byod_model
+      op: eq
+      value: Yes - direct access allowed
+  then:
+    actions:
+    - type: enable_section
+      target: DV-02
+      mode: full
+    - type: add_risk_flag
+      target: DV-02
+      risk_flag: byod_direct_access_high_boundary_risk
+- id: BTC-RULE-MANAGED-ONLY
+  description: If managed devices required, substitute unmanaged-device question to focus on CA enforcement proof.
+  priority: 75
+  when:
+    all:
+    - source: cui
+      path: managed_device_required
+      op: eq
+      value: Yes - managed only
+  then:
+    actions:
+    - type: set_question_mode
+      target: BTC.DEV.002
+      mode: substitute
+      substitute_with: BTC.DEV.002.CA_ENFORCEMENT_PROOF
+- id: BTC-RULE-EMAIL-FWD-NO
+  description: If email forwarding is not permitted, require Exchange configuration proof.
+  priority: 70
+  when:
+    all:
+    - source: cui
+      path: email_forwarding_posture
+      op: eq
+      value: 'No'
+  then:
+    actions:
+    - type: require_question
+      target: BTC.INT.003
+      mode: full
+- id: BTC-RULE-BACKUP-OUT-OF-SCOPE
+  description: If backups are out of scope, require explicit validation and add risk flag.
+  priority: 88
+  when:
+    all:
+    - source: cui
+      path: backup_model
+      op: eq
+      value: Third-party backup (out-of-scope)
+  then:
+    actions:
+    - type: require_question
+      target: BTC.INT.004
+      mode: full
+    - type: add_risk_flag
+      target: DV-05
+      risk_flag: backup_outside_boundary_requires_comp_controls
+- id: BTC-RULE-SI-NO-EXTERNAL
+  description: If SI prohibits external collaboration, enforce full interconnection verification depth.
+  priority: 82
+  when:
+    all:
+    - source: si
+      path: external_collaboration_posture
+      op: eq
+      value: No external sharing
+  then:
+    actions:
+    - type: enable_section
+      target: DV-05
+      mode: full

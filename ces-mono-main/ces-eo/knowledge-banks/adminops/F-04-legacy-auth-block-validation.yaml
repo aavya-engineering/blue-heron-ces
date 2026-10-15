@@ -1,0 +1,74 @@
+controlId: "IA.L1-3.5.1"
+relatedControlIds:
+  - "AC.L1-3.1.1"
+  - "AC.L2-3.1.3"
+  - "SC.L1-3.13.1"  # [VERIFY] mapping not yet confirmed
+practiceStatement: Limit system access to authorized users, processes acting on behalf of users, and devices.
+useCaseId: F-04
+useCaseTitle: "Legacy Auth Block Validation"
+domain: Security Operations
+priority: P3 Medium
+trigger: 'SCHEDULE: Monthly (first Monday of each month)'
+sodTier: Tier 1 (per SoD model in front matter)
+entraRolesRequired:
+- Security Reader
+- Reports Reader
+approvalRequired: false
+services:
+- name: Entra Admin Center -- Conditional Access policies
+  purpose: ''
+- name: Entra ID -- sign-in logs
+  purpose: legacy authentication filter
+- name: Microsoft Graph API -- `signIns` endpoint with `clientAppUsed` filter
+  purpose: ''
+- name: Microsoft Sentinel -- analytics rule for legacy auth detection
+  purpose: ''
+- name: Azure Immutable Blob Storage -- evidence artifact storage
+  purpose: ''
+configurationSteps:
+  portalPath: //entra.microsoft.us > Protection > Conditional Access > Policies.
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes AuditLog.Read.All, Policy.Read.All
+  - cmdlet: Get-MgIdentityConditionalAccessPolicy
+    parameters:
+    - -MgIdentityConditionalAccessPolicy
+    - -Filter
+    - -Json
+    - -Depth
+    - -File
+  - cmdlet: Get-MgAuditLogSignIn
+    parameters:
+    - -MgAuditLogSignIn
+    - -Filter
+    - -All
+    - -Object
+    - -Object
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/identity/conditionalAccess/policies?$filter=displayName
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-f-security/F-04/2026/03/
+  format: JSON (policy export), CSV (sign-in events and validation result)
+  filenamePattern: F-04_LegacyAuthPolicy_{YYYYMMDD}_{HHmmss}_Config.json
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |-
+    - Conditional Access policies and sign-in logs are fully available in GCC High. The `clientAppUsed` property in sign-in logs correctly captures legacy authentication protocol types.
+    - The filter values for legacy auth client apps are identical to commercial: `Exchange ActiveSync (EAS)`, `Other clients`, `IMAP4`, `MAPI Over HTTP`, `POP3`, `SMTP`, etc.
+    - Some GCC High tenants may have service accounts that legitimately require SMTP AUTH for application relay. If any legacy auth events are detected, verify whether they are from authorized service accounts documented in an exception list before cl
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

@@ -1,0 +1,228 @@
+Prompt: “Always-On Help” design for SIT question pages and answer capture
+
+You are implementing a consultative Strategic Intent Tool (SIT): one question per page, standard controls, and always-on expert help to ensure the consultant knows what they’re doing and captures answers that are actionable downstream.
+
+You MUST use the following domain knowledge bases to generate and render help content:
+
+CES Assessor Approach Knowledge Base (methods, evidence sufficiency, scoping/sampling, POA&M/closeout, design-for-assessment). 
+
+domain CES Assessor Approach Kn…
+
+CES Assessor Evidence Matrix (domain defaults for methods/evidence, requirement-specific evidence archetypes, common tests, design-for-assessment). 
+
+domain CES Assessor Evidence Ma…
+
+CES CMMC Fundamental Requirements Store (requirement text, assessment objectives, evidence minimums, scoping impacts, UI help blocks). 
+
+domain CES CMMC Fundamental Req…
+
+A) Global help shown on every question page (top “Know What You’re Doing” strip)
+
+Show a compact strip (expandable) that always includes:
+
+Assessment Lens (FACT / INFERENCE / OPEN_QUESTION)
+
+Require the consultant to tag how the answer is being captured:
+
+FACT (client states, doc exists)
+
+INFERENCE (consultant judgement)
+
+OPEN_QUESTION (still unknown)
+This tagging model is explicitly supported in your assessor KB and other domain schemas. 
+
+domain CES Assessor Approach Kn…
+
+ 
+
+domain CES Assessor Evidence Ma…
+
+Assessor Method Expectation
+
+Display the default “assessor methods” relevant to this topic as: Examine / Interview / Test.
+
+If the question maps to requirements, show method defaults from the Evidence Matrix domain defaults or requirement matrix. 
+
+domain CES Assessor Evidence Ma…
+
+Evidence Sufficiency Reminder
+
+Always show a short reminder: “For audit survivability, prefer objective evidence over narratives; attachable artifacts help later even in SIT.”
+
+Backed by the Assessor KB’s evidence sufficiency model (the schema explicitly includes it). 
+
+domain CES Assessor Approach Kn…
+
+Scope Sensitivity Warning (when applicable)
+
+If this question touches boundary / external services / assets, show a warning: “Scoping answers affect sampling, evidence expectations, and what is in/out of assessment.”
+
+This aligns with Assessor KB “scoping_and_sampling” and fundamental requirements “scoping_impacts”. 
+
+domain CES Assessor Approach Kn…
+
+ 
+
+domain CES CMMC Fundamental Req…
+
+B) Per-question helper panel (right rail) — the “Consultant Assist Pack”
+
+For every question, render a structured help panel with the following sections:
+
+What this question is trying to determine
+
+One sentence, plain language.
+
+Why it matters for CMMC attainment
+
+Use the domain UI help fields where available (ui_help.why_it_matters, attainment_impact). 
+
+domain CES CMMC Fundamental Req…
+
+Expected evidence archetypes (preview)
+
+Show likely evidence archetypes that will later be needed.
+
+Pull from:
+
+Evidence Matrix domain_defaults.evidence_default if question is domain-scoped 
+
+domain CES Assessor Evidence Ma…
+
+Evidence Matrix requirement_matrix.evidence_archetypes if requirement-mapped 
+
+domain CES Assessor Evidence Ma…
+
+Fundamental Requirements Store evidence_minimum.must_have/nice_to_have if requirement-mapped 
+
+domain CES CMMC Fundamental Req…
+
+Assessor angle: how this will be evaluated
+
+Show “Assessors will likely examine X, interview Y, and test Z” derived from Evidence Matrix assessor_methods + common_tests. 
+
+domain CES Assessor Evidence Ma…
+
+Common pitfalls and red flags
+
+When requirement-mapped: show common_pitfalls from the Fundamental Requirements Store (if populated). 
+
+domain CES CMMC Fundamental Req…
+
+Otherwise, show curated pitfalls from Assessor KB principles (design-for-assessment).
+
+Good answer shape
+
+Present 2–3 examples of “good” answers and 1 example of a “bad/insufficient” answer.
+
+Make them consultant-facing, not client-facing.
+
+Follow-up prompts
+
+Provide 3–5 short follow-ups the consultant can ask if the client answers vaguely.
+
+If the Assessor KB has open questions for a relevant block (e.g., scoping), include those. 
+
+domain CES Assessor Approach Kn…
+
+Sources
+
+Display authoritative source IDs (not links) from the knowledge base blocks (source_ids) and allow clicking to view the underlying source registry. 
+
+domain CES Assessor Approach Kn…
+
+C) Per-answer capture support — “Answer Quality Controls”
+
+Every time an answer is entered, show a small “Answer Quality” card (inline under the input) with:
+
+Basis / Provenance control
+
+A required pick: Client-stated / Documented / Demonstrated / Consultant inference / Unknown
+
+Map this to the tagging policy (FACT/INFERENCE/OPEN_QUESTION). 
+
+domain CES Assessor Approach Kn…
+
+Confidence
+
+High / Medium / Low (defaults to Medium)
+
+Low confidence triggers an auto “follow-up required” flag.
+
+Completeness rubric
+
+Simple rubric: “Specific / Measurable / Evidence-linked / Scope-aware”
+
+If missing, highlight what’s missing:
+
+“You named a tool but not coverage”
+
+“You described policy but not operationalization”
+
+“You asserted control exists but no evidence pointer”
+
+Evidence preview (optional attachments)
+
+Allow attaching optional contextual artifacts even in SIT:
+
+policies, screenshots, diagrams, contracts, org charts
+
+Clearly label these as “context artifacts (non-evidence yet)” to avoid confusion.
+
+Downstream impact preview
+
+Show what this answer will influence later (not generate):
+
+“This will change scoping categories”
+
+“This will change evidence expectations”
+
+“This will affect which RR modules are required”
+This is how you keep the consultant oriented without mixing SIT with RR execution.
+
+D) “Do we have enough to move on?” guardrails (soft gates at question level)
+
+On every question page, show a small checklist that must be satisfied before “Next” is enabled (unless question optional):
+
+Answer is in correct value domain (enum, boolean, etc.)
+
+Basis/provenance selected (FACT/INFERENCE/OPEN_QUESTION)
+
+If OPEN_QUESTION: follow-up recorded
+
+If the question is scope-critical: a scope note is captured
+
+This is consistent with your governance emphasis and the schemas’ pervasive tagging policy requirement. 
+
+domain CES Assessor Approach Kn…
+
+ 
+
+domain CES CMMC Fundamental Req…
+
+E) Two “always available” mini-tools for the consultant
+
+Provide these everywhere (top bar icons):
+
+Assessor Lens cheat sheet
+
+Pull from the Assessor KB:
+
+methods of assessment definitions (examine/interview/test)
+
+evidence types
+
+sufficiency model
+
+scoping/sampling principles
+These are explicitly modeled in the KB schema blocks. 
+
+domain CES Assessor Approach Kn…
+
+Evidence archetype browser
+
+Show evidence archetypes catalog + preferred forms (from the Fundamental Requirements Store catalogs). 
+
+domain CES CMMC Fundamental Req…
+
+Cross-link from the per-question evidence preview.

@@ -1,0 +1,65 @@
+controlId: "CM.L2-3.4.2"
+relatedControlIds:
+  - "CM.L2-3.4.1"
+  - "CM.L2-3.4.6"  # [VERIFY] mapping not yet confirmed
+practiceStatement: Establish and maintain baseline configurations and inventories of organizational systems throughout the
+  respective system development life cycles.
+useCaseId: F-09
+useCaseTitle: "CIS Benchmark Hardening"
+domain: Security Operations
+priority: P4 Standard
+trigger: 'SCHEDULE: Quarterly'
+sodTier: Tier 2 (per SoD model in front matter)
+entraRolesRequired:
+- Security Administrator
+- Compliance Administrator
+approvalRequired: true
+services:
+- name: CISA ScubaGear PowerShell module
+  purpose: '`https://github.com/cisagov/ScubaGear`'
+- name: Exchange Online -- configuration settings evaluated by ScubaGear
+  purpose: ''
+- name: SharePoint Online -- sharing and access settings evaluated by ScubaGear
+  purpose: ''
+- name: Entra ID -- authentication and CA settings evaluated by ScubaGear
+  purpose: ''
+- name: Microsoft Defender for Office 365 -- anti-phishing, Safe Links, Safe Attachments evaluated by ScubaGear
+  purpose: ''
+- name: Microsoft Teams -- meeting and messaging policies evaluated by ScubaGear
+  purpose: ''
+- name: Azure Immutable Blob Storage -- evidence artifact storage
+  purpose: ''
+configurationSteps:
+  portalPath: ''
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes Directory.Read.All, Policy.Read.All, SecurityEvents.Read.All
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/identity/conditionalAccess/policies
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-f-security/F-09/2026/03/
+  format: CSV (summary), JSON (full results), HTML (human-readable report)
+  filenamePattern: F-09_CISBenchmark_{YYYYMMDD}_{HHmmss}_Summary.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: '- ScubaGear supports GCC High via the `-M365Environment "gcchigh"` parameter. This parameter configures all internal
+    API calls to use `.us` endpoints. `[UNCONFIRMED IN GCC HIGH -- verify in tenant]` -- while ScubaGear documents GCC High
+    support, some individual checks may produce false positives or errors if they reference commercial-only features. **Workaround:**
+    Run ScubaGear in the GCC High tenant and review the output for any checks that error with "endpoint not found" or similar.
+    Suppress those checks in subsequent runs using the `-OmitPolicy` parameter and document the suppressed checks '
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

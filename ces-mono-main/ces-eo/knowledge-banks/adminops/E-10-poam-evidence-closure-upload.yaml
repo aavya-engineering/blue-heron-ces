@@ -1,0 +1,65 @@
+controlId: "CA.L2-3.12.4"
+relatedControlIds:
+  - "CA.L2-3.12.2"
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: E-10
+useCaseTitle: "POA&M Evidence Closure"
+domain: Audit & Logging
+priority: P4 Standard
+trigger: 'ASSESSMENT: On-demand (per finding remediation completion)'
+sodTier: Tier 2
+entraRolesRequired:
+- Compliance Administrator
+approvalRequired: true
+services:
+- name: Azure Immutable Blob Storage -- WORM evidence store for closure packages
+  purpose: ''
+- name: ITSM platform
+  purpose: ServiceNow, Jira, or equivalent) -- POA&M tracking
+- name: Microsoft Purview -- eDiscovery
+  purpose: if evidence retrieval requires content search
+- name: PowerShell -- `Get-FileHash` for evidence integrity verification
+  purpose: ''
+- name: Relevant domain services per finding
+  purpose: e.g., Entra ID for AC findings, Intune for CM findings, Sentinel for AU findings
+configurationSteps:
+  portalPath: Open the POA&M tracker (ITSM platform or SharePoint list) and identify the finding to be closed. Record the
+    finding ID, CMMC practice ID, finding description, and original assessment date.
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes Policy.Read.All
+  - cmdlet: Get-MgIdentityConditionalAccessPolicy
+    parameters:
+    - -MgIdentityConditionalAccessPolicy
+    - -ConditionalAccessPolicyId
+    - -Json
+    - -Depth
+    - -Item
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/identity/conditionalAccess/policies/{policyId}
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-e-audit/E-10/{year}/{month}/
+  format: ZIP (per-finding closure package containing before/after evidence, closure manifest), JSON (closure_manifest.json)
+  filenamePattern: E-10_POAMClosure_{FindingID}_{YYYYMMDD}_{HHmmss}_ClosurePackage.zip
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |-
+    - POA&M tracking tools vary by organization. If using SharePoint Online in GCC High for POA&M tracking, ensure the SharePoint site is labeled with the `CUI` sensitivity label if POA&M entries contain CUI-related findings.
+    - All evidence uploads to Azure Immutable Blob Storage in GCC High are subject to the WORM policy. Once uploaded, closure evidence cannot be modified or deleted, providing tamper-evident storage that C3PAO assessors can verify.
+    - If the POA&M finding relates to an `[UNCONFIRMED IN GCC HIGH -- verify in tenant]` feature, the closure evidence must document either (a) confirmati
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

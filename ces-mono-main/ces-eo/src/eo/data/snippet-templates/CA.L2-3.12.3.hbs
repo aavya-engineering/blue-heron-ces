@@ -1,0 +1,42 @@
+## Control {{controlId}}: Monitor Security Controls on an Ongoing Basis
+
+**Implementation Status:** {{status}}
+
+This organization monitors and controls external system connections within the {{tenantName}} M365 GCC High tenant through cross-tenant access policies, guest access controls, and B2B collaboration restrictions managed by {{variables.systemAdministrator}}.
+
+{{#if crossTenantPolicyConfigured}}
+**Cross-Tenant Access Controls:**
+Cross-tenant access policies restrict external system connections:
+- Inbound access: External users from authorized partner tenants only, subject to MFA and compliance requirements
+- Outbound access: Organizational users restricted from sharing CUI with unauthorized external tenants
+- B2B collaboration limited to explicitly approved organizations
+{{/if}}
+
+{{#if conditionalAccessActive}}
+**External User Enforcement:**
+{{caPoliciesTotalCount}} Conditional Access policies enforce security requirements for external connections:
+{{#each policies}}
+- **{{displayName}}** ({{state}}): Requires {{#each grantControls.builtInControls}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+{{/each}}
+
+Guest users and external collaborators are subject to the same MFA, device compliance, and session controls as internal users.
+{{/if}}
+
+{{#if organizationConfigured}}
+**Organization Identity:**
+Organization: **{{organizationName}}**
+{{#if verifiedDomains}}Verified domains: {{#each verifiedDomains}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{/if}}
+{{/if}}
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine cross-tenant access policies, guest access configurations, B2B collaboration settings, Conditional Access policies for external users, and external connection audit logs.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

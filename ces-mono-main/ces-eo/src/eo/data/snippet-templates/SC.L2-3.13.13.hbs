@@ -1,0 +1,39 @@
+## Control {{controlId}}: Control and Monitor the Use of Mobile Code
+
+**Implementation Status:** {{status}}
+
+This organization controls and monitors mobile code execution within the {{tenantName}} M365 GCC High tenant through application protection policies, endpoint security configurations, and code execution restrictions managed by {{variables.systemAdministrator}}.
+
+{{#if appProtectionsActive}}
+**Application Protection Policies:**
+{{appProtectionsCount}} application protection policies restrict mobile code execution on managed and unmanaged devices:
+- Managed apps enforce data loss prevention controls preventing unauthorized code execution
+- Cut/copy/paste restrictions between managed and unmanaged applications
+- Jailbreak/root detection blocks access from compromised devices capable of executing unauthorized mobile code
+{{else}}
+Application protection policies have not been configured. Mobile code restrictions on managed applications are not enforced.
+{{/if}}
+
+**Endpoint Code Execution Controls:**
+- PowerShell execution policies restrict script execution to signed scripts from trusted publishers
+- Windows Defender Application Control (WDAC) policies enforce application allowlisting on managed endpoints
+- Microsoft Defender for Endpoint monitors and blocks suspicious script execution (JavaScript, VBScript, macro-enabled documents)
+- Browser security policies disable unauthorized ActiveX, Java applets, and browser extensions
+
+{{#if securityAlertsActive}}
+**Mobile Code Monitoring:**
+{{securityAlertsCount}} security alert rules detect unauthorized mobile code activity, including malicious macro execution, unauthorized script invocation, and suspicious application behavior.
+{{/if}}
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine application protection policies, WDAC configurations, PowerShell execution policies, Defender alert rules for code execution, and endpoint security baselines.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

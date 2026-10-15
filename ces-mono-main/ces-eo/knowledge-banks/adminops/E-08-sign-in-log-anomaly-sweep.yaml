@@ -1,0 +1,75 @@
+controlId: "SI.L1-3.14.2"
+relatedControlIds:
+  - "AU.L2-3.3.1"
+  - "AU.L2-3.3.5"
+  - "IA.L2-3.5.3"  # [VERIFY] mapping not yet confirmed
+  - "IR.L2-3.6.1"  # [VERIFY] mapping not yet confirmed
+practiceStatement: Create and retain system audit logs and records to the extent needed to enable the monitoring, analysis,
+  investigation, and reporting of unlawful or unauthorized system activity.
+useCaseId: E-08
+useCaseTitle: "Sign-In Log Anomaly Sweep"
+domain: Audit & Logging
+priority: P4 Standard
+trigger: 'SCHEDULE: Daily'
+sodTier: Tier 1
+entraRolesRequired:
+- Security Reader
+- Reports Reader
+approvalRequired: false
+services:
+- name: Entra ID -- sign-in logs
+  purpose: interactive, non-interactive, service principal, managed identity
+- name: Entra ID Protection -- risky sign-in reports, risk detections
+  purpose: ''
+- name: Microsoft Sentinel -- SigninLogs table, KQL queries
+  purpose: ''
+- name: Conditional Access -- risk-based policies
+  purpose: inform context for anomaly analysis
+configurationSteps:
+  portalPath: //entra.microsoft.us > Protection > Identity Protection > Risky sign-ins. Filter to the past 24 hours. Review
+    all sign-ins with risk level Medium or High.
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes AuditLog.Read.All, IdentityRiskyUser.Read.All, IdentityRiskEvent.Read.All
+  - cmdlet: Get-MgRiskyUser
+    parameters:
+    - -MgRiskyUser
+    - -Filter
+    - -All
+    - -Object
+    - -Csv
+  - cmdlet: Get-MgRiskDetection
+    parameters:
+    - -MgRiskDetection
+    - -Filter
+    - -All
+    - -Object
+    - -Csv
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/identityProtection/riskyUsers?$filter=riskLastUpdatedDateTime
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-e-audit/E-08/{year}/{month}/
+  format: CSV (risky sign-ins, risk detections, KQL anomaly results), JSON (raw Graph API response)
+  filenamePattern: E-08_SignInAnomalySweep_{YYYYMMDD}_{HHmmss}_RiskySignIns.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |-
+    - Entra ID Protection risk detections are fully available in GCC High with the M365 G5 license. The risk detection engine uses the same ML models as commercial, though the threat intelligence feed may be GCC High-specific.
+    - The `SigninLogs` table in Sentinel GCC High includes the same schema as commercial. The `LocationDetails` field provides geolocation data for impossible travel analysis.
+    - Security Copilot-assisted sign-in investigation is not available in GCC High. Use the KQL queries documented above for manual anomaly detection. Consider building Sentinel workbooks for recurring daily s
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

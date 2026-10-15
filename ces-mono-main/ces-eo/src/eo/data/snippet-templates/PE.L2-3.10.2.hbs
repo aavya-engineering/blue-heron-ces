@@ -1,0 +1,37 @@
+## Control {{controlId}}: Protect and Monitor the Physical Facility and Support Infrastructure
+
+**Implementation Status:** {{status}}
+
+This organization protects and monitors physical facilities supporting the {{tenantName}} M365 GCC High tenant through physical access controls, surveillance, and environmental protections documented in "Physical Security Policy v1.0" maintained by {{variables.systemAdministrator}}.
+
+**Cloud Infrastructure Physical Security:**
+M365 GCC High services are hosted in Microsoft Azure Government datacenters providing FedRAMP High physical security:
+- 24/7 security personnel, CCTV surveillance, and intrusion detection
+- Multi-factor physical access control (badge + biometric)
+- Redundant power (UPS + generators), fire suppression, and climate control
+- Physical access logs retained for 90+ days
+
+**On-Premises Facility Controls:**
+- Physical access to areas containing CUI systems restricted via badge access control
+- Visitor access requires escort by authorized personnel and visitor log entry
+- Server rooms and network closets secured with separate access controls
+- Environmental monitoring (temperature, humidity, water detection) for equipment areas
+
+**Operational Procedure:**
+- **Action:** Monthly review of physical access logs; quarterly facility security assessment; annual physical security audit
+- **Frequency:** Monthly/Quarterly/Annual per control type
+- **Responsible Party:** {{variables.systemAdministrator}}
+- **Documentation:** Physical Security Policy v1.0, Facility Security Assessment Form PE-002
+
+**Review Frequency:** Quarterly by ISSO
+
+**Verification Method:** Examine physical access logs, surveillance records, visitor logs, environmental monitoring reports, and facility security assessment documentation.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** Review physical security records per procedure PE-002. No automated evidence collection available for this procedural control. {{evidenceArtifactUrl}}
+{{/if}}

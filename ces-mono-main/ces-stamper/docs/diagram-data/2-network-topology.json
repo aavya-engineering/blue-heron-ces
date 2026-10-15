@@ -1,0 +1,135 @@
+{
+  "_changelog": [
+    {
+      "date": "2026-04-19",
+      "changes": [
+        "Added 'status: reserved' to empty subnets (management, identity, firewall)",
+        "Added 'planned_use' documentation for each reserved subnet",
+        "Updated firewall.ha from 'single' to 'allocated-not-deployed'",
+        "Confirmed NSG-only segmentation as current model"
+      ],
+      "sources": ["infrastructure manifest", "fabrica-remediation-spec.md"]
+    }
+  ],
+  "perimeter": {
+    "wan": [
+      { "provider": "Microsoft Azure Government backbone", "type": "Cloud-native (no ISP circuit — cloud-only tenant)", "bandwidth": "Azure Gov SLA" }
+    ],
+    "firewall": {
+      "make": "Microsoft",
+      "model": "Azure Firewall",
+      "os": "Azure-managed (PaaS)",
+      "ha": "allocated-not-deployed",
+      "tls_inspection": false
+    }
+  },
+  "dmz": {
+    "subnet": null,
+    "services": []
+  },
+  "core": {
+    "device": "Azure VNet (vfsgov-vnet-eo)",
+    "role": "L3 virtual network",
+    "routing": "Azure-managed subnet routing with NSG enforcement"
+  },
+  "vlans": [
+    {
+      "id": 1,
+      "label": "Private Endpoints",
+      "subnet": "10.0.1.0/27",
+      "scope_class": "cui-enclave",
+      "endpoints": [
+        { "type": "private-endpoint (Key Vault)", "count": 1 },
+        { "type": "private-endpoint (Blob Storage)", "count": 1 }
+      ],
+      "key_devices": ["vfsgov-pe-kv", "vfsgov-pe-blob"],
+      "egress": "deny-all-default"
+    },
+    {
+      "id": 2,
+      "label": "Management",
+      "subnet": "10.0.2.0/27",
+      "scope_class": "management",
+      "endpoints": [],
+      "key_devices": [],
+      "egress": "deny-all-default",
+      "status": "reserved",
+      "planned_use": "Reserved for future deployment — Bastion/jump boxes"
+    },
+    {
+      "id": 3,
+      "label": "Identity",
+      "subnet": "10.0.3.0/27",
+      "scope_class": "security-protection",
+      "endpoints": [],
+      "key_devices": [],
+      "egress": "deny-all-default",
+      "status": "reserved",
+      "planned_use": "Reserved for future deployment — Entra Connect sync appliance"
+    },
+    {
+      "id": 5,
+      "label": "AzureFirewallSubnet",
+      "subnet": "10.0.5.0/27",
+      "scope_class": "security-protection",
+      "endpoints": [
+        { "type": "Azure Firewall (allocated, not yet deployed)", "count": 0 }
+      ],
+      "key_devices": [],
+      "egress": "deny-all-default",
+      "status": "reserved",
+      "planned_use": "Reserved for Azure Firewall instance (not yet deployed — NSG-only segmentation in effect)"
+    }
+  ],
+  "wireless": [],
+  "remote_access": {
+    "vpn": null,
+    "ztna": "No remote access — CUI accessed via browser-only VDI/Cloud PC sessions through Conditional Access App Control"
+  },
+  "acls": [
+    {
+      "from": "Internet",
+      "to": "snet-pe (10.0.1.0/27)",
+      "posture": "DenyInternetInbound (NSG priority 100)",
+      "note": "All inbound from Internet denied to private endpoint subnet. Key Vault and Storage accessible only via private endpoints within VNet."
+    },
+    {
+      "from": "Internet",
+      "to": "All subnets",
+      "posture": "Denied by default",
+      "note": "Azure VNet default — no public inbound unless explicitly allowed. No public IPs assigned to any resources."
+    },
+    {
+      "from": "M365 GCC High services",
+      "to": "Azure Storage (vfsgovevops01)",
+      "posture": "Private endpoint only",
+      "note": "Storage account has public network access disabled. Accessed only via private endpoint vfsgov-pe-blob in snet-pe."
+    },
+    {
+      "from": "Automation (vfsgov-automation-eo)",
+      "to": "Key Vault / Storage / LAW",
+      "posture": "RBAC-scoped",
+      "note": "Automation account uses managed identity with least-privilege role assignments: Security Reader, Log Analytics Reader, Storage Blob Data Contributor, Key Vault Crypto Service Encryption User."
+    }
+  ],
+  "cloud_edges": [
+    {
+      "link_type": "Intra-Azure backbone",
+      "cloud": "Azure Government (usgovvirginia)",
+      "segmentation_note": "VNet vfsgov-vnet-eo (10.0.0.0/16) with 4 subnets segmented by function. Private DNS zones for Key Vault (privatelink.vaultcore.usgovcloudapi.net) and Blob (privatelink.blob.core.usgovcloudapi.net) resolve within VNet."
+    },
+    {
+      "link_type": "M365-to-Azure service mesh",
+      "cloud": "M365 GCC High ↔ Azure Gov",
+      "segmentation_note": "M365 services (Exchange, SPO, Teams) communicate with Azure Gov resources (Sentinel, LAW, Storage) over Microsoft backbone. No public Internet traversal."
+    }
+  ],
+  "gaps": [
+    { "field": "firewall", "note": "AzureFirewallSubnet (10.0.5.0/27) is allocated but no Azure Firewall instance deployed (status: reserved). NSG-only segmentation is current deployment model. Confirm whether Azure Firewall deployment is planned or if subnet should be deallocated." },
+    { "field": "vlans.management", "note": "Management subnet (10.0.2.0/27) marked as reserved for Bastion/jump boxes. No devices currently deployed. Confirm if deployment is planned and update status when resources are provisioned." },
+    { "field": "vlans.identity", "note": "Identity subnet (10.0.3.0/27) marked as reserved for Entra Connect sync appliance. No devices currently deployed. Confirm if Entra Connect deployment is planned and update status when resources are provisioned." },
+    { "field": "perimeter.tls_inspection", "status": "closed", "note": "Not applicable — no inline TLS inspection device deployed. NSG-only segmentation model. Outbound traffic from CUI workloads routes over Microsoft backbone (M365 GCC High) or through private endpoints (Azure Gov). No customer-controlled proxy or firewall performs TLS break-and-inspect." },
+    { "field": "wireless", "status": "closed", "note": "No wireless networks — SI baseline confirms 'no_wireless'. Cloud-only deployment, no physical office infrastructure." },
+    { "field": "remote_access", "status": "closed", "note": "Cloud PC/VDI deployment details deferred (see Blocking Issue 4). Current access model: browser-only via Conditional Access App Control. No VPN or direct remote access to Azure VNet. CUI access terminates at M365 GCC High browser sessions." }
+  ]
+}

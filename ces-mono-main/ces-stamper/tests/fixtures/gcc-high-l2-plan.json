@@ -1,0 +1,361 @@
+{
+  "plan_id": "gcc-high-l2-build-001",
+  "target_level": "L2",
+  "tech_stack_id": 1,
+  "variables": {
+    "target_level": "L2",
+    "organization": "ValorForge Solutions - Client Alpha",
+    "cloud_provider": "azure",
+    "identity_provider": "entra_id",
+    "region": "us-gov-virginia",
+    "tenant_type": "gcc_high",
+    "byod_enabled": false,
+    "collab_platform": "teams_first",
+    "workspace_name": "sentinel-cmmc-ws",
+    "resource_group": "rg-cmmc-security"
+  },
+  "prechecks": [
+    {
+      "id": "precheck_gcc_high_connectivity",
+      "description": "Verify connectivity to GCC High tenant and Azure Government endpoints",
+      "method": "api_query",
+      "expected": "All GCC High target systems reachable (login.microsoftonline.us, graph.microsoft.us)",
+      "on_fail": "Abort execution - cannot reach GCC High environment"
+    },
+    {
+      "id": "precheck_operator_permissions",
+      "description": "Verify operator has Global Administrator and Security Administrator roles in target tenant",
+      "method": "api_query",
+      "expected": "Operator has required administrative permissions for all 102 controls",
+      "on_fail": "Request permission escalation before proceeding"
+    }
+  ],
+  "execution_graph": [
+    {
+      "id": "task_AC.L2-3.1.12",
+      "type": "monitoring",
+      "priority": "p0",
+      "depends_on": [],
+      "action": {
+        "engine": "powershell",
+        "command": "New-MgIdentityConditionalAccessNamedLocation",
+        "args": {
+          "requirement_id": "AC.L2-3.1.12",
+          "description": "Configure remote access monitoring - named locations for VPN egress",
+          "powershell_commands": [
+            "New-MgIdentityConditionalAccessNamedLocation -DisplayName 'Corporate VPN Egress' -AdditionalProperties @{'@odata.type'='#microsoft.graph.ipNamedLocation';ipRanges=@(@{cidrAddress='203.0.113.0/24';'@odata.type'='#microsoft.graph.iPv4CidrRange'});isTrusted=$true}",
+            "Get-MgIdentityConditionalAccessNamedLocation | Select DisplayName,Id | Export-Csv named_locations.csv"
+          ],
+          "portal_ref": "entra.microsoft.com > Protection > Conditional Access > Named locations",
+          "service": "Conditional Access"
+        }
+      },
+      "inputs": ["gap_AC.L2-3.1.12"],
+      "outputs": ["config_AC.L2-3.1.12"],
+      "controls": ["AC.L2-3.1.12"],
+      "idempotency": "best_effort",
+      "rollback": {
+        "strategy": "manual",
+        "notes": "Remove named location 'Corporate VPN Egress' from Conditional Access if rollback needed"
+      },
+      "evidence_emit": [
+        {
+          "artifact_id": "config_export_AC.L2-3.1.12",
+          "artifact_type": "config_export",
+          "description": "Conditional Access named location configuration export",
+          "collector": "stamper",
+          "retention_days": 365,
+          "storage_location_ref": "evidence/gcc-high-l2-build-001/task_AC.L2-3.1.12"
+        }
+      ]
+    },
+    {
+      "id": "task_IA.L2-3.5.3",
+      "type": "configuration",
+      "priority": "p0",
+      "depends_on": [],
+      "action": {
+        "engine": "powershell",
+        "command": "New-MgIdentityConditionalAccessPolicy",
+        "args": {
+          "requirement_id": "IA.L2-3.5.3",
+          "description": "Enforce MFA for all users via Conditional Access policy",
+          "powershell_commands": [
+            "New-MgIdentityConditionalAccessPolicy -DisplayName 'Require MFA - All Users' -Conditions @{users=@{includeUsers=@('All')};applications=@{includeApplications=@('All')}} -GrantControls @{builtInControls=@('mfa');operator='OR'} -State 'enabled'",
+            "Get-MgIdentityConditionalAccessPolicy | Where {$_.GrantControls.BuiltInControls -contains 'mfa'} | Select DisplayName,State | Export-Csv mfa_policies.csv"
+          ],
+          "portal_ref": "entra.microsoft.com > Protection > Conditional Access > New policy",
+          "service": "Conditional Access"
+        }
+      },
+      "inputs": ["gap_IA.L2-3.5.3"],
+      "outputs": ["config_IA.L2-3.5.3"],
+      "controls": ["IA.L2-3.5.3"],
+      "idempotency": "safe",
+      "rollback": {
+        "strategy": "none",
+        "notes": "MFA policy is additive and safe"
+      },
+      "evidence_emit": [
+        {
+          "artifact_id": "config_export_IA.L2-3.5.3",
+          "artifact_type": "config_export",
+          "description": "MFA Conditional Access policy configuration",
+          "collector": "stamper",
+          "retention_days": 365,
+          "storage_location_ref": "evidence/gcc-high-l2-build-001/task_IA.L2-3.5.3"
+        }
+      ]
+    },
+    {
+      "id": "task_AC.L1-3.1.1",
+      "type": "policy",
+      "priority": "p1",
+      "depends_on": ["task_IA.L2-3.5.3"],
+      "action": {
+        "engine": "powershell",
+        "command": "New-MgIdentityGovernanceLifecycleWorkflow",
+        "args": {
+          "requirement_id": "AC.L1-3.1.1",
+          "description": "Configure identity lifecycle workflow for onboarding with MFA prerequisite",
+          "powershell_commands": [
+            "New-MgIdentityGovernanceLifecycleWorkflow -DisplayName 'Onboard new hire' -Category 'joiner' -ExecutionConditions @{trigger=@{type='attributeChanges';value=@{attributeName='employeeHireDate'}}} -Tasks @(@{taskDefinitionId='...';displayName='Create user account'})",
+            "Get-MgIdentityGovernanceLifecycleWorkflow | Select DisplayName,Category,IsEnabled"
+          ],
+          "portal_ref": "entra.microsoft.com > Identity Governance > Lifecycle workflows",
+          "service": "Entra ID Governance"
+        }
+      },
+      "inputs": ["config_IA.L2-3.5.3"],
+      "outputs": ["config_AC.L1-3.1.1"],
+      "controls": ["AC.L1-3.1.1"],
+      "idempotency": "safe",
+      "rollback": {
+        "strategy": "none",
+        "notes": "Lifecycle workflows are additive"
+      },
+      "evidence_emit": [
+        {
+          "artifact_id": "config_export_AC.L1-3.1.1",
+          "artifact_type": "config_export",
+          "description": "Identity lifecycle workflow configuration",
+          "collector": "stamper",
+          "retention_days": 365,
+          "storage_location_ref": "evidence/gcc-high-l2-build-001/task_AC.L1-3.1.1"
+        }
+      ]
+    },
+    {
+      "id": "task_AT.L2-3.2.2",
+      "type": "training",
+      "priority": "p1",
+      "depends_on": [],
+      "action": {
+        "engine": "manual_gate",
+        "command": "deliver_training_AT.L2-3.2.2",
+        "args": {
+          "requirement_id": "AT.L2-3.2.2",
+          "description": "Deliver role-based security training for privileged users",
+          "what_to_do": [
+            "Deploy role-based training via Viva Learning assigned by Entra ID security groups",
+            "Create role categories: system admin, developer, auditor, incident responder, security manager",
+            "Include hands-on labs for technical roles",
+            "Track certifications with Power Automate expiration alerts"
+          ],
+          "how_to_verify": [
+            "Each privileged role has documented training requirements",
+            "Role-specific training completed before privileged access granted",
+            "Hands-on assessment documented for technical roles"
+          ],
+          "service": "Viva Learning"
+        }
+      },
+      "inputs": ["gap_AT.L2-3.2.2"],
+      "outputs": ["training_AT.L2-3.2.2"],
+      "controls": ["AT.L2-3.2.2"],
+      "idempotency": "safe",
+      "rollback": {
+        "strategy": "none",
+        "notes": "Training delivery does not require rollback"
+      },
+      "evidence_emit": [
+        {
+          "artifact_id": "training_record_AT.L2-3.2.2",
+          "artifact_type": "training_record",
+          "description": "Role-based security training completion records",
+          "collector": "evidence_ops",
+          "retention_days": 365,
+          "storage_location_ref": "evidence/gcc-high-l2-build-001/task_AT.L2-3.2.2"
+        }
+      ]
+    },
+    {
+      "id": "task_AU.L2-3.3.3",
+      "type": "process",
+      "priority": "p1",
+      "depends_on": ["task_AC.L2-3.1.12"],
+      "action": {
+        "engine": "api",
+        "command": "https://management.usgovcloudapi.net/subscriptions/${subscription_id}/resourceGroups/${resource_group}/providers/Microsoft.OperationalInsights/workspaces/${workspace_name}/savedSearches?api-version=2020-08-01",
+        "args": {
+          "requirement_id": "AU.L2-3.3.3",
+          "description": "Implement log review and analysis process via Sentinel saved searches",
+          "method": "GET",
+          "headers": {
+            "Content-Type": "application/json"
+          }
+        }
+      },
+      "inputs": ["config_AC.L2-3.1.12"],
+      "outputs": ["process_AU.L2-3.3.3"],
+      "controls": ["AU.L2-3.3.3"],
+      "idempotency": "best_effort",
+      "rollback": {
+        "strategy": "manual",
+        "notes": "Remove Sentinel saved searches and log review automation if rollback required"
+      },
+      "evidence_emit": [
+        {
+          "artifact_id": "config_export_AU.L2-3.3.3",
+          "artifact_type": "log_export",
+          "description": "Sentinel log review process configuration and saved searches",
+          "collector": "stamper",
+          "retention_days": 365,
+          "storage_location_ref": "evidence/gcc-high-l2-build-001/task_AU.L2-3.3.3"
+        }
+      ]
+    },
+    {
+      "id": "task_CM.L2-3.4.8",
+      "type": "configuration",
+      "priority": "p1",
+      "depends_on": ["task_IA.L2-3.5.3"],
+      "action": {
+        "engine": "terraform",
+        "command": "configure_CM.L2-3.4.8",
+        "args": {
+          "requirement_id": "CM.L2-3.4.8",
+          "description": "Deploy WDAC deny-by-default application allowlisting via Terraform",
+          "terraform_module": "modules/wdac-policy",
+          "terraform_vars": {
+            "policy_name": "CMMC-L2-Deny-By-Default",
+            "mode": "enforced",
+            "managed_installer": true
+          },
+          "portal_ref": "intune.microsoft.com > Endpoint security > Application control > Create WDAC policy",
+          "service": "Intune"
+        }
+      },
+      "inputs": ["config_IA.L2-3.5.3"],
+      "outputs": ["config_CM.L2-3.4.8"],
+      "controls": ["CM.L2-3.4.8"],
+      "idempotency": "best_effort",
+      "rollback": {
+        "strategy": "reverse_task",
+        "notes": "Run terraform destroy on WDAC policy module to revert application control"
+      },
+      "evidence_emit": [
+        {
+          "artifact_id": "config_export_CM.L2-3.4.8",
+          "artifact_type": "config_export",
+          "description": "WDAC deny-by-default policy Terraform state and Intune config export",
+          "collector": "evidence_ops",
+          "retention_days": 365,
+          "storage_location_ref": "evidence/gcc-high-l2-build-001/task_CM.L2-3.4.8"
+        }
+      ]
+    },
+    {
+      "id": "task_IA.L2-3.5.10",
+      "type": "assessment",
+      "priority": "p2",
+      "depends_on": ["task_IA.L2-3.5.3", "task_CM.L2-3.4.8"],
+      "action": {
+        "engine": "cli",
+        "command": "verify_IA.L2-3.5.10",
+        "args": {
+          "requirement_id": "IA.L2-3.5.10",
+          "description": "Verify cryptographic password storage - Entra ID inherent hashing verification",
+          "verification_steps": [
+            "Confirm Entra ID uses approved cryptographic hashing for password storage",
+            "Document platform-inherent security controls",
+            "Verify no custom applications bypass platform authentication"
+          ],
+          "service": "Entra ID"
+        }
+      },
+      "inputs": ["config_IA.L2-3.5.3", "config_CM.L2-3.4.8"],
+      "outputs": ["assessment_IA.L2-3.5.10"],
+      "controls": ["IA.L2-3.5.10"],
+      "idempotency": "safe",
+      "rollback": {
+        "strategy": "none",
+        "notes": "Assessment task - read-only verification"
+      },
+      "evidence_emit": [
+        {
+          "artifact_id": "scan_report_IA.L2-3.5.10",
+          "artifact_type": "scan_report",
+          "description": "Cryptographic password storage verification report",
+          "collector": "stamper",
+          "retention_days": 365,
+          "storage_location_ref": "evidence/gcc-high-l2-build-001/task_IA.L2-3.5.10"
+        }
+      ]
+    },
+    {
+      "id": "task_SC.L2-3.13.8",
+      "type": "configuration",
+      "priority": "p1",
+      "depends_on": [],
+      "action": {
+        "engine": "powershell",
+        "command": "Get-AzWebApp",
+        "args": {
+          "requirement_id": "SC.L2-3.13.8",
+          "description": "Verify and enforce TLS 1.2+ on all web applications",
+          "powershell_commands": [
+            "Get-AzWebApp | Select Name,@{N='MinTls';E={$_.SiteConfig.MinTlsVersion}}",
+            "Get-AzWebApp | Where {$_.SiteConfig.MinTlsVersion -lt '1.2'} | ForEach-Object { Set-AzWebApp -Name $_.Name -ResourceGroupName $_.ResourceGroup -MinTlsVersion '1.2' }"
+          ],
+          "portal_ref": "portal.azure.com > App Services > TLS/SSL settings",
+          "service": "Azure App Service"
+        }
+      },
+      "inputs": [],
+      "outputs": ["config_SC.L2-3.13.8"],
+      "controls": ["SC.L2-3.13.8"],
+      "idempotency": "best_effort",
+      "rollback": {
+        "strategy": "reverse_task",
+        "notes": "Revert TLS minimum version on affected web apps if issues arise"
+      },
+      "evidence_emit": [
+        {
+          "artifact_id": "config_export_SC.L2-3.13.8",
+          "artifact_type": "config_export",
+          "description": "TLS configuration export for all Azure web applications",
+          "collector": "stamper",
+          "retention_days": 365,
+          "storage_location_ref": "evidence/gcc-high-l2-build-001/task_SC.L2-3.13.8"
+        }
+      ]
+    }
+  ],
+  "postchecks": [
+    {
+      "id": "postcheck_tasks_completed",
+      "description": "Verify all 8 selected tasks completed successfully",
+      "method": "api_query",
+      "expected": "All 8 tasks report success with evidence collected",
+      "on_fail": "Generate failure report and flag incomplete tasks for manual remediation"
+    },
+    {
+      "id": "postcheck_evidence_integrity",
+      "description": "Verify evidence artifact integrity via SHA-256 hash verification",
+      "method": "config_export",
+      "expected": "All evidence artifacts present with valid hashes in evidence store",
+      "on_fail": "Flag corrupted or missing evidence artifacts for re-collection"
+    }
+  ]
+}

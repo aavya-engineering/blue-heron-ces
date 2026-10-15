@@ -1,0 +1,40 @@
+## Control {{controlId}}: Limit System Access to Authorized Users
+
+**Implementation Status:** {{status}}
+
+This organization limits information system access to authorized users through role-based access control (RBAC) implemented via Azure Active Directory security groups and Conditional Access policies within the {{tenantName}} M365 GCC High tenant.
+
+{{#if cuiGroupExists}}
+The "{{groupDisplayName}}" security group ({{memberCount}} members) defines the authorized user population for CUI access. Group membership is managed by {{variables.accessControlAdministrator}} and reviewed quarterly per procedure AC-001.
+{{else}}
+CUI-Authorized-Users security group has not been created. Access control relies on manual authorization processes pending automation implementation.
+{{/if}}
+
+{{#if policies}}
+Access enforcement is automated via the following Conditional Access policies:
+{{#each policies}}
+- **{{displayName}}** ({{state}}): Requires {{#each grantControls.builtInControls}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{#if grantControls.authenticationStrength}} with {{grantControls.authenticationStrength}} authentication strength{{/if}}. Applied to {{conditions.users}} users and {{conditions.applications}} applications.
+{{/each}}
+{{else}}
+Conditional Access policies have not been configured. Access restrictions are enforced via Azure AD group membership only.
+{{/if}}
+
+{{#if infraResources}}
+Supporting infrastructure resources:
+{{#each infraResources}}
+- {{resourceType}} "{{name}}"{{#if properties.retention_days}} (retention: {{properties.retention_days}} days){{/if}}
+{{/each}}
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Examine Azure AD group membership reports, Conditional Access policy configurations, and quarterly access review logs.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

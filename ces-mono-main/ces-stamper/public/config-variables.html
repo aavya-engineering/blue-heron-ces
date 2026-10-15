@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Config Variables</title>
+  <link rel="icon" type="image/svg+xml" href="./ces-favicon.svg">
+  <link rel="stylesheet" href="./ces-ui.css">
+  <script src="./ces-theme-toggle.js"></script>
+  <style>
+    /* =======================================
+       TOKEN ALIAS SHIM — maps Blueprint-Dark
+       local names to CES canonical --co-* vars.
+       ces-ui.css :root provides light defaults;
+       [data-theme="dark"] provides dark overrides.
+       ======================================= */
+    :root {
+      --bg-page:           var(--co-bg);
+      --bg-panel:          var(--co-surface);
+      --bg-elevated:       var(--co-bg-elevated);
+      --bg-console:        var(--co-bg-console);
+      --border:            var(--co-border);
+      --border-subtle:     var(--co-border);
+      --text-body:         var(--co-text);
+      --text-muted:        var(--co-text-muted);
+      --text-heading:      var(--co-text);
+      --accent-blue:       var(--co-primary);
+      --accent-blue-hover: var(--co-primary-hover);
+      --accent-blue-subtle:var(--co-primary-focus);
+      --accent-green:      var(--co-compliant);
+      --accent-green-hover:var(--co-compliant);
+      --accent-amber:      var(--co-risk);
+      --accent-red:        var(--co-violation);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--co-font-sans);
+      font-size: 14px;
+      letter-spacing: 0.01em;
+      background: var(--bg-page);
+      color: var(--text-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      background: var(--bg-panel);
+      color: var(--text-heading);
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header .tenant-label {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+
+    .header select {
+      padding: 4px 8px;
+      font-size: 11px;
+      font-family: var(--co-font-mono);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--co-radius);
+      color: var(--text-body);
+    }
+
+    .header select:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+    }
+
+    .header .path-hint {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-left: auto;
+      font-family: var(--co-font-mono);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 300px;
+    }
+
+    /* ---- Scrollable form ---- */
+    .config-form-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 16px;
+    }
+
+    .config-form-scroll::-webkit-scrollbar { width: 6px; }
+    .config-form-scroll::-webkit-scrollbar-track { background: var(--bg-page); }
+    .config-form-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: var(--co-radius); }
+
+    /* ---- Config sections ---- */
+    .config-section { margin-bottom: 2px; }
+
+    .var-category-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 0;
+      cursor: pointer;
+      user-select: none;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-heading);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .var-category-header:hover { color: var(--accent-blue-subtle); }
+
+    .var-category-toggle {
+      font-size: 10px;
+      color: var(--text-muted);
+      transition: transform 0.2s;
+    }
+
+    .var-category-count {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-left: auto;
+    }
+
+    .var-category-body.collapsed { display: none; }
+
+    /* ---- Config fields ---- */
+    .config-field {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 3px 0 3px 20px;
+    }
+
+    .config-field:hover { background: rgba(30,64,175,0.04); border-radius: var(--co-radius); }
+
+    .config-field label {
+      margin: 0;
+      font-size: 11px;
+      font-family: var(--co-font-mono);
+      color: var(--text-body);
+      min-width: 160px;
+      flex-shrink: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .config-field input[type="text"],
+    .config-field input[type="password"] {
+      flex: 1;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-family: var(--co-font-mono);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--co-radius);
+      color: var(--text-body);
+      min-width: 0;
+    }
+
+    .config-field input:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 1px var(--accent-blue);
+    }
+
+    .config-field select {
+      flex: 1;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-family: var(--co-font-mono);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--co-radius);
+      color: var(--text-body);
+      min-width: 0;
+    }
+
+    .config-field select:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+    }
+
+    .config-field .var-eye {
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      width: 18px;
+      text-align: center;
+    }
+
+    .config-field .var-eye:hover { color: var(--text-body); }
+
+    .config-field.resource-id input { color: var(--text-muted); }
+
+    /* ---- TOU upload ---- */
+    .tou-upload-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 0 4px 20px;
+    }
+
+    .tou-upload-row label {
+      font-size: 11px;
+      font-family: var(--co-font-mono);
+      color: var(--text-body);
+      min-width: 160px;
+      flex-shrink: 0;
+      margin: 0;
+    }
+
+    .tou-file-name {
+      font-size: 12px;
+      color: var(--text-body);
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .tou-browse-btn {
+      font-size: 11px;
+      padding: 2px 8px;
+      background: var(--bg-elevated);
+      color: var(--text-body);
+      border: 1px solid var(--border);
+      border-radius: var(--co-radius);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .tou-browse-btn:hover { background: var(--bg-panel); border-color: var(--accent-blue); }
+
+    .tou-clear-btn {
+      font-size: 11px;
+      padding: 2px 6px;
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--co-radius);
+      cursor: pointer;
+      flex-shrink: 0;
+      display: none;
+    }
+
+    .tou-clear-btn:hover { color: var(--accent-red); border-color: var(--accent-red); }
+
+    /* ---- Button bar ---- */
+    .config-btn-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--bg-panel);
+    }
+
+    .btn-sm {
+      padding: 6px 14px;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      color: var(--text-body);
+      border-radius: var(--co-radius);
+      cursor: pointer;
+    }
+
+    .btn-sm:hover:not(:disabled) {
+      background: var(--bg-panel);
+      border-color: var(--accent-blue);
+      color: var(--accent-blue-subtle);
+    }
+
+    .btn-sm:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--accent-blue);
+      border-color: var(--accent-blue);
+      color: #fff;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--accent-blue-hover);
+      border-color: var(--accent-blue-hover);
+      color: #fff;
+    }
+
+    .dirty-hint {
+      font-size: 11px;
+      color: var(--accent-amber);
+      display: none;
+    }
+
+    /* ---- Empty state ---- */
+    .empty-state {
+      text-align: center;
+      padding: 40px 16px;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 12px 18px;
+      border-radius: var(--co-radius);
+      font-size: 13px;
+      font-weight: 500;
+      z-index: 10000;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.success { background: var(--accent-green); color: #fff; }
+    .toast.error { background: var(--accent-red); color: #fff; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    Config Variables
+    <span class="tenant-label">Tenant:</span>
+    <select id="tenantSelect" onchange="onTenantChange()"></select>
+    <span class="path-hint" id="pathHint"></span>
+    <button id="ces-theme-toggle" title="Toggle light/dark theme" style="margin-left:8px;padding:2px 6px;font-size:12px;background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-body);cursor:pointer;border-radius:var(--co-radius);">&#9680;</button>
+  </div>
+
+  <div id="emptyState" class="empty-state">
+    <p>Select a tenant to view and edit its configuration.</p>
+  </div>
+
+  <div class="config-form-scroll" id="configFormScroll" style="display:none;">
+    <!-- Client -->
+    <div class="config-section">
+      <div class="var-category-header" onclick="toggleSection('cfgClient')">
+        <span class="var-category-toggle" id="cfgClientToggle">&#9660;</span>
+        Client
+        <span class="var-category-count" id="cfgClientCount"></span>
+      </div>
+      <div class="var-category-body" id="cfgClientBody">
+        <div class="config-field"><label>slug</label><input type="text" data-path="client.slug" /></div>
+        <div class="config-field"><label>name</label><input type="text" data-path="client.name" /></div>
+        <div class="config-field"><label>engagement_id</label><input type="text" data-path="client.engagement_id" /></div>
+      </div>
+    </div>
+    <!-- Tenant -->
+    <div class="config-section">
+      <div class="var-category-header" onclick="toggleSection('cfgTenant')">
+        <span class="var-category-toggle" id="cfgTenantToggle">&#9660;</span>
+        Tenant
+        <span class="var-category-count" id="cfgTenantCount"></span>
+      </div>
+      <div class="var-category-body" id="cfgTenantBody">
+        <div class="config-field"><label>tenant_id</label><input type="text" data-path="tenant.tenant_id" /></div>
+        <div class="config-field"><label>domain</label><input type="text" data-path="tenant.domain" /></div>
+        <div class="config-field"><label>environment</label>
+          <select data-path="tenant.environment">
+            <option value="">--</option>
+            <option value="gcchigh">gcchigh</option>
+            <option value="gcc">gcc</option>
+            <option value="commercial">commercial</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <!-- Auth -->
+    <div class="config-section">
+      <div class="var-category-header" onclick="toggleSection('cfgAuth')">
+        <span class="var-category-toggle" id="cfgAuthToggle">&#9660;</span>
+        Auth
+        <span class="var-category-count" id="cfgAuthCount"></span>
+      </div>
+      <div class="var-category-body" id="cfgAuthBody">
+        <div class="config-field"><label>app_id</label><input type="text" data-path="auth.app_id" /></div>
+        <div class="config-field"><label>cert_thumbprint</label><input type="password" data-path="auth.cert_thumbprint" /><span class="var-eye" onclick="toggleEye(this)">&#128065;</span></div>
+        <div class="config-field"><label>cert_path</label><input type="text" data-path="auth.cert_path" /></div>
+      </div>
+    </div>
+    <!-- Endpoints -->
+    <div class="config-section">
+      <div class="var-category-header" onclick="toggleSection('cfgEndpoints')">
+        <span class="var-category-toggle" id="cfgEndpointsToggle">&#9660;</span>
+        Endpoints
+        <span class="var-category-count" id="cfgEndpointsCount"></span>
+      </div>
+      <div class="var-category-body collapsed" id="cfgEndpointsBody">
+        <div class="config-field"><label>graph</label><input type="text" data-path="endpoints.graph" /></div>
+        <div class="config-field"><label>login</label><input type="text" data-path="endpoints.login" /></div>
+        <div class="config-field"><label>compliance_uri</label><input type="text" data-path="endpoints.compliance_uri" /></div>
+        <div class="config-field"><label>exchange_env</label><input type="text" data-path="endpoints.exchange_env" /></div>
+        <div class="config-field"><label>azure_auth</label><input type="text" data-path="endpoints.azure_auth" /></div>
+        <div class="config-field"><label>arm</label><input type="text" data-path="endpoints.arm" /></div>
+      </div>
+    </div>
+    <!-- Subscription -->
+    <div class="config-section">
+      <div class="var-category-header" onclick="toggleSection('cfgSubscription')">
+        <span class="var-category-toggle" id="cfgSubscriptionToggle">&#9660;</span>
+        Subscription
+        <span class="var-category-count" id="cfgSubscriptionCount"></span>
+      </div>
+      <div class="var-category-body" id="cfgSubscriptionBody">
+        <div class="config-field"><label>subscription_id</label><input type="text" data-path="subscription.subscription_id" /></div>
+        <div class="config-field"><label>resource_group</label><input type="text" data-path="subscription.resource_group" /></div>
+        <div class="config-field"><label>location</label><input type="text" data-path="subscription.location" /></div>
+      </div>
+    </div>
+    <!-- Resources -->
+    <div class="config-section">
+      <div class="var-category-header" onclick="toggleSection('cfgResources')">
+        <span class="var-category-toggle" id="cfgResourcesTogg">&#9660;</span>
+        Resources
+        <span class="var-category-count" id="cfgResourcesCount"></span>
+      </div>
+      <div class="var-category-body collapsed" id="cfgResourcesBody">
+        <div class="config-field"><label>law_name</label><input type="text" data-path="resources.law_name" /></div>
+        <div class="config-field"><label>law_workspace_id</label><input type="text" data-path="resources.law_workspace_id" /></div>
+        <div class="config-field resource-id"><label>law_resource_id</label><input type="text" data-path="resources.law_resource_id" /></div>
+        <div class="config-field"><label>kv_name</label><input type="text" data-path="resources.kv_name" /></div>
+        <div class="config-field"><label>kv_uri</label><input type="text" data-path="resources.kv_uri" /></div>
+        <div class="config-field resource-id"><label>kv_resource_id</label><input type="text" data-path="resources.kv_resource_id" /></div>
+        <div class="config-field"><label>storage_account_name</label><input type="text" data-path="resources.storage_account_name" /></div>
+        <div class="config-field resource-id"><label>storage_resource_id</label><input type="text" data-path="resources.storage_resource_id" /></div>
+        <div class="config-field"><label>storage_mi_principal_id</label><input type="text" data-path="resources.storage_mi_principal_id" /></div>
+        <div class="config-field"><label>automation_account_name</label><input type="text" data-path="resources.automation_account_name" /></div>
+        <div class="config-field resource-id"><label>automation_resource_id</label><input type="text" data-path="resources.automation_resource_id" /></div>
+        <div class="config-field"><label>automation_mi_principal_id</label><input type="text" data-path="resources.automation_mi_principal_id" /></div>
+        <div class="config-field"><label>vnet_name</label><input type="text" data-path="resources.vnet_name" /></div>
+        <div class="config-field"><label>vnet_cidr</label><input type="text" data-path="resources.vnet_cidr" placeholder="10.0.0.0/16" /></div>
+        <div class="config-field"><label>mgmt_subnet_cidr</label><input type="text" data-path="resources.mgmt_subnet_cidr" placeholder="10.0.1.0/26" /></div>
+        <div class="config-field"><label>workload_subnet_cidr</label><input type="text" data-path="resources.workload_subnet_cidr" placeholder="10.0.2.0/24" /></div>
+        <div class="config-field"><label>bastion_subnet_cidr</label><input type="text" data-path="resources.bastion_subnet_cidr" placeholder="10.0.3.0/26" /></div>
+        <div class="config-field"><label>firewall_subnet_cidr</label><input type="text" data-path="resources.firewall_subnet_cidr" placeholder="10.0.4.0/26" /></div>
+        <div class="config-field"><label>nsg_name</label><input type="text" data-path="resources.nsg_name" /></div>
+        <div class="config-field"><label>eo_sp_object_id</label><input type="text" data-path="resources.eo_sp_object_id" /></div>
+        <div class="config-field"><label>cmk_key_name</label><input type="text" data-path="resources.cmk_key_name" /></div>
+        <div class="config-field"><label>cmk_key_version</label><input type="text" data-path="resources.cmk_key_version" /></div>
+        <div class="config-field"><label>cui_group_name</label><input type="text" data-path="resources.cui_group_name" /></div>
+        <div class="config-field"><label>breakglass_upn</label><input type="text" data-path="resources.breakglass_upn" /></div>
+        <div class="config-field"><label>operator_upn</label><input type="text" data-path="resources.operator_upn" /></div>
+        <div class="config-field"><label>admin_username</label><input type="text" data-path="resources.admin_username" /></div>
+        <div class="config-field"><label>primary_domain</label><input type="text" data-path="resources.primary_domain" placeholder="example.onmicrosoft.us" /></div>
+        <div class="config-field"><label>vm_name</label><input type="text" data-path="resources.vm_name" placeholder="az-vm-enclave-01" /></div>
+        <div class="config-field"><label>ciso_email</label><input type="text" data-path="resources.ciso_email" placeholder="ciso@example.gov" /></div>
+        <div class="config-field"><label>security_email</label><input type="text" data-path="resources.security_email" placeholder="security@example.gov" /></div>
+        <div class="config-field"><label>compliance_role_id</label><input type="text" data-path="resources.compliance_role_id" placeholder="00000000-0000-0000-0000-000000000000" /></div>
+        <div class="config-field"><label>role_def_id</label><input type="text" data-path="resources.role_def_id" placeholder="00000000-0000-0000-0000-000000000000" /></div>
+        <div class="config-field"><label>wifi_ssid</label><input type="text" data-path="resources.wifi_ssid" placeholder="EnclaveSecureWiFi" /></div>
+        <div class="config-field"><label>approved_ip_range</label><input type="text" data-path="resources.approved_ip_range" placeholder="10.0.0.0/24" /></div>
+        <div class="config-field"><label>initial_password</label><input type="password" data-path="resources.initial_password" placeholder="Initial VM password" /></div>
+        <!-- Terms of Use PDF upload -->
+        <input type="hidden" id="touFileName" data-path="resources.tou_file_name" />
+        <input type="hidden" id="touFileBase64" data-path="resources.tou_file_base64" />
+        <div class="tou-upload-row">
+          <label>terms_of_use</label>
+          <span class="tou-file-name" id="touFileLabel">No file selected</span>
+          <button type="button" class="tou-browse-btn" id="touBrowseBtn">Browse</button>
+          <button type="button" class="tou-browse-btn" id="touLoadSampleBtn" title="Load sample CUI TOU from project">Sample</button>
+          <input type="file" id="touFileInput" accept=".pdf" style="display:none" />
+          <button type="button" class="tou-clear-btn" id="touClearBtn">&times;</button>
+        </div>
+      </div>
+    </div>
+    <!-- Onboarding -->
+    <div class="config-section">
+      <div class="var-category-header" onclick="toggleSection('cfgOnboarding')">
+        <span class="var-category-toggle" id="cfgOnboardingToggle">&#9660;</span>
+        Onboarding
+        <span class="var-category-count" id="cfgOnboardingCount"></span>
+      </div>
+      <div class="var-category-body collapsed" id="cfgOnboardingBody">
+        <div class="config-field"><label>bootstrapped_at</label><input type="text" data-path="onboarding.bootstrapped_at" /></div>
+        <div class="config-field"><label>bootstrapped_by</label><input type="text" data-path="onboarding.bootstrapped_by" /></div>
+        <div class="config-field"><label>cert_expires</label><input type="text" data-path="onboarding.cert_expires" /></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="config-btn-bar" id="btnBar" style="display:none;">
+    <button class="btn-sm" onclick="loadTenantFromFile()">Load</button>
+    <span class="dirty-hint" id="dirtyHint">Unsaved changes</span>
+    <button class="btn-sm btn-primary" id="saveBtn" onclick="saveTenantConfig()" disabled style="margin-left:auto;">Save</button>
+    <button class="btn-sm" onclick="saveTenantConfigAs()">Save As</button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---- State ----
+    var currentTenant = '';
+    var configOriginal = {};
+    var configSlug = '';
+
+    // ---- Init ----
+    (function init() {
+      var params = new URLSearchParams(window.location.search);
+      currentTenant = params.get('tenant') || '';
+
+      // Load tenant list
+      fetch('/api/tenants')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          var sel = document.getElementById('tenantSelect');
+          sel.innerHTML = '<option value="">-- Select Tenant --</option>';
+          if (data.ok && data.tenants) {
+            data.tenants.forEach(function(t) {
+              var opt = document.createElement('option');
+              opt.value = t;
+              opt.textContent = t;
+              sel.appendChild(opt);
+            });
+          }
+          if (currentTenant) {
+            sel.value = currentTenant;
+            loadTenantConfig(currentTenant);
+          }
+        })
+        .catch(function() {
+          showToast('Failed to load tenants', 'error');
+        });
+
+      // Dirty detection on input
+      document.getElementById('configFormScroll').addEventListener('input', function() {
+        updateDirtyState();
+        updateSectionCounts();
+      });
+
+      initTouUpload();
+    })();
+
+    // ---- Tenant change ----
+    function onTenantChange() {
+      var sel = document.getElementById('tenantSelect');
+      currentTenant = sel.value;
+      if (!currentTenant) {
+        document.getElementById('emptyState').style.display = '';
+        document.getElementById('configFormScroll').style.display = 'none';
+        document.getElementById('btnBar').style.display = 'none';
+        return;
+      }
+      loadTenantConfig(currentTenant);
+    }
+
+    // ---- Load config ----
+    async function loadTenantConfig(slug) {
+      var empty = document.getElementById('emptyState');
+      var form = document.getElementById('configFormScroll');
+      var btnBar = document.getElementById('btnBar');
+      var pathHint = document.getElementById('pathHint');
+
+      configOriginal = {};
+      configSlug = '';
+      updateDirtyState();
+
+      try {
+        var resp = await fetch('/api/tenants/' + encodeURIComponent(slug));
+        var data = await resp.json();
+        if (!data.ok) {
+          empty.style.display = '';
+          empty.innerHTML = '<p>Error: ' + escHtml(data.error || 'Unknown') + '</p>';
+          form.style.display = 'none';
+          btnBar.style.display = 'none';
+          return;
+        }
+        configOriginal = data.config || {};
+        configSlug = slug;
+        populateConfigForm(configOriginal);
+        if (pathHint) pathHint.textContent = data.path || '';
+        if (pathHint) pathHint.title = data.path || '';
+        empty.style.display = 'none';
+        form.style.display = '';
+        btnBar.style.display = 'flex';
+        updateDirtyState();
+        document.title = 'Config Variables \u2014 ' + slug;
+      } catch (e) {
+        empty.style.display = '';
+        empty.innerHTML = '<p>Failed to load: ' + escHtml(e.message) + '</p>';
+        form.style.display = 'none';
+        btnBar.style.display = 'none';
+      }
+    }
+
+    // ---- Populate form ----
+    function populateConfigForm(config) {
+      var inputs = document.querySelectorAll('#configFormScroll [data-path]');
+      for (var i = 0; i < inputs.length; i++) {
+        var el = inputs[i];
+        var path = el.getAttribute('data-path');
+        var parts = path.split('.');
+        var val = config;
+        for (var j = 0; j < parts.length; j++) {
+          val = val ? val[parts[j]] : undefined;
+        }
+        el.value = val || '';
+      }
+      updateSectionCounts();
+      // Refresh ToU display
+      var touName = document.getElementById('touFileName');
+      var touLabel = document.getElementById('touFileLabel');
+      var touClear = document.getElementById('touClearBtn');
+      if (touName && touLabel && touClear) {
+        if (touName.value) {
+          touLabel.textContent = touName.value;
+          touClear.style.display = '';
+        } else {
+          touLabel.textContent = 'No file selected';
+          touClear.style.display = 'none';
+        }
+      }
+    }
+
+    // ---- Serialize form ----
+    function serializeConfigForm() {
+      var cfg = {};
+      var inputs = document.querySelectorAll('#configFormScroll [data-path]');
+      for (var i = 0; i < inputs.length; i++) {
+        var el = inputs[i];
+        var path = el.getAttribute('data-path');
+        var parts = path.split('.');
+        var val = el.value;
+        if (!val && val !== '0') continue;
+        var obj = cfg;
+        for (var j = 0; j < parts.length - 1; j++) {
+          if (!obj[parts[j]]) obj[parts[j]] = {};
+          obj = obj[parts[j]];
+        }
+        obj[parts[parts.length - 1]] = val;
+      }
+      return cfg;
+    }
+
+    // ---- Dirty state ----
+    function isDirty() {
+      return JSON.stringify(serializeConfigForm()) !== JSON.stringify(configOriginal);
+    }
+
+    function updateDirtyState() {
+      var dirty = isDirty();
+      var hint = document.getElementById('dirtyHint');
+      var btn = document.getElementById('saveBtn');
+      if (hint) hint.style.display = dirty ? '' : 'none';
+      if (btn) btn.disabled = !dirty;
+    }
+
+    // ---- Section counts ----
+    function updateSectionCounts() {
+      var sections = {
+        cfgClient: 'client', cfgTenant: 'tenant', cfgAuth: 'auth',
+        cfgEndpoints: 'endpoints', cfgSubscription: 'subscription',
+        cfgResources: 'resources', cfgOnboarding: 'onboarding'
+      };
+      for (var prefix in sections) {
+        var body = document.getElementById(prefix + 'Body');
+        if (!body) continue;
+        var inputs = body.querySelectorAll('[data-path]');
+        var filled = 0;
+        for (var i = 0; i < inputs.length; i++) {
+          if (inputs[i].value && inputs[i].value.trim()) filled++;
+        }
+        var countEl = document.getElementById(prefix + 'Count');
+        if (countEl) countEl.textContent = filled + '/' + inputs.length;
+      }
+    }
+
+    // ---- Save ----
+    async function saveTenantConfig() {
+      var slug = configSlug || currentTenant;
+      if (!slug) return;
+
+      var cfg = serializeConfigForm();
+      var json = JSON.stringify(cfg, null, 2);
+
+      try {
+        var resp = await fetch('/api/tenants/' + encodeURIComponent(slug), {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ json: json })
+        });
+        var data = await resp.json();
+        if (!data.ok) {
+          showToast('Save failed: ' + (data.error || 'Unknown'), 'error');
+          return;
+        }
+        configOriginal = cfg;
+        updateDirtyState();
+        showToast('Config saved', 'success');
+
+        // Notify parent
+        if (window.opener) {
+          window.opener.postMessage({ type: 'config-saved', tenant: slug }, '*');
+        }
+      } catch (e) {
+        showToast('Save failed: ' + e.message, 'error');
+      }
+    }
+
+    // ---- Save As ----
+    async function saveTenantConfigAs() {
+      var newSlug = prompt('Enter new tenant slug (letters, numbers, hyphens, underscores):');
+      if (!newSlug) return;
+      newSlug = newSlug.trim();
+      if (!/^[a-zA-Z0-9_-]+$/.test(newSlug)) {
+        showToast('Invalid slug', 'error');
+        return;
+      }
+
+      var cfg = serializeConfigForm();
+      if (!cfg.client) cfg.client = {};
+      cfg.client.slug = newSlug;
+      var json = JSON.stringify(cfg, null, 2);
+
+      try {
+        var resp = await fetch('/api/tenants', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ json: json })
+        });
+        var data = await resp.json();
+        if (!data.ok) {
+          showToast('Save As failed: ' + (data.error || 'Unknown'), 'error');
+          return;
+        }
+        showToast('Saved as: ' + newSlug, 'success');
+
+        // Reload tenant list and switch
+        var selResp = await fetch('/api/tenants');
+        var selData = await selResp.json();
+        var sel = document.getElementById('tenantSelect');
+        sel.innerHTML = '<option value="">-- Select Tenant --</option>';
+        if (selData.ok && selData.tenants) {
+          selData.tenants.forEach(function(t) {
+            var opt = document.createElement('option');
+            opt.value = t;
+            opt.textContent = t;
+            sel.appendChild(opt);
+          });
+        }
+        sel.value = newSlug;
+        currentTenant = newSlug;
+        await loadTenantConfig(newSlug);
+
+        // Notify parent
+        if (window.opener) {
+          window.opener.postMessage({ type: 'config-saved', tenant: newSlug }, '*');
+        }
+      } catch (e) {
+        showToast('Save As failed: ' + e.message, 'error');
+      }
+    }
+
+    // ---- Load from file browser ----
+    function loadTenantFromFile() {
+      fetch('/api/tenants-browse')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (!data.ok || !data.files || data.files.length === 0) {
+            showToast('No tenant files found', 'error');
+            return;
+          }
+          // Simple: pick from list
+          var names = data.files.map(function(f) { return f.name; });
+          var choice = prompt('Available configs:\n' + names.join('\n') + '\n\nEnter filename to load:');
+          if (!choice) return;
+          var match = data.files.find(function(f) { return f.name === choice || f.name === choice + '.json'; });
+          if (!match) {
+            showToast('File not found: ' + choice, 'error');
+            return;
+          }
+          loadTenantFromPath(match.path);
+        })
+        .catch(function(err) {
+          showToast('Failed to browse: ' + err.message, 'error');
+        });
+    }
+
+    async function loadTenantFromPath(filePath) {
+      try {
+        var resp = await fetch('/api/browse-file?path=' + encodeURIComponent(filePath));
+        var data = await resp.json();
+        if (!data.ok) {
+          showToast('Failed to load: ' + (data.error || 'Unknown'), 'error');
+          return;
+        }
+        var cfg = JSON.parse(data.content);
+        configOriginal = cfg;
+        configSlug = cfg.client && cfg.client.slug ? cfg.client.slug : '';
+        populateConfigForm(cfg);
+
+        var pathHint = document.getElementById('pathHint');
+        if (pathHint) { pathHint.textContent = filePath; pathHint.title = filePath; }
+
+        document.getElementById('emptyState').style.display = 'none';
+        document.getElementById('configFormScroll').style.display = '';
+        document.getElementById('btnBar').style.display = 'flex';
+
+        updateDirtyState();
+        showToast('Loaded from ' + filePath.split(/[/\\]/).pop(), 'success');
+      } catch (e) {
+        showToast('Failed to load: ' + e.message, 'error');
+      }
+    }
+
+    // ---- Section toggle ----
+    function toggleSection(prefix) {
+      var body = document.getElementById(prefix + 'Body');
+      var toggle = document.getElementById(prefix + 'Toggle');
+      if (!body) return;
+      var collapsed = body.classList.toggle('collapsed');
+      if (toggle) toggle.innerHTML = collapsed ? '&#9654;' : '&#9660;';
+    }
+
+    // ---- Eye toggle ----
+    function toggleEye(el) {
+      var input = el.previousElementSibling;
+      if (!input) return;
+      if (input.type === 'password') {
+        input.type = 'text';
+        el.style.color = 'var(--accent-blue)';
+      } else {
+        input.type = 'password';
+        el.style.color = '';
+      }
+    }
+
+    // ---- TOU Upload ----
+    function initTouUpload() {
+      var fileInput = document.getElementById('touFileInput');
+      var browseBtn = document.getElementById('touBrowseBtn');
+      var clearBtn  = document.getElementById('touClearBtn');
+      var nameInput = document.getElementById('touFileName');
+      var b64Input  = document.getElementById('touFileBase64');
+      var label     = document.getElementById('touFileLabel');
+      if (!fileInput || !browseBtn) return;
+
+      browseBtn.addEventListener('click', function() { fileInput.click(); });
+
+      var sampleBtn = document.getElementById('touLoadSampleBtn');
+      if (sampleBtn) {
+        sampleBtn.addEventListener('click', function() {
+          fetch('/api/file-to-base64', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filePath: 'CUI-System-Access-Notice.pdf' })
+          })
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            if (!data.ok) { showToast('Failed to load sample TOU: ' + data.error, 'error'); return; }
+            nameInput.value = data.fileName;
+            b64Input.value = data.base64;
+            label.textContent = data.fileName;
+            clearBtn.style.display = '';
+            updateDirtyState();
+            updateSectionCounts();
+          })
+          .catch(function(err) { showToast('Error loading sample TOU: ' + err.message, 'error'); });
+        });
+      }
+
+      fileInput.addEventListener('change', function() {
+        var file = fileInput.files && fileInput.files[0];
+        if (!file) return;
+        if (file.type !== 'application/pdf') {
+          showToast('Only PDF files accepted', 'error');
+          fileInput.value = '';
+          return;
+        }
+        if (file.size > 3 * 1024 * 1024) {
+          showToast('PDF must be under 3 MB', 'error');
+          fileInput.value = '';
+          return;
+        }
+        var reader = new FileReader();
+        reader.onload = function() {
+          var base64 = reader.result.split(',')[1] || '';
+          nameInput.value = file.name;
+          b64Input.value = base64;
+          label.textContent = file.name;
+          clearBtn.style.display = '';
+          updateDirtyState();
+          updateSectionCounts();
+        };
+        reader.readAsDataURL(file);
+      });
+
+      clearBtn.addEventListener('click', function() {
+        nameInput.value = '';
+        b64Input.value = '';
+        fileInput.value = '';
+        label.textContent = 'No file selected';
+        clearBtn.style.display = 'none';
+        updateDirtyState();
+        updateSectionCounts();
+      });
+    }
+
+    // ---- Utilities ----
+    function escHtml(s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function showToast(message, type) {
+      var toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast ' + type;
+      setTimeout(function() { toast.classList.add('show'); }, 10);
+      setTimeout(function() { toast.classList.remove('show'); }, 3000);
+    }
+  </script>
+</body>
+</html>

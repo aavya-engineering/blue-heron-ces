@@ -1,0 +1,76 @@
+controlId: "SI.L1-3.14.4"
+relatedControlIds:
+  - "SI.L1-3.14.1"
+  - "SI.L1-3.14.2"
+  - "SI.L2-3.14.3"
+  - "SI.L2-3.14.6"  # [VERIFY] mapping not yet confirmed
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: B-11
+useCaseTitle: "EDR Coverage Gap Detection"
+domain: Device & Endpoint Management
+priority: P4 Standard
+trigger: 'SCHEDULE: Weekly automated comparison; CHANGE: after new device enrollment batch'
+sodTier: Tier 1 -- Read-Only Audit (detection); Tier 2 -- Config Manager (onboarding package push)
+entraRolesRequired:
+- Security Reader (detection); Intune Administrator
+- Security Administrator (onboarding push)
+approvalRequired: true
+services:
+- name: Microsoft Intune
+  purpose: managed device inventory, Defender for Endpoint onboarding configuration profile
+- name: Microsoft Defender for Endpoint
+  purpose: device inventory, onboarding status
+- name: Microsoft Graph API
+  purpose: deviceManagement/managedDevices, security API for Defender machines
+- name: Microsoft Defender Portal
+  purpose: '`https://security.microsoft.us`'
+configurationSteps:
+  portalPath: https://intune.microsoft.us
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes DeviceManagementManagedDevices.Read.All
+  - cmdlet: Get-MgDeviceManagementManagedDevice
+    parameters:
+    - -MgDeviceManagementManagedDevice
+    - -All
+    - -Filter
+    - -Property
+    - -gov
+  - cmdlet: Get-MgDeviceManagementDeviceConfiguration
+    parameters:
+    - -MgDeviceManagementDeviceConfiguration
+    - -Filter
+    - -Onboarding
+    - -not
+    - -Output
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/deviceManagement/managedDevices?$filter=operatingSystem
+  graphApiPayloadExample: {}
+  requiredPermissions:
+  - DeviceManagementManagedDevices.Read.All
+  - Machine.Read.All (Defender for Endpoint API)
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-b-device/B-11/{year}/{month}/
+  format: CSV (gap device list), JSON (onboarding profile deployment status)
+  filenamePattern: B-11_EDRCoverageGap_{YYYYMMDD}_{HHmmss}_GapReport.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://api-gov.securitycenter.microsoft.us
+  - https://security.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: Microsoft Defender for Endpoint in GCC High uses the dedicated API base URL `https://api-gov.securitycenter.microsoft.us`
+    (not the commercial endpoint). The Defender portal in GCC High is at `https://security.microsoft.us`. Onboarding packages
+    downloaded from the GCC High Defender portal are pre-configured for GCC High cloud endpoints; do not use commercial onboarding
+    packages. The Intune connector for Defender for Endpoint must be configured to point to the GCC High Defender service.
+    Verify the connector status at **Intune Admin Center > Endpoint security > Microsoft Defender for Endpoint > C
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

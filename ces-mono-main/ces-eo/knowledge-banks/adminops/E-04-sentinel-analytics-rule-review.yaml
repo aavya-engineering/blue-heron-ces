@@ -1,0 +1,58 @@
+controlId: "SI.L1-3.14.4"
+relatedControlIds:
+  - "AU.L2-3.3.5"
+  - "SI.L2-3.14.6"
+  - "SI.L2-3.14.7"
+  - "IR.L2-3.6.1"  # [VERIFY] mapping not yet confirmed
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: E-04
+useCaseTitle: "Sentinel Analytics Rule Review"
+domain: Audit & Logging
+priority: P4 Standard
+trigger: 'SCHEDULE: Monthly'
+sodTier: Tier 2
+entraRolesRequired:
+- Security Reader (audit phase)
+- Microsoft Sentinel Contributor (modification phase)
+approvalRequired: true
+services:
+- name: Microsoft Sentinel -- analytics rules
+  purpose: scheduled, NRT, Microsoft Security, fusion
+- name: Sentinel content hub -- rule template library
+  purpose: ''
+- name: MITRE ATT&CK framework -- technique-to-rule mapping
+  purpose: ''
+- name: Log Analytics workspace -- KQL query execution
+  purpose: ''
+configurationSteps:
+  portalPath: //portal.azure.us > Microsoft Sentinel > select workspace > Analytics > Active rules.
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes SecurityEvents.Read.All
+  graphApiEndpoint: ''
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-e-audit/E-04/{year}/{month}/
+  format: CSV (rule inventory with MITRE mapping), JSON (effectiveness query results)
+  filenamePattern: E-04_SentinelRuleReview_{YYYYMMDD}_{HHmmss}_RuleInventory.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://security.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |-
+    - Microsoft Sentinel in Azure Government provides the same analytics rule engine as commercial. Content hub templates are available but the template library may have a smaller selection compared to commercial. Verify template availability when searching for specific detection content.
+    - MITRE ATT&CK coverage view is available in Sentinel in Azure Government. The heatmap references the same MITRE ATT&CK framework version as commercial.
+    - After March 31, 2027, Sentinel analytics rules will be managed through the Microsoft Defender portal (`https://security.microsoft.us`). Plan for portal migrati
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

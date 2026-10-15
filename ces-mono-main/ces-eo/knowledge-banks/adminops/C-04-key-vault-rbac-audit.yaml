@@ -1,0 +1,55 @@
+controlId: "AC.L1-3.1.1"
+relatedControlIds:
+  - "AC.L2-3.1.5"
+  - "AC.L2-3.1.6"
+  - "SC.L2-3.13.10"
+practiceStatement: Limit system access to authorized users, processes acting on behalf of users, and devices.
+useCaseId: C-04
+useCaseTitle: "Key Vault RBAC Audit"
+domain: Credential & Secret Management
+priority: P2 High
+trigger: 'SCHEDULE: Monthly (first business day); or CHANGE: After any Key Vault role assignment modification'
+sodTier: Tier 1 (Read-Only Audit)
+entraRolesRequired:
+- Security Reader
+- Reader (Azure RBAC on Key Vault scope)
+approvalRequired: true
+services:
+- name: Azure Key Vault
+  purpose: all vaults in the subscription
+- name: Azure RBAC
+  purpose: role assignments at vault, resource group, and subscription scope
+- name: Microsoft Sentinel
+  purpose: alert on unauthorized role changes
+- name: Azure Resource Graph
+  purpose: bulk inventory queries
+configurationSteps:
+  portalPath: //portal.azure.us > Key Vaults. List all vaults.
+  powershellCmdlets: []
+  graphApiEndpoint: ''
+  graphApiPayloadExample: {}
+  requiredPermissions:
+  - Reader (Azure RBAC at vault scope)
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-c-credential/C-04/2026/03/
+  format: 'CSV (columns: VaultName, PrincipalName, PrincipalType, RoleName, Scope, AssignmentType, CreatedOn)'
+  filenamePattern: C-04_KeyVaultRBAC_{YYYYMMDD}_{HHmmss}_AllVaults.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: Azure RBAC for Key Vault is fully supported in Azure Government. The management plane endpoint is `management.usgovcloudapi.net`.
+    Ensure all `az role assignment` commands target the correct Azure Government subscription. The Key Vault diagnostic settings
+    should send to the Sentinel-connected Log Analytics workspace in an Azure Government region for centralized alerting on
+    role assignment changes.
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

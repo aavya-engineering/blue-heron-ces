@@ -1,0 +1,50 @@
+## Control {{controlId}}: Remediate Vulnerabilities in Accordance with Risk Assessments
+
+**Implementation Status:** {{status}}
+
+This organization remediates vulnerabilities based on risk assessment within the {{tenantName}} M365 GCC High tenant through patch management, Secure Score improvement tracking, and POA&M processes managed by {{variables.systemAdministrator}}.
+
+{{#if updateRingsConfigured}}
+**Automated Patch Remediation:**
+{{updateRingsCount}} Windows Update ring policies automate vulnerability remediation through controlled patch deployment:
+{{#if rings}}
+{{#each rings}}
+- **{{displayName}}** — Deferral: {{deploymentDeferralInDays}} days — Mode: {{automaticUpdateMode}}
+{{/each}}
+{{/if}}
+
+Update rings ensure security patches are tested and deployed within organizational remediation timelines.
+{{else}}
+Windows Update ring policies have not been configured. Patch remediation automation is not active.
+{{/if}}
+
+{{#if secureScoresAvailable}}
+**Remediation Progress Tracking:**
+Microsoft Secure Score ({{currentScore}} / {{maxScore}}, {{percentage}}%) tracks remediation progress across security controls.
+{{/if}}
+
+**Remediation Framework:**
+- **Critical (CVSS 9.0+):** Remediation within 15 days; emergency patching authorized outside maintenance windows
+- **High (CVSS 7.0-8.9):** Remediation within 30 days via standard maintenance process
+- **Medium (CVSS 4.0-6.9):** Remediation within 90 days; tracked in vulnerability register
+- **Low (CVSS 0.1-3.9):** Remediation within 180 days; bundled with scheduled maintenance
+
+**POA&M Integration:**
+Vulnerabilities that cannot be remediated within prescribed timelines are documented in the Plan of Action and Milestones (POA&M) with:
+- Vulnerability description and affected components
+- Risk level and mitigating factors
+- Planned remediation actions and completion date
+- Responsible party and resources required
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine patch deployment reports, update ring configurations, Secure Score trends, vulnerability remediation records, and POA&M entries.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

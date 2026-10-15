@@ -1,0 +1,35 @@
+## Control {{controlId}}: Prohibit the Use of Portable Storage Devices When Such Devices Have No Identifiable Owner
+
+**Implementation Status:** {{status}}
+
+This organization prohibits unidentified portable storage devices within the {{tenantName}} M365 GCC High tenant through device registration requirements and removable media policies documented in "Portable Storage Device Policy v1.0" maintained by {{variables.systemAdministrator}}.
+
+{{#if deviceConfigurationsActive}}
+**Device Registration Enforcement:**
+{{deviceConfigurationsCount}} device configuration policies require device registration before accessing organizational resources. Unregistered devices are blocked from connecting to managed endpoints.
+{{/if}}
+
+**Portable Storage Restrictions:**
+- All authorized portable storage devices must be registered in the organization's asset inventory with identifiable owner
+- Unidentified USB devices found in the facility are quarantined and reported to {{variables.systemAdministrator}}
+- Found/unidentified storage media is never connected to CUI systems — treated as potentially compromised
+- Authorized portable storage devices are labeled with owner name and asset tracking number
+
+**Operational Procedure:**
+- **Action:** Maintain portable storage device inventory; investigate and quarantine unidentified devices; annual inventory reconciliation
+- **Frequency:** Continuous enforcement via device policy; annual inventory audit
+- **Responsible Party:** {{variables.systemAdministrator}}
+- **Documentation:** Portable Storage Device Policy v1.0, Device Inventory Register
+
+**Review Frequency:** Annually by ISSO
+
+**Verification Method:** Examine portable storage device inventory, device registration records, quarantine procedures, and annual reconciliation reports.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** Review device inventory per procedure MP-008. No automated evidence collection available for this procedural control. {{evidenceArtifactUrl}}
+{{/if}}

@@ -1,0 +1,42 @@
+## Control {{controlId}}: Control Connection of Mobile Devices
+
+**Implementation Status:** {{status}}
+
+This organization establishes usage restrictions, configuration requirements, connection requirements, and implementation guidance for organization-controlled mobile devices within the {{tenantName}} M365 GCC High tenant. Mobile device management is enforced through Microsoft Intune enrollment policies, app protection policies, and Conditional Access device compliance requirements.
+
+{{#if deviceConfigurationsActive}}
+Intune mobile device management enforces connection controls through {{deviceConfigurationsCount}} device configuration policies. All mobile devices must be enrolled in Intune and verified compliant before accessing CUI resources. Configuration policies enforce: device encryption, minimum OS version, PIN/biometric lock, jailbreak/root detection, and approved application lists. Non-compliant devices are blocked from accessing organizational resources.
+{{else}}
+Intune mobile device enrollment and configuration policies have not been configured. Mobile device controls rely on manual verification pending MDM deployment.
+{{/if}}
+
+{{#if appProtectionsActive}}
+{{appProtectionsCount}} app protection policies enforce data protection on mobile devices. Policies prevent CUI data leakage through: copy/paste restrictions to unmanaged applications, "Save As" blocks to personal storage, and screen capture prevention for CUI-classified content.
+{{/if}}
+
+{{#if policies}}
+Conditional Access policies enforce mobile device compliance:
+{{#each policies}}
+- **{{displayName}}** ({{state}}): Requires {{#each grantControls.builtInControls}}{{this}}{{#unless @last}}, {{/unless}}{{/each}} for mobile access.
+{{/each}}
+{{/if}}
+
+{{#if infraResources}}
+Supporting infrastructure:
+{{#each infraResources}}
+- {{resourceType}} "{{name}}"{{#if properties.retention_days}} (retention: {{properties.retention_days}} days){{/if}}
+{{/each}}
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Review Intune device enrollment status, compliance policy configurations, app protection policy settings, and device compliance reports for mobile device fleet.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

@@ -1,0 +1,45 @@
+## Control {{controlId}}: Monitor Organizational Systems Including Inbound and Outbound Communications Traffic
+
+**Implementation Status:** {{status}}
+
+This organization monitors systems and communications traffic within the {{tenantName}} M365 GCC High tenant through Microsoft Defender, sensitivity labels, and DLP policies managed by {{variables.systemAdministrator}}.
+
+{{#if securityAlertsActive}}
+**Threat Detection:**
+{{securityAlertsCount}} security alert rules detect attacks and indicators of potential attacks across M365 services:
+{{#if alerts}}
+{{#each alerts}}
+- **{{title}}** — Severity: {{severity}} — Status: {{status}} — {{createdDateTime}}
+{{/each}}
+{{/if}}
+{{/if}}
+
+{{#if dlpLabelsConfigured}}
+**Information Handling Controls:**
+{{dlpLabelsCount}} sensitivity labels enforce proper CUI handling during communications:
+{{#each labels}}
+- **{{name}}**{{#if isActive}} (Active){{else}} (Inactive){{/if}} — Priority: {{priority}}
+{{/each}}
+
+DLP policies monitor outbound communications for CUI and block unauthorized transmission. Sensitivity labels enforce encryption and access restrictions on emails and documents containing CUI.
+{{else}}
+Sensitivity labels for information handling have not been configured.
+{{/if}}
+
+{{#if signInLogsAvailable}}
+**Authentication Traffic Monitoring:**
+{{signInLogsCount}} sign-in events monitored for credential-based attacks, anomalous access patterns, and impossible travel indicators.
+{{/if}}
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine Defender alert rules, DLP policy configurations, sensitivity label enforcement, sign-in anomaly detection, and communications monitoring logs.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

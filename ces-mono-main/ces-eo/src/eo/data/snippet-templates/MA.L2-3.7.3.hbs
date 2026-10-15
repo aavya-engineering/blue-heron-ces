@@ -1,0 +1,40 @@
+## Control {{controlId}}: Ensure Equipment Removed for Off-Site Maintenance Is Sanitized of Any CUI
+
+**Implementation Status:** {{status}}
+
+This organization sanitizes CUI from equipment before off-site maintenance within the {{tenantName}} M365 GCC High tenant through data sanitization procedures and encryption enforcement documented in "Equipment Sanitization Policy v1.0" maintained by {{variables.systemAdministrator}}.
+
+{{#if bitLockerEnforced}}
+**Encryption-Based Protection:**
+BitLocker Drive Encryption on {{deviceCount}} managed devices ensures CUI is cryptographically inaccessible even if equipment is sent for off-site maintenance without full sanitization. Recovery keys are stored in Entra ID and are not shared with maintenance vendors.
+{{/if}}
+
+**Sanitization Procedures:**
+- **Cloud-First Architecture:** CUI primarily resides in M365 GCC High cloud services, minimizing local data on devices sent for maintenance
+- **Pre-Maintenance Sanitization:** Before off-site maintenance, devices are wiped of locally cached CUI using Intune remote wipe or manual NIST SP 800-88 Clear/Purge procedures
+- **Verification:** Sanitization verified by {{variables.systemAdministrator}} before equipment release to maintenance vendor
+- **Documentation:** Sanitization certificate completed with device identifier, sanitization method, verification results, and date
+
+{{#if pimConfigured}}
+**Maintenance Access Controls:**
+PIM ensures that administrative credentials are not stored on devices sent for maintenance — just-in-time activation means no persistent privileged tokens exist on the device.
+{{/if}}
+
+**Operational Procedure:**
+- **Action:** Sanitize CUI from equipment before off-site release; document sanitization; verify before handoff
+- **Frequency:** Per maintenance event
+- **Responsible Party:** {{variables.systemAdministrator}}
+- **Documentation:** Equipment Sanitization Policy v1.0, Sanitization Certificate Form MA-003
+
+**Review Frequency:** Per event, quarterly audit by ISSO
+
+**Verification Method:** Examine sanitization certificates, equipment maintenance logs, Intune wipe records, and vendor maintenance documentation.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** Review sanitization certificates per procedure MA-003. {{evidenceArtifactUrl}}
+{{/if}}

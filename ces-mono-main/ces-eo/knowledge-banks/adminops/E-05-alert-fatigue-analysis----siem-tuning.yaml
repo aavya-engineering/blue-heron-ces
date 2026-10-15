@@ -1,0 +1,53 @@
+controlId: "SI.L1-3.14.4"
+relatedControlIds:
+  - "AU.L2-3.3.5"
+  - "IR.L2-3.6.1"  # [VERIFY] mapping not yet confirmed
+  - "SI.L2-3.14.6"
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: E-05
+useCaseTitle: "Alert Fatigue Analysis"
+domain: Audit & Logging
+priority: P4 Standard
+trigger: 'SCHEDULE: Monthly'
+sodTier: Tier 2
+entraRolesRequired:
+- Security Reader (analysis phase)
+- Microsoft Sentinel Contributor (tuning phase)
+approvalRequired: true
+services:
+- name: Microsoft Sentinel -- analytics rules, automation rules, incident classification data
+  purpose: ''
+- name: Log Analytics workspace -- KQL queries for false positive rate calculation
+  purpose: ''
+- name: Sentinel workbooks -- alert efficiency workbook
+  purpose: built-in or custom
+configurationSteps:
+  portalPath: //portal.azure.us > Microsoft Sentinel > select workspace > Incidents. Filter to Closed status with classification
+    False Positive over the past 30 days.
+  powershellCmdlets: []
+  graphApiEndpoint: ''
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-e-audit/E-05/{year}/{month}/
+  format: CSV (false positive rate per rule), JSON (tuning actions applied)
+  filenamePattern: E-05_AlertFatigueAnalysis_{YYYYMMDD}_{HHmmss}_FPRateReport.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |-
+    - Sentinel automation rules are fully available in Azure Government. The SOAR (Security Orchestration, Automation, and Response) engine operates identically to commercial.
+    - Built-in Sentinel workbooks for alert efficiency may require manual import in GCC High if they are not pre-loaded in the content hub. Export the workbook JSON from a reference environment and import via the Azure portal.
+    - Security Copilot-assisted tuning recommendations are not available in GCC High. All tuning decisions must be manual, based on KQL analysis of incident classification data.
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

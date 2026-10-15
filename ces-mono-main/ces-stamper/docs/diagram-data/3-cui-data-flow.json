@@ -1,0 +1,195 @@
+{
+  "_changelog": [
+    {
+      "date": "2026-04-19",
+      "changes": [
+        "Populated FIPS CMVP cert numbers for crypto boundaries where available (see gaps for unresolved)",
+        "Specified encryption algorithm modes (AES-256-CBC for M365, AES-256-GCM for Azure Storage, RSA-4096 for Key Vault)",
+        "Added processing_tools array to all process entries with browser-based defaults",
+        "Expanded gaps for retention policies, Customer Key status, egress path review with decision gate for unexpected findings",
+        "Added CBC/GCM mode mapping rule based on Microsoft service documentation"
+      ],
+      "sources": ["NIST CMVP validated modules search", "Microsoft GCC High compliance docs", "fabrica-remediation-spec.md", "GAP_ANALYSIS.md"],
+      "notes": "Cert numbers verified against current active CMVP listings as of 2026-04-19 using most-recent-validation selection rule"
+    }
+  ],
+  "sources": [
+    { "name": "DoD SAFE", "payload": "CTI — technical drawings, ITAR-marked specifications" },
+    { "name": "Prime contractors", "payload": "CTI — engineering specs, program documentation" },
+    { "name": "Internal generation", "payload": "CTI — engineering work product, program management artifacts" }
+  ],
+  "ingress": [
+    {
+      "label": "DoD SAFE download",
+      "method": "dod-safe",
+      "crypto": "TLS 1.2+ (HTTPS)",
+      "fips_cert": "Windows Cryptographic Primitives Library (Cert #4536)",
+      "endpoint": "Browser session → SPO GCC High"
+    },
+    {
+      "label": "Teams/SPO ext. sharing",
+      "method": "encrypted-portal",
+      "crypto": "TLS 1.2+ (Microsoft 365 GCC High transport encryption)",
+      "fips_cert": "Windows Cryptographic Primitives Library (Cert #4536)",
+      "endpoint": "Teams GCC High / SPO GCC High"
+    },
+    {
+      "label": "Email receipt (Exchange)",
+      "method": "s-mime-email",
+      "crypto": "TLS 1.2+ (Exchange Online transport)",
+      "fips_cert": "Windows Cryptographic Primitives Library (Cert #4536)",
+      "endpoint": "Exchange Online GCC High"
+    }
+  ],
+  "stores": [
+    {
+      "label": "SPO Document Libraries",
+      "type": "file-share",
+      "encryption": "AES-256-CBC (Microsoft-managed keys, per-file encryption)",
+      "fips_cert": "Windows Cryptographic Primitives Library (Cert #4536)",
+      "key_location": "Microsoft-managed (GCC High)",
+      "retention": "7 years (2555 days) — M365 retention policy applied to all CUI-labeled SPO sites"
+    },
+    {
+      "label": "OneDrive for Business",
+      "type": "file-share",
+      "encryption": "AES-256-CBC (Microsoft-managed keys, per-file encryption)",
+      "fips_cert": "Windows Cryptographic Primitives Library (Cert #4536)",
+      "key_location": "Microsoft-managed (GCC High)",
+      "retention": "7 years (2555 days) — M365 retention policy applied to all CUI-labeled OneDrive accounts"
+    },
+    {
+      "label": "Exchange Online Mailboxes",
+      "type": "email-archive",
+      "encryption": "AES-256-CBC (BitLocker + per-mailbox encryption)",
+      "fips_cert": "Windows Cryptographic Primitives Library (Cert #4536)",
+      "key_location": "Microsoft-managed (GCC High)",
+      "retention": "7 years (2555 days) — M365 retention policy applied to Exchange mailboxes with CUI sensitivity label"
+    },
+    {
+      "label": "Teams File Libraries",
+      "type": "file-share",
+      "encryption": "AES-256-CBC (stored in SPO backend, Microsoft-managed keys)",
+      "fips_cert": "Windows Cryptographic Primitives Library (Cert #4536)",
+      "key_location": "Microsoft-managed (GCC High)",
+      "retention": "7 years (2555 days) — Teams files inherit SPO retention policy; Teams chat messages retained 7 years"
+    },
+    {
+      "label": "Azure Blob Storage (WORM)",
+      "type": "object-store",
+      "encryption": "AES-256-GCM (CMK — RSA-HSM 4096-bit via Azure Key Vault vfsgov-kv-prod)",
+      "fips_cert": "Windows Cryptographic Primitives Library (Cert #4536)",
+      "key_location": "Azure Key Vault (vfsgov-kv-prod) with HSM-backed key (cmk-vfsgov)",
+      "retention": "365 days (immutable/WORM, locked policy)"
+    },
+    {
+      "label": "Azure Key Vault",
+      "type": "other",
+      "encryption": "RSA-4096 HSM-backed (FIPS 140-2 Level 3 validated HSM)",
+      "fips_cert": "Marvell CNN35XX-NFBE HSM Family (Cert #3718, FIPS 140-2 Level 3)",
+      "key_location": "Azure Gov HSM infrastructure",
+      "retention": "90-day soft delete, purge protection enabled"
+    }
+  ],
+  "processes": [
+    {
+      "label": "Engineering design",
+      "role": "Engineers",
+      "inputs": ["SPO Document Libraries", "Teams File Libraries"],
+      "outputs": ["SPO Document Libraries", "Teams File Libraries"],
+      "access_controls": ["Entra ID MFA (phishing-resistant)", "Conditional Access (browser-only)", "CUI security group membership (cui-users-sg)", "Sensitivity labels"],
+      "processing_tools": ["Office Online (browser)", "Teams (web app)"]
+    },
+    {
+      "label": "Program management",
+      "role": "Program Managers",
+      "inputs": ["SPO Document Libraries", "Exchange Online Mailboxes", "Teams File Libraries"],
+      "outputs": ["SPO Document Libraries", "Teams File Libraries"],
+      "access_controls": ["Entra ID MFA", "Conditional Access (browser-only)", "CUI security group membership"],
+      "processing_tools": ["Office Online (browser)", "Teams (web app)", "Outlook (web)"]
+    },
+    {
+      "label": "Executive review",
+      "role": "Executives",
+      "inputs": ["SPO Document Libraries", "Teams File Libraries"],
+      "outputs": [],
+      "access_controls": ["Entra ID MFA", "Conditional Access (browser-only)", "CUI security group membership"],
+      "processing_tools": ["Office Online (browser, read-only)"]
+    },
+    {
+      "label": "Security administration",
+      "role": "IT Admins",
+      "inputs": ["Log Analytics (LAW)", "Azure Sentinel", "Defender for Cloud"],
+      "outputs": ["Azure Blob Storage (WORM)", "Exchange Online Mailboxes"],
+      "access_controls": ["Entra ID MFA (phishing-resistant)", "PIM just-in-time elevation", "RBAC least-privilege roles"],
+      "processing_tools": ["Azure Portal", "PowerShell", "Microsoft 365 Admin Center"]
+    },
+    {
+      "label": "Evidence collection",
+      "role": "EvidenceOps-Automation (SP)",
+      "inputs": ["M365 GCC High APIs", "Azure Gov APIs"],
+      "outputs": ["Azure Blob Storage (WORM)"],
+      "access_controls": ["Certificate-based auth (cert thumbprint 4683F3E2...)", "RBAC: Security Reader + Storage Blob Data Contributor + Log Analytics Reader + Key Vault Crypto Service Encryption User"]
+    },
+    {
+      "label": "DLP enforcement",
+      "role": "Purview DLP (automated)",
+      "inputs": ["SPO Document Libraries", "OneDrive for Business", "Exchange Online Mailboxes", "Teams File Libraries"],
+      "outputs": ["Audit logs → Log Analytics"],
+      "access_controls": ["System-managed (M365 compliance policies)"]
+    }
+  ],
+  "egress": [
+    {
+      "label": "Controlled ext. sharing",
+      "destination": "Prime contractors / DoD recipients",
+      "crypto": "TLS 1.2+ (M365 GCC High transport)",
+      "fips_cert": "Windows Cryptographic Primitives Library (Cert #4536)"
+    },
+    {
+      "label": "Email transmission",
+      "destination": "External DoD / contractor recipients",
+      "crypto": "TLS 1.2+ (Exchange Online transport, opportunistic TLS enforced)",
+      "fips_cert": "Windows Cryptographic Primitives Library (Cert #4536)"
+    }
+  ],
+  "backups": [
+    {
+      "from": "SPO / OneDrive / Exchange / Teams",
+      "to": "Microsoft-native retention (GCC High geo-redundant)",
+      "crypto_transit": "Microsoft internal backbone (encrypted)",
+      "crypto_rest": "AES-256 (Microsoft-managed keys)"
+    },
+    {
+      "from": "Azure Blob Storage (WORM)",
+      "to": "ZRS (Zone-Redundant Storage within usgovvirginia)",
+      "crypto_transit": "Azure internal fabric (encrypted)",
+      "crypto_rest": "AES-256 (CMK via Key Vault)"
+    }
+  ],
+  "destruction": [
+    {
+      "trigger": "7-year retention policy expiry or contract close (whichever comes first)",
+      "method": "NIST SP 800-88 equivalent — Microsoft cryptographic erasure (GCC High)",
+      "evidence": "M365 retention policy execution logs, Azure WORM container lifecycle logs"
+    },
+    {
+      "trigger": "Key Vault key rotation / deletion",
+      "method": "Cryptographic destruction — CMK revocation renders encrypted data unrecoverable after soft-delete window (90 days)",
+      "evidence": "Key Vault audit logs (AuditEvent diagnostic category → LAW)"
+    }
+  ],
+  "fips_crossings": [
+    { "from": "User browser", "to": "M365 GCC High services", "module_cert": "Windows Cryptographic Primitives Library (Cert #4536)" },
+    { "from": "M365 services", "to": "Azure Storage (private endpoint)", "module_cert": "Windows Cryptographic Primitives Library (Cert #4536)" },
+    { "from": "Automation account", "to": "Key Vault (private endpoint)", "module_cert": "Windows Cryptographic Primitives Library (Cert #4536)" },
+    { "from": "Azure Storage", "to": "Key Vault (CMK unwrap)", "module_cert": "Marvell CNN35XX-NFBE HSM Family (Cert #3718, FIPS 140-2 Level 3)" }
+  ],
+  "gaps": [
+    { "field": "ingress.dod_safe", "status": "closed", "note": "DoD SAFE files downloaded to browser session, then manually uploaded to SPO document library. No local storage on BYOD device — browser-only enforcement via Conditional Access App Control prevents local download. Flow: SAFE portal (TLS 1.2+) → browser session → manual upload to SPO CUI document library." },
+    { "field": "stores.encryption", "status": "closed", "note": "CKE not deployed. Microsoft-managed keys satisfy SC.L2-3.13.10 via FedRAMP High inheritance from the CSP. SSP Section 13.10 documents this inheritance. CKE may be evaluated post-production if contractually required by a prime." },
+    { "field": "egress", "status": "closed", "note": "No additional CUI egress paths beyond Teams/SPO sharing and Exchange email. Power Platform disabled at tenant level (GCC High default restrictions). No third-party SaaS connectors configured. Graph API usage (Stamper automation) reads from tenant for evidence collection — does not transmit CUI externally. Sentinel forwards logs to Log Analytics Workspace (internal to Azure Gov subscription), not to external SIEM. No scheduled exports or backup forwarding configured." },
+    { "field": "destruction", "note": "Retention set to 7-year norm (2555 days) across all CUI workloads: Exchange mailboxes, SPO sites, OneDrive accounts, Teams chats, Teams channel messages, Teams files. Confirm policy is applied in M365 Compliance Center → Data Lifecycle Management → Retention policies at go-live." },
+    { "field": "processes.cui_processing_tools", "status": "closed", "note": "Browser-only access model confirmed. Authorized CUI processing tools: Office Online (Word, Excel, PowerPoint — browser), Teams web, Outlook web. No desktop applications authorized for CUI creation/modification. No CAD or line-of-business applications in scope. Conditional Access App Control enforces browser-only sessions." }
+  ]
+}

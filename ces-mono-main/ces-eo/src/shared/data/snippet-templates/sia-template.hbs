@@ -1,0 +1,28 @@
+Security Impact Analysis (SIA) was conducted for {{systemName}} production deployment. The SIA evaluated confidentiality, integrity, and availability impacts of system changes including:
+
+**Affected Systems:**
+{{#if tenant.name}}
+- M365 GCC High Tenant: {{tenant.name}}
+{{/if}}
+{{#if infraResources}}
+{{#each infraResources}}
+- {{this.resourceType}}: {{this.name}}
+{{/each}}
+{{/if}}
+
+**Risk Assessment:**
+- **Confidentiality:** Azure Blob Storage access restricted via SharedKey authentication. SAS tokens enforce time-based expiry (24-hour max). Network-level access control via Azure Private Link (future).
+- **Integrity:** Evidence artifacts protected with SHA-256 hash verification at capture time. Immutable blob storage tier prevents evidence tampering.
+- **Availability:** Evidence Collector (EC) and Evidence Ops (EO) servers deployed with health monitoring. Blob storage provides geo-redundant backup.
+
+**Mitigation Controls:**
+- Azure Storage Firewall rules restrict access to authorized IP ranges
+- TLS 1.2+ enforced for all blob storage connections
+- Evidence retention policy prevents accidental deletion (90-day minimum)
+- Audit logging enabled for all storage account operations
+
+The SIA document was reviewed and approved by the ISSO prior to production deployment.
+
+{{#if evidenceArtifacts}}
+Evidence artifacts: {{#each evidenceArtifacts}}{{this.path}}{{#unless @last}}, {{/unless}}{{/each}}
+{{/if}}

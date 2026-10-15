@@ -1,0 +1,38 @@
+## Control {{controlId}}: Control Information Posted on Publicly Accessible Systems
+
+**Implementation Status:** {{status}}
+
+This organization controls information posted or processed on publicly accessible information systems within the {{tenantName}} M365 GCC High tenant. Controls prevent unauthorized disclosure of CUI through public-facing services by restricting external sharing capabilities, anonymous access, and public link generation across all M365 services.
+
+{{#if sharepointConfigured}}
+SharePoint Online external sharing is restricted to "{{sharepointSharingCapability}}" mode, preventing anonymous or unauthenticated access to CUI resources. Content shared externally requires authentication through approved identity providers. Azure AD cross-tenant policies prevent creation of public-facing links to CUI-classified content. Information designated as CUI is prohibited from publication on any publicly accessible system without explicit authorization from {{variables.accessControlAdministrator}}.
+{{else}}
+SharePoint Online external sharing restrictions have not been configured. Public information controls are not enforced beyond default M365 settings, pending configuration.
+{{/if}}
+
+{{#if policies}}
+Conditional Access policies enforce additional public access restrictions:
+{{#each policies}}
+- **{{displayName}}** ({{state}}): Blocks {{#each grantControls.builtInControls}}{{this}}{{#unless @last}}, {{/unless}}{{/each}} for public access scenarios.
+{{/each}}
+{{/if}}
+
+{{#if infraResources}}
+Supporting infrastructure:
+{{#each infraResources}}
+- {{resourceType}} "{{name}}"{{#if properties.retention_days}} (retention: {{properties.retention_days}} days){{/if}}
+{{/each}}
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Review SharePoint external sharing settings, cross-tenant access policies, and content classification labels to verify public information controls.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

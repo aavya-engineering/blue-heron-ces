@@ -1,0 +1,58 @@
+controlId: "MP.L2-3.8.9"
+relatedControlIds:
+  - "MA.L2-3.7.1"  # [VERIFY] mapping not yet confirmed
+  - "MA.L2-3.7.2"  # [VERIFY] mapping not yet confirmed
+  - "SI.L1-3.14.1"  # [VERIFY] mapping not yet confirmed
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: H-07
+useCaseTitle: "Backup Integrity Verification"
+domain: Incident Response
+priority: P3 Medium
+trigger: 'SCHEDULE: Monthly (backup status check), Monthly (restore test)'
+sodTier: Tier 1 -- Read-Only Audit (for status check); Tier 2 -- Config Manager (for restore test)
+entraRolesRequired:
+- Backup Reader (status check)
+- Backup Operator
+- Virtual Machine Contributor (restore test)
+approvalRequired: true
+services:
+- name: Azure Backup
+  purpose: Azure Government -- `https://portal.azure.us`
+- name: Recovery Services Vault
+  purpose: Azure Government
+- name: Azure Virtual Machines
+  purpose: Azure Government -- for restore test targets
+- name: Azure Storage
+  purpose: Azure Government -- for file share restore targets
+- name: Log Analytics Workspace
+  purpose: Azure Government -- for backup monitoring
+configurationSteps:
+  portalPath: //portal.azure.us > **Backup center** (or **Recovery Services vaults**)
+  powershellCmdlets: []
+  graphApiEndpoint: ''
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-h-incident/H-07/{year}/{month}/
+  format: JSON (backup status report, restore test record)
+  filenamePattern: H-07_BackupStatus_{YYYYMMDD}_{HHmmss}_Monthly.json
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://management.usgovcloudapi.net
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: Azure Backup in Azure Government uses the ARM endpoint `https://management.usgovcloudapi.net`, not the commercial
+    `management.azure.com`. Recovery Services Vaults must be provisioned in Azure Government regions (USGov Virginia, USGov
+    Arizona, USGov Texas). The Azure Government portal at `https://portal.azure.us` provides the Backup center experience.
+    PowerShell operations require `Connect-AzAccount -Environment AzureUSGovernment`. Backup encryption keys stored in Azure
+    Key Vault must also be in an Azure Government region. All backup data remains within the Azure Government boundary and
+    is subj
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

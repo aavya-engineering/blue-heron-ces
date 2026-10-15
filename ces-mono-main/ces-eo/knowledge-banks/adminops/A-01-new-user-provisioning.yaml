@@ -1,0 +1,118 @@
+controlId: "AC.L1-3.1.1"
+relatedControlIds:
+  - "IA.L1-3.5.1"
+  - "AC.L1-3.1.2"
+  - "IA.L1-3.5.2"
+  - "PS.L2-3.9.2"
+
+practiceStatement: "Limit system access to authorized users, processes acting on behalf of users, and devices."
+
+useCaseId: "A-01"
+useCaseTitle: "New User Provisioning"
+domain: "Identity & Access Management"
+priority: "P1 Critical"
+trigger: "PERSONNEL: New hire notification from HR/HRIS system"
+
+sodTier: "Tier 2 -- Config Manager"
+entraRolesRequired:
+  - "User Administrator"
+
+approvalRequired: false
+
+services:
+  - name: "Entra ID"
+    purpose: "User creation, group membership, license assignment"
+  - name: "Microsoft Graph PowerShell"
+    modules:
+      - "Microsoft.Graph.Users"
+      - "Microsoft.Graph.Groups"
+      - "Microsoft.Graph.Identity.DirectoryManagement"
+  - name: "Conditional Access"
+    purpose: "Auto-targeting via group membership"
+  - name: "Intune"
+    purpose: "Device enrollment group pre-assignment"
+  - name: "Exchange Online"
+    purpose: "Mailbox auto-provisioning via license"
+
+configurationSteps:
+  portalPath: "https://entra.microsoft.us > Identity > Users > All users > New user > Create new user"
+
+  powershellCmdlets:
+    - cmdlet: "Connect-MgGraph"
+      parameters:
+        - "-Environment USGov"
+        - "-Scopes User.ReadWrite.All,Group.ReadWrite.All,Directory.ReadWrite.All"
+    - cmdlet: "New-MgUser"
+      parameters:
+        - "-DisplayName"
+        - "-UserPrincipalName"
+        - "-MailNickname"
+        - "-AccountEnabled"
+        - "-PasswordProfile"
+        - "-UsageLocation US"
+    - cmdlet: "Add-MgGroupMember"
+      parameters:
+        - "-GroupId"
+        - "-DirectoryObjectId"
+    - cmdlet: "Set-MgUserLicense"
+      parameters:
+        - "-UserId"
+        - "-BodyParameter"
+
+  graphApiEndpoint: "POST https://graph.microsoft.us/v1.0/users"
+  graphApiPayloadExample:
+    accountEnabled: true
+    displayName: "{displayName}"
+    mailNickname: "{mailNickname}"
+    userPrincipalName: "{upn}"
+    usageLocation: "US"
+    passwordProfile:
+      forceChangePasswordNextSignIn: true
+      password: "{temporaryPassword}"
+
+  requiredPermissions:
+    - "User.ReadWrite.All"
+    - "Group.ReadWrite.All"
+    - "Directory.ReadWrite.All"
+
+evidenceArtifacts:
+  - type: "Azure AD Audit Logs"
+    retentionPeriod: "7 years"
+    storageLocation: "evidence-store/domain-a-identity/A-01/{year}/{month}/"
+    query: "Activity: Add user, Result: Success"
+  - type: "Stamper Execution Evidence"
+    hashAlgorithm: "SHA-256"
+    storageLocation: "evidence-store/domain-a-identity/A-01/{year}/{month}/"
+    format: "JSON (Graph API response body confirming user creation)"
+    filenamePattern: "A-01_NewUserProvisioned_{YYYYMMDD}_{HHmmss}_{UPN}.json"
+
+gccHighSpecifics:
+  endpoints:
+    - "https://graph.microsoft.us"
+    - "https://entra.microsoft.us"
+  complianceBoundary: "FedRAMP High + CMMC L2"
+  endpointValidation: "All endpoints use .microsoft.us or .usgovcloudapi.net domains"
+  notes: "Conditional Access policies that target baseline-all-users group automatically apply to new user without additional configuration"
+
+relatedPolicies:
+  - "AC-001 Access Control Policy"
+  - "IA-002 Identification and Authentication Policy"
+
+odpValues:
+  - odpId: "AC.L2-3.1.1_ODP_01"
+    description: "Authorized users for system access"
+    value: "Users added to baseline-all-users group via A-01 provisioning workflow"
+    rationale: "Group-based targeting ensures all provisioned users are subject to Conditional Access controls"
+    enforcementMechanism: "Entra ID group membership + Conditional Access policy targeting"
+
+dependencies:
+  hardDependencies:
+    - useCaseId: "A-07"
+      reason: "MFA Enrollment Enforcement CA policy must exist to auto-apply to new user"
+  softDependencies:
+    - useCaseId: "A-17"
+      reason: "Admin performing provisioning should use a separated admin account"
+    - useCaseId: "G-02"
+      reason: "New hire training enforcement should be configured"
+
+notes: "Every new account must be added to baseline-all-users group to ensure CA targeting from first sign-in. UsageLocation must be set to US for GCC High license assignment to succeed."

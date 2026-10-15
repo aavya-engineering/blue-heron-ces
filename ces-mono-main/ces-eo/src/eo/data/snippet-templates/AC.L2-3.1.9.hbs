@@ -1,0 +1,38 @@
+## Control {{controlId}}: Provide Privacy and Security Notices for CUI
+
+**Implementation Status:** {{status}}
+
+This organization provides privacy and security notices consistent with applicable CUI rules within the {{tenantName}} M365 GCC High tenant. System use notifications are presented to users prior to granting access through Azure AD Terms of Use agreements, logon banners, and consent-based access workflows that document user acknowledgment of privacy and security requirements.
+
+{{#if agreementsConfigured}}
+Azure AD Terms of Use agreements enforce user acknowledgment of privacy and security obligations. {{agreementsCount}} active agreements are configured, requiring acceptance before CUI system access is granted. Agreements include: system use notification statements, CUI handling requirements per 32 CFR Part 2002, acceptable use policy acknowledgment, and consent to security monitoring. Users must re-accept terms at the frequency defined by organizational policy.
+{{else}}
+Azure AD Terms of Use agreements have not been configured. Privacy and security notices are delivered through manual onboarding procedures pending automated enforcement.
+{{/if}}
+
+{{#if policies}}
+Conditional Access policies enforce notice acknowledgment:
+{{#each policies}}
+- **{{displayName}}** ({{state}}): Requires Terms of Use acceptance with {{#each grantControls.builtInControls}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}.
+{{/each}}
+{{/if}}
+
+{{#if infraResources}}
+Supporting infrastructure:
+{{#each infraResources}}
+- {{resourceType}} "{{name}}"{{#if properties.retention_days}} (retention: {{properties.retention_days}} days){{/if}}
+{{/each}}
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Review Azure AD Terms of Use agreement configurations, user acceptance records, and Conditional Access policy enforcement of notice acknowledgment.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

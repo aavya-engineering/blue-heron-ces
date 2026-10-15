@@ -1,0 +1,38 @@
+## Control {{controlId}}: Authorize Wireless Access Before Connections
+
+**Implementation Status:** {{status}}
+
+This organization authorizes wireless access prior to allowing such connections within the {{tenantName}} M365 GCC High tenant. Wireless access authorization is enforced through Intune device compliance policies, Conditional Access device requirements, and network access control configurations that require device authentication and compliance verification before granting wireless network connectivity.
+
+{{#if deviceConfigurationsActive}}
+Intune enforces wireless access authorization through {{deviceConfigurationsCount}} device configuration policies. Devices must be enrolled in Intune, marked as compliant, and authenticate via certificate-based 802.1X authentication before connecting to wireless networks that provide access to CUI resources. Non-compliant or unmanaged devices are restricted to guest network segments with no CUI access.
+{{else}}
+Intune device compliance policies for wireless access authorization have not been configured. Wireless access relies on network-level authentication pending device compliance policy deployment.
+{{/if}}
+
+{{#if policies}}
+Conditional Access policies enforce wireless device authorization:
+{{#each policies}}
+- **{{displayName}}** ({{state}}): Requires {{#each grantControls.builtInControls}}{{this}}{{#unless @last}}, {{/unless}}{{/each}} for device access.
+{{/each}}
+{{/if}}
+
+{{#if infraResources}}
+Supporting infrastructure:
+{{#each infraResources}}
+- {{resourceType}} "{{name}}"{{#if properties.retention_days}} (retention: {{properties.retention_days}} days){{/if}}
+{{/each}}
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Review Intune device compliance policies, 802.1X certificate configurations, Conditional Access device compliance requirements, and wireless network access logs.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

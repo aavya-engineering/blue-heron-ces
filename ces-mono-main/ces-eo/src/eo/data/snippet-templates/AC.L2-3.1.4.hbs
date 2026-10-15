@@ -1,0 +1,35 @@
+## Control {{controlId}}: Separate Duties to Reduce Malevolent Activity Risk
+
+**Implementation Status:** {{status}}
+
+This organization separates the duties of individuals to reduce the risk of malevolent activity without collusion within the {{tenantName}} M365 GCC High tenant. Duty separation is enforced through Azure AD directory roles, Privileged Identity Management (PIM) policies, and administrative account segmentation that prevents any single individual from controlling all aspects of critical security functions.
+
+{{#if directoryRolesConfigured}}
+Azure AD enforces separation of duties through {{directoryRolesCount}} distinct directory roles. Each administrative role is scoped to specific functions (e.g., Global Administrator, Security Administrator, Compliance Administrator, User Administrator) with mutually exclusive permissions. Role assignments are reviewed quarterly by {{variables.accessControlAdministrator}} to identify and remediate incompatible duty combinations.
+{{else}}
+Azure AD directory role separation has not been configured. Duty separation controls rely on procedural controls pending RBAC implementation.
+{{/if}}
+
+{{#if pimConfigured}}
+Privileged Identity Management enforces time-bound role activation with approval workflows, preventing persistent privileged access. Administrators must justify and receive approval before activating elevated roles, creating an auditable chain of custody for all privileged operations.
+{{/if}}
+
+{{#if infraResources}}
+Supporting infrastructure:
+{{#each infraResources}}
+- {{resourceType}} "{{name}}"{{#if properties.retention_days}} (retention: {{properties.retention_days}} days){{/if}}
+{{/each}}
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Review Azure AD role assignments for incompatible duty combinations, PIM activation logs, and administrative account separation documentation.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

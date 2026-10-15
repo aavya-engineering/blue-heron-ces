@@ -1,0 +1,91 @@
+controlId: "PS.L2-3.9.2"
+relatedControlIds:
+  - "AT.L2-3.2.1"  # [VERIFY] mapping not yet confirmed
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: G-06
+useCaseTitle: "NDA/AUP Acknowledgment"
+domain: Personnel Security
+priority: P4 Standard
+trigger: 'ONBOARDING: New user account provisioned, or SCHEDULE: Annual re-acknowledgment cycle'
+sodTier: Tier 2 (Config Manager)
+entraRolesRequired:
+- User Administrator
+- Compliance Administrator
+approvalRequired: false
+services:
+- name: SharePoint Online -- NDA/AUP tracking list, document library for signed acknowledgments
+  purpose: ''
+- name: Entra ID -- security groups
+  purpose: '`nda-aup-noncompliant`), Conditional Access'
+- name: Power Automate -- annual reminder notifications and compliance checks
+  purpose: ''
+- name: Azure Immutable Blob Storage -- evidence retention
+  purpose: ''
+configurationSteps:
+  portalPath: //{tenant}-admin.sharepoint.us).
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes User.Read.All
+  - cmdlet: Get-MgUser
+    parameters:
+    - -MgUser
+    - -Filter
+    - -Property
+    - -All
+    - -Object
+  - cmdlet: Get-MgGroup
+    parameters:
+    - -MgGroup
+    - -Filter
+    - -aup
+    - -noncompliant
+    - -Object
+  - cmdlet: Get-MgGroupMember
+    parameters:
+    - -MgGroupMember
+    - -GroupId
+    - -All
+    - -MgGroupMemberByRef
+    - -GroupId
+  - cmdlet: Remove-MgGroupMemberByRef
+    parameters:
+    - -MgGroupMemberByRef
+    - -GroupId
+    - -DirectoryObjectId
+    - -MgGroupMemberByRef
+    - -GroupId
+  - cmdlet: New-MgGroupMemberByRef
+    parameters:
+    - -MgGroupMemberByRef
+    - -GroupId
+    - -BodyParameter
+    - -Date
+    - -Format
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/sites/{siteId}/lists/{listId}/items?$expand=fields
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-g-personnel/G-06/{year}/{month}/
+  format: CSV (acknowledgment status report), JSON (SharePoint list schema export), PDF (sample signed NDA/AUP)
+  filenamePattern: G-06_NDA_AUP_Audit_{YYYYMMDD}_{HHmmss}_{Context}.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://flow.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: SharePoint Online is fully available in GCC High. The SharePoint site URL uses the `.sharepoint.us` domain. Power
+    Automate flows for reminder notifications must be created in the GCC High Power Automate environment (`https://flow.microsoft.us`).
+    Signed NDA/AUP documents stored in the SharePoint document library should be protected with the `Non-CUI` sensitivity
+    label (the documents themselves are internal administrative records, not CUI, unless they contain CUI-specific terms).
+    All Graph API calls must target `graph.microsoft.us`.
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

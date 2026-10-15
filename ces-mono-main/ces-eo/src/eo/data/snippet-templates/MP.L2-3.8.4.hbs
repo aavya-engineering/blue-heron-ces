@@ -1,0 +1,37 @@
+## Control {{controlId}}: Mark Media with Necessary CUI Markings and Distribution Limitations
+
+**Implementation Status:** {{status}}
+
+This organization marks media with CUI markings and distribution limitations within the {{tenantName}} M365 GCC High tenant through Microsoft Information Protection sensitivity labels and automated labeling rules managed by {{variables.accessControlAdministrator}}.
+
+{{#if dlpLabelsConfigured}}
+**Automated CUI Marking:**
+{{dlpLabelsCount}} sensitivity labels enforce CUI markings on digital media:
+{{#each labels}}
+- **{{name}}**{{#if isActive}} (Active){{else}} (Inactive){{/if}} — Priority: {{priority}}{{#if tooltip}} — {{tooltip}}{{/if}}
+{{/each}}
+
+Sensitivity labels apply:
+- **Headers/Footers:** "CUI" or "CONTROLLED UNCLASSIFIED INFORMATION" markings on documents and emails
+- **Watermarks:** Visual watermarks on CUI documents per 32 CFR Part 2002 requirements
+- **Metadata:** Machine-readable classification tags embedded in file properties
+- **Distribution Limitations:** "NOFORN," "FEDCON," or organization-specific dissemination controls applied via label policy
+{{else}}
+Sensitivity labels for CUI marking have not been configured. Media marking relies on manual procedures.
+{{/if}}
+
+**Paper Media Marking:**
+Paper media containing CUI is marked with banner markings on each page per 32 CFR Part 2002, including CUI category, limited dissemination controls, and organization identifier.
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Examine sensitivity label configurations, header/footer/watermark settings, automated labeling rules, and paper media marking compliance samples.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

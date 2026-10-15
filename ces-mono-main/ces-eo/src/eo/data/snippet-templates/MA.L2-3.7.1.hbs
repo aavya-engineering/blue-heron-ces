@@ -1,0 +1,34 @@
+## Control {{controlId}}: Perform Maintenance on Organizational Systems
+
+**Implementation Status:** {{status}}
+
+This organization performs timely maintenance on organizational systems within the {{tenantName}} M365 GCC High tenant through scheduled maintenance windows and change management procedures documented in "System Maintenance Policy v1.0" maintained by {{variables.systemAdministrator}}.
+
+**Maintenance Scope:**
+- **Cloud Infrastructure:** Microsoft manages physical infrastructure, hypervisor, and platform-level maintenance under FedRAMP High authorization within GCC High boundary
+- **Tenant Configuration:** Entra ID, Exchange Online, SharePoint, Teams, and Intune configuration maintenance performed by authorized administrators during approved windows
+- **Endpoint Maintenance:** Managed device patching, configuration updates, and hardware replacements coordinated through Intune
+
+{{#if updateRingsConfigured}}
+**Automated Patch Maintenance:**
+{{updateRingsCount}} Windows Update ring policies automate routine software maintenance on managed endpoints.
+{{/if}}
+
+**Operational Procedure:**
+- **Action:** Scheduled maintenance performed during designated maintenance windows (Saturdays 02:00-06:00 UTC); emergency maintenance follows expedited approval process
+- **Frequency:** Monthly routine maintenance; as-needed for security patches and emergency fixes
+- **Responsible Party:** {{variables.systemAdministrator}}
+- **Documentation:** System Maintenance Policy v1.0, Change Management Form MA-001
+
+**Review Frequency:** Monthly maintenance summary reviewed by ISSO
+
+**Verification Method:** Examine maintenance logs, change management records, patch deployment reports, and maintenance window compliance documentation.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** Review maintenance records per procedure MA-001. {{evidenceArtifactUrl}}
+{{/if}}

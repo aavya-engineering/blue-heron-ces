@@ -1,0 +1,91 @@
+controlId: "AT.L2-3.2.3"
+relatedControlIds:
+  - "AT.L2-3.2.2"
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: G-03
+useCaseTitle: "Role-Based CUI Training"
+domain: Personnel Security
+priority: P4 Standard
+trigger: 'CHANGE: User added to a CUI-scoped security group or assigned a CUI-handling role'
+sodTier: Tier 2 (Config Manager)
+entraRolesRequired:
+- User Administrator
+- Compliance Administrator
+approvalRequired: false
+services:
+- name: Entra ID -- security groups
+  purpose: '`CUI-Users`, `cui-training-noncompliant`), Conditional Access'
+- name: LMS
+  purpose: vendor-agnostic) -- CUI-specific course enrollment and completion tracking
+- name: Power Automate or Azure Logic Apps -- group membership change detection
+  purpose: ''
+- name: SharePoint Online -- CUI training materials hosting
+  purpose: ''
+configurationSteps:
+  portalPath: //entra.microsoft.us) > Groups > All groups.
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes User.Read.All
+  - cmdlet: Get-MgGroup
+    parameters:
+    - -MgGroup
+    - -Filter
+    - -MgGroupMember
+    - -GroupId
+    - -All
+  - cmdlet: Get-MgGroupMember
+    parameters:
+    - -MgGroupMember
+    - -GroupId
+    - -All
+    - -Object
+    - -ExpandProperty
+  - cmdlet: Get-MgUser
+    parameters:
+    - -MgUser
+    - -Filter
+    - -Property
+    - -All
+    - -Object
+  - cmdlet: Remove-MgGroupMemberByRef
+    parameters:
+    - -MgGroupMemberByRef
+    - -GroupId
+    - -DirectoryObjectId
+    - -MgGroupMemberByRef
+    - -GroupId
+  - cmdlet: New-MgGroupMemberByRef
+    parameters:
+    - -MgGroupMemberByRef
+    - -GroupId
+    - -BodyParameter
+    - -Date
+    - -Format
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/groups/{cuiGroupId}/members?$select=id,userPrincipalName,displayName
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-g-personnel/G-03/{year}/{month}/
+  format: CSV (CUI training roster), CSV (non-compliant CUI user list), JSON (CA policy snapshot)
+  filenamePattern: G-03_CUITrainingAudit_{YYYYMMDD}_{HHmmss}_{Context}.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: 'All Entra group management and Conditional Access features are fully available in GCC High. The CUI training roster
+    depends on an external LMS that must export data in the documented CSV format. Ensure that training materials hosted on
+    SharePoint Online use a GCC High tenant site (`https://{tenant}.sharepoint.us`) and that CUI training content is protected
+    with the `CUI` sensitivity label (Baseline prerequisite #6).'
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

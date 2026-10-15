@@ -1,0 +1,45 @@
+## Control {{controlId}}: Supervise Maintenance Activities of Personnel Without Required Access Authorization
+
+**Implementation Status:** {{status}}
+
+This organization supervises unauthorized maintenance personnel within the {{tenantName}} M365 GCC High tenant through escorted access procedures and audit logging documented in "Maintenance Personnel Supervision Policy v1.0" maintained by {{variables.systemAdministrator}}.
+
+**Supervision Requirements:**
+- Maintenance personnel without required access authorization (vendor technicians, contractors awaiting clearance) are escorted by authorized personnel at all times during maintenance activities
+- All actions performed by supervised maintenance personnel are logged and reviewed
+- Supervised sessions use temporary, restricted-scope credentials that are revoked upon maintenance completion
+- Physical access to server rooms and network closets requires escort by authorized personnel
+
+{{#if roleAssignmentsConfigured}}
+**Authorized Escort Personnel:**
+Only personnel with designated administrative roles can escort and supervise unauthorized maintenance staff:
+{{#if assignments}}
+{{#each assignments}}
+- **{{principalDisplayName}}** — Role: {{roleDefinitionName}}
+{{/each}}
+{{/if}}
+{{/if}}
+
+{{#if directoryAuditsAvailable}}
+**Audit Trail:**
+Directory audit logs capture all administrative actions during supervised maintenance sessions, providing attributable records of actions performed.
+{{/if}}
+
+**Operational Procedure:**
+- **Action:** Escort and supervise all unauthorized maintenance personnel; log activities; revoke temporary access upon completion
+- **Frequency:** Per maintenance event
+- **Responsible Party:** {{variables.systemAdministrator}}
+- **Documentation:** Maintenance Personnel Supervision Policy v1.0, Supervision Log Form MA-006
+
+**Review Frequency:** Per event review; quarterly audit by ISSO
+
+**Verification Method:** Examine supervision logs, temporary credential records, escort documentation, and audit trail for supervised maintenance sessions.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** Review supervision logs per procedure MA-006. {{evidenceArtifactUrl}}
+{{/if}}

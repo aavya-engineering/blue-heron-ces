@@ -1,0 +1,40 @@
+## Control {{controlId}}: Limit System Access to Authorized Users
+
+**Implementation Status:** {{status}}
+
+This organization limits information system access to authorized users, processes acting on behalf of authorized users, and devices (including other information systems) within the {{tenantName}} M365 GCC High tenant. Access is managed through Azure Active Directory identity governance and Conditional Access policy enforcement.
+
+{{#if cuiGroupExists}}
+The "{{groupDisplayName}}" security group ({{memberCount}} members) serves as the primary access control mechanism. All users requiring system access must be provisioned into this group by {{variables.accessControlAdministrator}}. Membership is reviewed quarterly and reconciled against HR records to ensure only active, authorized personnel retain access.
+{{else}}
+A dedicated security group for authorized users has not been created. Access control relies on individual account provisioning pending group-based automation.
+{{/if}}
+
+{{#if policies}}
+The following Conditional Access policies enforce access restrictions at the authentication layer:
+{{#each policies}}
+- **{{displayName}}** ({{state}}): Enforces {{#each grantControls.builtInControls}}{{this}}{{#unless @last}}, {{/unless}}{{/each}} for {{conditions.users}} users across {{conditions.applications}} applications.
+{{/each}}
+{{else}}
+Conditional Access policies are not yet configured. System access is controlled through Azure AD group membership and application-level permissions only.
+{{/if}}
+
+{{#if infraResources}}
+Supporting infrastructure:
+{{#each infraResources}}
+- {{resourceType}} "{{name}}"{{#if properties.retention_days}} (log retention: {{properties.retention_days}} days){{/if}}
+{{/each}}
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Review Azure AD user provisioning records, security group membership exports, and Conditional Access policy audit logs.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

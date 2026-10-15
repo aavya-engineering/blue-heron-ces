@@ -1,0 +1,60 @@
+controlId: "AT.L2-3.2.2"
+relatedControlIds:
+  - "AT.L2-3.2.1"
+  - "AT.L2-3.2.3"  # [VERIFY] mapping not yet confirmed
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: G-04
+useCaseTitle: "Phishing Simulation Report"
+domain: Personnel Security
+priority: P3 Medium
+trigger: 'SCHEDULE: Monthly or quarterly phishing simulation campaign completion'
+sodTier: Tier 2 (Config Manager)
+entraRolesRequired:
+- Security Administrator
+- Compliance Administrator
+approvalRequired: false
+services:
+- name: Microsoft Defender for Office 365 P2 -- Attack Simulator
+  purpose: if available in GCC High
+- name: KnowBe4
+  purpose: third-party alternative -- evaluate for your environment
+- name: Entra ID -- user directory for targeting simulation campaigns
+  purpose: ''
+- name: Microsoft Sentinel -- optional ingestion of simulation results for correlation
+  purpose: ''
+- name: Azure Immutable Blob Storage -- evidence artifact retention
+  purpose: ''
+configurationSteps:
+  portalPath: ''
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes AttackSimulation.Read.All
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/security/attackSimulation/simulations
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-g-personnel/G-04/{year}/{month}/
+  format: CSV (campaign results -- UPN, click status, report status, timestamps)
+  filenamePattern: G-04_PhishingSimulation_{YYYYMMDD}_{HHmmss}_{CampaignID}.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://security.microsoft.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |
+    Attack Simulator (Attack simulation training in Microsoft Defender for Office 365 P2) is `[UNCONFIRMED IN GCC HIGH -- verify in tenant]`. The Graph API endpoints for attack simulation (`/security/attackSimulation/`) may not be available in the GCC High Graph instance (`graph.microsoft.us`). Before relying on Attack Simulator, test the following in your tenant:
+
+    1. Navigate to `https://security.microsoft.us` > Email & collaboration. Verify "Attack simulation training" appears in the navigation.
+    2. Attempt to create a test simulation. If the feature is grayed out or absent, it is not available.
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

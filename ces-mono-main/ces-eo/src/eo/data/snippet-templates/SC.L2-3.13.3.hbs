@@ -1,0 +1,42 @@
+## Control {{controlId}}: Separate User Functionality from System Management Functionality
+
+**Implementation Status:** {{status}}
+
+This organization separates user functionality from system management functionality within the {{tenantName}} M365 GCC High tenant through dedicated administrative accounts, Privileged Identity Management (PIM), and role-based access control enforced by {{variables.accessControlAdministrator}}.
+
+{{#if directoryRolesConfigured}}
+**Role-Based Separation:**
+{{directoryRolesCount}} directory roles define the boundary between user and administrative functionality. Administrative actions require assignment to specific roles with separate privileged accounts distinct from standard user accounts.
+{{else}}
+Directory role configuration has not been confirmed. Role-based separation between user and administrative functions is not verified.
+{{/if}}
+
+{{#if pimConfigured}}
+**Privileged Identity Management:**
+Azure AD PIM enforces just-in-time (JIT) elevation for administrative access. Administrators use standard user accounts for daily operations and activate privileged roles only when performing system management tasks, with time-bound activation and approval workflows.
+{{else}}
+Privileged Identity Management has not been configured. Administrative access separation relies on static role assignments without JIT elevation.
+{{/if}}
+
+{{#if conditionalAccessActive}}
+**Administrative Access Enforcement:**
+Conditional Access policies enforce additional controls for administrative sessions:
+{{#each policies}}
+- **{{displayName}}** ({{state}}): Requires {{#each grantControls.builtInControls}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+{{/each}}
+{{else}}
+Conditional Access enforcement for administrative sessions has not been configured.
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Examine Azure AD directory role assignments, PIM activation logs, administrative account separation documentation, and Conditional Access policies targeting admin roles.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

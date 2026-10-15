@@ -1,0 +1,1926 @@
+[
+  {
+    "id": "A-01",
+    "title": "New User Provisioning",
+    "domain": "A",
+    "domainName": "Identity & Access Management",
+    "trigger": "ONBOARDING",
+    "priority": "P1 Critical",
+    "sodTier": "Tier 2",
+    "overview": "Provisions new user accounts with proper group memberships, license assignments, Conditional Access targeting, and Intune pre-assignment.",
+    "cmmcPractices": ["AC.L1-3.1.1", "IA.L1-3.5.1"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "upn",
+        "label": "User Principal Name",
+        "type": "text",
+        "required": true,
+        "placeholder": "user@tenant.onmicrosoft.us"
+      },
+      {
+        "name": "displayName",
+        "label": "Display Name",
+        "type": "text",
+        "required": true,
+        "placeholder": "John Doe"
+      },
+      {
+        "name": "m365LicenseSkuId",
+        "label": "M365 License SKU ID",
+        "type": "readonly",
+        "source": "m365LicenseSkuId",
+        "required": true
+      },
+      {
+        "name": "baseGroupId",
+        "label": "Base Security Group Object ID",
+        "type": "readonly",
+        "source": "baseGroupId",
+        "required": true
+      },
+      {
+        "name": "tenantId",
+        "label": "Tenant ID",
+        "type": "readonly",
+        "source": "tenantId",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "A-02",
+    "title": "User Offboarding -- Disable",
+    "domain": "A",
+    "domainName": "Identity & Access Management",
+    "trigger": "OFFBOARDING",
+    "priority": "P1 Critical",
+    "sodTier": "Tier 2",
+    "overview": "Disables user account, revokes sign-in sessions, converts mailbox to shared, and applies litigation hold.",
+    "cmmcPractices": ["AC.L1-3.1.2"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "upn",
+        "label": "User Principal Name",
+        "type": "text",
+        "required": true,
+        "placeholder": "user@tenant.onmicrosoft.us"
+      }
+    ]
+  },
+  {
+    "id": "A-03",
+    "title": "User Offboarding -- Hard Delete",
+    "domain": "A",
+    "domainName": "Identity & Access Management",
+    "trigger": "OFFBOARDING",
+    "priority": "P2 High",
+    "sodTier": "Tier 3",
+    "overview": "Permanently removes user account, reclaims licenses, archives mailbox. Requires Tier 3 separation of duties approval.",
+    "cmmcPractices": ["AC.L1-3.1.2"],
+    "idempotencyClass": "unsafe_requires_gate",
+    "parameters": [
+      {
+        "name": "targetUPN",
+        "label": "Target User Principal Name",
+        "type": "text",
+        "required": true,
+        "placeholder": "user@tenant.onmicrosoft.us"
+      },
+      {
+        "name": "reason",
+        "label": "Deletion Reason",
+        "type": "text",
+        "required": true,
+        "placeholder": "Permanent termination — approved by HR"
+      }
+    ]
+  },
+  {
+    "id": "A-04",
+    "title": "Role Change / Transfer",
+    "domain": "A",
+    "domainName": "Identity & Access Management",
+    "trigger": "ROLE_CHANGE",
+    "priority": "P3 Medium",
+    "sodTier": "Tier 2",
+    "overview": "Audits group memberships, reassigns PIM roles, updates Conditional Access and Intune targeting.",
+    "cmmcPractices": ["AC.L1-3.1.1"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "targetUPN",
+        "label": "Target User Principal Name",
+        "type": "text",
+        "required": true,
+        "placeholder": "user@tenant.onmicrosoft.us"
+      },
+      {
+        "name": "oldGroupId",
+        "label": "Old Group Object ID",
+        "type": "text",
+        "required": true,
+        "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+      },
+      {
+        "name": "newGroupId",
+        "label": "New Group Object ID",
+        "type": "text",
+        "required": true,
+        "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+      },
+      {
+        "name": "newDepartment",
+        "label": "New Department",
+        "type": "text",
+        "required": true,
+        "placeholder": "Engineering"
+      }
+    ]
+  },
+  {
+    "id": "A-05",
+    "title": "Leave of Absence -- Suspend",
+    "domain": "A",
+    "domainName": "Identity & Access Management",
+    "trigger": "LOA",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Disables account without license removal, adds to LOA security group, preserves memberships.",
+    "cmmcPractices": ["AC.L1-3.1.2"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "targetUPN",
+        "label": "Target User Principal Name",
+        "type": "text",
+        "required": true,
+        "placeholder": "user@tenant.onmicrosoft.us"
+      },
+      {
+        "name": "loaGroupId",
+        "label": "LOA Security Group Object ID",
+        "type": "readonly",
+        "source": "loaGroupId",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "A-06",
+    "title": "LOA Return -- Restore",
+    "domain": "A",
+    "domainName": "Identity & Access Management",
+    "trigger": "LOA",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Re-enables account, restores PIM roles, forces MFA re-registration.",
+    "cmmcPractices": ["AC.L1-3.1.2", "IA.L2-3.5.3"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "targetUPN",
+        "label": "Target User Principal Name",
+        "type": "text",
+        "required": true,
+        "placeholder": "user@tenant.onmicrosoft.us"
+      },
+      {
+        "name": "loaGroupId",
+        "label": "LOA Security Group Object ID",
+        "type": "readonly",
+        "source": "loaGroupId",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "A-07",
+    "title": "MFA Enrollment Enforcement",
+    "domain": "A",
+    "domainName": "Identity & Access Management",
+    "trigger": "ONBOARDING",
+    "priority": "P1 Critical",
+    "sodTier": "Tier 2",
+    "overview": "Enforces MFA enrollment via Conditional Access policy and Authentication Methods Policy. Requires phishing-resistant methods.",
+    "cmmcPractices": ["IA.L2-3.5.3", "AC.L1-3.1.1"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "upn",
+        "label": "User Principal Name",
+        "type": "text",
+        "required": true,
+        "placeholder": "user@tenant.onmicrosoft.us"
+      },
+      {
+        "name": "enforcementMode",
+        "label": "Enforcement Mode",
+        "type": "select",
+        "required": true,
+        "options": [
+          { "value": "immediate", "label": "Immediate" },
+          { "value": "grace", "label": "Grace Period (14 days)" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "A-08",
+    "title": "MFA Method Audit -- Weak Removal",
+    "domain": "A",
+    "domainName": "Identity & Access Management",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Audits registered MFA methods and removes weak methods (SMS/voice).",
+    "cmmcPractices": ["IA.L2-3.5.3"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "A-09",
+    "title": "Privileged Role Review (PIM)",
+    "domain": "A",
+    "domainName": "Identity & Access Management",
+    "trigger": "AUDIT",
+    "priority": "P1 Critical",
+    "sodTier": "Tier 2",
+    "overview": "Quarterly Access Review on privileged roles with auto-remove for stale assignments.",
+    "cmmcPractices": ["AC.L2-3.1.3"],
+    "idempotencyClass": "evidence-only",
+    "parameters": [
+      {
+        "name": "globalAdminRoleDefId",
+        "source": "globalAdminRoleDefId",
+        "required": true
+      },
+      {
+        "name": "privilegedRoleAdminDefId",
+        "source": "privilegedRoleAdminDefId",
+        "required": true
+      },
+      {
+        "name": "securityAdminRoleDefId",
+        "source": "securityAdminRoleDefId",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "A-10",
+    "title": "Standing Privilege Elimination",
+    "domain": "A",
+    "domainName": "Identity & Access Management",
+    "trigger": "CONFIG",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Converts a permanent (standing) Global Administrator assignment to a PIM-eligible assignment: creates JIT eligibility for the principal, then removes the standing active assignment. Remediates AC.L2-3.1.5.",
+    "cmmcPractices": ["AC.L2-3.1.5"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      { "name": "targetUPN", "label": "Admin UPN to convert to PIM-eligible", "type": "text", "required": true, "placeholder": "admin@tenant.onmicrosoft.us" },
+      {
+        "name": "globalAdminRoleDefId",
+        "label": "Global Administrator role definition id (tenant-derived)",
+        "type": "readonly",
+        "source": "globalAdminRoleDefId",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "A-18",
+    "title": "Default User Permission Lockdown",
+    "domain": "A",
+    "domainName": "Identity & Access Management",
+    "trigger": "CONFIG",
+    "priority": "P3 Medium",
+    "sodTier": "Tier 2",
+    "overview": "Restricts default (non-admin) user permissions: blocks app registration, security-group creation, and tenant creation. Remediates AC.L2-3.1.2 (transaction/function control).",
+    "cmmcPractices": ["AC.L1-3.1.2"],
+    "idempotencyClass": "get-then-set",
+    "parameters": []
+  },
+  {
+    "id": "A-19",
+    "title": "Break-Glass Conditional Access Exclusion",
+    "domain": "A",
+    "domainName": "Identity & Access Management",
+    "trigger": "CONFIG",
+    "priority": "P3 Medium",
+    "sodTier": "Tier 3",
+    "overview": "Excludes the emergency-access (break-glass) account from a blocking Conditional Access policy so an MFA/grant-control outage cannot lock out emergency access, while the policy stays enforced for all other users. Idempotent - no-op if the account is already excluded. Remediates the CA-02 exclusion finding (AC.L2-3.1.7 emergency-access resilience).",
+    "cmmcPractices": ["AC.L2-3.1.7"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      { "name": "breakglassUPN", "label": "Break-glass account UPN", "type": "text", "source": "resources.breakglass_upn", "required": true, "placeholder": "breakglass@tenant.onmicrosoft.us" },
+      { "name": "policyDisplayName", "label": "CA policy to exclude the break-glass account from", "type": "text", "required": true, "placeholder": "CA-02: Block Legacy Authentication" }
+    ]
+  },
+  {
+    "id": "A-20",
+    "title": "Conditional Access Duplicate Policy Cleanup",
+    "domain": "A",
+    "domainName": "Identity & Access Management",
+    "trigger": "CONFIG",
+    "priority": "P3 Medium",
+    "sodTier": "Tier 3",
+    "overview": "Deletes duplicate Conditional Access policies that share one displayName, keeping the oldest copy. Only report-only/disabled duplicates are deleted - an ENABLED duplicate is never deleted automatically (it is surfaced for manual review) so enforcement cannot change. Remediates CA-policy config drift such as a provisioning re-run loop creating dozens of copies of the same policy. Baseline hygiene for CM.L2-3.4.1/3.4.2.",
+    "cmmcPractices": ["CM.L2-3.4.1", "CM.L2-3.4.2"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      { "name": "policyDisplayName", "label": "Duplicated CA policy displayName to dedupe", "type": "text", "required": true, "placeholder": "CMMC-RemoteMaintenance-MFA" }
+    ]
+  },
+  {
+    "id": "B-13",
+    "title": "Device Compliance Baseline Enforcement",
+    "domain": "B",
+    "domainName": "Device & Endpoint Management",
+    "trigger": "CONFIG",
+    "priority": "P2 High",
+    "sodTier": "Tier 2",
+    "overview": "Creates a Windows 10/11 device compliance policy (BitLocker, secure boot, min OS) so the compliant-device Conditional Access gate has a baseline to evaluate. Remediates CM.L2-3.4.2.",
+    "cmmcPractices": ["CM.L2-3.4.2"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      { "name": "policyName", "label": "Compliance Policy Name", "type": "text", "required": true, "placeholder": "CMMC-Windows-Compliance" }
+    ]
+  },
+  {
+    "id": "B-14",
+    "title": "Autopilot Profile Provisioning",
+    "domain": "B",
+    "domainName": "Device & Endpoint Management",
+    "trigger": "CONFIG",
+    "priority": "P3 Medium",
+    "sodTier": "Tier 2",
+    "overview": "Creates a Windows Autopilot deployment profile so new devices are provisioned to a controlled baseline at enrollment. Remediates CM.L2-3.4.1 (baseline configuration).",
+    "cmmcPractices": ["CM.L2-3.4.1"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      { "name": "profileName", "label": "Autopilot Profile Name", "type": "text", "required": true, "placeholder": "CMMC-Autopilot-Baseline" }
+    ]
+  },
+  {
+    "id": "A-11",
+    "title": "Stale Account Detection",
+    "domain": "A",
+    "domainName": "Identity & Access Management",
+    "trigger": "AUDIT",
+    "priority": "P2 High",
+    "sodTier": "Tier 2",
+    "overview": "Filters accounts by signInActivity, disables accounts with no sign-in >90 days, deletes >180 days.",
+    "cmmcPractices": ["AC.L1-3.1.2"],
+    "idempotencyClass": "evidence-only",
+    "parameters": [
+      {
+        "name": "operatorUPN",
+        "source": "operatorUPN",
+        "required": true
+      },
+      {
+        "name": "breakGlassUPN",
+        "source": "breakGlassUPN",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "A-12",
+    "title": "Guest / External User Audit",
+    "domain": "A",
+    "domainName": "Identity & Access Management",
+    "trigger": "AUDIT",
+    "priority": "P2 High",
+    "sodTier": "Tier 2",
+    "overview": "Guest user inventory with Access Review and B2B cross-tenant policy enforcement.",
+    "cmmcPractices": ["AC.L1-3.1.2"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "A-13",
+    "title": "CA Policy Review",
+    "domain": "A",
+    "domainName": "Identity & Access Management",
+    "trigger": "AUDIT",
+    "priority": "P3 Medium",
+    "sodTier": "Tier 2",
+    "overview": "Exports all Conditional Access policies and performs gap analysis against CMMC AC/SC requirements.",
+    "cmmcPractices": ["AC.L1-3.1.1"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "A-14",
+    "title": "Named Location Update",
+    "domain": "A",
+    "domainName": "Identity & Access Management",
+    "trigger": "CONFIG",
+    "priority": "P3 Medium",
+    "sodTier": "Tier 2",
+    "overview": "Updates trusted IP ranges and geo-blocking configurations for Conditional Access.",
+    "cmmcPractices": ["AC.L2-3.1.12"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "namedLocationId",
+        "label": "Named Location Object ID",
+        "type": "readonly",
+        "source": "namedLocationId",
+        "required": true
+      },
+      {
+        "name": "trustedCidr",
+        "label": "Trusted IP CIDR Range",
+        "type": "text",
+        "required": true,
+        "placeholder": "198.51.100.0/24"
+      }
+    ]
+  },
+  {
+    "id": "A-15",
+    "title": "Break-Glass Validation",
+    "domain": "A",
+    "domainName": "Identity & Access Management",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 3",
+    "overview": "Monthly test sign-in, Sentinel alert verification, CA/PIM exclusion validation.",
+    "cmmcPractices": ["AC.L2-3.1.7"],
+    "idempotencyClass": "unsafe_requires_gate",
+    "parameters": [
+      {
+        "name": "breakGlassUPN",
+        "label": "Break-Glass UPN",
+        "type": "readonly",
+        "source": "breakGlassUPN",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "A-16",
+    "title": "Suspicious Sign-In Response",
+    "domain": "A",
+    "domainName": "Identity & Access Management",
+    "trigger": "INCIDENT",
+    "priority": "P1 Critical",
+    "sodTier": "Tier 2",
+    "overview": "Confirms risky user compromise, revokes sessions, escalates to H-02 for containment.",
+    "cmmcPractices": ["SI.L1-3.14.2"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "targetUPN",
+        "label": "Target User Principal Name",
+        "type": "text",
+        "required": true,
+        "placeholder": "user@tenant.onmicrosoft.us"
+      }
+    ]
+  },
+  {
+    "id": "A-17",
+    "title": "Admin Account Separation",
+    "domain": "A",
+    "domainName": "Identity & Access Management",
+    "trigger": "CONFIG",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Creates cloud-only admin accounts with no mailbox and PIM-only role assignments.",
+    "cmmcPractices": ["AC.L2-3.1.5"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "adminUPN",
+        "label": "Admin Account UPN",
+        "type": "text",
+        "required": true,
+        "placeholder": "admin.jsmith@tenant.onmicrosoft.us"
+      },
+      {
+        "name": "adminDisplayName",
+        "label": "Admin Display Name",
+        "type": "text",
+        "required": true,
+        "placeholder": "John Smith (Admin)"
+      },
+      {
+        "name": "adminGroupId",
+        "label": "Admin Security Group Object ID",
+        "type": "readonly",
+        "source": "adminGroupId",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "B-01",
+    "title": "New Device Enrollment",
+    "domain": "B",
+    "domainName": "Device & Endpoint Management",
+    "trigger": "ONBOARDING",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Enrolls device via Autopilot, applies compliance policy, security baseline, and BitLocker XTS-AES 256.",
+    "cmmcPractices": ["CM.L2-3.4.1"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "deviceName",
+        "label": "Device Name",
+        "type": "text",
+        "required": true,
+        "placeholder": "CORP-WIN-0001"
+      },
+      {
+        "name": "deviceSerialNumber",
+        "label": "Device Serial Number",
+        "type": "text",
+        "required": true,
+        "placeholder": "SN1234567890"
+      }
+    ]
+  },
+  {
+    "id": "B-02",
+    "title": "Compliance Policy Gap Report",
+    "domain": "B",
+    "domainName": "Device & Endpoint Management",
+    "trigger": "AUDIT",
+    "priority": "P2 High",
+    "sodTier": "Tier 2",
+    "overview": "Generates device inventory pivot by compliance policy status.",
+    "cmmcPractices": ["CM.L2-3.4.1"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "B-03",
+    "title": "OS Patch Currency Audit",
+    "domain": "B",
+    "domainName": "Device & Endpoint Management",
+    "trigger": "AUDIT",
+    "priority": "P2 High",
+    "sodTier": "Tier 2",
+    "overview": "OS version inventory, comparison against MSRC, expedited critical patch deployment.",
+    "cmmcPractices": ["SI.L1-3.14.1"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "B-04",
+    "title": "Security Baseline Drift",
+    "domain": "B",
+    "domainName": "Device & Endpoint Management",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Detects drift from Intune Security Baselines and re-deploys configurations.",
+    "cmmcPractices": ["CM.L2-3.4.2"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "B-05",
+    "title": "Terminated-User Device Wipe",
+    "domain": "B",
+    "domainName": "Device & Endpoint Management",
+    "trigger": "OFFBOARDING",
+    "priority": "P1 Critical",
+    "sodTier": "Tier 2",
+    "overview": "Full wipe for corporate devices, selective wipe for BYOD, Autopilot deregistration.",
+    "cmmcPractices": ["MP.L1-3.8.3"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "targetUPN",
+        "label": "Terminated User UPN",
+        "type": "text",
+        "required": true,
+        "placeholder": "user@tenant.onmicrosoft.us"
+      }
+    ]
+  },
+  {
+    "id": "B-06",
+    "title": "Lost/Stolen Device Wipe",
+    "domain": "B",
+    "domainName": "Device & Endpoint Management",
+    "trigger": "INCIDENT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Immediate full wipe, lost mode activation, escalation to D-03/H-01.",
+    "cmmcPractices": ["MP.L1-3.8.3"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "deviceId",
+        "label": "Intune Managed Device ID",
+        "type": "text",
+        "required": true,
+        "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+      },
+      {
+        "name": "itHelpDeskPhone",
+        "label": "IT Help Desk Phone",
+        "type": "readonly",
+        "source": "itHelpDeskPhone",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "B-07",
+    "title": "Non-Compliant Device CA Block",
+    "domain": "B",
+    "domainName": "Device & Endpoint Management",
+    "trigger": "CONFIG",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Conditional Access policy requiring compliant device status with grace period.",
+    "cmmcPractices": ["AC.L2-3.1.18"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "caPolicyId",
+        "label": "CA Policy Object ID",
+        "type": "readonly",
+        "source": "deviceComplianceCaPolicyId",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "B-08",
+    "title": "CUI App Allowlist/Blocklist",
+    "domain": "B",
+    "domainName": "Device & Endpoint Management",
+    "trigger": "CONFIG",
+    "priority": "P3 Medium",
+    "sodTier": "Tier 2",
+    "overview": "WDAC policies, App Protection Policies, Defender web filtering for CUI access control.",
+    "cmmcPractices": ["CM.L2-3.4.7"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "appProtectionPolicyId",
+        "label": "Android App Protection Policy ID",
+        "type": "readonly",
+        "source": "androidAppProtectionPolicyId",
+        "required": true
+      },
+      {
+        "name": "appPackageId",
+        "label": "App Package ID to Allowlist",
+        "type": "text",
+        "required": true,
+        "placeholder": "com.microsoft.teams"
+      }
+    ]
+  },
+  {
+    "id": "B-09",
+    "title": "BYOD Separation (MAM)",
+    "domain": "B",
+    "domainName": "Device & Endpoint Management",
+    "trigger": "CONFIG",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "MAM policies with data transfer blocking and selective wipe validation.",
+    "cmmcPractices": ["AC.L1-3.1.20"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "appProtectionPolicyId",
+        "label": "Android App Protection Policy ID",
+        "type": "readonly",
+        "source": "androidAppProtectionPolicyId",
+        "required": true
+      },
+      {
+        "name": "iosAppProtectionPolicyId",
+        "label": "iOS App Protection Policy ID",
+        "type": "readonly",
+        "source": "iosAppProtectionPolicyId",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "B-10",
+    "title": "Hardware Inventory Reconciliation",
+    "domain": "B",
+    "domainName": "Device & Endpoint Management",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Compares Intune inventory against procurement records to identify rogue/unenrolled devices.",
+    "cmmcPractices": ["CM.L2-3.4.1"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "B-11",
+    "title": "EDR Coverage Gap Detection",
+    "domain": "B",
+    "domainName": "Device & Endpoint Management",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Compares Intune vs. Defender for Endpoint inventory and pushes onboarding package.",
+    "cmmcPractices": ["SI.L1-3.14.4"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "B-12",
+    "title": "Autopilot Profile Review",
+    "domain": "B",
+    "domainName": "Device & Endpoint Management",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Audits Autopilot profiles, identifies stale profiles, validates alignment.",
+    "cmmcPractices": ["CM.L2-3.4.1"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "C-01",
+    "title": "App Secret/Cert Expiry Alert",
+    "domain": "C",
+    "domainName": "Credential & Key Lifecycle",
+    "trigger": "AUDIT",
+    "priority": "P1 Critical",
+    "sodTier": "Tier 2",
+    "overview": "Scans application registrations for expiring credentials and creates Sentinel alerts.",
+    "cmmcPractices": ["IA.L2-3.5.10"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "C-02",
+    "title": "App Secret Rotation",
+    "domain": "C",
+    "domainName": "Credential & Key Lifecycle",
+    "trigger": "CONFIG",
+    "priority": "P3 Medium",
+    "sodTier": "Tier 2",
+    "overview": "Rotates application secrets with Key Vault integration.",
+    "cmmcPractices": ["IA.L2-3.5.10"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "appId",
+        "label": "Application (client) ID",
+        "type": "text",
+        "required": true,
+        "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+      },
+      {
+        "name": "rotationReason",
+        "label": "Rotation Reason",
+        "type": "text",
+        "required": true,
+        "placeholder": "Scheduled 90-day rotation"
+      },
+      {
+        "name": "secretValidityDays",
+        "label": "New Secret Validity (days)",
+        "type": "text",
+        "required": true,
+        "placeholder": "90"
+      }
+    ]
+  },
+  {
+    "id": "C-03",
+    "title": "Key Vault Key Rotation",
+    "domain": "C",
+    "domainName": "Credential & Key Lifecycle",
+    "trigger": "CONFIG",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Auto-rotation policy for HSM-backed keys, FIPS 140-2 Level 2 compliant.",
+    "cmmcPractices": ["SC.L2-3.13.10"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "keyVaultName",
+        "label": "Key Vault Name",
+        "type": "readonly",
+        "source": "keyVaultName",
+        "required": true
+      },
+      {
+        "name": "keyName",
+        "label": "Key Name",
+        "type": "text",
+        "required": true,
+        "placeholder": "cmmc-encryption-key"
+      }
+    ]
+  },
+  {
+    "id": "C-04",
+    "title": "Key Vault RBAC Audit",
+    "domain": "C",
+    "domainName": "Credential & Key Lifecycle",
+    "trigger": "AUDIT",
+    "priority": "P2 High",
+    "sodTier": "Tier 2",
+    "overview": "Audits RBAC assignments on Key Vaults, deprecates vault access policies.",
+    "cmmcPractices": ["AC.L1-3.1.1"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "C-05",
+    "title": "TLS/SSL Certificate Expiry",
+    "domain": "C",
+    "domainName": "Credential & Key Lifecycle",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Scans App Service, App Gateway, and Key Vault for expiring certificates.",
+    "cmmcPractices": ["SC.L2-3.13.8"],
+    "idempotencyClass": "evidence-only",
+    "parameters": [
+      {
+        "name": "keyVaultName",
+        "label": "Key Vault Name",
+        "type": "readonly",
+        "source": "keyVaultName",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "C-06",
+    "title": "Service Account Password Rotation",
+    "domain": "C",
+    "domainName": "Credential & Key Lifecycle",
+    "trigger": "CONFIG",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "90-day rotation for service accounts with 24+ character passwords. Recommends managed identities.",
+    "cmmcPractices": ["IA.L2-3.5.10"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "serviceAccountUPN",
+        "label": "Service Account UPN",
+        "type": "text",
+        "required": true,
+        "placeholder": "svc-app@tenant.onmicrosoft.us"
+      }
+    ]
+  },
+  {
+    "id": "C-07",
+    "title": "Managed Identity Adoption",
+    "domain": "C",
+    "domainName": "Credential & Key Lifecycle",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Calculates managed identity adoption rate and identifies conversion candidates.",
+    "cmmcPractices": ["IA.L1-3.5.1"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "C-08",
+    "title": "Orphaned App/SPN Cleanup",
+    "domain": "C",
+    "domainName": "Credential & Key Lifecycle",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Identifies apps with no owner, expired credentials, or no sign-in activity.",
+    "cmmcPractices": ["AC.L1-3.1.1"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "C-09",
+    "title": "Password Policy Compliance",
+    "domain": "C",
+    "domainName": "Credential & Key Lifecycle",
+    "trigger": "CONFIG",
+    "priority": "P3 Medium",
+    "sodTier": "Tier 2",
+    "overview": "Enforces custom banned password list, Smart Lockout, and 14+ character minimum.",
+    "cmmcPractices": ["IA.L2-3.5.7"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "bannedPasswordList",
+        "label": "Banned Password List (comma-separated)",
+        "type": "text",
+        "required": true,
+        "placeholder": "password,letmein,welcome"
+      },
+      {
+        "name": "lockoutThreshold",
+        "label": "Smart Lockout Threshold",
+        "type": "text",
+        "required": true,
+        "placeholder": "10"
+      }
+    ]
+  },
+  {
+    "id": "C-10",
+    "title": "Leaked Credential Response",
+    "domain": "C",
+    "domainName": "Credential & Key Lifecycle",
+    "trigger": "INCIDENT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Responds to Entra ID Protection risky users, forces password reset, escalates to H-02.",
+    "cmmcPractices": ["SI.L1-3.14.2"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "targetUPN",
+        "label": "Target User Principal Name",
+        "type": "text",
+        "required": true,
+        "placeholder": "user@tenant.onmicrosoft.us"
+      }
+    ]
+  },
+  {
+    "id": "D-01",
+    "title": "Sensitivity Label Coverage",
+    "domain": "D",
+    "domainName": "Data Protection & CUI Boundary",
+    "trigger": "AUDIT",
+    "priority": "P2 High",
+    "sodTier": "Tier 2",
+    "overview": "Audits label coverage via Content Explorer and trainable classifiers.",
+    "cmmcPractices": ["MP.L2-3.8.2"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "D-02",
+    "title": "DLP Policy Effectiveness",
+    "domain": "D",
+    "domainName": "Data Protection & CUI Boundary",
+    "trigger": "AUDIT",
+    "priority": "P3 Medium",
+    "sodTier": "Tier 2",
+    "overview": "Reviews DLP activity explorer and tunes policies for false positives.",
+    "cmmcPractices": ["SC.L2-3.13.6"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "D-03",
+    "title": "DLP Incident -- CUI Exfiltration",
+    "domain": "D",
+    "domainName": "Data Protection & CUI Boundary",
+    "trigger": "INCIDENT",
+    "priority": "P1 Critical",
+    "sodTier": "Tier 3",
+    "overview": "Containment actions, eDiscovery hold, escalation to H-01 for incident response.",
+    "cmmcPractices": ["IR.L2-3.6.1"],
+    "idempotencyClass": "unsafe_requires_gate",
+    "parameters": [
+      {
+        "name": "targetUPN",
+        "label": "Subject User Principal Name",
+        "type": "text",
+        "required": true,
+        "placeholder": "user@tenant.onmicrosoft.us"
+      },
+      {
+        "name": "incidentId",
+        "label": "Incident ID",
+        "type": "text",
+        "required": true,
+        "placeholder": "INC-2026-001"
+      }
+    ]
+  },
+  {
+    "id": "D-04",
+    "title": "External Sharing Audit",
+    "domain": "D",
+    "domainName": "Data Protection & CUI Boundary",
+    "trigger": "AUDIT",
+    "priority": "P2 High",
+    "sodTier": "Tier 2",
+    "overview": "Audits SharePoint sharing capabilities, anonymous links, and domain restrictions.",
+    "cmmcPractices": ["AC.L1-3.1.20"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "D-05",
+    "title": "CUI Site Membership Recertification",
+    "domain": "D",
+    "domainName": "Data Protection & CUI Boundary",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Quarterly Access Review on CUI site groups.",
+    "cmmcPractices": ["AC.L2-3.1.3"],
+    "idempotencyClass": "evidence-only",
+    "parameters": [
+      {
+        "name": "cuiSiteId",
+        "label": "CUI Site URL",
+        "type": "readonly",
+        "source": "cuiSiteId",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "D-06",
+    "title": "Email Encryption & Transport Rules",
+    "domain": "D",
+    "domainName": "Data Protection & CUI Boundary",
+    "trigger": "CONFIG",
+    "priority": "P3 Medium",
+    "sodTier": "Tier 2",
+    "overview": "Configures transport rules, IRM, and OME for CUI email protection.",
+    "cmmcPractices": ["SC.L2-3.13.8"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "transportRuleName",
+        "label": "Transport Rule Name",
+        "type": "text",
+        "required": true,
+        "placeholder": "Encrypt-CUI-Outbound"
+      },
+      {
+        "name": "omeTemplateName",
+        "label": "OME Template Name",
+        "type": "text",
+        "required": true,
+        "placeholder": "Encrypt"
+      }
+    ]
+  },
+  {
+    "id": "D-07",
+    "title": "Retention Policy & Legal Hold",
+    "domain": "D",
+    "domainName": "Data Protection & CUI Boundary",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Audits retention policies and litigation hold inventory.",
+    "cmmcPractices": ["AU.L2-3.3.8"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "D-08",
+    "title": "Public Teams Detection",
+    "domain": "D",
+    "domainName": "Data Protection & CUI Boundary",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Detects public Teams and remediates to private visibility.",
+    "cmmcPractices": ["AC.L1-3.1.20"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "D-09",
+    "title": "CUI Repository Onboarding",
+    "domain": "D",
+    "domainName": "Data Protection & CUI Boundary",
+    "trigger": "CONFIG",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "9-item intake checklist for new CUI repositories.",
+    "cmmcPractices": ["MP.L2-3.8.1"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "cuiSiteUrl",
+        "label": "CUI Site URL",
+        "type": "text",
+        "required": true,
+        "placeholder": "https://tenant.sharepoint.us/sites/CUI-NewSite"
+      },
+      {
+        "name": "cuiGroupId",
+        "label": "CUI Security Group Object ID",
+        "type": "readonly",
+        "source": "cuiGroupId",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "D-10",
+    "title": "Oversharing Risk Report",
+    "domain": "D",
+    "domainName": "Data Protection & CUI Boundary",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "DSPM analysis with Copilot restriction policy recommendations.",
+    "cmmcPractices": ["AC.L1-3.1.20"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "D-11",
+    "title": "CUI Label Protection Enablement",
+    "domain": "D",
+    "domainName": "Data Protection & CUI Boundary",
+    "trigger": "CONFIG",
+    "priority": "P2 High",
+    "sodTier": "Tier 3",
+    "overview": "Enables encryption (rights-based access limited to the CUI-authorized group) and automatic content marking (header/footer/watermark) on the published CUI sensitivity label. Converts MP.L2-3.8.2 (label-based access to CUI media) and MP.L2-3.8.4 (CUI markings) from attested to directly enforced (remediates FINDING F-LABEL). Get-then-set via the Security & Compliance PS (IPPS) channel; idempotent.",
+    "cmmcPractices": ["MP.L2-3.8.2", "MP.L2-3.8.4"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      { "name": "labelDisplayName", "label": "CUI sensitivity label display name", "type": "text", "required": true, "placeholder": "CUI - Controlled Unclassified Information" },
+      { "name": "cuiGroupEmail", "label": "CUI-authorized group email (granted encryption rights)", "type": "text", "required": true, "placeholder": "cui-users-sg@tenant.us" }
+    ]
+  },
+  {
+    "id": "E-01",
+    "title": "Audit Log Retention",
+    "domain": "E",
+    "domainName": "Audit, Logging & Monitoring",
+    "trigger": "CONFIG",
+    "priority": "P2 High",
+    "sodTier": "Tier 2",
+    "overview": "Configures retention policies, WORM storage, and Sentinel retention.",
+    "cmmcPractices": ["AU.L2-3.3.1"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "auditLogRetentionDays",
+        "label": "Audit Log Retention (days)",
+        "type": "readonly",
+        "source": "auditLogRetentionDays",
+        "required": true
+      },
+      {
+        "name": "sentinelWorkspaceName",
+        "label": "Sentinel Workspace Name",
+        "type": "readonly",
+        "source": "sentinelWorkspaceName",
+        "required": true
+      },
+      {
+        "name": "resourceGroupName",
+        "label": "Resource Group Name",
+        "type": "readonly",
+        "source": "resourceGroupName",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "E-02",
+    "title": "Unified Audit Log Health",
+    "domain": "E",
+    "domainName": "Audit, Logging & Monitoring",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Verifies events are flowing, detects gaps, validates Sentinel heartbeat.",
+    "cmmcPractices": ["AU.L2-3.3.1"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "E-03",
+    "title": "Diagnostic Settings Coverage",
+    "domain": "E",
+    "domainName": "Audit, Logging & Monitoring",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Per-resource audit of diagnostic settings with Log Analytics destination.",
+    "cmmcPractices": ["AU.L2-3.3.1"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "E-04",
+    "title": "Sentinel Analytics Rule Review",
+    "domain": "E",
+    "domainName": "Audit, Logging & Monitoring",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Reviews rule inventory with MITRE mapping and effectiveness metrics.",
+    "cmmcPractices": ["SI.L1-3.14.4"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "E-05",
+    "title": "Alert Fatigue Analysis",
+    "domain": "E",
+    "domainName": "Audit, Logging & Monitoring",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Calculates false positive rate and tunes rules with automation rules.",
+    "cmmcPractices": ["SI.L1-3.14.4"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "E-06",
+    "title": "Log Export to SIEM Validation",
+    "domain": "E",
+    "domainName": "Audit, Logging & Monitoring",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Validates data connectors and monitors ingestion latency.",
+    "cmmcPractices": ["AU.L2-3.3.8"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "E-07",
+    "title": "Privileged Action Audit",
+    "domain": "E",
+    "domainName": "Audit, Logging & Monitoring",
+    "trigger": "AUDIT",
+    "priority": "P2 High",
+    "sodTier": "Tier 2",
+    "overview": "Audits role changes with PIM activation correlation.",
+    "cmmcPractices": ["AU.L2-3.3.1"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "E-08",
+    "title": "Sign-In Log Anomaly Sweep",
+    "domain": "E",
+    "domainName": "Audit, Logging & Monitoring",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "KQL queries on risky sign-ins, escalation to A-16 for suspected compromise.",
+    "cmmcPractices": ["SI.L1-3.14.2"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "E-09",
+    "title": "C3PAO Evidence Package Assembly",
+    "domain": "E",
+    "domainName": "Audit, Logging & Monitoring",
+    "trigger": "AUDIT",
+    "priority": "P1 Critical",
+    "sodTier": "Tier 2",
+    "overview": "Creates ZIP structure with SHA-256 manifest and Key Vault signing for C3PAO audit.",
+    "cmmcPractices": ["CA.L2-3.12.2"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "E-10",
+    "title": "POA&M Evidence Closure",
+    "domain": "E",
+    "domainName": "Audit, Logging & Monitoring",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Per-finding remediation evidence with closure package assembly.",
+    "cmmcPractices": ["CA.L2-3.12.4"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "F-01",
+    "title": "Secure Score Trend Report",
+    "domain": "F",
+    "domainName": "Security Configuration & Posture",
+    "trigger": "AUDIT",
+    "priority": "P3 Medium",
+    "sodTier": "Tier 2",
+    "overview": "Weekly trend report via Graph API secureScores endpoint.",
+    "cmmcPractices": ["RA.L2-3.11.1"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "F-02",
+    "title": "Defender Recommendation Sprint",
+    "domain": "F",
+    "domainName": "Security Configuration & Posture",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Monthly top 5 recommendations prioritized by CMMC alignment.",
+    "cmmcPractices": ["RA.L2-3.11.3"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "F-03",
+    "title": "ASR Rule Audit",
+    "domain": "F",
+    "domainName": "Security Configuration & Posture",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Rule-by-rule coverage with Advanced Hunting metrics.",
+    "cmmcPractices": ["SI.L1-3.14.5"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "F-04",
+    "title": "Legacy Auth Block Validation",
+    "domain": "F",
+    "domainName": "Security Configuration & Posture",
+    "trigger": "AUDIT",
+    "priority": "P3 Medium",
+    "sodTier": "Tier 2",
+    "overview": "CA policy verification with sign-in log validation (target: 0 legacy auth).",
+    "cmmcPractices": ["IA.L1-3.5.1"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "F-05",
+    "title": "Azure Security Benchmark Report",
+    "domain": "F",
+    "domainName": "Security Configuration & Posture",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Defender for Cloud regulatory compliance report for ASB.",
+    "cmmcPractices": ["CA.L2-3.12.1"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "F-06",
+    "title": "Resource Firewall/NSG Audit",
+    "domain": "F",
+    "domainName": "Security Configuration & Posture",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "NSG rules, Storage/KV/SQL firewalls, deny-by-default enforcement.",
+    "cmmcPractices": ["SC.L1-3.13.1"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "F-07",
+    "title": "Admin Portal IP Restriction",
+    "domain": "F",
+    "domainName": "Security Configuration & Posture",
+    "trigger": "CONFIG",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "CA policy restricting admin portal access to trusted IPs only.",
+    "cmmcPractices": ["AC.L2-3.1.12"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "adminPortalCaPolicyId",
+        "label": "Admin Portal CA Policy ID",
+        "type": "readonly",
+        "source": "adminPortalCaPolicyId",
+        "required": true
+      },
+      {
+        "name": "namedLocationId",
+        "label": "Named Location Object ID",
+        "type": "readonly",
+        "source": "namedLocationId",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "F-08",
+    "title": "Config Drift Alert Response",
+    "domain": "F",
+    "domainName": "Security Configuration & Posture",
+    "trigger": "INCIDENT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Responds to Sentinel config drift alerts, investigates, reverts if unauthorized.",
+    "cmmcPractices": ["CM.L2-3.4.3"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "alertId",
+        "label": "Sentinel Alert ID",
+        "type": "text",
+        "required": true,
+        "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+      },
+      {
+        "name": "driftResourceId",
+        "label": "Drifted Resource ARM ID",
+        "type": "text",
+        "required": true,
+        "placeholder": "/subscriptions/{subId}/resourceGroups/{rg}/providers/..."
+      },
+      {
+        "name": "driftProperty",
+        "label": "Drifted Property Path",
+        "type": "text",
+        "required": true,
+        "placeholder": "securityProfile.enabled"
+      },
+      {
+        "name": "expectedValue",
+        "label": "Expected Value",
+        "type": "text",
+        "required": true,
+        "placeholder": "true"
+      },
+      {
+        "name": "operatorUPN",
+        "label": "Operator UPN",
+        "type": "readonly",
+        "source": "operatorUPN",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "F-09",
+    "title": "CIS Benchmark Hardening",
+    "domain": "F",
+    "domainName": "Security Configuration & Posture",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Runs ScubaGear (CISA) or CIS-CAT for benchmark compliance.",
+    "cmmcPractices": ["CM.L2-3.4.2"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "F-10",
+    "title": "Third-Party App Consent Audit",
+    "domain": "F",
+    "domainName": "Security Configuration & Posture",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Permission inventory with high-risk permission detection.",
+    "cmmcPractices": ["AC.L2-3.1.6"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "F-11",
+    "title": "Azure Firewall Deallocate",
+    "domain": "F",
+    "domainName": "Security Configuration & Posture",
+    "trigger": "CONFIG",
+    "priority": "P2 High",
+    "sodTier": "Tier 2",
+    "overview": "Deallocates the fw-cmmc Azure Firewall Premium — strips IP configurations to stop billing while preserving rule configuration. Network egress filtering stops until re-allocated. Run only during approved maintenance windows.",
+    "cmmcPractices": ["SC.L1-3.13.1", "SC.L2-3.13.6"],
+    "parameters": [
+      { "name": "resourceGroup", "label": "Resource Group", "type": "text", "source": "resources.resourceGroup", "required": true, "placeholder": "rg-eo-prod" },
+      { "name": "firewallName", "label": "Firewall Name", "type": "text", "source": "resources.firewallName", "required": true, "placeholder": "fw-cmmc" }
+    ]
+  },
+  {
+    "id": "F-12",
+    "title": "Azure Firewall Allocate",
+    "domain": "F",
+    "domainName": "Security Configuration & Posture",
+    "trigger": "CONFIG",
+    "priority": "P2 High",
+    "sodTier": "Tier 2",
+    "overview": "Allocates (restarts) the fw-cmmc Azure Firewall Premium — re-attaches VNET and public IP to restore network traffic filtering. Required after a deallocate maintenance window.",
+    "cmmcPractices": ["SC.L1-3.13.1", "SC.L2-3.13.6"],
+    "parameters": [
+      { "name": "resourceGroup", "label": "Resource Group", "type": "text", "source": "resources.resourceGroup", "required": true, "placeholder": "rg-eo-prod" },
+      { "name": "firewallName", "label": "Firewall Name", "type": "text", "source": "resources.firewallName", "required": true, "placeholder": "fw-cmmc" },
+      { "name": "vnetName", "label": "Virtual Network Name", "type": "text", "source": "resources.vnetName", "required": true, "placeholder": "vfsgov-vnet-eo" },
+      { "name": "publicIpName", "label": "Public IP Name", "type": "text", "source": "resources.publicIpName", "required": true, "placeholder": "pip-fw-cmmc" }
+    ]
+  },
+  {
+    "id": "F-13",
+    "title": "Enclave Subnet Deny-by-Default Baseline",
+    "domain": "F",
+    "domainName": "Security Configuration & Posture",
+    "trigger": "CONFIG",
+    "priority": "P2 High",
+    "sodTier": "Tier 3",
+    "overview": "Applies the no-firewall boundary posture to every non-platform subnet of a VNet (G-FW-ALT Phase 1): ensures each subnet has an NSG (creates one if missing) carrying Allow-VNet in/out at priority 4000 and explicit Deny-All in/out at 4096, associates a 0.0.0.0/0 -> None blackhole route table, and enables privateEndpointNetworkPolicies so NSG rules evaluate on Private Endpoint traffic. Idempotent - existing rules/associations are left in place. Remediates UC-H findings F-NET-1/2/3 (SC.L2-3.13.1[e][f][h], SC.L2-3.13.6[a][b]).",
+    "cmmcPractices": ["SC.L1-3.13.1", "SC.L2-3.13.6"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      { "name": "resourceGroup", "label": "Resource Group", "type": "text", "source": "subscription.resource_group", "required": true, "placeholder": "rg-eo-prod" },
+      { "name": "vnetName", "label": "Virtual Network Name", "type": "text", "source": "resources.vnet_name", "required": true, "placeholder": "vfsgov-vnet-eo" }
+    ]
+  },
+  {
+    "id": "F-14",
+    "title": "VNet Flow Logs + Sentinel Flow Analytics",
+    "domain": "F",
+    "domainName": "Security Configuration & Posture",
+    "trigger": "CONFIG",
+    "priority": "P2 High",
+    "sodTier": "Tier 3",
+    "overview": "Enables VNet flow logs (NSG flow log creation retired Jun 2025) on a VNet with Traffic Analytics into the Log Analytics workspace, and creates a Sentinel scheduled analytics rule over NTANetAnalytics for denied/anomalous flows. Idempotent - skips whatever already exists. Remediates UC-H finding F-NET-4 (SC.L2-3.13.1[c][d][g], SI.L2-3.14.6[a][b][c]). Incremental cost ~$10-40/mo ingestion.",
+    "cmmcPractices": ["SC.L1-3.13.1", "SI.L2-3.14.6"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      { "name": "resourceGroup", "label": "Resource Group", "type": "text", "source": "subscription.resource_group", "required": true, "placeholder": "rg-eo-prod" },
+      { "name": "vnetName", "label": "Virtual Network Name", "type": "text", "source": "resources.vnet_name", "required": true, "placeholder": "vfsgov-vnet-eo" },
+      { "name": "storageAccountName", "label": "Flow-log Storage Account", "type": "text", "source": "resources.storage_account_name", "required": true, "placeholder": "vfsgoevops01" },
+      { "name": "workspaceName", "label": "Log Analytics Workspace", "type": "text", "source": "resources.law_name", "required": true, "placeholder": "vfsgov-law-prod" }
+    ]
+  },
+  {
+    "id": "G-01",
+    "title": "Annual Security Training Audit",
+    "domain": "G",
+    "domainName": "Personnel Security & Training Compliance",
+    "trigger": "AUDIT",
+    "priority": "P2 High",
+    "sodTier": "Tier 2",
+    "overview": "LMS CSV import with HRIS-to-Entra sync for compliance tracking.",
+    "cmmcPractices": ["AT.L2-3.2.1"],
+    "idempotencyClass": "evidence-only",
+    "parameters": [
+      {
+        "name": "trainingRosterPath",
+        "label": "Training Roster CSV Path",
+        "type": "readonly",
+        "source": "trainingRosterPath",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "G-02",
+    "title": "New Hire Training Enforcement",
+    "domain": "G",
+    "domainName": "Personnel Security & Training Compliance",
+    "trigger": "ONBOARDING",
+    "priority": "P2 High",
+    "sodTier": "Tier 2",
+    "overview": "Detects new users, enrolls in LMS, CA block until training complete.",
+    "cmmcPractices": ["AT.L2-3.2.2"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "targetUPN",
+        "label": "New Hire UPN",
+        "type": "text",
+        "required": true,
+        "placeholder": "newhire@tenant.onmicrosoft.us"
+      },
+      {
+        "name": "trainingEnforcementGroupId",
+        "label": "Training Enforcement Group Object ID",
+        "type": "readonly",
+        "source": "trainingEnforcementGroupId",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "G-03",
+    "title": "Role-Based CUI Training",
+    "domain": "G",
+    "domainName": "Personnel Security & Training Compliance",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "CUI group membership with separate tracking from general security training.",
+    "cmmcPractices": ["AT.L2-3.2.3"],
+    "idempotencyClass": "evidence-only",
+    "parameters": [
+      {
+        "name": "cuiGroupId",
+        "label": "CUI Security Group Object ID",
+        "type": "readonly",
+        "source": "cuiGroupId",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "G-04",
+    "title": "Phishing Simulation Report",
+    "domain": "G",
+    "domainName": "Personnel Security & Training Compliance",
+    "trigger": "AUDIT",
+    "priority": "P3 Medium",
+    "sodTier": "Tier 2",
+    "overview": "Attack Simulator reporting or third-party integration (KnowBe4).",
+    "cmmcPractices": ["AT.L2-3.2.2"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "G-05",
+    "title": "Personnel Screening Sync",
+    "domain": "G",
+    "domainName": "Personnel Security & Training Compliance",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "HR/clearance system CSV import with CUI access gating.",
+    "cmmcPractices": ["PS.L2-3.9.1"],
+    "idempotencyClass": "evidence-only",
+    "parameters": [
+      {
+        "name": "trainingRosterPath",
+        "label": "HR/Clearance Roster CSV Path",
+        "type": "readonly",
+        "source": "trainingRosterPath",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "G-06",
+    "title": "NDA/AUP Acknowledgment",
+    "domain": "G",
+    "domainName": "Personnel Security & Training Compliance",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "SharePoint list tracking with annual re-acknowledgment enforcement.",
+    "cmmcPractices": ["PS.L2-3.9.2"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "G-07",
+    "title": "Insider Threat Indicator Report",
+    "domain": "G",
+    "domainName": "Personnel Security & Training Compliance",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Purview Insider Risk Management monthly report generation.",
+    "cmmcPractices": ["PS.L2-3.9.1"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "G-08",
+    "title": "Contractor Access Recertification",
+    "domain": "G",
+    "domainName": "Personnel Security & Training Compliance",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Quarterly Access Review on guest and contractor accounts.",
+    "cmmcPractices": ["AC.L2-3.1.3"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "H-01",
+    "title": "Security Incident Intake",
+    "domain": "H",
+    "domainName": "Incident Response & Recovery Operations",
+    "trigger": "INCIDENT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Sentinel incident triage, classification, and ticket creation.",
+    "cmmcPractices": ["IR.L2-3.6.1"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "incidentId",
+        "label": "Sentinel Incident ID",
+        "type": "text",
+        "required": true,
+        "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+      },
+      {
+        "name": "incidentSeverity",
+        "label": "Incident Severity",
+        "type": "select",
+        "required": true,
+        "options": [
+          { "value": "high", "label": "High" },
+          { "value": "medium", "label": "Medium" },
+          { "value": "low", "label": "Low" },
+          { "value": "informational", "label": "Informational" }
+        ]
+      },
+      {
+        "name": "incidentClassification",
+        "label": "Incident Classification",
+        "type": "select",
+        "required": true,
+        "options": [
+          { "value": "truePositive", "label": "True Positive" },
+          { "value": "falsePositive", "label": "False Positive" },
+          { "value": "benignPositive", "label": "Benign Positive" },
+          { "value": "undetermined", "label": "Undetermined" }
+        ]
+      },
+      {
+        "name": "operatorUPN",
+        "label": "Operator UPN",
+        "type": "readonly",
+        "source": "operatorUPN",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "H-02",
+    "title": "Compromised Account Containment",
+    "domain": "H",
+    "domainName": "Incident Response & Recovery Operations",
+    "trigger": "INCIDENT",
+    "priority": "P1 Critical",
+    "sodTier": "Tier 3",
+    "overview": "Tier 3 two-person approval required. Revoke, disable, reset user account.",
+    "cmmcPractices": ["IR.L2-3.6.1"],
+    "idempotencyClass": "unsafe_requires_gate",
+    "parameters": [
+      {
+        "name": "targetUPN",
+        "label": "Compromised Account UPN",
+        "type": "text",
+        "required": true,
+        "placeholder": "user@tenant.onmicrosoft.us"
+      },
+      {
+        "name": "operatorUPN",
+        "label": "Operator UPN",
+        "type": "readonly",
+        "source": "operatorUPN",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "H-03",
+    "title": "Malware/Ransomware Isolation",
+    "domain": "H",
+    "domainName": "Incident Response & Recovery Operations",
+    "trigger": "INCIDENT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Defender for Endpoint device isolation with investigation package.",
+    "cmmcPractices": ["IR.L2-3.6.1"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "deviceId",
+        "label": "Intune Managed Device ID",
+        "type": "text",
+        "required": true,
+        "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+      },
+      {
+        "name": "operatorUPN",
+        "label": "Operator UPN",
+        "type": "readonly",
+        "source": "operatorUPN",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "H-04",
+    "title": "Timeline & Evidence Preservation",
+    "domain": "H",
+    "domainName": "Incident Response & Recovery Operations",
+    "trigger": "INCIDENT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "eDiscovery hold, log exports, SHA-256 hash manifest creation.",
+    "cmmcPractices": ["IR.L2-3.6.2"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "incidentId",
+        "label": "Incident ID",
+        "type": "text",
+        "required": true,
+        "placeholder": "INC-2026-001"
+      },
+      {
+        "name": "targetUPN",
+        "label": "Subject User UPN",
+        "type": "text",
+        "required": true,
+        "placeholder": "user@tenant.onmicrosoft.us"
+      }
+    ]
+  },
+  {
+    "id": "H-05",
+    "title": "IR Tabletop/Drill Evidence",
+    "domain": "H",
+    "domainName": "Incident Response & Recovery Operations",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Annual exercise with attendee roster and AAR documentation.",
+    "cmmcPractices": ["IR.L2-3.6.3"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  },
+  {
+    "id": "H-06",
+    "title": "Post-Incident Review Package",
+    "domain": "H",
+    "domainName": "Incident Response & Recovery Operations",
+    "trigger": "INCIDENT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "RCA, timeline, POA&M entry creation for lessons learned.",
+    "cmmcPractices": ["IR.L2-3.6.2"],
+    "idempotencyClass": "get-then-set",
+    "parameters": [
+      {
+        "name": "incidentId",
+        "label": "Incident ID",
+        "type": "text",
+        "required": true,
+        "placeholder": "INC-2026-001"
+      },
+      {
+        "name": "incidentStartDate",
+        "label": "Incident Start Date (MM/DD/YYYY)",
+        "type": "text",
+        "required": true,
+        "placeholder": "01/01/2026"
+      },
+      {
+        "name": "incidentEndDate",
+        "label": "Incident End Date (MM/DD/YYYY)",
+        "type": "text",
+        "required": true,
+        "placeholder": "01/02/2026"
+      }
+    ]
+  },
+  {
+    "id": "H-07",
+    "title": "Backup Integrity Verification",
+    "domain": "H",
+    "domainName": "Incident Response & Recovery Operations",
+    "trigger": "AUDIT",
+    "priority": "P3 Medium",
+    "sodTier": "Tier 2",
+    "overview": "Azure Backup status with monthly restore test validation.",
+    "cmmcPractices": ["MP.L2-3.8.9"],
+    "idempotencyClass": "evidence-only",
+    "parameters": [
+      {
+        "name": "backupVaultName",
+        "label": "Recovery Services vault name",
+        "type": "readonly",
+        "source": "backupVaultName",
+        "required": true
+      },
+      {
+        "name": "resourceGroupName",
+        "label": "Resource group",
+        "type": "readonly",
+        "source": "resourceGroupName",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "H-08",
+    "title": "BCP/DR Contact List & Runbook",
+    "domain": "H",
+    "domainName": "Incident Response & Recovery Operations",
+    "trigger": "AUDIT",
+    "priority": "P4 Standard",
+    "sodTier": "Tier 2",
+    "overview": "Contact currency validation, runbook review, region failover testing.",
+    "cmmcPractices": ["MP.L2-3.8.9"],
+    "idempotencyClass": "evidence-only",
+    "parameters": []
+  }
+]

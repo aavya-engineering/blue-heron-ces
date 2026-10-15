@@ -1,0 +1,38 @@
+## Control {{controlId}}: Verify and Control Connections to External Systems
+
+**Implementation Status:** {{status}}
+
+This organization verifies and controls all connections to external information systems within the {{tenantName}} M365 GCC High tenant. External system connections are managed through Azure AD cross-tenant access policies, B2B collaboration settings, and Conditional Access policies that restrict external sharing and guest access to authorized organizations only.
+
+{{#if crossTenantPolicyConfigured}}
+Azure AD cross-tenant access policies are configured to control inbound and outbound connections. Default B2B collaboration settings restrict external sharing to pre-approved organizations. Guest user access is governed by cross-tenant trust relationships that define which external tenants may authenticate and access resources. Each external connection is documented and reviewed by {{variables.accessControlAdministrator}} prior to approval.
+{{else}}
+Azure AD cross-tenant access policies have not been configured. External system connections are not restricted beyond default Azure AD settings, pending policy implementation.
+{{/if}}
+
+{{#if policies}}
+Conditional Access policies enforce additional external connection controls:
+{{#each policies}}
+- **{{displayName}}** ({{state}}): Requires {{#each grantControls.builtInControls}}{{this}}{{#unless @last}}, {{/unless}}{{/each}} for external access scenarios.
+{{/each}}
+{{/if}}
+
+{{#if infraResources}}
+Supporting infrastructure:
+{{#each infraResources}}
+- {{resourceType}} "{{name}}"{{#if properties.retention_days}} (retention: {{properties.retention_days}} days){{/if}}
+{{/each}}
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Review Azure AD cross-tenant access policy configurations, B2B collaboration settings, and guest user access logs to verify external connection controls.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

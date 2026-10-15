@@ -1,0 +1,36 @@
+## Control {{controlId}}: Employ Replay-Resistant Authentication for Network Access to Privileged and Non-Privileged Accounts
+
+**Implementation Status:** {{status}}
+
+This organization employs replay-resistant authentication for all network access within the {{tenantName}} M365 GCC High tenant through cryptographic challenge-response mechanisms, FIDO2 security keys, and certificate-based authentication managed by {{variables.accessControlAdministrator}}.
+
+{{#if mfaEnabled}}
+**Replay-Resistant Methods Deployed:**
+{{authMethodsCount}} authentication methods configured include replay-resistant mechanisms:
+{{#if authMethods}}
+{{#each authMethods}}
+- **{{displayName}}** ({{state}})
+{{/each}}
+{{/if}}
+
+All Entra ID authentication flows use replay-resistant protocols:
+- **OAuth 2.0 / OpenID Connect:** Authorization codes are single-use; tokens include nonce values, timestamps, and audience restrictions
+- **FIDO2 Security Keys:** Cryptographic challenge-response with origin binding prevents credential replay across sessions
+- **Certificate-Based Authentication:** Mutual TLS with client certificates includes session-unique challenge values
+- **Windows Hello for Business:** TPM-bound credentials with cryptographic proof of possession
+{{else}}
+Replay-resistant authentication methods have not been confirmed.
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Examine authentication method configurations, OAuth token settings, FIDO2 key registration records, and certificate-based authentication policies.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

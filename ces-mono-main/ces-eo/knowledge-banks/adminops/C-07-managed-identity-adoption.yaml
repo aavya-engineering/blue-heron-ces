@@ -1,0 +1,75 @@
+controlId: "IA.L1-3.5.1"
+relatedControlIds:
+  - "IA.L1-3.5.2"
+  - "AC.L2-3.1.5"
+  - "SC.L2-3.13.10"  # [VERIFY] mapping not yet confirmed
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: C-07
+useCaseTitle: "Managed Identity Adoption"
+domain: Credential & Secret Management
+priority: P4 Standard
+trigger: 'SCHEDULE: Quarterly review; or CHANGE: New application deployment requesting service account credentials'
+sodTier: Tier 1 (Read-Only Audit) for adoption rate calculation; Tier 2 (Config Manager) for conversion execution
+entraRolesRequired:
+- Security Reader (for audit); Application Administrator
+- Managed Identity Contributor (for conversion)
+approvalRequired: true
+services:
+- name: Entra ID Application Registrations and Service Principals
+  purpose: ''
+- name: Azure Managed Identities
+  purpose: system-assigned and user-assigned
+- name: Azure Resource Graph
+  purpose: cross-resource managed identity inventory
+- name: Microsoft Sentinel
+  purpose: monitoring for managed identity usage patterns
+configurationSteps:
+  portalPath: //portal.azure.us > Entra ID > Enterprise applications > filter by Application type = All.
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes Application.Read.All, Directory.Read.All
+  - cmdlet: Get-MgApplication
+    parameters:
+    - -MgApplication
+    - -All
+    - -Property
+    - -Object
+    - -gt
+  - cmdlet: Get-MgServicePrincipal
+    parameters:
+    - -MgServicePrincipal
+    - -All
+    - -Filter
+    - -Object
+    - -MgApplication
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/servicePrincipals?$filter=servicePrincipalType
+  graphApiPayloadExample: {}
+  requiredPermissions:
+  - Application.Read.All
+  - Directory.Read.All
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-c-credential/C-07/2026/03/
+  format: 'JSON (fields: ReportDate, TotalAppRegistrations, SecretBasedApps, ManagedIdentityWorkloads, AdoptionRatePercent,
+    ConversionCandidates array)'
+  filenamePattern: C-07_ManagedIdentityAdoption_{YYYYMMDD}_{HHmmss}_QuarterlyReport.json
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: Managed identities are fully available in Azure Government. System-assigned managed identities work with all major
+    Azure Government services (App Service, Functions, VMs, AKS, Logic Apps). User-assigned managed identities can be shared
+    across resources. The Graph endpoint for service principal queries is `graph.microsoft.us`. Azure Resource Graph queries
+    use `management.usgovcloudapi.net`. There are no GCC High-specific limitations for managed identity adoption.
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

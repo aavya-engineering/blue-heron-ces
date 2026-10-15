@@ -1,0 +1,78 @@
+controlId: "CM.L2-3.4.1"
+relatedControlIds:
+  - "CM.L2-3.4.2"
+  - "CM.L2-3.4.3"  # [VERIFY] mapping not yet confirmed
+practiceStatement: Establish and maintain baseline configurations and inventories of organizational systems throughout the
+  respective system development life cycles.
+useCaseId: B-12
+useCaseTitle: "Autopilot Profile Review"
+domain: Device & Endpoint Management
+priority: P4 Standard
+trigger: 'SCHEDULE: Quarterly profile review; CHANGE: after Windows feature update release'
+sodTier: Tier 1 -- Read-Only Audit (review phase); Tier 2 -- Config Manager (profile modification)
+entraRolesRequired:
+- Security Reader (review); Intune Administrator (modification)
+approvalRequired: true
+services:
+- name: Microsoft Intune
+  purpose: Windows Autopilot deployment profiles, Enrollment Status Page configuration
+- name: Windows Autopilot
+  purpose: device identity management, profile assignment
+- name: Entra ID
+  purpose: dynamic device groups for profile targeting
+- name: Microsoft Graph API
+  purpose: windowsAutopilotDeploymentProfiles endpoint
+configurationSteps:
+  portalPath: https://intune.microsoft.us
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes DeviceManagementServiceConfig.Read.All
+  - cmdlet: Get-MgDeviceManagementWindowsAutopilotDeploymentProfile
+    parameters:
+    - -MgDeviceManagementWindowsAutopilotDeploymentProfile
+    - -All
+    - -MgDeviceManagementWindowsAutopilotDeploymentProfileAssignment
+    - -WindowsAutopilotDeploymentProfileId
+  - cmdlet: Get-MgDeviceManagementWindowsAutopilotDeploymentProfileAssignment
+    parameters:
+    - -MgDeviceManagementWindowsAutopilotDeploymentProfileAssignment
+    - -WindowsAutopilotDeploymentProfileId
+    - -Object
+    - -Output
+  - cmdlet: Get-MgDeviceManagementWindowsAutopilotDeviceIdentity
+    parameters:
+    - -MgDeviceManagementWindowsAutopilotDeviceIdentity
+    - -All
+    - -Object
+    - -Csv
+    - -Path
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/deviceManagement/windowsAutopilotDeploymentProfiles?$select=id,displayName,deviceNameTemplate,language,lastModifiedDateTime
+  graphApiPayloadExample: {}
+  requiredPermissions:
+  - DeviceManagementServiceConfig.Read.All
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-b-device/B-12/{year}/{month}/
+  format: CSV (profile audit report), JSON (Graph API profile export), PNG (ESP configuration screenshot)
+  filenamePattern: B-12_AutopilotProfileReview_{YYYYMMDD}_{HHmmss}_AllProfiles.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: Windows Autopilot deployment profiles and the Enrollment Status Page are fully supported in GCC High. Autopilot network
+    requirements in GCC High differ from commercial; devices must be able to reach GCC High-specific endpoints during the
+    OOBE phase. Verify the Autopilot network requirements list for GCC High in Microsoft's published documentation, as some
+    URLs differ from commercial (e.g., the Autopilot deployment service endpoint uses government-specific URLs). Self-deploying
+    mode in GCC High requires TPM 2.0 with attestation support; verify device firmware compatibility. The `windowsAutopilo
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

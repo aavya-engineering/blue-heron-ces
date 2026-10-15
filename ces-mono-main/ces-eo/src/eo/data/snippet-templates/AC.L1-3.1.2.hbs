@@ -1,0 +1,38 @@
+## Control {{controlId}}: Limit System Access to Authorized Transactions and Functions
+
+**Implementation Status:** {{status}}
+
+This organization limits information system access to the types of transactions and functions that authorized users are permitted to execute within the {{tenantName}} M365 GCC High tenant. Function-level access control is enforced through Azure AD role-based access control (RBAC), application permissions, and Conditional Access policies.
+
+{{#if roleAssignmentsConfigured}}
+Azure AD enforces transaction-level restrictions through {{directoryRolesCount}} directory roles with {{roleAssignmentsCount}} active role assignments. Each role grants specific permissions aligned to job function requirements. Users are assigned the minimum role necessary to perform authorized transactions, preventing unauthorized access to administrative functions, data modification operations, and security configuration changes.
+{{else}}
+Azure AD role assignments have not been configured. Transaction-level access restrictions rely on default permissions pending RBAC implementation.
+{{/if}}
+
+{{#if policies}}
+Conditional Access policies enforce additional transaction controls:
+{{#each policies}}
+- **{{displayName}}** ({{state}}): Controls access to {{conditions.applications}} applications requiring {{#each grantControls.builtInControls}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}.
+{{/each}}
+{{/if}}
+
+{{#if infraResources}}
+Supporting infrastructure:
+{{#each infraResources}}
+- {{resourceType}} "{{name}}"{{#if properties.retention_days}} (retention: {{properties.retention_days}} days){{/if}}
+{{/each}}
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Review Azure AD role assignment reports, application permission grants, and Conditional Access policy configurations to verify function-level restrictions.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

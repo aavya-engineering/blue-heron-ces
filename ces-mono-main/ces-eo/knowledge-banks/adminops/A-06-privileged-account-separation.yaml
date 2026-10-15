@@ -1,0 +1,106 @@
+controlId: "AC.L1-3.1.2"
+relatedControlIds:
+  - "IA.L2-3.5.3"
+  - "AC.L2-3.1.17"
+  - "AC.L2-3.1.6"
+  - "AC.L2-3.1.7"
+
+practiceStatement: "Separate privileged functions from non-privileged functions."
+
+useCaseId: "A-06"
+useCaseTitle: "LOA Return -- Restore"
+domain: "Identity & Access Management"
+priority: "P4 Standard"
+trigger: "PERSONNEL: Return from leave of absence notification from HR"
+
+sodTier: "Tier 2 -- Config Manager"
+entraRolesRequired:
+  - "User Administrator"
+
+approvalRequired: false
+
+services:
+  - name: "Entra ID"
+    purpose: "Account re-enable, group membership management, authentication methods management"
+  - name: "PIM"
+    purpose: "Restore eligible role assignments if expired"
+  - name: "Microsoft Graph PowerShell"
+    modules:
+      - "Microsoft.Graph.Users"
+      - "Microsoft.Graph.Groups"
+      - "Microsoft.Graph.Identity.SignIns"
+  - name: "Conditional Access"
+    purpose: "LOA group removal restores normal policy targeting"
+
+configurationSteps:
+  portalPath: "https://entra.microsoft.us > Identity > Users > All users > search user > Properties > Edit > Account enabled: toggle to Yes"
+
+  powershellCmdlets:
+    - cmdlet: "Connect-MgGraph"
+      parameters:
+        - "-Environment USGov"
+        - "-Scopes User.ReadWrite.All,Group.ReadWrite.All,UserAuthenticationMethod.ReadWrite.All,RoleManagement.ReadWrite.Directory"
+    - cmdlet: "Update-MgUser"
+      parameters:
+        - "-UserId"
+        - "-AccountEnabled $true"
+    - cmdlet: "Remove-MgGroupMemberByRef"
+      parameters:
+        - "-GroupId"
+        - "-DirectoryObjectId"
+    - cmdlet: "Get-MgUserAuthenticationMethod"
+      parameters:
+        - "-UserId"
+    - cmdlet: "Remove-MgUserAuthenticationPhoneMethod"
+      parameters:
+        - "-UserId"
+        - "-PhoneAuthenticationMethodId"
+    - cmdlet: "Get-MgRoleManagementDirectoryRoleEligibilitySchedule"
+      parameters:
+        - "-Filter principalId eq '$userId'"
+
+  graphApiEndpoint: "PATCH https://graph.microsoft.us/v1.0/users/{userId}"
+  graphApiPayloadExample:
+    accountEnabled: true
+
+  requiredPermissions:
+    - "User.ReadWrite.All"
+    - "Group.ReadWrite.All"
+    - "UserAuthenticationMethod.ReadWrite.All"
+
+evidenceArtifacts:
+  - type: "Azure AD Audit Logs"
+    retentionPeriod: "7 years"
+    storageLocation: "evidence-store/domain-a-identity/A-06/{year}/{month}/"
+    query: "Activity: Enable account, Remove from LOA group"
+  - type: "Stamper Execution Evidence"
+    hashAlgorithm: "SHA-256"
+    storageLocation: "evidence-store/domain-a-identity/A-06/{year}/{month}/"
+    format: "JSON (account re-enable confirmation, LOA group removal, MFA method reset status, PIM role verification)"
+    filenamePattern: "A-06_LOARestored_{YYYYMMDD}_{HHmmss}_{UPN}.json"
+
+gccHighSpecifics:
+  endpoints:
+    - "https://graph.microsoft.us"
+    - "https://entra.microsoft.us"
+  complianceBoundary: "FedRAMP High + CMMC L2"
+  endpointValidation: "All endpoints use .microsoft.us domains"
+  notes: "Account re-enable propagates within minutes. MFA re-registration is enforced by removing existing authentication methods and relying on CA MFA requirement policy to prompt registration at next sign-in."
+
+relatedPolicies:
+  - "AC-001 Access Control Policy"
+  - "IA-002 Identification and Authentication Policy"
+
+odpValues: []
+
+dependencies:
+  hardDependencies:
+    - useCaseId: "A-05"
+      reason: "User must be in LOA suspended state"
+    - useCaseId: "A-07"
+      reason: "MFA enforcement policy must exist for re-registration"
+  softDependencies:
+    - useCaseId: "A-04"
+      reason: "If role changed during LOA, process role change separately"
+
+notes: "Forced MFA re-registration addresses risk of authentication method compromise during absence period. PIM eligible role assignments that expired during LOA must be manually re-created."

@@ -1,0 +1,39 @@
+## Control {{controlId}}: Limit Use of Portable Storage on External Systems
+
+**Implementation Status:** {{status}}
+
+This organization limits the use of organizational portable storage devices on external information systems within the {{tenantName}} M365 GCC High tenant. Portable storage restrictions are enforced through Intune app protection policies, device configuration policies, and endpoint DLP rules that prevent CUI data transfer to unauthorized external storage media and cloud services.
+
+{{#if appProtectionsActive}}
+{{appProtectionsCount}} app protection policies enforce portable storage restrictions. Policies block "Save As" operations to external or personal storage locations, prevent copy/paste of CUI data to unmanaged applications, and restrict file downloads to approved organizational storage. USB storage access on managed devices is controlled through device configuration policies that block or restrict removable media access for CUI-classified data.
+{{else}}
+Intune app protection policies for portable storage restriction have not been configured. Storage controls rely on user awareness training pending technical enforcement.
+{{/if}}
+
+{{#if deviceConfigurationsActive}}
+{{deviceConfigurationsCount}} device configuration policies enforce removable storage controls. Policies restrict USB mass storage device access, block unauthorized cloud storage synchronization clients, and enforce DLP policies on file transfer operations.
+{{/if}}
+
+{{#if dlpLabelsConfigured}}
+{{dlpLabelsCount}} sensitivity labels enforce data classification-based storage restrictions. CUI-classified content is automatically blocked from transfer to unauthorized portable storage through label-based DLP policy enforcement.
+{{/if}}
+
+{{#if infraResources}}
+Supporting infrastructure:
+{{#each infraResources}}
+- {{resourceType}} "{{name}}"{{#if properties.retention_days}} (retention: {{properties.retention_days}} days){{/if}}
+{{/each}}
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Review Intune app protection policies for storage restrictions, device configuration policies for USB controls, DLP policy rules, and data transfer audit logs.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

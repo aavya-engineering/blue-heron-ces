@@ -1,0 +1,738 @@
+schema_version: '1.0'
+module: Boundary_Topology_Confirmation
+purpose: Empirical confirmation that the declared CUI boundary is structurally and operationally true prior to planning/stamping.
+metadata:
+  created_utc: '2026-02-19T20:52:26Z'
+sections:
+- id: DV-01
+  name: Identity Verification
+  questions:
+  - id: BTC.ID.001
+    section: Identity Verification
+    prompt: Export list of Global Admins. Does it match declared scope?
+    answer_type: boolean
+    options: []
+    required: true
+    help: Provide evidence export (CSV/PDF) and indicate mismatch if any.
+    roles:
+      primary_respondents:
+      - Identity Admin
+      validators:
+      - Compliance Officer
+    validations:
+    - rule: evidence_required
+      evidence_type: export
+      source: Entra
+    risk_flags:
+    - unexpected_global_admin_if_false
+    bindings:
+      evidence:
+        ga_export: attachment
+      btc:
+        ga_matches_declared: answer
+    scoring: {}
+    activation:
+      default_mode: full
+    aliases:
+    - DV.ID.001
+  - id: BTC.ID.002
+    section: Identity Verification
+    prompt: Export privileged role assignments (PIM/role members). Any unexpected privileged roles or persistent assignments?
+    answer_type: single_select
+    options:
+    - No unexpected roles
+    - Yes - unexpected roles found
+    - Unknown
+    required: true
+    help: Export PIM role assignments from Entra ID. Look for persistent (non-time-limited) privileged roles, roles assigned to unexpected accounts, or any Global Admin assignments not on the declared list.
+    roles:
+      primary_respondents:
+      - Identity Admin
+      validators:
+      - Security Lead
+    validations:
+    - rule: evidence_required
+      evidence_type: export
+      source: Entra/PIM
+    risk_flags:
+    - privilege_sprawl_if_yes
+    bindings:
+      evidence:
+        pim_roles_export: attachment
+      btc:
+        priv_role_anomalies: answer
+    scoring: {}
+    activation:
+      default_mode: full
+    aliases:
+    - DV.ID.002
+  - id: BTC.ID.003
+    section: Identity Verification
+    prompt: Are guest accounts present in the tenant? If yes, are they aligned to the declared boundary policy?
+    answer_type: single_select
+    options:
+    - No guests
+    - Guests present - aligned
+    - Guests present - not aligned
+    - Unknown
+    required: true
+    help: Query Entra ID for guest (B2B) accounts. Verify each guest is approved, has an expiration date, and is scoped to non-CUI resources unless explicitly authorized in the boundary policy.
+    roles:
+      primary_respondents:
+      - Identity Admin
+      validators:
+      - Compliance Officer
+    validations:
+    - rule: evidence_required
+      evidence_type: query
+      source: Entra
+    risk_flags:
+    - guest_misalignment_if_not_aligned
+    bindings:
+      btc:
+        guest_alignment: answer
+    scoring: {}
+    activation:
+      default_mode: full
+    aliases:
+    - DV.ID.003
+  - id: BTC.ID.004
+    section: Identity Verification
+    prompt: Are break-glass accounts configured, protected, and excluded appropriately (documented)?
+    answer_type: single_select
+    options:
+    - 'Yes'
+    - Partially
+    - 'No'
+    - Unknown
+    required: true
+    help: Verify break-glass accounts exist, are excluded from Conditional Access, use FIDO2 or hardware token MFA, and are documented with monitoring alerts for any sign-in activity.
+    recommended: 'Yes'
+    roles:
+      primary_respondents:
+      - Security Lead
+      - Identity Admin
+      validators:
+      - Compliance Officer
+    validations:
+    - rule: evidence_required
+      evidence_type: config_export
+      source: Entra/CA
+    risk_flags:
+    - no_breakglass_if_no
+    bindings:
+      evidence:
+        breakglass_doc: attachment
+      btc:
+        breakglass_status: answer
+    scoring: {}
+    activation:
+      default_mode: full
+    aliases:
+    - DV.ID.004
+  activation:
+    default_mode: full
+    gating: true
+- id: DV-02
+  name: Device Verification
+  questions:
+  - id: BTC.DEV.001
+    section: Device Verification
+    prompt: Export enrolled devices. Do all CUI users have compliant managed devices?
+    answer_type: single_select
+    options:
+    - 'Yes'
+    - No - gaps found
+    - Unknown
+    required: true
+    help: Export the Intune device inventory and cross-reference against in-scope CUI users. Every user who accesses CUI must have at least one compliant, managed device enrolled.
+    roles:
+      primary_respondents:
+      - Endpoint Admin
+      validators:
+      - Security Lead
+    validations:
+    - rule: evidence_required
+      evidence_type: export
+      source: Intune
+    risk_flags:
+    - unmanaged_cui_access_if_no
+    bindings:
+      evidence:
+        device_export: attachment
+      btc:
+        device_compliance_gaps: answer
+    scoring: {}
+    activation:
+      default_mode: full
+    aliases:
+    - DV.DEV.001
+  - id: BTC.DEV.002
+    section: Device Verification
+    prompt: Are any unmanaged devices accessing CUI (via SharePoint/Teams/Exchange access logs)?
+    answer_type: single_select
+    options:
+    - 'No'
+    - 'Yes'
+    - Unknown
+    required: true
+    help: Review sign-in logs and Unified Audit Log for access from non-compliant or unmanaged devices to SharePoint, Teams, or Exchange resources that contain CUI.
+    recommended: 'No'
+    roles:
+      primary_respondents:
+      - Security Operations Lead
+      - Endpoint Admin
+      validators:
+      - Compliance Officer
+    validations:
+    - rule: evidence_required
+      evidence_type: query
+      source: Sentinel/Unified Audit
+    risk_flags:
+    - unmanaged_access_if_yes
+    bindings:
+      btc:
+        unmanaged_access: answer
+    scoring: {}
+    activation:
+      default_mode: full
+    aliases:
+    - DV.DEV.002
+  - id: BTC.DEV.003
+    section: Device Verification
+    prompt: Are privileged admin devices isolated/hardened (PAW/SAW) per declared model?
+    answer_type: single_select
+    options:
+    - 'Yes'
+    - Partially
+    - 'No'
+    - Unknown
+    required: true
+    help: Check whether admins performing privileged operations use dedicated Privileged Access Workstations (PAW) or Secure Admin Workstations (SAW) with hardened Intune compliance policies.
+    recommended: 'Yes'
+    roles:
+      primary_respondents:
+      - Security Lead
+      - Endpoint Admin
+      validators:
+      - Compliance Officer
+    validations:
+    - rule: evidence_required
+      evidence_type: config_export
+      source: Intune
+    risk_flags:
+    - no_paw_if_no
+    bindings:
+      btc:
+        paw_status: answer
+    scoring: {}
+    activation:
+      default_mode: full
+    aliases:
+    - DV.DEV.003
+  activation:
+    default_mode: full
+    gating: true
+- id: DV-03
+  name: Logging & Telemetry Verification
+  questions:
+  - id: BTC.LOG.001
+    section: Logging & Telemetry Verification
+    prompt: Is Unified Audit Log enabled and ingesting events?
+    answer_type: single_select
+    options:
+    - 'Yes'
+    - 'No'
+    - Unknown
+    required: true
+    help: Confirm UAL is turned on in the Microsoft Purview compliance portal and verify recent events are being captured by running a search for the last 24 hours.
+    roles:
+      primary_respondents:
+      - Security Operations Lead
+      validators:
+      - Compliance Officer
+    validations:
+    - rule: evidence_required
+      evidence_type: query
+      source: Unified Audit
+    risk_flags:
+    - no_audit_log_if_no
+    bindings:
+      btc:
+        ual_enabled: answer
+    scoring: {}
+    activation:
+      default_mode: full
+    aliases:
+    - DV.LOG.001
+  - id: BTC.LOG.002
+    section: Logging & Telemetry Verification
+    prompt: Is Sentinel connected and ingesting required data sources (Entra, M365, Defender, etc.)?
+    answer_type: single_select
+    options:
+    - 'Yes'
+    - Partially
+    - 'No'
+    - Unknown
+    required: true
+    help: Open the Sentinel workspace and check that data connectors for Entra ID, Microsoft 365, Defender for Endpoint, and other declared sources show a healthy ingestion status.
+    recommended: 'Yes'
+    roles:
+      primary_respondents:
+      - Security Operations Lead
+      validators:
+      - IT Director
+    validations:
+    - rule: evidence_required
+      evidence_type: workspace_check
+      source: Sentinel
+    risk_flags:
+    - no_siem_ingestion_if_no
+    bindings:
+      btc:
+        sentinel_ingestion: answer
+    scoring: {}
+    activation:
+      default_mode: full
+    aliases:
+    - DV.LOG.002
+  - id: BTC.LOG.003
+    section: Logging & Telemetry Verification
+    prompt: Is log retention configured as declared (duration, immutability, eDiscovery/retention policies)?
+    answer_type: single_select
+    options:
+    - 'Yes'
+    - Partially
+    - 'No'
+    - Unknown
+    required: true
+    help: Export Purview retention policies and Sentinel workspace retention settings. Verify the retention period matches the declared target and that immutability locks or preservation hold are enabled.
+    recommended: 'Yes'
+    roles:
+      primary_respondents:
+      - Compliance Officer
+      - Security Lead
+      validators:
+      - Executive Sponsor
+    validations:
+    - rule: evidence_required
+      evidence_type: config_export
+      source: Purview/Unified Audit
+    risk_flags:
+    - retention_mismatch_if_no
+    bindings:
+      btc:
+        retention_alignment: answer
+    scoring: {}
+    activation:
+      default_mode: full
+    aliases:
+    - DV.LOG.003
+  - id: BTC.LOG.004
+    section: Logging & Telemetry Verification
+    prompt: Is tamper protection / protection against log disabling in place (where applicable)?
+    answer_type: single_select
+    options:
+    - 'Yes'
+    - Partially
+    - 'No'
+    - Unknown
+    required: true
+    help: Verify that Defender tamper protection is enabled in the security portal and that audit log disable events trigger alerts. Check that non-admin users cannot turn off logging.
+    recommended: 'Yes'
+    roles:
+      primary_respondents:
+      - Security Lead
+      validators:
+      - Compliance Officer
+    validations:
+    - rule: evidence_required
+      evidence_type: config_export
+      source: Defender/Sentinel
+    risk_flags:
+    - log_tamper_risk_if_no
+    bindings:
+      btc:
+        tamper_protection: answer
+    scoring: {}
+    activation:
+      default_mode: full
+    aliases:
+    - DV.LOG.004
+  activation:
+    default_mode: full
+    gating: true
+- id: DV-04
+  name: DevOps Verification
+  questions:
+  - id: BTC.DEVOPS.001
+    section: DevOps Verification
+    prompt: Are any CUI repositories located in commercial environments or outside the declared boundary?
+    answer_type: single_select
+    options:
+    - 'No'
+    - 'Yes'
+    - Unknown
+    required: true
+    help: Inventory all Git repos that contain CUI or CUI-related code. Confirm each is hosted within the declared enclave (e.g., Azure DevOps in GCC High) and not in commercial GitHub or other external platforms.
+    roles:
+      primary_respondents:
+      - DevOps Lead
+      validators:
+      - Compliance Officer
+    validations:
+    - rule: evidence_required
+      evidence_type: repo_inventory
+      source: Git platform
+    risk_flags:
+    - cui_repo_outside_boundary_if_yes
+    bindings:
+      btc:
+        repo_boundary_alignment: answer
+    scoring: {}
+    activation:
+      default_mode: full
+    aliases:
+    - DV.DEVOPS.001
+  - id: BTC.DEVOPS.002
+    section: DevOps Verification
+    prompt: Are CI/CD pipelines fully within the declared boundary (runners, artifacts, logs)?
+    answer_type: single_select
+    options:
+    - 'Yes'
+    - Partially
+    - 'No'
+    - Unknown
+    required: true
+    help: Verify that build agents, artifact feeds, and pipeline logs are all hosted inside the declared boundary. Self-hosted runners must be on managed, in-scope infrastructure.
+    roles:
+      primary_respondents:
+      - DevOps Lead
+      validators:
+      - Security Lead
+    validations:
+    - rule: evidence_required
+      evidence_type: pipeline_inventory
+      source: CI/CD
+    risk_flags:
+    - pipeline_outside_boundary_if_no
+    bindings:
+      btc:
+        pipeline_boundary_alignment: answer
+    scoring: {}
+    activation:
+      default_mode: full
+    aliases:
+    - DV.DEVOPS.002
+  - id: BTC.DEVOPS.003
+    section: DevOps Verification
+    prompt: Are build artifacts stored inside the enclave with retention and access controls?
+    answer_type: single_select
+    options:
+    - 'Yes'
+    - Partially
+    - 'No'
+    - Unknown
+    required: true
+    help: Confirm that artifact storage (NuGet feeds, container registries, etc.) resides inside the enclave, has RBAC access controls, and applies retention policies aligned with the declared schedule.
+    roles:
+      primary_respondents:
+      - DevOps Lead
+      validators:
+      - Compliance Officer
+    validations:
+    - rule: evidence_required
+      evidence_type: storage_check
+      source: Artifact store
+    risk_flags:
+    - artifact_leak_risk_if_no
+    bindings:
+      btc:
+        artifact_storage_alignment: answer
+    scoring: {}
+    activation:
+      default_mode: full
+    aliases:
+    - DV.DEVOPS.003
+  activation:
+    default_mode: full
+    gating: true
+- id: DV-05
+  name: Interconnection Verification
+  questions:
+  - id: BTC.INT.001
+    section: Interconnection Verification
+    prompt: Validate all external SaaS integrations that connect to in-scope data (list and confirm).
+    answer_type: single_select
+    options:
+    - All identified and approved
+    - Some identified but not approved
+    - Unknown
+    required: true
+    help: List all third-party SaaS apps with access to M365 or Azure data (check Enterprise Applications in Entra). Each must be approved, documented, and scoped to least-privilege permissions.
+    recommended: All identified and approved
+    roles:
+      primary_respondents:
+      - IT Architect
+      - Security Lead
+      validators:
+      - Compliance Officer
+    validations:
+    - rule: evidence_required
+      evidence_type: integration_inventory
+      source: M365/Azure
+    risk_flags:
+    - unknown_integrations_if_not_all
+    bindings:
+      btc:
+        integration_alignment: answer
+    scoring: {}
+    activation:
+      default_mode: full
+    aliases:
+    - DV.INT.001
+  - id: BTC.INT.002
+    section: Interconnection Verification
+    prompt: 'Review API tokens/service principals: are they inventoried, least-privilege, and documented?'
+    answer_type: single_select
+    options:
+    - 'Yes'
+    - Partially
+    - 'No'
+    - Unknown
+    required: true
+    help: Export Entra app registrations and service principals. Verify each has documented ownership, least-privilege API permissions, and credential expiration policies. Remove any orphaned or unused entries.
+    recommended: 'Yes'
+    roles:
+      primary_respondents:
+      - Identity Admin
+      - Security Lead
+      validators:
+      - Compliance Officer
+    validations:
+    - rule: evidence_required
+      evidence_type: spn_export
+      source: Entra
+    risk_flags:
+    - spn_sprawl_if_no
+    bindings:
+      btc:
+        service_principal_governance: answer
+    scoring: {}
+    activation:
+      default_mode: full
+    aliases:
+    - DV.INT.002
+  - id: BTC.INT.003
+    section: Interconnection Verification
+    prompt: Confirm email forwarding restrictions are enforced as declared.
+    answer_type: single_select
+    options:
+    - 'Yes'
+    - Partially
+    - 'No'
+    - Unknown
+    required: true
+    help: Export Exchange transport rules and remote domain settings. Verify auto-forwarding is blocked or restricted to approved domains only, and that mailbox-level forwarding rules are audited.
+    roles:
+      primary_respondents:
+      - Messaging Admin
+      - Security Lead
+      validators:
+      - Compliance Officer
+    validations:
+    - rule: evidence_required
+      evidence_type: config_export
+      source: Exchange
+    risk_flags:
+    - email_egress_risk_if_no
+    bindings:
+      btc:
+        forwarding_alignment: answer
+    scoring: {}
+    activation:
+      default_mode: full
+    aliases:
+    - DV.INT.003
+  - id: BTC.INT.004
+    section: Interconnection Verification
+    prompt: Verify backup storage locations and whether any backup falls outside the boundary.
+    answer_type: single_select
+    options:
+    - All in scope
+    - Some out of scope
+    - Unknown
+    required: true
+    help: Document all backup destinations (cloud and on-premises). Confirm backup data stays within the declared boundary and that third-party backup solutions are FedRAMP-authorized if applicable.
+    recommended: All in scope
+    roles:
+      primary_respondents:
+      - IT Director
+      validators:
+      - Security Lead
+    validations:
+    - rule: evidence_required
+      evidence_type: backup_config
+      source: Backup platform
+    risk_flags:
+    - backup_outside_boundary_if_some
+    bindings:
+      btc:
+        backup_boundary_alignment: answer
+    scoring: {}
+    activation:
+      default_mode: full
+    aliases:
+    - DV.INT.004
+  activation:
+    default_mode: full
+    gating: true
+- id: DV-06
+  name: Exception & Governance Validation
+  questions:
+  - id: BTC.GOV.001
+    section: Exception & Governance Validation
+    prompt: Is there a documented exception register for boundary/control deviations?
+    answer_type: single_select
+    options:
+    - 'Yes'
+    - 'No'
+    - Unknown
+    required: true
+    help: An exception register tracks any approved deviations from the declared boundary or CMMC controls. It should include the exception description, justification, risk owner, approval date, and review schedule.
+    roles:
+      primary_respondents:
+      - Compliance Officer
+      validators:
+      - Executive Sponsor
+    validations: []
+    risk_flags:
+    - no_exception_register_if_no
+    bindings:
+      btc:
+        exception_register: answer
+    scoring: {}
+    activation:
+      default_mode: full
+    aliases:
+    - DV.GOV.001
+  - id: BTC.GOV.002
+    section: Exception & Governance Validation
+    prompt: Are compensating controls documented for each exception (with owners and due dates)?
+    answer_type: single_select
+    options:
+    - 'Yes'
+    - Partially
+    - 'No'
+    - Unknown
+    required: true
+    help: Each exception in the register must have a compensating control that mitigates the risk, an assigned owner responsible for implementation, and a target remediation date.
+    recommended: 'Yes'
+    roles:
+      primary_respondents:
+      - Compliance Officer
+      - Security Lead
+      validators:
+      - Executive Sponsor
+    validations: []
+    risk_flags:
+    - no_comp_controls_if_no
+    bindings:
+      btc:
+        compensating_controls: answer
+    scoring: {}
+    activation:
+      default_mode: full
+    aliases:
+    - DV.GOV.002
+  - id: BTC.GOV.003
+    section: Exception & Governance Validation
+    prompt: Is risk acceptance formally recorded and approved when gaps remain?
+    answer_type: single_select
+    options:
+    - 'Yes'
+    - Partially
+    - 'No'
+    - Unknown
+    required: true
+    help: When a control gap cannot be immediately remediated, a formal risk acceptance must be signed by an authorized executive. Include the gap description, residual risk level, and acceptance expiration date.
+    recommended: 'Yes'
+    roles:
+      primary_respondents:
+      - Executive Sponsor
+      - Compliance Officer
+      validators:
+      - Contracts/Compliance Officer
+    validations: []
+    risk_flags:
+    - unapproved_risk_if_no
+    bindings:
+      btc:
+        risk_acceptance: answer
+    scoring: {}
+    activation:
+      default_mode: full
+    aliases:
+    - DV.GOV.003
+  - id: BTC.GOV.004
+    section: Exception & Governance Validation
+    prompt: Is change governance defined (approvals, rollback authority, change windows) and enforced?
+    answer_type: single_select
+    options:
+    - 'Yes'
+    - Partially
+    - 'No'
+    - Unknown
+    required: true
+    help: Verify there is a documented change management process with defined approval workflows, rollback procedures, and maintenance windows. Changes to boundary-critical systems should require security review.
+    recommended: 'Yes'
+    roles:
+      primary_respondents:
+      - IT Director
+      - Compliance Officer
+      validators:
+      - Executive Sponsor
+    validations: []
+    risk_flags:
+    - weak_change_governance_if_no
+    bindings:
+      btc:
+        change_governance: answer
+    scoring: {}
+    activation:
+      default_mode: full
+    aliases:
+    - DV.GOV.004
+  activation:
+    default_mode: full
+    gating: true
+virtual_questions:
+- id: BTC.DEV.002.CA_ENFORCEMENT_PROOF
+  section: Device Verification
+  prompt: Provide proof that Conditional Access blocks unmanaged/noncompliant devices from accessing CUI resources (SharePoint/Teams/Exchange).
+  answer_type: single_select
+  options:
+  - Proof provided (exports/screenshots)
+  - Not enforced
+  - Unknown
+  required: true
+  help: Attach CA policy export and a sample sign-in log showing device compliance requirement enforcement.
+  roles:
+    primary_respondents:
+    - Security Operations Lead
+    - Identity Admin
+    validators:
+    - Compliance Officer
+  validations:
+  - rule: evidence_required
+    evidence_type: export
+    source: Entra/Conditional Access
+  risk_flags:
+  - ca_not_enforcing_device_compliance_if_not_enforced
+  bindings:
+    evidence:
+      ca_policy_export: attachment
+    btc:
+      device_ca_enforcement: answer
+  activation:
+    default_mode: full

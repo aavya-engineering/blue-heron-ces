@@ -1,0 +1,40 @@
+{
+  "name": "ces-ao",
+  "version": "2.2.3",
+  "description": "CMMC L2 AdminOps Console — 85 use case command interface",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "ao": "./dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "ao": "npx tsx src/cli/index.ts gui --port 3001",
+    "gui": "npx tsx src/cli/index.ts gui",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "audit-cmmc-migration": "tsx scripts/audit-cmmc-migration.ts"
+  },
+  "dependencies": {
+    "axios": "^1.6.2",
+    "ces-shared": "*",
+    "ces-stamper": "*",
+    "ces-tenant": "file:../ces-tenant",
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.0",
+    "open": "^8.4.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.0",
+    "@types/node": "^20.10.5",
+    "@vitest/coverage-v8": "^4.1.9",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3",
+    "vitest": "^4.1.7"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

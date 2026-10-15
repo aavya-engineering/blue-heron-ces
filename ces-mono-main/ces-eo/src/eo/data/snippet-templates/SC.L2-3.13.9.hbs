@@ -1,0 +1,35 @@
+## Control {{controlId}}: Terminate Network Connections Associated with Communications Sessions at End of Sessions or After Defined Inactivity Period
+
+**Implementation Status:** {{status}}
+
+This organization terminates network connections after defined periods of inactivity within the {{tenantName}} M365 GCC High tenant through Conditional Access session controls and device configuration policies managed by {{variables.systemAdministrator}}.
+
+{{#if conditionalAccessActive}}
+**Session Timeout Enforcement:**
+{{caPoliciesTotalCount}} Conditional Access policies enforce session termination controls:
+{{#each policies}}
+- **{{displayName}}** ({{state}}){{#if sessionControls}}: Session controls enforce sign-in frequency and persistent browser restrictions{{/if}}
+{{/each}}
+
+Conditional Access sign-in frequency policies require re-authentication after defined inactivity periods, automatically terminating idle sessions to prevent unauthorized access to CUI resources.
+{{else}}
+Conditional Access session termination controls have not been configured. Session inactivity timeout relies on application-level defaults.
+{{/if}}
+
+{{#if deviceConfigurationsActive}}
+**Endpoint Session Controls:**
+{{deviceConfigurationsCount}} device configuration policies enforce screen lock and session timeout at the endpoint level, ensuring devices automatically lock after defined inactivity periods.
+{{/if}}
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine Conditional Access sign-in frequency settings, persistent browser session configurations, device lock timeout policies, and session termination logs.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

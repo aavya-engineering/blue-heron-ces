@@ -1,0 +1,76 @@
+controlId: "CM.L2-3.4.2"
+relatedControlIds:
+  - "CM.L2-3.4.1"
+  - "CM.L2-3.4.3"
+  - "CM.L2-3.4.5"
+practiceStatement: Establish and maintain baseline configurations and inventories of organizational systems throughout the
+  respective system development life cycles.
+useCaseId: B-04
+useCaseTitle: "Security Baseline Drift"
+domain: Device & Endpoint Management
+priority: P4 Standard
+trigger: 'SCHEDULE: Weekly automated detection; CHANGE: after security baseline profile update'
+sodTier: Tier 1 -- Read-Only Audit (drift detection); Tier 2 -- Config Manager (re-deployment)
+entraRolesRequired:
+- Security Reader (detection); Intune Administrator (remediation)
+approvalRequired: true
+services:
+- name: Microsoft Intune
+  purpose: security baselines, device configuration profiles, per-setting compliance status
+- name: Entra ID
+  purpose: device identity, group membership for baseline assignment
+- name: Microsoft Graph API
+  purpose: deviceManagement/deviceCompliancePolicySettingStateSummaries
+configurationSteps:
+  portalPath: https://intune.microsoft.us
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes DeviceManagementConfiguration.Read.All
+  - cmdlet: Get-MgDeviceManagementIntent
+    parameters:
+    - -MgDeviceManagementIntent
+    - -All
+    - -Object
+    - -Table
+    - -AutoSize
+  - cmdlet: Get-MgDeviceManagementIntentDeviceState
+    parameters:
+    - -MgDeviceManagementIntentDeviceState
+    - -DeviceManagementIntentId
+    - -All
+    - -Object
+    - -Property
+  - cmdlet: Get-MgDeviceManagementIntentDeviceStateSummary
+    parameters:
+    - -MgDeviceManagementIntentDeviceStateSummary
+    - -DeviceManagementIntentId
+    - -Output
+  graphApiEndpoint: GET https://graph.microsoft.us/beta/deviceManagement/intents?$select=id,displayName,templateId
+  graphApiPayloadExample: {}
+  requiredPermissions:
+  - DeviceManagementConfiguration.Read.All
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-b-device/B-04/{year}/{month}/
+  format: CSV (drift report), JSON (Graph API baseline state export)
+  filenamePattern: B-04_BaselineDrift_{YYYYMMDD}_{HHmmss}_{BaselineName}.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://intune.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: Intune security baselines are fully supported in GCC High. Baseline template versions in GCC High may trail commercial
+    releases by one to two update cycles. Always verify the latest available baseline version at `https://intune.microsoft.us`
+    before comparing against commercial documentation. The `/beta/deviceManagement/intents` endpoint is available in GCC High
+    but is a beta API; behavior may change without notice. For production-grade reporting, supplement API queries with portal
+    exports.
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

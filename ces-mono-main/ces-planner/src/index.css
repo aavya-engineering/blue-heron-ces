@@ -1,0 +1,242 @@
+/*
+  SPDX-FileCopyrightText: Blue Heron Defense LLC and its licensors. All rights reserved.
+  SPDX-License-Identifier: LicenseRef-BHD-Proprietary
+  CONFIDENTIAL - TRADE SECRET. Unpublished work. Provided solely to perform work for Blue Heron Defense LLC at its direction.
+  Any other use, copying, disclosure, or reuse, in whole or in part, is prohibited.
+  Changes made to this file for Blue Heron Defense LLC are made on its behalf; it claims all rights in them.
+  Submitting a change to this repository means you accept TERMS.md.
+  Removing or altering this notice is prohibited (17 U.S.C. 1202). Ref: BHD-CES-MONO-2026A
+  See LICENSE and TERMS.md.
+*/
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * ComplianceOne design system (designmd.ai: chef/complianceone)
+ * Token foundation for the CES Planner. See repo-root DESIGN.md.
+ */
+
+:root {
+  /* Color tokens (mirrors tailwind.config.js + ces-shared/ui/ces-ui.css v2 "Instrument"). */
+  --co-primary: #1b2a4a;         /* Heron Ink */
+  --co-primary-hover: #24365c;
+  --co-designation: #502b85;     /* regulation CUI-banner purple — constant across themes */
+  --co-designation-text: #ffffff;
+  --co-bg: #f8fafc;
+  --co-surface: #ffffff;
+  --co-text: #0f172a;
+  --co-text-muted: #475569;
+  --co-border: #e2e8f0;
+  --co-border-strong: #cbd5e1;
+  --co-compliant: #047857;
+  --co-risk: #b45309;
+  --co-violation: #b91c1c;
+  --co-review: #1d4ed8;
+
+  font-family: 'IBM Plex Sans', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light;
+  color: var(--co-text);
+  background-color: var(--co-bg);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background-color: var(--co-bg);
+  color: var(--co-text);
+}
+
+/* Designation rail — mirrors ces-ui.css: regulation CUI marking bar, CSS-only,
+   theme-constant, prints. The system's single deliberate accent. */
+body::before {
+  content: 'CUI';
+  display: block;
+  height: 20px;
+  line-height: 20px;
+  background-color: var(--co-designation);
+  color: var(--co-designation-text);
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.45em;
+  text-indent: 0.45em;
+  text-align: center;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+@layer base {
+  /* Headings use the display face (title-block voice); body stays IBM Plex Sans. */
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+    letter-spacing: 0.015em;
+    color: var(--co-text);
+  }
+
+  /* Regulation codes / control IDs / audit refs in monospace (spec rule #1). */
+  code,
+  kbd,
+  samp,
+  .control-id {
+    font-family: 'Fira Code', ui-monospace, monospace;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+    opacity: 0.4; /* ComplianceOne disabled state */
+  }
+
+  input:not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="file"]):not([type="color"]):not([type="image"]):not([type="hidden"]):not([type="radio"]):not([type="checkbox"]):not([type="range"]),
+  textarea,
+  select {
+    background-color: var(--co-surface);
+    color: var(--co-text);
+    border-color: var(--co-border);
+  }
+
+  input:not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="file"]):not([type="color"]):not([type="image"]):not([type="hidden"]):not([type="radio"]):not([type="checkbox"]):not([type="range"])::placeholder,
+  textarea::placeholder {
+    color: var(--co-text-muted);
+  }
+}
+
+@layer components {
+  /*
+   * Token-driven button primitives so pages can adopt ComplianceOne button
+   * variants without bespoke utility soup. Sharp corners, no radius.
+   */
+  .btn {
+    @apply inline-flex items-center justify-center font-semibold transition-colors;
+    @apply h-9 px-[14px] text-body; /* md size */
+    border-radius: 0;
+  }
+  .btn-sm {
+    @apply h-7 px-[10px] text-small;
+  }
+  .btn-lg {
+    @apply h-11 px-5 text-body;
+  }
+  .btn-primary {
+    @apply text-white;
+    background-color: var(--co-primary);
+  }
+  .btn-primary:hover {
+    background-color: var(--co-primary-hover);
+  }
+  .btn-secondary {
+    @apply bg-transparent;
+    color: var(--co-primary);
+    border: 1.5px solid var(--co-primary);
+  }
+  .btn-secondary:hover {
+    background-color: #eff6ff;
+  }
+  .btn-ghost {
+    @apply bg-transparent text-slate-600;
+  }
+  .btn-ghost:hover {
+    @apply bg-slate-100;
+  }
+  .btn-destructive {
+    @apply text-white;
+    background-color: var(--co-violation);
+  }
+  .btn-destructive:hover {
+    background-color: #b91c1c;
+  }
+
+  /* Status chip primitives (square; color + intended icon pairing). */
+  .chip {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 text-small font-medium;
+    border-radius: 0;
+  }
+  .chip-compliant {
+    background-color: #dcfce7;
+    color: var(--co-compliant);
+  }
+  .chip-risk {
+    background-color: #fef3c7;
+    color: var(--co-risk);
+  }
+  .chip-violation {
+    background-color: #fee2e2;
+    color: var(--co-violation);
+  }
+  .chip-review {
+    background-color: #dbeafe;
+    color: var(--co-review);
+  }
+}
+
+/*
+ * Dark token overrides — mirrors ces-shared/ui/ces-ui.css [data-theme="dark"] block.
+ * Wire-up only: no dark: Tailwind classes exist in Planner source, so light rendering
+ * is unchanged. Dark activates only when data-theme="dark" is set on <html>.
+ */
+[data-theme="dark"] {
+  color-scheme: dark;
+  /* Ops-floor dark (mirrors ces-ui.css v2): blue-black, colder than slate. */
+  --co-primary:        #7ea0d6;
+  --co-primary-hover:  #99b5e3;
+  --co-bg:             #0b1220;
+  --co-surface:        #121c2e;
+  --co-text:           #f2f6fc;
+  --co-text-muted:     #96a6bd;
+  --co-border:         #24344e;
+  --co-border-strong:  #3a4e6e;
+  --co-compliant:      #34d399;
+  --co-risk:           #fbbf24;
+  --co-violation:      #f87171;
+  --co-review:         #60a5fa;
+  /* --co-designation intentionally not overridden — marking color is constant. */
+}
+
+/*
+ * Autofill override — hardcoded hex because -webkit-box-shadow during autofill
+ * painting does not reliably resolve CSS custom properties in all Chromium versions.
+ * Light values: --co-surface=#ffffff, --co-text=#0f172a
+ * Dark values:  --co-surface=#1e293b, --co-text=#f8fafc
+ */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
+  -webkit-text-fill-color: #0f172a;
+}
+
+[data-theme="dark"] input:-webkit-autofill,
+[data-theme="dark"] input:-webkit-autofill:hover,
+[data-theme="dark"] input:-webkit-autofill:focus,
+[data-theme="dark"] textarea:-webkit-autofill,
+[data-theme="dark"] textarea:-webkit-autofill:hover,
+[data-theme="dark"] textarea:-webkit-autofill:focus,
+[data-theme="dark"] select:-webkit-autofill,
+[data-theme="dark"] select:-webkit-autofill:hover,
+[data-theme="dark"] select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #1e293b inset;
+  -webkit-text-fill-color: #f8fafc;
+}

@@ -1,0 +1,45 @@
+## Control {{controlId}}: Scan for Vulnerabilities in Organizational Systems and Applications Periodically
+
+**Implementation Status:** {{status}}
+
+This organization scans for vulnerabilities within the {{tenantName}} M365 GCC High tenant through Microsoft Defender Vulnerability Management, Secure Score, and endpoint compliance scanning managed by {{variables.systemAdministrator}}.
+
+{{#if secureScoresAvailable}}
+**Continuous Vulnerability Assessment:**
+Microsoft Secure Score ({{currentScore}} / {{maxScore}}, {{percentage}}%) provides continuous vulnerability assessment:
+{{#if controlScores}}
+{{#each controlScores}}
+- **{{controlName}}** — Score: {{score}} / {{maxScore}}
+{{/each}}
+{{/if}}
+{{/if}}
+
+**Vulnerability Scanning Program:**
+- **Microsoft Defender Vulnerability Management:** Continuous agent-based vulnerability scanning of managed endpoints
+- **Microsoft Secure Score:** Configuration vulnerability assessment for M365 services
+- **Intune Compliance:** Device compliance scans detect configuration drift from security baselines
+- **Scan Frequency:** Continuous (agent-based), daily (configuration), weekly (comprehensive)
+
+{{#if securityAlertsActive}}
+**Vulnerability-Related Alerts:**
+{{securityAlertsCount}} security alerts include vulnerability exploitation detection and newly discovered vulnerability notifications.
+{{/if}}
+
+**Remediation Timelines:**
+- Critical vulnerabilities: 15 days
+- High vulnerabilities: 30 days
+- Medium vulnerabilities: 90 days
+- Low vulnerabilities: 180 days
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine Defender Vulnerability Management reports, Secure Score assessment results, Intune compliance scan logs, and remediation tracking records.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

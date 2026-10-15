@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="no-referrer" />
+  <title>CES — Approver Token Issuer</title>
+  <link rel="icon" type="image/svg+xml" href="./ces-favicon.svg">
+  <link rel="stylesheet" href="./ces-ui.css">
+  <script src="./ces-theme-toggle.js"></script>
+  <!--
+    FC-EO-E (2026-09-28): the AdminOps approver-token issuer page.
+    1. The BHD operator signs in with Microsoft Entra ID (authorization code + PKCE, no library;
+       settings from GET /api/approver-tokens/config). The ID token is kept in memory only.
+    2. Picks the customer tenant and names the approver.
+    3. Gets the token ONCE (copy button); it is never stored by this page or by the server.
+    4. Sees the tenant's recent mints (who, for whom, when, expiry) — never tokens.
+    In the dev fallback mode (CES_EO_OPERATOR_DEV_FALLBACK=1, loopback only) a dev operator token
+    is pasted instead of signing in, and every mint is recorded as unverified.
+    FC-EO-G (2026-09-28): when Entra is not configured and passkeys are (CES_EO_OPERATOR_PASSKEY_ORIGIN),
+    the operator signs in with a passkey registered on this machine (WebAuthn, user verification
+    required) and gets a short-lived operator session held in memory only. An enrollment link
+    (#enroll=<code>, from `npm run operator:enroll` or from another operator) registers a passkey.
+    Signed-in operators can add operators (one-time code) and list / revoke passkeys.
+  -->
+  <style>
+    :root { --pad: 16px; }
+    body { background: var(--co-bg); color: var(--co-text); font-family: 'IBM Plex Sans', system-ui, sans-serif; margin: 0; }
+    main { max-width: 880px; margin: 0 auto; padding: 24px var(--pad) 48px; }
+    h1 { font-size: 1.4rem; margin: 0 0 4px; }
+    h2 { font-size: 1.05rem; margin: 0 0 12px; }
+    p.lead { color: var(--co-text-muted); margin: 0 0 20px; }
+    section.card { background: var(--co-surface); border: 1px solid var(--co-border); border-radius: 8px; padding: var(--pad); margin-bottom: 16px; }
+    label { display: block; font-size: .85rem; color: var(--co-text-muted); margin: 10px 0 4px; }
+    input, select, textarea { width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid var(--co-border); border-radius: 6px; background: var(--co-bg); color: var(--co-text); font: inherit; }
+    textarea { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: .8rem; min-height: 90px; }
+    button { margin-top: 12px; padding: 8px 14px; border-radius: 6px; border: 1px solid var(--co-primary); background: var(--co-primary); color: #fff; font: inherit; cursor: pointer; }
+    button.secondary { background: transparent; color: var(--co-primary); }
+    button:disabled { opacity: .5; cursor: default; }
+    .status { font-size: .9rem; margin-top: 8px; }
+    .status.err { color: var(--co-violation); }
+    .status.ok { color: var(--co-compliant); }
+    .warn { color: var(--co-risk); font-weight: 600; }
+    table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+    th, td { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--co-border); vertical-align: top; overflow-wrap: anywhere; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 600px) { .row2 { grid-template-columns: 1fr; } }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Approver Token Issuer</h1>
+  <p class="lead">Mint a short-lived AdminOps approver token for a named approver. BHD operators only; every mint is recorded as evidence.</p>
+
+  <section class="card" id="issuerSignIn">
+    <h2>1. Operator sign-in</h2>
+    <div id="issuerAuthState" class="status">Loading sign-in settings…</div>
+    <button id="issuerSignInBtn" hidden>Sign in with Microsoft</button>
+    <button id="issuerPasskeySignInBtn" hidden>Sign in with passkey</button>
+    <div id="issuerEnrollBox" hidden>
+      <p>Register a passkey on this machine with your one-time enrollment code (valid 10 minutes, single use).</p>
+      <label for="issuerEnrollCode">Enrollment code</label>
+      <input id="issuerEnrollCode" type="text" autocomplete="off" spellcheck="false" />
+      <button id="issuerEnrollBtn">Register passkey</button>
+      <div id="issuerEnrollStatus" class="status"></div>
+    </div>
+    <button id="issuerSignOutBtn" class="secondary" hidden>Sign out</button>
+    <div id="issuerDevBox" hidden>
+      <p class="warn">Dev fallback mode: loopback only; mints are recorded as unverified.</p>
+      <label for="issuerDevToken">Dev operator token</label>
+      <textarea id="issuerDevToken" autocomplete="off" spellcheck="false"></textarea>
+      <button id="issuerDevUseBtn" class="secondary">Use this token</button>
+    </div>
+  </section>
+
+  <section class="card" id="issuerMintCard">
+    <h2>2. Mint a token</h2>
+    <label for="issuerTenant">Customer tenant</label>
+    <select id="issuerTenant"><option value="">Select a tenant…</option></select>
+    <div class="row2">
+      <div>
+        <label for="issuerApprover">Approver (user principal name)</label>
+        <input id="issuerApprover" type="email" autocomplete="off" placeholder="name@customer.example" />
+      </div>
+      <div>
+        <label for="issuerApproverName">Approver display name (optional)</label>
+        <input id="issuerApproverName" type="text" autocomplete="off" />
+      </div>
+    </div>
+    <label for="issuerTtl">Lifetime (minutes, 1–30)</label>
+    <input id="issuerTtl" type="number" min="1" max="30" value="15" />
+    <button id="issuerMintBtn">Mint token</button>
+    <div id="issuerMintStatus" class="status"></div>
+    <div id="issuerTokenBox" hidden>
+      <label for="issuerTokenOut">Token — shown once. Copy it now; it cannot be shown again.</label>
+      <textarea id="issuerTokenOut" readonly></textarea>
+      <button id="issuerCopyBtn" class="secondary">Copy token</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>3. Recent mints for this tenant</h2>
+    <div id="issuerMintsBody" class="status">Sign in and pick a tenant to see recent mints.</div>
+  </section>
+
+  <section class="card" id="issuerOperatorsCard" hidden>
+    <h2>4. Operators and passkeys</h2>
+    <div id="issuerPasskeysBody" class="status"></div>
+    <h2 style="margin-top:16px">Add an operator</h2>
+    <div class="row2">
+      <div>
+        <label for="issuerNewOpName">Display name</label>
+        <input id="issuerNewOpName" type="text" autocomplete="off" />
+      </div>
+      <div>
+        <label for="issuerNewOpUpn">Their own sign-in address</label>
+        <input id="issuerNewOpUpn" type="email" autocomplete="off" placeholder="name@bhd.example" />
+      </div>
+    </div>
+    <button id="issuerIssueCodeBtn" class="secondary">Create one-time enrollment code</button>
+    <div id="issuerNewCodeStatus" class="status"></div>
+    <textarea id="issuerNewCodeOut" readonly hidden></textarea>
+  </section>
+</main>
+
+<script>
+// ------------------------------------------------------------------------------------------
+// State (memory only). The operator's ID token lives in this variable; nothing is persisted
+// except the one-time PKCE verifier/state/nonce, which sessionStorage holds across the redirect.
+// ------------------------------------------------------------------------------------------
+var issuerConfig = null;
+var issuerOperatorToken = '';
+/** Passkey session details (display name, address, credential id, expiry); memory only. */
+var issuerOperatorInfo = null;
+
+function $(sel) { return document.querySelector(sel); }
+
+function issuerEsc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+function issuerB64url(bytes) {
+  var s = '';
+  for (var i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+  return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function issuerRandom() {
+  var a = new Uint8Array(32);
+  crypto.getRandomValues(a);
+  return issuerB64url(a);
+}
+
+function issuerJwtClaims(token) {
+  try {
+    var p = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(decodeURIComponent(escape(atob(p))));
+  } catch (e) { return null; }
+}
+
+function issuerRedirectUri() { return location.origin + location.pathname; }
+
+async function issuerStartSignIn() {
+  var e = issuerConfig && issuerConfig.entra;
+  if (!e) return;
+  var verifier = issuerRandom();
+  var state = issuerRandom();
+  var nonce = issuerRandom();
+  var digest = new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier)));
+  sessionStorage.setItem('issuer.pkce', JSON.stringify({ verifier: verifier, state: state, nonce: nonce }));
+  var q = new URLSearchParams({
+    client_id: e.clientId,
+    response_type: 'code',
+    redirect_uri: issuerRedirectUri(),
+    response_mode: 'query',
+    scope: e.scopes.join(' '),
+    state: state,
+    nonce: nonce,
+    code_challenge: issuerB64url(digest),
+    code_challenge_method: 'S256',
+    prompt: 'select_account',
+  });
+  location.assign(e.authorizeUrl + '?' + q.toString());
+}
+
+/** Finish the redirect: exchange the code (PKCE) for an ID token; check state and nonce. */
+async function issuerCompleteSignIn() {
+  var params = new URLSearchParams(location.search);
+  var code = params.get('code');
+  var err = params.get('error');
+  if (!code && !err) return false;
+  history.replaceState(null, '', location.pathname); // drop code/state from the address bar
+  var saved = null;
+  try { saved = JSON.parse(sessionStorage.getItem('issuer.pkce') || 'null'); } catch (e) { saved = null; }
+  sessionStorage.removeItem('issuer.pkce');
+  if (err) throw new Error('Sign-in failed: ' + err);
+  if (!saved || params.get('state') !== saved.state) throw new Error('Sign-in failed: state mismatch');
+  var e = issuerConfig.entra;
+  var res = await fetch(e.tokenUrl, {
+    method: 'POST',
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      client_id: e.clientId,
+      grant_type: 'authorization_code',
+      code: code,
+      redirect_uri: issuerRedirectUri(),
+      code_verifier: saved.verifier,
+      scope: e.scopes.join(' '),
+    }).toString(),
+  });
+  var body = await res.json();
+  if (!res.ok || !body.id_token) throw new Error('Sign-in failed: ' + (body.error_description || body.error || res.status));
+  var claims = issuerJwtClaims(body.id_token);
+  if (!claims || claims.nonce !== saved.nonce) throw new Error('Sign-in failed: nonce mismatch');
+  issuerOperatorToken = body.id_token;
+  return true;
+}
+
+// ------------------------------------------------------------------------------------------
+// Passkeys (FC-EO-G). WebAuthn options/credentials cross the wire as base64url JSON; the browser
+// API wants ArrayBuffers. No library: the conversions are below.
+// ------------------------------------------------------------------------------------------
+function issuerB64urlToBuf(s) {
+  var t = String(s).replace(/-/g, '+').replace(/_/g, '/');
+  while (t.length % 4) t += '=';
+  var bin = atob(t);
+  var a = new Uint8Array(bin.length);
+  for (var i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i);
+  return a.buffer;
+}
+
+function issuerBufToB64url(buf) { return issuerB64url(new Uint8Array(buf)); }
+
+function issuerCreationOptions(o) {
+  var pk = Object.assign({}, o);
+  pk.challenge = issuerB64urlToBuf(o.challenge);
+  pk.user = Object.assign({}, o.user, { id: issuerB64urlToBuf(o.user.id) });
+  pk.excludeCredentials = (o.excludeCredentials || []).map(function (c) { return Object.assign({}, c, { id: issuerB64urlToBuf(c.id) }); });
+  return pk;
+}
+
+function issuerRequestOptions(o) {
+  var pk = Object.assign({}, o);
+  pk.challenge = issuerB64urlToBuf(o.challenge);
+  pk.allowCredentials = (o.allowCredentials || []).map(function (c) { return Object.assign({}, c, { id: issuerB64urlToBuf(c.id) }); });
+  return pk;
+}
+
+function issuerCredentialJSON(cred) {
+  var r = cred.response;
+  var out = {
+    id: cred.id,
+    rawId: issuerBufToB64url(cred.rawId),
+    type: cred.type,
+    clientExtensionResults: cred.getClientExtensionResults ? cred.getClientExtensionResults() : {},
+    response: { clientDataJSON: issuerBufToB64url(r.clientDataJSON) },
+  };
+  if (cred.authenticatorAttachment) out.authenticatorAttachment = cred.authenticatorAttachment;
+  if (r.attestationObject) {
+    out.response.attestationObject = issuerBufToB64url(r.attestationObject);
+    if (r.getTransports) out.response.transports = r.getTransports();
+  }
+  if (r.authenticatorData) {
+    out.response.authenticatorData = issuerBufToB64url(r.authenticatorData);
+    out.response.signature = issuerBufToB64url(r.signature);
+    if (r.userHandle) out.response.userHandle = issuerBufToB64url(r.userHandle);
+  }
+  return out;
+}
+
+async function issuerPostJson(url, body, operatorToken) {
+  var headers = { 'content-type': 'application/json' };
+  if (operatorToken) headers['x-ces-principal'] = operatorToken;
+  var res = await fetch(url, { method: 'POST', headers: headers, body: JSON.stringify(body || {}) });
+  var data = await res.json().catch(function () { return {}; });
+  return { ok: res.ok, status: res.status, data: data };
+}
+
+function issuerRefusalText(r) {
+  return 'Refused (' + r.status + '): ' + (r.data.detail || r.data.error || r.data.reason || 'unknown error');
+}
+
+/** Register a passkey on this machine with a one-time enrollment code. */
+async function issuerPasskeyEnroll(code) {
+  var status = $('#issuerEnrollStatus');
+  if (!code) { status.className = 'status err'; status.textContent = 'Enter your enrollment code.'; return null; }
+  var o = await issuerPostJson('/api/approver-tokens/passkeys/enroll/options', { code: code });
+  if (!o.ok) { status.className = 'status err'; status.textContent = issuerRefusalText(o); return null; }
+  var cred;
+  try {
+    cred = await navigator.credentials.create({ publicKey: issuerCreationOptions(o.data) });
+  } catch (e) {
+    status.className = 'status err'; status.textContent = 'Passkey registration was cancelled or failed: ' + e.message; return null;
+  }
+  var v = await issuerPostJson('/api/approver-tokens/passkeys/enroll/verify', { code: code, response: issuerCredentialJSON(cred) });
+  if (!v.ok) { status.className = 'status err'; status.textContent = issuerRefusalText(v); return null; }
+  status.className = 'status ok';
+  status.textContent = 'Passkey registered for ' + v.data.displayName + '. Sign in with it now.';
+  return v.data;
+}
+
+/** Passkey sign-in: returns the session (held in memory only) or null. */
+async function issuerPasskeySignIn() {
+  var el = $('#issuerAuthState');
+  var o = await issuerPostJson('/api/approver-tokens/passkeys/signin/options', {});
+  if (!o.ok) { el.className = 'status err'; el.textContent = issuerRefusalText(o); return null; }
+  var cred;
+  try {
+    cred = await navigator.credentials.get({ publicKey: issuerRequestOptions(o.data.options) });
+  } catch (e) {
+    el.className = 'status err'; el.textContent = 'Passkey sign-in was cancelled or failed: ' + e.message; return null;
+  }
+  var v = await issuerPostJson('/api/approver-tokens/passkeys/signin/verify', { challengeId: o.data.challengeId, response: issuerCredentialJSON(cred) });
+  if (!v.ok) { el.className = 'status err'; el.textContent = issuerRefusalText(v); return null; }
+  issuerOperatorToken = v.data.sessionToken;
+  issuerOperatorInfo = { displayName: v.data.operator.displayName, upn: v.data.operator.upn, credentialId: v.data.credentialId, expiresAt: v.data.expiresAt };
+  return v.data;
+}
+
+/** List operator passkeys (never public keys) into #issuerPasskeysBody, with revoke buttons. */
+async function issuerLoadPasskeys(operatorToken) {
+  var el = $('#issuerPasskeysBody');
+  if (!operatorToken) return null;
+  var res = await fetch('/api/approver-tokens/passkeys', { headers: { 'x-ces-principal': operatorToken } });
+  var data = await res.json().catch(function () { return {}; });
+  if (!res.ok) {
+    el.className = 'status err';
+    el.textContent = 'Could not load passkeys (' + res.status + '): ' + (data.detail || data.error || data.reason || '');
+    return null;
+  }
+  var rows = data.passkeys || [];
+  el.className = '';
+  el.innerHTML = rows.length ? '<table><thead><tr><th>Operator</th><th>Address</th><th>Created</th><th>Last used</th><th>Status</th></tr></thead><tbody>' +
+    rows.map(function (p) {
+      return '<tr><td>' + issuerEsc(p.displayName) + '</td><td>' + issuerEsc(p.upn) + '</td><td>' + issuerEsc(p.createdAt) +
+        '</td><td>' + issuerEsc(p.lastUsedAt || '') + '</td><td>' + (p.revokedAt ? 'revoked ' + issuerEsc(p.revokedAt)
+          : '<button class="secondary" data-revoke="' + issuerEsc(p.credentialId) + '">Revoke</button>') + '</td></tr>';
+    }).join('') + '</tbody></table>' : 'No passkeys registered.';
+  return rows;
+}
+
+/** Revoke a passkey (effective immediately). Revoking your own ends this session. */
+async function issuerRevokePasskey(operatorToken, credentialId) {
+  var res = await fetch('/api/approver-tokens/passkeys/' + encodeURIComponent(credentialId), {
+    method: 'DELETE', headers: { 'x-ces-principal': operatorToken },
+  });
+  var data = await res.json().catch(function () { return {}; });
+  if (!res.ok) {
+    $('#issuerPasskeysBody').className = 'status err';
+    $('#issuerPasskeysBody').textContent = 'Could not revoke (' + res.status + '): ' + (data.detail || data.error || data.reason || '');
+    return null;
+  }
+  if (issuerOperatorInfo && issuerOperatorInfo.credentialId === credentialId) {
+    issuerOperatorToken = '';
+    issuerOperatorInfo = null;
+  }
+  return data.revoked;
+}
+
+/** Create a one-time enrollment code for a new operator; shows the code and link once. */
+async function issuerIssueEnrollmentCode(operatorToken, displayName, upn) {
+  var status = $('#issuerNewCodeStatus');
+  var out = $('#issuerNewCodeOut');
+  out.value = '';
+  out.hidden = true;
+  var r = await issuerPostJson('/api/approver-tokens/passkeys/enrollment-codes', { displayName: displayName, upn: upn }, operatorToken);
+  if (r.status !== 201) { status.className = 'status err'; status.textContent = issuerRefusalText(r); return null; }
+  out.value = 'Code: ' + r.data.code + '\nLink (open on this machine): ' + r.data.link;
+  out.hidden = false;
+  status.className = 'status ok';
+  status.textContent = 'One-time code for ' + displayName + ', expires ' + r.data.expiresAt + '. Hand it over in person.';
+  return r.data;
+}
+
+function issuerRenderAuthState() {
+  var el = $('#issuerAuthState');
+  var claims = issuerOperatorToken ? issuerJwtClaims(issuerOperatorToken) : null;
+  var mode = issuerConfig ? issuerConfig.mode : 'not_configured';
+  $('#issuerSignInBtn').hidden = !(mode === 'entra' && !issuerOperatorToken);
+  $('#issuerPasskeySignInBtn').hidden = !(mode === 'passkey' && !issuerOperatorToken);
+  $('#issuerOperatorsCard').hidden = !(mode === 'passkey' && issuerOperatorToken);
+  $('#issuerSignOutBtn').hidden = !issuerOperatorToken;
+  $('#issuerDevBox').hidden = !(mode === 'dev-hs256' && !issuerOperatorToken);
+  if (mode === 'not_configured') {
+    el.className = 'status err';
+    el.textContent = 'Operator sign-in is not configured on this server: ' + ((issuerConfig && issuerConfig.detail) || '');
+  } else if (issuerOperatorToken && mode === 'passkey' && issuerOperatorInfo) {
+    el.className = 'status ok';
+    el.textContent = 'Signed in as ' + issuerOperatorInfo.displayName + ' (' + issuerOperatorInfo.upn + ') with a passkey until ' + issuerOperatorInfo.expiresAt;
+  } else if (issuerOperatorToken) {
+    el.className = 'status ok';
+    el.textContent = 'Signed in as ' + ((claims && (claims.preferred_username || claims.upn)) || 'operator') +
+      (mode === 'dev-hs256' ? ' (dev fallback, unverified)' : '');
+  } else {
+    el.className = 'status';
+    el.textContent = mode === 'entra' ? 'Sign in with your BHD Microsoft account.'
+      : mode === 'passkey' ? 'Sign in with your operator passkey on this machine.' : 'Paste a dev operator token.';
+  }
+}
+
+async function issuerLoadTenants() {
+  var res = await fetch('/api/tenants');
+  if (!res.ok) return;
+  var list = await res.json();
+  var tenants = Array.isArray(list) ? list : (list.tenants || []);
+  var sel = $('#issuerTenant');
+  sel.innerHTML = '<option value="">Select a tenant…</option>' + tenants.map(function (t) {
+    return '<option value="' + issuerEsc(t.slug) + '">' + issuerEsc(t.slug) + (t.client_name && t.client_name !== 'Unknown' ? ' — ' + issuerEsc(t.client_name) : '') + '</option>';
+  }).join('');
+}
+
+/**
+ * Mint a token for the named approver. Shows the token once in #issuerTokenOut; the page keeps no
+ * other copy. Returns the server response body (or null on refusal).
+ */
+async function issuerMint(operatorToken, tenant, approverUpn, approverDisplayName, ttlMinutes) {
+  var status = $('#issuerMintStatus');
+  var out = $('#issuerTokenOut');
+  var box = $('#issuerTokenBox');
+  out.value = '';
+  box.hidden = true;
+  if (!operatorToken) { status.className = 'status err'; status.textContent = 'Sign in first.'; return null; }
+  if (!tenant) { status.className = 'status err'; status.textContent = 'Pick a tenant.'; return null; }
+  var minutes = Number(ttlMinutes);
+  var body = { approverUpn: approverUpn };
+  if (approverDisplayName) body.approverDisplayName = approverDisplayName;
+  if (ttlMinutes !== '' && ttlMinutes != null) body.ttlSeconds = Math.round(minutes * 60);
+  var res = await fetch('/api/approver-tokens?tenant=' + encodeURIComponent(tenant), {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'x-ces-principal': operatorToken },
+    body: JSON.stringify(body),
+  });
+  var data = await res.json().catch(function () { return {}; });
+  if (res.status !== 201) {
+    status.className = 'status err';
+    status.textContent = 'Refused (' + res.status + '): ' + (data.detail || data.error || data.reason || 'unknown error');
+    return null;
+  }
+  out.value = data.token;
+  box.hidden = false;
+  status.className = 'status ok';
+  status.textContent = 'Token for ' + data.approverUpn + ' expires ' + data.expiresAt +
+    (data.operatorAuth === 'dev-hs256-unverified' ? ' (minted by an UNVERIFIED dev operator)' : '');
+  return data;
+}
+
+/** Load this tenant's mint evidence (never tokens) into #issuerMintsBody. */
+async function issuerLoadMints(operatorToken, tenant) {
+  var el = $('#issuerMintsBody');
+  if (!operatorToken || !tenant) return;
+  var res = await fetch('/api/approver-tokens/mints?tenant=' + encodeURIComponent(tenant), {
+    headers: { 'x-ces-principal': operatorToken },
+  });
+  var data = await res.json().catch(function () { return {}; });
+  if (!res.ok) {
+    el.className = 'status err';
+    el.textContent = 'Could not load mints (' + res.status + '): ' + (data.detail || data.error || data.reason || '');
+    return;
+  }
+  var rows = (data.mints || []).slice().reverse().slice(0, 25);
+  if (!rows.length) { el.className = 'status'; el.textContent = 'No mints recorded for this tenant yet.'; return; }
+  el.className = '';
+  el.innerHTML = '<table><thead><tr><th>Approver</th><th>Minted by</th><th>Issued</th><th>Expires</th><th>Sign-in</th></tr></thead><tbody>' +
+    rows.map(function (m) {
+      return '<tr><td>' + issuerEsc(m.approver && m.approver.upn) + '</td><td>' + issuerEsc(m.mintedBy && m.mintedBy.upn) +
+        '</td><td>' + issuerEsc(m.issuedAt) + '</td><td>' + issuerEsc(m.expiresAt) + '</td><td>' + issuerEsc(m.operatorAuth || '') + '</td></tr>';
+    }).join('') + '</tbody></table>';
+}
+
+async function issuerInit() {
+  try {
+    issuerConfig = await (await fetch('/api/approver-tokens/config')).json();
+  } catch (e) {
+    issuerConfig = { mode: 'not_configured', detail: 'could not reach the server' };
+  }
+  try {
+    if (issuerConfig.mode === 'entra') await issuerCompleteSignIn();
+  } catch (e) {
+    $('#issuerAuthState').className = 'status err';
+    $('#issuerAuthState').textContent = e.message;
+  }
+  if (issuerConfig.mode === 'passkey') {
+    var m = /(?:^#|&)enroll=([A-Za-z0-9_-]+)/.exec(location.hash || '');
+    if (m) {
+      $('#issuerEnrollCode').value = m[1];
+      $('#issuerEnrollBox').hidden = false;
+      history.replaceState(null, '', location.pathname); // drop the code from the address bar
+    }
+  }
+  issuerRenderAuthState();
+  issuerLoadTenants();
+
+  $('#issuerPasskeySignInBtn').addEventListener('click', async function () {
+    if (await issuerPasskeySignIn()) {
+      issuerRenderAuthState();
+      issuerLoadPasskeys(issuerOperatorToken);
+      issuerLoadMints(issuerOperatorToken, $('#issuerTenant').value);
+    }
+  });
+  $('#issuerEnrollBtn').addEventListener('click', async function () {
+    if (await issuerPasskeyEnroll($('#issuerEnrollCode').value.trim())) {
+      $('#issuerEnrollCode').value = '';
+      $('#issuerPasskeySignInBtn').hidden = false;
+    }
+  });
+  $('#issuerIssueCodeBtn').addEventListener('click', function () {
+    issuerIssueEnrollmentCode(issuerOperatorToken, $('#issuerNewOpName').value.trim(), $('#issuerNewOpUpn').value.trim());
+  });
+  $('#issuerPasskeysBody').addEventListener('click', async function (ev) {
+    var id = ev.target && ev.target.getAttribute && ev.target.getAttribute('data-revoke');
+    if (!id || !confirm('Revoke this passkey? It stops working immediately.')) return;
+    await issuerRevokePasskey(issuerOperatorToken, id);
+    issuerRenderAuthState();
+    issuerLoadPasskeys(issuerOperatorToken);
+  });
+
+  $('#issuerSignInBtn').addEventListener('click', issuerStartSignIn);
+  $('#issuerSignOutBtn').addEventListener('click', function () {
+    if (issuerOperatorInfo) issuerPostJson('/api/approver-tokens/passkeys/signout', {}, issuerOperatorToken);
+    issuerOperatorInfo = null;
+    issuerOperatorToken = '';
+    $('#issuerTokenOut').value = '';
+    $('#issuerTokenBox').hidden = true;
+    issuerRenderAuthState();
+  });
+  $('#issuerDevUseBtn').addEventListener('click', function () {
+    issuerOperatorToken = $('#issuerDevToken').value.trim();
+    $('#issuerDevToken').value = '';
+    issuerRenderAuthState();
+    issuerLoadMints(issuerOperatorToken, $('#issuerTenant').value);
+  });
+  $('#issuerTenant').addEventListener('change', function () {
+    $('#issuerTokenOut').value = '';
+    $('#issuerTokenBox').hidden = true;
+    issuerLoadMints(issuerOperatorToken, $('#issuerTenant').value);
+  });
+  $('#issuerMintBtn').addEventListener('click', async function () {
+    var btn = $('#issuerMintBtn');
+    btn.disabled = true;
+    try {
+      var tenant = $('#issuerTenant').value;
+      await issuerMint(issuerOperatorToken, tenant, $('#issuerApprover').value.trim(), $('#issuerApproverName').value.trim(), $('#issuerTtl').value);
+      await issuerLoadMints(issuerOperatorToken, tenant);
+    } finally { btn.disabled = false; }
+  });
+  $('#issuerCopyBtn').addEventListener('click', async function () {
+    var out = $('#issuerTokenOut');
+    try { await navigator.clipboard.writeText(out.value); } catch (e) { out.select(); document.execCommand('copy'); }
+    $('#issuerCopyBtn').textContent = 'Copied';
+  });
+}
+
+issuerInit();
+</script>
+</body>
+</html>

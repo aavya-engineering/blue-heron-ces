@@ -1,0 +1,101 @@
+controlId: "MP.L2-3.8.1"
+relatedControlIds:
+  - "AC.L1-3.1.1"
+  - "AC.L2-3.1.3"
+  - "MP.L2-3.8.2"
+  - "CM.L2-3.4.1"  # [VERIFY] mapping not yet confirmed
+practiceStatement: Limit system access to authorized users, processes acting on behalf of users, and devices.
+useCaseId: D-09
+useCaseTitle: "CUI Repository Onboarding"
+domain: Data Protection & Information Management
+priority: P4 Standard
+trigger: 'ONBOARDING: New CUI repository (SharePoint site, Teams team, or OneDrive location) is requested'
+sodTier: Tier 2 -- Config Manager
+entraRolesRequired:
+- SharePoint Administrator
+- Compliance Administrator
+- User Administrator
+approvalRequired: true
+services:
+- name: SharePoint Admin Center
+  purpose: '`https://{tenant}-admin.sharepoint.us`'
+- name: Microsoft Teams Admin Center
+  purpose: ''
+- name: Microsoft Purview Compliance Portal
+  purpose: '`https://compliance.microsoft.us`'
+- name: Entra Admin Center
+  purpose: '`https://entra.microsoft.us`'
+- name: Exchange Admin Center
+  purpose: '`https://admin.exchange.microsoft.us`'
+- name: Microsoft Sentinel
+  purpose: '`https://portal.azure.us` > Sentinel'
+configurationSteps:
+  portalPath: ''
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes Group.ReadWrite.All
+  - cmdlet: New-MgGroup
+    parameters:
+    - -MgGroup
+    - -DisplayName
+    - -MailEnabled
+    - -MailNickname
+    - -SecurityEnabled
+  - cmdlet: Get-MgUser
+    parameters:
+    - -MgUser
+    - -UserId
+    - -MgGroupOwner
+    - -GroupId
+    - -DirectoryObjectId
+  - cmdlet: New-MgGroupOwner
+    parameters:
+    - -MgGroupOwner
+    - -GroupId
+    - -DirectoryObjectId
+    - -MgUser
+    - -UserId
+  - cmdlet: New-MgGroupMember
+    parameters:
+    - -MgGroupMember
+    - -GroupId
+    - -DirectoryObjectId
+    - -DlpCompliancePolicy
+    - -Object
+  - cmdlet: Get-MgGroup
+    parameters:
+    - -MgGroup
+    - -Filter
+    - -Object
+    - -First
+    - -eq
+  graphApiEndpoint: POST https://graph.microsoft.us/v1.0/groups
+  graphApiPayloadExample: {}
+  requiredPermissions:
+  - Group.ReadWrite.All
+  - User.Read.All
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-d-dataprotection/D-09/2026/03/
+  format: JSON (onboarding record with 9-item checklist results)
+  filenamePattern: D-09_Onboarding_{YYYYMMDD}_{HHmmss}_{GroupName}.json
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://compliance.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |-
+    - All portal URLs use `.us` suffixes. SharePoint site URLs use `{tenant}.sharepoint.us`.
+    - SPO Management Shell connects via `Connect-SPOService -Url "https://{tenant}-admin.sharepoint.us"`.
+    - Sensitivity label container settings (Item 1) must be configured in the label definition at `https://compliance.microsoft.us`. The label must have "Groups & sites" settings enabled.
+    - The 9-item checklist is a procedural control; all underlying technical mechanisms (DLP, retention, sharing, labels) are individually confirmed available in GCC High by their respective use cases.
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

@@ -1,0 +1,61 @@
+controlId: "IR.L2-3.6.2"
+relatedControlIds:
+  - "IR.L2-3.6.1"
+  - "CA.L2-3.12.1"  # [VERIFY] mapping not yet confirmed
+  - "CA.L2-3.12.3"  # [VERIFY] mapping not yet confirmed
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: H-06
+useCaseTitle: "Post-Incident Review Package"
+domain: Incident Response
+priority: P4 Standard
+trigger: 'INCIDENT: Post-close -- within 14 days of incident closure'
+sodTier: Tier 2 -- Config Manager
+entraRolesRequired:
+- Security Administrator
+- Compliance Administrator
+approvalRequired: true
+services:
+- name: Microsoft Sentinel
+  purpose: Azure Government -- incident timeline data
+- name: Microsoft Defender Portal
+  purpose: '`https://security.microsoft.us` -- alert and investigation data'
+- name: Entra ID Audit Logs
+  purpose: '`https://entra.microsoft.us`'
+- name: SharePoint Online
+  purpose: GCC High -- for RCA document storage
+- name: ITSM system
+  purpose: for POA&M tracking
+configurationSteps:
+  portalPath: //security.microsoft.us > **Incidents** > select the closed incident
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes SecurityIncident.Read.All
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/security/incidents/{incidentId}
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-h-incident/H-06/{year}/{month}/
+  format: JSON (all structured documents), PDF (CISO-signed RCA for formal record)
+  filenamePattern: H-06_RCA_{YYYYMMDD}_{HHmmss}_{IncidentID}.json
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://graph.microsoft.us
+  - https://security.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: All incident data retrieval uses GCC High endpoints. The Security API at `https://graph.microsoft.us/v1.0/security/incidents`
+    provides access to incident and alert data. Sentinel investigation graphs are available through the Azure Government portal
+    at `https://portal.azure.us`. After March 2027, the Sentinel investigation experience will be integrated into the Defender
+    portal at `https://security.microsoft.us`. The RCA and corrective action plan should be stored in a SharePoint Online
+    GCC High site with restricted access (incident response team only). If the incident involves CUI exposure, th
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

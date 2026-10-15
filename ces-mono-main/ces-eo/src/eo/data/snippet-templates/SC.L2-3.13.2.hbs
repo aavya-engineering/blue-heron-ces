@@ -1,0 +1,43 @@
+## Control {{controlId}}: Employ Architectural Designs, Software Development Techniques, and Systems Engineering Principles That Promote Effective Information Security
+
+**Implementation Status:** {{status}}
+
+This organization employs defense-in-depth architectural principles within the {{tenantName}} M365 GCC High tenant, implementing layered security controls across identity, network, endpoint, and data protection boundaries managed by {{variables.systemAdministrator}}.
+
+{{#if namedLocationsConfigured}}
+**Network Boundary Architecture:**
+The tenant enforces {{namedLocationsCount}} named location definitions establishing trusted network boundaries:
+{{#each locations}}
+- **{{displayName}}**{{#if isTrusted}} (Trusted){{/if}}{{#if ipRanges}} — IP ranges: {{#each ipRanges}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{/if}}
+{{/each}}
+{{else}}
+Named location definitions have not been configured. Network boundary enforcement relies on Conditional Access policies without location-based segmentation.
+{{/if}}
+
+{{#if conditionalAccessActive}}
+**Identity Boundary Enforcement:**
+{{caPoliciesTotalCount}} Conditional Access policies enforce authentication and authorization boundaries:
+{{#each policies}}
+- **{{displayName}}** ({{state}}): Requires {{#each grantControls.builtInControls}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{#if grantControls.authenticationStrength}} with {{grantControls.authenticationStrength}} authentication strength{{/if}}
+{{/each}}
+{{else}}
+Conditional Access policies have not been configured. Identity boundary enforcement is limited to Azure AD authentication defaults.
+{{/if}}
+
+{{#if securityAlertsActive}}
+**Continuous Monitoring:**
+{{securityAlertsCount}} security alert rules provide real-time threat detection across architectural boundaries via Microsoft Defender for Cloud.
+{{/if}}
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine network architecture diagrams, Conditional Access policy configurations, named location definitions, and Microsoft Defender alert configurations.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

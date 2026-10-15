@@ -1,0 +1,747 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/ces-assessor-approach.schema.json",
+  "title": "CES Assessor Approach Knowledge Base (CMMC 2.0) Schema",
+  "type": "object",
+  "required": [
+    "ces",
+    "assessor_fields",
+    "assessor_knowledge_base"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "ces": {
+      "type": "object",
+      "required": [
+        "artifact",
+        "version",
+        "generated_on",
+        "intent",
+        "authoritative_sources",
+        "governance"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "artifact": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "generated_on": {
+          "type": "string",
+          "format": "date"
+        },
+        "intent": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authoritative_sources": {
+          "type": "object",
+          "required": [
+            "government"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "government": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": [
+                  "id",
+                  "title",
+                  "url"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9_\\-]+$"
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "governance": {
+          "type": "object",
+          "required": [
+            "non_negotiables",
+            "tagging_policy"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "non_negotiables": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "tagging_policy": {
+              "type": "object",
+              "required": [
+                "allowed_tags",
+                "rules"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "allowed_tags": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "FACT",
+                      "INFERENCE",
+                      "OPEN_QUESTION"
+                    ]
+                  }
+                },
+                "rules": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "assessor_fields": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "string",
+          "minLength": 3
+        }
+      }
+    },
+    "assessor_knowledge_base": {
+      "type": "object",
+      "required": [
+        "overview",
+        "roles_and_bodies",
+        "assessment_event_types",
+        "methods_of_assessment",
+        "evidence_types",
+        "evidence_sufficiency_model",
+        "scoping_and_sampling",
+        "poam_and_closeout",
+        "design_for_assessment_requirements"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "overview": {
+          "$ref": "#/$defs/kb_block"
+        },
+        "roles_and_bodies": {
+          "$ref": "#/$defs/roles_block"
+        },
+        "assessment_event_types": {
+          "$ref": "#/$defs/event_types_block"
+        },
+        "methods_of_assessment": {
+          "$ref": "#/$defs/methods_block"
+        },
+        "evidence_types": {
+          "$ref": "#/$defs/evidence_types_block"
+        },
+        "evidence_sufficiency_model": {
+          "$ref": "#/$defs/sufficiency_block"
+        },
+        "scoping_and_sampling": {
+          "$ref": "#/$defs/scoping_block"
+        },
+        "poam_and_closeout": {
+          "$ref": "#/$defs/poam_block"
+        },
+        "design_for_assessment_requirements": {
+          "$ref": "#/$defs/dfa_block"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "tag_enum": {
+      "type": "string",
+      "enum": [
+        "FACT",
+        "INFERENCE",
+        "OPEN_QUESTION"
+      ]
+    },
+    "kb_block": {
+      "type": "object",
+      "required": [
+        "tag",
+        "source_ids",
+        "summary",
+        "advisor_ui"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tag": {
+          "$ref": "#/$defs/tag_enum"
+        },
+        "source_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "advisor_ui": {
+          "type": "object",
+          "required": [
+            "description",
+            "why_it_matters",
+            "how_it_impacts_attainment"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "description": {
+              "type": "string",
+              "minLength": 1
+            },
+            "why_it_matters": {
+              "type": "string",
+              "minLength": 1
+            },
+            "how_it_impacts_attainment": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "role_entity": {
+      "type": "object",
+      "required": [
+        "role",
+        "responsibilities",
+        "design_implications"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "responsibilities": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "design_implications": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "roles_block": {
+      "type": "object",
+      "required": [
+        "tag",
+        "source_ids",
+        "entities"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tag": {
+          "$ref": "#/$defs/tag_enum"
+        },
+        "source_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "entities": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/role_entity"
+          }
+        }
+      }
+    },
+    "event_type": {
+      "type": "object",
+      "required": [
+        "id",
+        "level",
+        "route",
+        "assessor_body",
+        "affirmation",
+        "notes"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "level": {
+          "type": "string",
+          "enum": [
+            "L1",
+            "L2",
+            "L3"
+          ]
+        },
+        "route": {
+          "type": "string",
+          "enum": [
+            "self",
+            "certification"
+          ]
+        },
+        "assessor_body": {
+          "type": "string",
+          "minLength": 1
+        },
+        "affirmation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "event_types_block": {
+      "type": "object",
+      "required": [
+        "tag",
+        "source_ids",
+        "catalog"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tag": {
+          "$ref": "#/$defs/tag_enum"
+        },
+        "source_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "catalog": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/event_type"
+          }
+        }
+      }
+    },
+    "method": {
+      "type": "object",
+      "required": [
+        "method",
+        "description",
+        "design_for_assessment"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": [
+            "examine",
+            "interview",
+            "test"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "design_for_assessment": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "methods_block": {
+      "type": "object",
+      "required": [
+        "tag",
+        "source_ids",
+        "methods"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tag": {
+          "$ref": "#/$defs/tag_enum"
+        },
+        "source_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "methods": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/method"
+          }
+        }
+      }
+    },
+    "evidence_type_item": {
+      "type": "object",
+      "required": [
+        "evidence_type",
+        "examples",
+        "preferred_form"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "evidence_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "examples": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "preferred_form": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "evidence_types_block": {
+      "type": "object",
+      "required": [
+        "tag",
+        "source_ids",
+        "rationale",
+        "catalog"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tag": {
+          "$ref": "#/$defs/tag_enum"
+        },
+        "source_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "catalog": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/evidence_type_item"
+          }
+        }
+      }
+    },
+    "sufficiency_level": {
+      "type": "object",
+      "required": [
+        "id",
+        "definition",
+        "design_implications"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "definition": {
+          "type": "string",
+          "minLength": 1
+        },
+        "design_implications": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "sufficiency_block": {
+      "type": "object",
+      "required": [
+        "tag",
+        "source_ids",
+        "rationale",
+        "sufficiency_levels"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tag": {
+          "$ref": "#/$defs/tag_enum"
+        },
+        "source_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sufficiency_levels": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/sufficiency_level"
+          }
+        }
+      }
+    },
+    "open_question": {
+      "type": "object",
+      "required": [
+        "tag",
+        "source_ids",
+        "question",
+        "recommended_followup"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tag": {
+          "const": "OPEN_QUESTION"
+        },
+        "source_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "question": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recommended_followup": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "scoping_block": {
+      "type": "object",
+      "required": [
+        "tag",
+        "source_ids",
+        "principles",
+        "design_for_assessment",
+        "open_questions"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tag": {
+          "$ref": "#/$defs/tag_enum"
+        },
+        "source_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "principles": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "design_for_assessment": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "open_questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/open_question"
+          }
+        }
+      }
+    },
+    "poam_block": {
+      "type": "object",
+      "required": [
+        "tag",
+        "source_ids",
+        "principles",
+        "design_for_assessment"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tag": {
+          "$ref": "#/$defs/tag_enum"
+        },
+        "source_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "principles": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "design_for_assessment": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "dfa_req": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "description",
+        "verification",
+        "impacts"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "verification": {
+          "type": "string",
+          "minLength": 1
+        },
+        "impacts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "dfa_block": {
+      "type": "object",
+      "required": [
+        "tag",
+        "source_ids",
+        "rationale",
+        "requirements"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tag": {
+          "$ref": "#/$defs/tag_enum"
+        },
+        "source_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requirements": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/dfa_req"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,64 @@
+controlId: "SC.L2-3.13.6"
+relatedControlIds:
+  - "MP.L1-3.8.3"
+  - "SC.L1-3.13.1"
+  - "SC.L2-3.13.2"
+  - "AU.L2-3.3.1"  # [VERIFY] mapping not yet confirmed
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: D-02
+useCaseTitle: "DLP Policy Effectiveness"
+domain: Data Protection & Information Management
+priority: P3 Medium
+trigger: 'SCHEDULE: Monthly'
+sodTier: Tier 2 -- Config Manager
+entraRolesRequired:
+- Compliance Administrator
+approvalRequired: false
+services:
+- name: Microsoft Purview Compliance Portal
+  purpose: '`https://compliance.microsoft.us`'
+- name: Microsoft Purview DLP Activity Explorer
+  purpose: ''
+- name: Microsoft Purview DLP Policies
+  purpose: ''
+- name: Exchange Online
+  purpose: email DLP telemetry
+- name: SharePoint Online
+  purpose: document DLP telemetry
+- name: Microsoft Teams
+  purpose: chat and channel DLP telemetry
+configurationSteps:
+  portalPath: //compliance.microsoft.us > **Data loss prevention** > **Activity explorer**.
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes InformationProtectionPolicy.Read
+  graphApiEndpoint: GET https://graph.microsoft.us/beta/security/alerts_v2?$filter=category
+  graphApiPayloadExample: {}
+  requiredPermissions:
+  - SecurityAlert.Read.All
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-d-dataprotection/D-02/2026/03/
+  format: CSV (policy and rule inventory), JSON (effectiveness report with match/false-positive rates)
+  filenamePattern: D-02_DLPEffectiveness_{YYYYMMDD}_{HHmmss}_Monthly.json
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://compliance.microsoft.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |-
+    - DLP Activity Explorer is available in GCC High via `https://compliance.microsoft.us`.
+    - DLP policies for Exchange, SharePoint, OneDrive, and Teams are fully supported in GCC High.
+    - Endpoint DLP (for Windows devices) is available in GCC High but may have telemetry delays compared to commercial. Monitor Activity Explorer for data freshness.
+    - Graph API DLP alert endpoints use `https://graph.microsoft.us/beta/security/alerts_v2`. Confirm beta endpoint stability in your tenant as beta endpoints may change.
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

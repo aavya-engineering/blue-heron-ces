@@ -1,0 +1,42 @@
+## Control {{controlId}}: Limit Unsuccessful Logon Attempts
+
+**Implementation Status:** {{status}}
+
+This organization limits unsuccessful logon attempts within the {{tenantName}} M365 GCC High tenant. Account lockout enforcement is implemented through Azure AD Smart Lockout, Conditional Access sign-in frequency policies, and risk-based authentication that automatically responds to brute-force and credential-stuffing attacks.
+
+{{#if conditionalAccessActive}}
+Azure AD Smart Lockout automatically locks accounts after repeated failed authentication attempts. Conditional Access policies across {{caPoliciesTotalCount}} configurations enforce sign-in frequency controls and risk-based responses. High-risk sign-in attempts are blocked or require additional authentication factors before proceeding.
+{{else}}
+Conditional Access sign-in frequency policies have not been configured. Unsuccessful logon limits rely on Azure AD Smart Lockout default settings, pending enhanced policy configuration.
+{{/if}}
+
+{{#if policies}}
+The following Conditional Access policies enforce logon attempt restrictions:
+{{#each policies}}
+- **{{displayName}}** ({{state}}): Enforces {{#each grantControls.builtInControls}}{{this}}{{#unless @last}}, {{/unless}}{{/each}} with session controls for failed attempt thresholds.
+{{/each}}
+{{/if}}
+
+{{#if signInLogsAvailable}}
+Sign-in logs capture {{signInLogsCount}} authentication events, including failed attempts, for audit and incident investigation. Security alerts are generated for anomalous lockout patterns.
+{{/if}}
+
+{{#if infraResources}}
+Supporting infrastructure:
+{{#each infraResources}}
+- {{resourceType}} "{{name}}"{{#if properties.retention_days}} (retention: {{properties.retention_days}} days){{/if}}
+{{/each}}
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Review Azure AD Smart Lockout configuration, Conditional Access sign-in risk policies, and authentication failure logs for lockout enforcement verification.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

@@ -1,0 +1,698 @@
+{
+  "ces": {
+    "artifact": "manual_mission_plan",
+    "version": "1.0.0",
+    "generated_on": "2026-02-07",
+    "intent": "Synthetic test fixture for PlanTranslator validation — 12 tasks across all 9 execution layers"
+  },
+  "inputs": {
+    "si_baseline": {},
+    "readiness_posture": {
+      "snapshot_id": "snap-test-001",
+      "as_of_date": "2026-02-07",
+      "control_status_summary": {
+        "level": "L2",
+        "met": 0,
+        "partial": 0,
+        "not_met": 10,
+        "unknown": 2
+      },
+      "key_findings": [
+        {
+          "id": "F-001",
+          "control_id": "AC.L2-3.1.2",
+          "title": "No PIM configured",
+          "status": "NOT_MET",
+          "severity": "high",
+          "evidence_gaps": ["No PIM activation logs"],
+          "recommended_actions": ["Configure Entra ID PIM"]
+        }
+      ],
+      "constraints": {
+        "time": "30 days",
+        "budget": "$50,000",
+        "tooling": ["Microsoft 365 GCC High E5"],
+        "staffing": "2 engineers"
+      }
+    },
+    "authoritative_sources": {
+      "government": [
+        {
+          "id": "cmmc-model-v2",
+          "title": "CMMC Model v2.0",
+          "url": "https://dodcio.defense.gov/CMMC/",
+          "type": "government",
+          "version": "2.0"
+        }
+      ],
+      "nist": [
+        {
+          "id": "nist-800-171-r2",
+          "title": "NIST SP 800-171 Rev 2",
+          "url": "https://csrc.nist.gov/publications/detail/sp/800-171/rev-2/final",
+          "type": "nist",
+          "version": "Rev 2"
+        }
+      ]
+    },
+    "vendor_capability_packages": [
+      {
+        "tech_stack_id": 1,
+        "name": "Microsoft 365 Government G5 (GCC High)",
+        "vendor": "Microsoft",
+        "fedramp_level": "High",
+        "package_ref": "ms365-gcch-e5"
+      }
+    ],
+    "assessor_knowledge": {
+      "assessor_approach_ref": "ces-assessor-approach-v1",
+      "assessor_evidence_matrix_ref": "ces-evidence-matrix-v1",
+      "design_for_assessment_rules": [
+        {
+          "id": "DFA-001",
+          "title": "Evidence must be machine-generated",
+          "rule": "Prefer automated evidence over screenshots",
+          "verification": "Check evidence collector field",
+          "sources": ["cmmc-assessment-guide-l2"]
+        }
+      ]
+    }
+  },
+  "outputs": {
+    "human_readable_mission_plan": {
+      "plan_id": "synthetic-gcch-l2-001",
+      "plan_mode": "harden_existing",
+      "target_level": "L2",
+      "milestones": [
+        {
+          "id": "MS-1",
+          "name": "Implementation Complete",
+          "objective": "All 12 synthetic tasks completed",
+          "exit_criteria": ["All tasks pass", "Evidence collected"],
+          "target_date": "2026-03-07"
+        }
+      ],
+      "steps": [
+        {
+          "id": "STEP-L0-001",
+          "title": "System Security Plan (SSP) Foundation",
+          "task_type": "policy",
+          "priority": "p0",
+          "control_coverage": [
+            { "control_id": "CA.L2-3.12.4", "support_type": "None", "gap_rationale": "SSP does not exist" }
+          ],
+          "what_to_do": ["Draft System Security Plan documenting all 110 L2 controls", "Include system boundary description and data flow diagrams"],
+          "how_to_verify": ["SSP document exists with all required sections", "Reviewed and signed by ISSO"],
+          "vendor_help_refs": [],
+          "expected_artifacts": [
+            {
+              "artifact_id": "ART-SSP-001",
+              "artifact_type": "ssp",
+              "description": "System Security Plan v1.0",
+              "collector": "manual",
+              "retention_days": 1095,
+              "storage_location_ref": "evidence/ssp/"
+            }
+          ],
+          "manual_completion_criteria": ["SSP document completed", "SSP reviewed by compliance lead"],
+          "estimated_effort_hours": 40,
+          "effort_estimate": {
+            "one_time_dev_loe": 0,
+            "one_time_config_manual": 40,
+            "one_time_config_automated": 0,
+            "recurring_evidence_manual": 8,
+            "recurring_evidence_automated": 0
+          }
+        },
+        {
+          "id": "STEP-L1-001",
+          "title": "Create Dedicated Admin Accounts",
+          "task_type": "configuration",
+          "priority": "p0",
+          "control_coverage": [
+            { "control_id": "AC.L2-3.1.6", "support_type": "Configurable", "gap_rationale": "No separate admin accounts exist" }
+          ],
+          "what_to_do": ["Create separate cloud-only admin accounts (admin_user@domain)", "Block admin accounts from email and Teams"],
+          "how_to_verify": ["Verify admin accounts exist without M365 license", "Confirm admin accounts blocked from productivity apps"],
+          "vendor_help_refs": [
+            { "vendor": "Microsoft", "product": "Entra ID", "title": "Create admin accounts" }
+          ],
+          "expected_artifacts": [
+            {
+              "artifact_id": "ART-ADMIN-001",
+              "artifact_type": "config_export",
+              "description": "Admin account listing export",
+              "collector": "powershell",
+              "retention_days": 365,
+              "storage_location_ref": "evidence/identity/"
+            }
+          ],
+          "manual_completion_criteria": ["Admin accounts created", "Admin accounts verified as cloud-only"],
+          "estimated_effort_hours": 4,
+          "actions": [
+            {
+              "action_id": "IAM-001-01",
+              "action": "Create dedicated admin accounts",
+              "action_type": "configuration",
+              "evidence_outputs": ["admin_account_listing"],
+              "vendor": {
+                "m365_service": "Entra ID",
+                "implementation": "Create cloud-only admin accounts",
+                "portal_path": "entra.microsoft.com > Users > New User",
+                "powershell": ["New-MgUser -DisplayName 'Admin - {Name}' -UserPrincipalName 'admin_{name}@{domain}' -PasswordProfile @{ForceChangePasswordNextSignIn=$true} -AccountEnabled $true"],
+                "evidence_commands": ["Get-MgUser -Filter \"startsWith(userPrincipalName,'admin_')\" | Select DisplayName,UserPrincipalName,AccountEnabled | Export-Csv admin_accounts.csv"]
+              }
+            }
+          ]
+        },
+        {
+          "id": "STEP-L1-002",
+          "title": "Create Security Groups for RBAC",
+          "task_type": "configuration",
+          "priority": "p0",
+          "control_coverage": [
+            { "control_id": "AC.L2-3.1.2", "support_type": "Configurable", "gap_rationale": "No role-assignable groups" }
+          ],
+          "what_to_do": ["Create role-assignable security groups for each admin tier", "Create groups for Conditional Access targeting"],
+          "how_to_verify": ["Groups exist with correct membership type", "Groups are role-assignable"],
+          "vendor_help_refs": [
+            { "vendor": "Microsoft", "product": "Entra ID", "title": "Create security groups" }
+          ],
+          "expected_artifacts": [
+            {
+              "artifact_id": "ART-GROUPS-001",
+              "artifact_type": "config_export",
+              "description": "Security group inventory",
+              "collector": "powershell",
+              "retention_days": 365,
+              "storage_location_ref": "evidence/identity/"
+            }
+          ],
+          "manual_completion_criteria": ["Security groups created", "Membership verified"],
+          "estimated_effort_hours": 4,
+          "actions": [
+            {
+              "action_id": "IAM-002-01",
+              "action": "Create role-assignable security groups",
+              "action_type": "configuration",
+              "evidence_outputs": ["group_inventory"],
+              "vendor": {
+                "m365_service": "Entra ID",
+                "powershell": ["New-MgGroup -DisplayName 'SG-GlobalAdmins' -MailEnabled:$false -MailNickname 'sg-globaladmins' -SecurityEnabled:$true -IsAssignableToRole:$true"],
+                "evidence_commands": ["Get-MgGroup -Filter \"securityEnabled eq true\" | Select DisplayName,Id,IsAssignableToRole | Export-Csv security_groups.csv"]
+              }
+            }
+          ]
+        },
+        {
+          "id": "STEP-L2-001",
+          "title": "Configure PIM Role Assignments",
+          "task_type": "configuration",
+          "priority": "p0",
+          "control_coverage": [
+            { "control_id": "AC.L2-3.1.2", "support_type": "Configurable", "gap_rationale": "PIM not configured" },
+            { "control_id": "AC.L2-3.1.5", "support_type": "Configurable", "gap_rationale": "No least privilege enforcement" }
+          ],
+          "what_to_do": ["Configure PIM requiring justification and MFA for role activation", "Set maximum activation duration to 8 hours"],
+          "how_to_verify": ["Test PIM activation requires MFA", "Verify 8-hour max duration"],
+          "vendor_help_refs": [
+            { "vendor": "Microsoft", "product": "Entra ID PIM", "title": "Configure PIM" }
+          ],
+          "expected_artifacts": [
+            {
+              "artifact_id": "ART-PIM-001",
+              "artifact_type": "config_export",
+              "description": "PIM configuration export",
+              "collector": "powershell",
+              "retention_days": 365,
+              "storage_location_ref": "evidence/identity/"
+            }
+          ],
+          "manual_completion_criteria": ["PIM configured for all privileged roles", "Activation tested successfully"],
+          "estimated_effort_hours": 8,
+          "dependencies": ["STEP-L1-001", "STEP-L1-002"],
+          "actions": [
+            {
+              "action_id": "IAM-003-01",
+              "action": "Configure PIM role settings",
+              "action_type": "configuration",
+              "evidence_outputs": ["pim_config_export"],
+              "vendor": {
+                "m365_service": "Entra ID PIM",
+                "powershell": ["Get-MgRoleManagementDirectoryRoleDefinition | Select DisplayName,Id | Export-Csv pim_roles.csv"],
+                "evidence_commands": ["Get-MgPolicyRoleManagementPolicyAssignment | Select RoleDefinitionId,PolicyId | Export-Csv pim_settings.csv"]
+              }
+            }
+          ]
+        },
+        {
+          "id": "STEP-L3-001",
+          "title": "Deploy Conditional Access Baseline",
+          "task_type": "configuration",
+          "priority": "p0",
+          "control_coverage": [
+            { "control_id": "IA.L2-3.5.3", "support_type": "Configurable", "gap_rationale": "No CA policies exist" },
+            { "control_id": "AC.L2-3.1.8", "support_type": "Configurable", "gap_rationale": "No lockout policy" }
+          ],
+          "what_to_do": ["Create CA policy requiring MFA for all users", "Create CA policy blocking legacy authentication", "Configure Smart Lockout (10 attempts, 60s duration)"],
+          "how_to_verify": ["Test MFA prompt on sign-in", "Verify legacy auth blocked", "Verify lockout triggers after 10 failures"],
+          "vendor_help_refs": [
+            { "vendor": "Microsoft", "product": "Conditional Access", "title": "Deploy CA policies" }
+          ],
+          "expected_artifacts": [
+            {
+              "artifact_id": "ART-CA-001",
+              "artifact_type": "config_export",
+              "description": "Conditional Access policy export",
+              "collector": "powershell",
+              "retention_days": 365,
+              "storage_location_ref": "evidence/identity/"
+            }
+          ],
+          "manual_completion_criteria": ["MFA CA policy active", "Legacy auth block active", "Smart Lockout configured"],
+          "estimated_effort_hours": 12,
+          "actions": [
+            {
+              "action_id": "IAM-004-01",
+              "action": "Deploy Conditional Access MFA policy",
+              "action_type": "configuration",
+              "evidence_outputs": ["ca_policy_export"],
+              "vendor": {
+                "m365_service": "Conditional Access",
+                "powershell": ["Get-MgIdentityConditionalAccessPolicy | Select DisplayName,State,Conditions,GrantControls | ConvertTo-Json -Depth 5 > ca_policies.json"],
+                "evidence_commands": ["Get-MgIdentityConditionalAccessPolicy | Select DisplayName,State | Export-Csv ca_policies.csv"]
+              }
+            }
+          ]
+        },
+        {
+          "id": "STEP-L4-001",
+          "title": "Deploy Intune Compliance Policies",
+          "task_type": "configuration",
+          "priority": "p1",
+          "control_coverage": [
+            { "control_id": "CM.L2-3.4.2", "support_type": "Configurable", "gap_rationale": "No compliance baselines" },
+            { "control_id": "AC.L2-3.1.18", "support_type": "Configurable", "gap_rationale": "No MDM enrollment" }
+          ],
+          "what_to_do": ["Deploy Intune configuration profiles aligned with CIS benchmarks", "Configure device compliance policies requiring encryption and OS version"],
+          "how_to_verify": ["Verify compliance policies assigned to all devices", "Test non-compliant device is blocked"],
+          "vendor_help_refs": [
+            { "vendor": "Microsoft", "product": "Intune", "title": "Deploy compliance policies" }
+          ],
+          "expected_artifacts": [
+            {
+              "artifact_id": "ART-INTUNE-001",
+              "artifact_type": "config_export",
+              "description": "Intune compliance policy export",
+              "collector": "powershell",
+              "retention_days": 365,
+              "storage_location_ref": "evidence/devices/"
+            }
+          ],
+          "manual_completion_criteria": ["Compliance policies deployed", "Test device evaluated"],
+          "estimated_effort_hours": 16,
+          "actions": [
+            {
+              "action_id": "DEV-001-01",
+              "action": "Deploy Intune compliance policies",
+              "action_type": "configuration",
+              "evidence_outputs": ["compliance_policy_export"],
+              "vendor": {
+                "m365_service": "Intune",
+                "powershell": ["Get-MgDeviceManagementDeviceCompliancePolicy | Select DisplayName,Id | Export-Csv compliance_policies.csv"],
+                "evidence_commands": ["Get-MgDeviceManagementDeviceCompliancePolicy | Select DisplayName,LastModifiedDateTime | Export-Csv compliance_status.csv"]
+              }
+            }
+          ]
+        },
+        {
+          "id": "STEP-L5-001",
+          "title": "Configure Sensitivity Labels for CUI",
+          "task_type": "configuration",
+          "priority": "p1",
+          "control_coverage": [
+            { "control_id": "MP.L2-3.8.4", "support_type": "Configurable", "gap_rationale": "No CUI labeling" },
+            { "control_id": "AC.L2-3.1.22", "support_type": "Configurable", "gap_rationale": "No DLP for CUI" }
+          ],
+          "what_to_do": ["Create sensitivity labels for CUI classification", "Configure auto-labeling policies", "Create DLP rule blocking CUI external sharing"],
+          "how_to_verify": ["Labels appear in Office apps", "Auto-labeling triggers on CUI keywords", "DLP blocks external CUI sharing"],
+          "vendor_help_refs": [
+            { "vendor": "Microsoft", "product": "Purview", "title": "Configure sensitivity labels" }
+          ],
+          "expected_artifacts": [
+            {
+              "artifact_id": "ART-LABELS-001",
+              "artifact_type": "config_export",
+              "description": "Sensitivity label configuration",
+              "collector": "powershell",
+              "retention_days": 365,
+              "storage_location_ref": "evidence/data-protection/"
+            }
+          ],
+          "manual_completion_criteria": ["Sensitivity labels published", "DLP policy active", "Auto-labeling tested"],
+          "estimated_effort_hours": 16,
+          "actions": [
+            {
+              "action_id": "DLP-001-01",
+              "action": "Deploy sensitivity labels and DLP",
+              "action_type": "configuration",
+              "evidence_outputs": ["label_config_export"],
+              "vendor": {
+                "m365_service": "Purview DLP + Sensitivity Labels",
+                "powershell": ["Get-Label | Select DisplayName,Priority,Disabled | Export-Csv sensitivity_labels.csv"],
+                "evidence_commands": ["Get-DlpCompliancePolicy | Select Name,Mode,Enabled | Export-Csv dlp_policies.csv"]
+              }
+            }
+          ]
+        },
+        {
+          "id": "STEP-L6-001",
+          "title": "Deploy Azure Network Segmentation",
+          "task_type": "configuration",
+          "priority": "p1",
+          "control_coverage": [
+            { "control_id": "SC.L2-3.13.5", "support_type": "Configurable", "gap_rationale": "No network segmentation" },
+            { "control_id": "SC.L2-3.13.6", "support_type": "Configurable", "gap_rationale": "No default-deny" }
+          ],
+          "what_to_do": ["Create dedicated VNet for CUI workloads", "Deploy NSGs with default deny-all", "Add explicit allow rules per documented requirements"],
+          "how_to_verify": ["VNet exists with correct address space", "NSGs have default-deny rules", "Only documented traffic is allowed"],
+          "vendor_help_refs": [
+            { "vendor": "Microsoft", "product": "Azure Virtual Networks + NSGs", "title": "Network segmentation" }
+          ],
+          "expected_artifacts": [
+            {
+              "artifact_id": "ART-NET-001",
+              "artifact_type": "config_export",
+              "description": "Network topology and NSG rules",
+              "collector": "cli",
+              "retention_days": 365,
+              "storage_location_ref": "evidence/infrastructure/"
+            }
+          ],
+          "manual_completion_criteria": ["VNet deployed", "NSGs applied", "Traffic tested"],
+          "estimated_effort_hours": 16,
+          "actions": [
+            {
+              "action_id": "NET-001-01",
+              "action": "Deploy Azure network segmentation",
+              "action_type": "configuration",
+              "evidence_outputs": ["network_topology"],
+              "vendor": {
+                "m365_service": "Azure Virtual Networks + NSGs",
+                "powershell": ["Get-AzVirtualNetwork | Select Name,AddressSpace,Subnets | ConvertTo-Json -Depth 3 > vnets.json", "Get-AzNetworkSecurityGroup | Select Name,SecurityRules | ConvertTo-Json -Depth 3 > nsgs.json"],
+                "evidence_commands": ["Get-AzNetworkSecurityGroup | Select Name,@{N='RuleCount';E={$_.SecurityRules.Count}} | Export-Csv nsg_summary.csv"]
+              }
+            }
+          ]
+        },
+        {
+          "id": "STEP-L7-001",
+          "title": "Deploy Sentinel Analytics Rules",
+          "task_type": "monitoring",
+          "priority": "p1",
+          "control_coverage": [
+            { "control_id": "AU.L2-3.3.1", "support_type": "Configurable", "gap_rationale": "No SIEM configured" },
+            { "control_id": "SI.L2-3.14.6", "support_type": "Configurable", "gap_rationale": "No system monitoring" }
+          ],
+          "what_to_do": ["Enable Unified Audit Log", "Deploy Sentinel workspace with data connectors", "Configure analytics rules for sign-in anomalies and privilege escalation"],
+          "how_to_verify": ["Audit log ingestion active", "Sentinel workspace receiving logs", "Analytics rules firing on test events"],
+          "vendor_help_refs": [
+            { "vendor": "Microsoft", "product": "Microsoft Sentinel", "title": "Deploy Sentinel" }
+          ],
+          "expected_artifacts": [
+            {
+              "artifact_id": "ART-SIEM-001",
+              "artifact_type": "config_export",
+              "description": "Sentinel analytics rules export",
+              "collector": "powershell",
+              "retention_days": 365,
+              "storage_location_ref": "evidence/monitoring/"
+            }
+          ],
+          "manual_completion_criteria": ["Sentinel deployed", "Data connectors active", "Analytics rules enabled"],
+          "estimated_effort_hours": 20,
+          "actions": [
+            {
+              "action_id": "MON-001-01",
+              "action": "Deploy Sentinel and analytics rules",
+              "action_type": "monitoring",
+              "evidence_outputs": ["sentinel_config_export"],
+              "vendor": {
+                "m365_service": "Microsoft Sentinel",
+                "powershell": ["Set-AdminAuditLogConfig -UnifiedAuditLogIngestionEnabled $true", "Get-AzSentinelAlertRule -WorkspaceName {ws} -ResourceGroupName {rg} | Select DisplayName,Severity,Enabled | Export-Csv sentinel_rules.csv"],
+                "evidence_commands": ["Get-AzSentinelAlertRule -WorkspaceName {ws} -ResourceGroupName {rg} | Measure-Object | Select Count"]
+              }
+            }
+          ]
+        },
+        {
+          "id": "STEP-L8-001",
+          "title": "Collect Identity Evidence Package",
+          "task_type": "evidence_collection",
+          "priority": "p2",
+          "control_coverage": [
+            { "control_id": "AC.L2-3.1.2", "support_type": "Configurable", "gap_rationale": "Evidence not yet collected" },
+            { "control_id": "AC.L2-3.1.6", "support_type": "Configurable", "gap_rationale": "Evidence not yet collected" },
+            { "control_id": "IA.L2-3.5.3", "support_type": "Configurable", "gap_rationale": "Evidence not yet collected" }
+          ],
+          "what_to_do": ["Export PIM configuration and role assignment logs", "Export Conditional Access policy state", "Export admin account inventory"],
+          "how_to_verify": ["All exports completed successfully", "Files contain expected data", "Hashes recorded"],
+          "vendor_help_refs": [],
+          "expected_artifacts": [
+            {
+              "artifact_id": "ART-EVID-IAM-001",
+              "artifact_type": "config_export",
+              "description": "Identity evidence package",
+              "collector": "powershell",
+              "retention_days": 1095,
+              "storage_location_ref": "evidence/packages/"
+            }
+          ],
+          "manual_completion_criteria": ["All identity evidence exported", "Evidence indexed"],
+          "estimated_effort_hours": 4,
+          "actions": [
+            {
+              "action_id": "EVID-001-01",
+              "action": "Collect identity evidence",
+              "action_type": "assessment",
+              "evidence_outputs": ["identity_evidence_package"],
+              "vendor": {
+                "m365_service": "Entra ID",
+                "evidence_commands": [
+                  "Get-MgUser -Filter \"startsWith(userPrincipalName,'admin_')\" | Export-Csv admin_accounts_evidence.csv",
+                  "Get-MgIdentityConditionalAccessPolicy | ConvertTo-Json -Depth 5 > ca_policies_evidence.json"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "STEP-L0-002",
+          "title": "Personnel Screening Policy",
+          "task_type": "policy",
+          "priority": "p1",
+          "control_coverage": [
+            { "control_id": "PS.L2-3.9.1", "support_type": "None", "gap_rationale": "No screening policy" }
+          ],
+          "what_to_do": ["Draft personnel screening policy covering background checks", "Define screening requirements for CUI access"],
+          "how_to_verify": ["Policy document exists", "Approved by HR and security lead"],
+          "vendor_help_refs": [],
+          "expected_artifacts": [
+            {
+              "artifact_id": "ART-PS-001",
+              "artifact_type": "policy",
+              "description": "Personnel Screening Policy",
+              "collector": "manual",
+              "retention_days": 1095,
+              "storage_location_ref": "evidence/policies/"
+            }
+          ],
+          "manual_completion_criteria": ["Policy drafted", "Policy approved"],
+          "estimated_effort_hours": 8
+        },
+        {
+          "id": "STEP-L0-003",
+          "title": "Security Awareness Training Program",
+          "task_type": "training",
+          "priority": "p1",
+          "control_coverage": [
+            { "control_id": "AT.L2-3.2.1", "support_type": "None", "gap_rationale": "No training program" },
+            { "control_id": "AT.L2-3.2.2", "support_type": "None", "gap_rationale": "No role-based training" }
+          ],
+          "what_to_do": ["Establish security awareness training program", "Define role-based training tracks (admin, user, developer)"],
+          "how_to_verify": ["Training program documented", "Training materials created", "Initial training scheduled"],
+          "vendor_help_refs": [],
+          "expected_artifacts": [
+            {
+              "artifact_id": "ART-TRAIN-001",
+              "artifact_type": "training_record",
+              "description": "Training program documentation",
+              "collector": "manual",
+              "retention_days": 1095,
+              "storage_location_ref": "evidence/training/"
+            }
+          ],
+          "manual_completion_criteria": ["Training program established", "Materials created"],
+          "estimated_effort_hours": 16
+        }
+      ],
+      "assessor_alignment_notes": [
+        "All evidence must be machine-generated where possible",
+        "Configuration exports preferred over screenshots"
+      ]
+    },
+    "cost_proposal_sow": {
+      "proposal_id": "PROP-SYNTH-001",
+      "assumptions": ["Test environment with GCC High E5 licensing"],
+      "line_items": [],
+      "sow": {
+        "statement_of_work": "Synthetic test fixture",
+        "deliverables": ["Implemented controls"],
+        "acceptance_criteria": ["All tasks pass"],
+        "out_of_scope": [],
+        "customer_dependencies": ["Admin access"]
+      }
+    },
+    "tenant_manifest": {
+      "manifest_id": "MANIFEST-SYNTH-001",
+      "tech_stack_id": 1,
+      "normative_controls": [
+        {
+          "control_id": "AC.L2-3.1.2",
+          "required_state": "PIM configured for all privileged roles with MFA and justification required",
+          "verification": [
+            {
+              "id": "CHK-AC-3.1.2-01",
+              "description": "PIM requires MFA for role activation",
+              "method": "api_query",
+              "expected": "MFA enforcement enabled for all privileged roles",
+              "on_fail": "Remediate PIM settings to require MFA"
+            }
+          ],
+          "evidence_artifacts": [
+            {
+              "artifact_id": "ART-PIM-001",
+              "artifact_type": "config_export",
+              "description": "PIM configuration export",
+              "collector": "powershell",
+              "retention_days": 365,
+              "storage_location_ref": "evidence/identity/"
+            }
+          ]
+        },
+        {
+          "control_id": "AC.L2-3.1.6",
+          "required_state": "Separate admin accounts without productivity licenses",
+          "verification": [
+            {
+              "id": "CHK-AC-3.1.6-01",
+              "description": "Admin accounts are cloud-only without M365 license",
+              "method": "api_query",
+              "expected": "All admin accounts have no M365 license assigned",
+              "on_fail": "Remove M365 licenses from admin accounts"
+            }
+          ],
+          "evidence_artifacts": []
+        },
+        {
+          "control_id": "IA.L2-3.5.3",
+          "required_state": "MFA enforced for all users via Conditional Access",
+          "verification": [
+            {
+              "id": "CHK-IA-3.5.3-01",
+              "description": "Conditional Access policy requires MFA",
+              "method": "api_query",
+              "expected": "CA policy with MFA grant control targeting all users is enabled",
+              "on_fail": "Create or enable MFA Conditional Access policy"
+            }
+          ],
+          "evidence_artifacts": []
+        }
+      ],
+      "assets": [],
+      "config_intents": [
+        {
+          "id": "CI-PIM-001",
+          "title": "PIM role activation settings",
+          "control_ids": ["AC.L2-3.1.2", "AC.L2-3.1.5"],
+          "desired_config": {
+            "mfa_required": true,
+            "justification_required": true,
+            "max_activation_hours": 8,
+            "approval_required_for_global_admin": true
+          },
+          "source_of_truth": "platform_setting",
+          "query_method": "api"
+        },
+        {
+          "id": "CI-CA-001",
+          "title": "Conditional Access MFA policy",
+          "control_ids": ["IA.L2-3.5.3"],
+          "desired_config": {
+            "state": "enabled",
+            "grant_controls": ["mfa"],
+            "target_users": "all"
+          },
+          "source_of_truth": "platform_setting",
+          "query_method": "api"
+        },
+        {
+          "id": "CI-LOCKOUT-001",
+          "title": "Smart Lockout settings",
+          "control_ids": ["AC.L2-3.1.8"],
+          "desired_config": {
+            "lockout_threshold": 10,
+            "lockout_duration_seconds": 60
+          },
+          "source_of_truth": "platform_setting",
+          "query_method": "api"
+        }
+      ],
+      "evidence_monitors": [
+        {
+          "id": "EM-PIM-001",
+          "control_ids": ["AC.L2-3.1.2"],
+          "signal": "PIM role activation events",
+          "collection_method": "api_poll",
+          "cadence": "daily",
+          "retention_days": 365,
+          "on_drift": "Alert compliance team, investigate unauthorized role activation"
+        },
+        {
+          "id": "EM-CA-001",
+          "control_ids": ["IA.L2-3.5.3"],
+          "signal": "Conditional Access policy change events",
+          "collection_method": "event_stream",
+          "cadence": "real-time",
+          "retention_days": 365,
+          "on_drift": "Alert immediately, investigate CA policy modification"
+        },
+        {
+          "id": "EM-AUDIT-001",
+          "control_ids": ["AU.L2-3.3.1"],
+          "signal": "Unified Audit Log ingestion status",
+          "collection_method": "api_poll",
+          "cadence": "daily",
+          "retention_days": 365,
+          "on_drift": "Re-enable audit log ingestion, escalate to security team"
+        }
+      ],
+      "drift_policies": [
+        {
+          "id": "DP-HIGH-001",
+          "scope": "All identity and access controls",
+          "severity": "high",
+          "detection": ["PIM settings changed", "CA policy disabled", "Admin account created outside process"],
+          "response_playbook": ["Notify compliance team within 1 hour", "Revert unauthorized change", "Document incident"]
+        },
+        {
+          "id": "DP-MED-001",
+          "scope": "Monitoring and evidence controls",
+          "severity": "medium",
+          "detection": ["Audit log ingestion stopped", "Sentinel rule disabled"],
+          "response_playbook": ["Notify security team within 24 hours", "Re-enable monitoring", "Investigate root cause"]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,75 @@
+controlId: "PS.L2-3.9.1"
+relatedControlIds:
+  - "AT.L2-3.2.3"
+  - "PS.L2-3.9.2"  # [VERIFY] mapping not yet confirmed
+  - "AC.L2-3.1.4"  # [VERIFY] mapping not yet confirmed
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: G-07
+useCaseTitle: "Insider Threat Indicator Report"
+domain: Personnel Security
+priority: P4 Standard
+trigger: 'SCHEDULE: Monthly report generation from Purview Insider Risk Management'
+sodTier: Tier 1 (Read-Only Audit)
+entraRolesRequired:
+- Security Reader
+- Reports Reader (Insider Risk Management Reader role may also be required)
+approvalRequired: false
+services:
+- name: Microsoft Purview Insider Risk Management -- policy configuration, alert triage, case management
+  purpose: ''
+- name: Microsoft Purview Compliance Portal -- Insider Risk settings, analytics, user activity reports
+  purpose: ''
+- name: Microsoft Sentinel -- optional correlation of insider risk alerts with other security signals
+  purpose: ''
+- name: Entra ID -- user directory for identity resolution
+  purpose: ''
+- name: Azure Immutable Blob Storage -- evidence retention
+  purpose: ''
+configurationSteps:
+  portalPath: //compliance.microsoft.us) > Insider risk management.
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes SecurityEvents.Read.All
+  - cmdlet: Get-MgRiskDetection
+    parameters:
+    - -MgRiskDetection
+    - -Filter
+    - -Date
+    - '-30'
+    - -MM
+  - cmdlet: Get-MgRiskyUser
+    parameters:
+    - -MgRiskyUser
+    - -Filter
+    - -All
+    - -Date
+    - -Format
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/identityProtection/riskDetections?$filter=detectedDateTime
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-g-personnel/G-07/{year}/{month}/
+  format: CSV (risk detection summary), PDF (monthly insider threat report), PNG (portal screenshot bundle for Purview IRM
+    dashboard)
+  filenamePattern: G-07_InsiderThreatReport_{YYYYMMDD}_{HHmmss}_{Monthly}.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://compliance.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |-
+    Microsoft Purview Insider Risk Management is available in GCC High as part of the Microsoft 365 G5 license. The Purview Compliance Portal at `https://compliance.microsoft.us` includes the Insider Risk Management blade. However, note the following GCC High-specific considerations:
+
+    - **HR connector**: The HR connector for Insider Risk Management (used to ingest resignation dates and performance improvement signals) requires configuration within the GCC High Purview environment. Verify the connector is available at `https://compliance.microsoft.us` > Data connectors > HR.
+    - **Analytics preview**
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

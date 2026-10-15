@@ -1,0 +1,94 @@
+controlId: "AC.L1-3.1.1"
+relatedControlIds:
+  - "AC.L1-3.1.2"
+  - "AC.L2-3.1.3"
+  - "SC.L1-3.13.1"
+
+practiceStatement: "Limit system access to authorized users, processes acting on behalf of users, and devices."
+
+useCaseId: "A-13"
+useCaseTitle: "CA Policy Review"
+domain: "Identity & Access Management"
+priority: "P3 Medium"
+trigger: "SCHEDULE: Quarterly or after any CA policy change"
+
+sodTier: "Tier 1 -- Read-Only Audit"
+entraRolesRequired:
+  - "Security Reader"
+  - "Conditional Access Administrator (for export)"
+
+approvalRequired: false
+
+services:
+  - name: "Entra ID Conditional Access"
+    purpose: "Policy export and review"
+  - name: "Microsoft Graph PowerShell"
+    modules:
+      - "Microsoft.Graph.Identity.SignIns"
+
+configurationSteps:
+  portalPath: "https://entra.microsoft.us > Protection > Conditional Access > Policies"
+
+  powershellCmdlets:
+    - cmdlet: "Connect-MgGraph"
+      parameters:
+        - "-Environment USGov"
+        - "-Scopes Policy.Read.All"
+    - cmdlet: "Get-MgIdentityConditionalAccessPolicy"
+      parameters:
+        - "-All"
+
+  graphApiEndpoint: "GET https://graph.microsoft.us/v1.0/identity/conditionalAccess/policies"
+  graphApiPayloadExample: {}
+
+  requiredPermissions:
+    - "Policy.Read.All"
+
+evidenceArtifacts:
+  - type: "JSON"
+    retentionPeriod: "7 years"
+    storageLocation: "evidence-store/domain-a-identity/A-13/{year}/{month}/"
+    format: "Full CA policy export"
+    filenamePattern: "A-13_CAPolicyReview_{YYYYMMDD}_{HHmmss}_AllPolicies.json"
+    hashAlgorithm: "SHA-256"
+  - type: "CSV"
+    retentionPeriod: "7 years"
+    storageLocation: "evidence-store/domain-a-identity/A-13/{year}/{month}/"
+    format: "Summary with gap analysis annotations"
+    filenamePattern: "A-13_CAPolicySummary_{YYYYMMDD}_{HHmmss}.csv"
+
+gccHighSpecifics:
+  endpoints:
+    - "https://graph.microsoft.us"
+    - "https://entra.microsoft.us"
+  complianceBoundary: "FedRAMP High + CMMC L2"
+  endpointValidation: "All endpoints use .microsoft.us or .usgovcloudapi.net domains"
+  notes: "CA policy export works identically in GCC High. Named locations referenced in CA policies must use GCC High-specific configurations. Verify location IDs in exported policies match actual named location objects. Report-only mode functions identically and is recommended for testing. Some CA policy templates may reference features not available in GCC High; review template-created policies for supported conditions and controls."
+
+relatedPolicies:
+  - "AC-001 Access Control Policy"
+  - "IA-002 Identification and Authentication Policy"
+  - "SC-001 System and Communications Protection Policy"
+
+odpValues:
+  - odpId: "AC.L2-3.1.1_ODP_01"
+    description: "Required CA policies for CMMC compliance"
+    value: "MFA for all users, block legacy auth, require compliant device, location-based restrictions for CUI apps, admin portal restriction, session sign-in frequency"
+    rationale: "CA policy set collectively enforces authorized access controls"
+    enforcementMechanism: "Quarterly review verifies all required policies are present and in On state"
+
+dependencies:
+  hardDependencies:
+    - useCaseId: "A-07"
+      reason: "MFA policy should exist"
+    - useCaseId: "A-14"
+      reason: "Named locations should be configured"
+  softDependencies:
+    - useCaseId: "F-04"
+      reason: "Legacy auth block validation complements this review"
+    - useCaseId: "F-07"
+      reason: "Admin portal restriction"
+    - useCaseId: "B-07"
+      reason: "Device compliance CA block"
+
+notes: "Performs gap analysis against CMMC Access Control and System and Communications Protection practice requirements. Identifies missing or misconfigured policies. Proactive review catches policy drift, accidental disabling, and configuration errors before they become assessment findings. Document each policy: Name, State, Users/Groups, Cloud apps, Conditions, Grant controls, Session controls."

@@ -1,0 +1,103 @@
+controlId: "AC.L2-3.1.12"
+relatedControlIds:
+  - "AC.L2-3.1.3"
+  - "AC.L1-3.1.1"
+  - "SC.L2-3.13.6"
+
+practiceStatement: "Control the flow of CUI in accordance with approved authorizations."
+
+useCaseId: "A-14"
+useCaseTitle: "Named Location Update"
+domain: "Identity & Access Management"
+priority: "P3 Medium"
+trigger: "CHANGE: Office IP range change, VPN endpoint change, or geographic access policy update"
+
+sodTier: "Tier 2 -- Config Manager"
+entraRolesRequired:
+  - "Conditional Access Administrator"
+
+approvalRequired: true
+
+services:
+  - name: "Entra ID Conditional Access"
+    purpose: "Named locations"
+  - name: "Microsoft Graph PowerShell"
+    modules:
+      - "Microsoft.Graph.Identity.SignIns"
+
+configurationSteps:
+  portalPath: "https://entra.microsoft.us > Protection > Conditional Access > Named locations"
+
+  powershellCmdlets:
+    - cmdlet: "Connect-MgGraph"
+      parameters:
+        - "-Environment USGov"
+        - "-Scopes Policy.ReadWrite.ConditionalAccess"
+    - cmdlet: "Get-MgIdentityConditionalAccessNamedLocation"
+      parameters:
+        - "-All"
+    - cmdlet: "Update-MgIdentityConditionalAccessNamedLocation"
+      parameters:
+        - "-NamedLocationId"
+        - "-BodyParameter"
+    - cmdlet: "New-MgIdentityConditionalAccessNamedLocation"
+      parameters:
+        - "-BodyParameter"
+
+  graphApiEndpoint: "GET https://graph.microsoft.us/v1.0/identity/conditionalAccess/namedLocations"
+  graphApiPayloadExample:
+    "@odata.type": "#microsoft.graph.ipNamedLocation"
+    displayName: "Corporate Trusted IPs"
+    isTrusted: true
+    ipRanges:
+      - "@odata.type": "#microsoft.graph.iPv4CidrRange"
+        cidrAddress: "{corporateCidr1}"
+
+  requiredPermissions:
+    - "Policy.ReadWrite.ConditionalAccess"
+
+evidenceArtifacts:
+  - type: "JSON"
+    retentionPeriod: "7 years"
+    storageLocation: "evidence-store/domain-a-identity/A-14/{year}/{month}/"
+    format: "Named location export before and after changes"
+    filenamePattern: "A-14_NamedLocations_{YYYYMMDD}_{HHmmss}_AllLocations.json"
+    hashAlgorithm: "SHA-256"
+
+gccHighSpecifics:
+  endpoints:
+    - "https://graph.microsoft.us"
+    - "https://entra.microsoft.us"
+  complianceBoundary: "FedRAMP High + CMMC L2"
+  endpointValidation: "All endpoints use .microsoft.us or .usgovcloudapi.net domains"
+  notes: "Named locations API operates identically via graph.microsoft.us. Geo-blocking uses ISO 3166-1 alpha-2 country codes. IncludeUnknownCountriesAndRegions flag should be set to true to block sign-ins where IP geolocation cannot be determined. For CMMC compliance, consider NOT exempting trusted locations from MFA, as MFA should be required universally per IA.L2-3.5.3. VPN endpoint IPs should be added to trusted locations if organization routes CUI-related traffic through managed VPN."
+
+relatedPolicies:
+  - "AC-001 Access Control Policy"
+  - "SC-001 System and Communications Protection Policy"
+
+odpValues:
+  - odpId: "AC.L2-3.1.3_ODP_01"
+    description: "Trusted network perimeters for CUI access"
+    value: "Corporate office IP ranges and VPN endpoint CIDRs marked as isTrusted"
+    rationale: "Defines network boundaries within which CUI access is authorized"
+    enforcementMechanism: "Entra ID named locations referenced in CA policies"
+  - odpId: "AC.L2-3.1.1_ODP_02"
+    description: "Blocked geographic regions"
+    value: "High-risk countries (e.g., RU, CN, KP, IR) plus unknown locations"
+    rationale: "Prevents access from unauthorized geographic regions"
+    enforcementMechanism: "Geo-blocking CA policy targeting countries/regions named location"
+
+dependencies:
+  hardDependencies:
+    - useCaseId: "A-13"
+      reason: "CA policy review identifies which policies reference named locations"
+  softDependencies:
+    - useCaseId: "F-07"
+      reason: "Admin portal IP restriction references trusted locations"
+    - useCaseId: "A-07"
+      reason: "MFA policy may reference named locations"
+    - useCaseId: "B-07"
+      reason: "Device compliance CA may reference locations"
+
+notes: "Trusted locations define network perimeters from which CUI access is permitted without additional restrictions, while geo-blocking prevents sign-in attempts from high-risk countries. Incorrect named locations can either block legitimate users or allow access from untrusted networks. Approval required if adding new trusted locations; not required for removing. Verify IP ranges match current organizational network infrastructure."

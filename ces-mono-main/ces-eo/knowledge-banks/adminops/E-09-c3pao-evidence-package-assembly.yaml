@@ -1,0 +1,62 @@
+controlId: "CA.L2-3.12.2"
+relatedControlIds:
+  - "AU.L2-3.3.1"
+  - "AU.L2-3.3.2"
+  - "CA.L2-3.12.1"
+  - "CA.L2-3.12.3"
+  - "CA.L2-3.12.4"  # [VERIFY] mapping not yet confirmed
+practiceStatement: Create and retain system audit logs and records to the extent needed to enable the monitoring, analysis,
+  investigation, and reporting of unlawful or unauthorized system activity.
+useCaseId: E-09
+useCaseTitle: "C3PAO Evidence Package Assembly"
+domain: Audit & Logging
+priority: P1 Critical
+trigger: 'ASSESSMENT: On-demand (prior to C3PAO assessment engagement)'
+sodTier: Tier 2
+entraRolesRequired:
+- Compliance Administrator
+- Key Vault Crypto User (for signing operations)
+approvalRequired: true
+services:
+- name: Azure Key Vault
+  purpose: Premium) -- RSA-PSS 2048-bit signing key, FIPS 140-2 Level 2 validated HSM
+- name: Azure Immutable Blob Storage -- WORM evidence store
+  purpose: source for artifact collection
+- name: Microsoft Purview -- eDiscovery content search
+  purpose: for bulk evidence retrieval if needed
+- name: PowerShell -- `Get-FileHash`, `Compress-Archive`, JSON manifest generation
+  purpose: ''
+- name: Azure CLI -- `az keyvault key sign` for digital signature
+  purpose: ''
+configurationSteps:
+  portalPath: '//portal.azure.us > Key Vaults > select the evidence signing vault. Verify the signing key exists: Keys > select
+    cmmc-evidence-signing-key. Confirm the key type is RSA-HSM, key size is 2048-bit or greater, and the key is in Enabled
+    state.'
+  powershellCmdlets: []
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/auditLogs/directoryAudits?$filter=activityDateTime
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-e-audit/E-09/{year}/{month}/
+  format: ZIP (per-family evidence package), JSON (manifest.json per family, master_package_index.json), SIG (manifest.json.sig
+    per family, master_package_index.json.sig)
+  filenamePattern: E-09_C3PAOPackage_{YYYYMMDD}_{HHmmss}_{PracticeFamily}.zip
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |-
+    - Azure Key Vault Premium tier in Azure Government provides FIPS 140-2 Level 2 validated HSM-backed keys. This is a requirement for evidence signing to meet the integrity expectations of C3PAO assessors. Ensure the key vault SKU is `Premium`, not `Standard`.
+    - The `az keyvault key sign` command works identically in Azure Government after running `az cloud set --name AzureUSGovernment`. The signing algorithm `RS256` (RSA-PKCS1-v1_5 with SHA-256) is the minimum; `PS256` (RSA-PSS with SHA-256) is preferred if the C3PAO tooling supports PSS padding.
+    - Azure Immutable Blob Storage in Azure Governme
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

@@ -1,0 +1,47 @@
+## Control {{controlId}}: Control the Use of Removable Media on System Components
+
+**Implementation Status:** {{status}}
+
+This organization controls removable media usage within the {{tenantName}} M365 GCC High tenant through device configuration policies and endpoint protection rules documented in "Removable Media Policy v1.0" maintained by {{variables.systemAdministrator}}.
+
+{{#if deviceConfigurationsActive}}
+**Endpoint Removable Media Controls:**
+{{deviceConfigurationsCount}} device configuration profiles enforce removable media restrictions:
+{{#if configurations}}
+{{#each configurations}}
+- **{{displayName}}** ({{platformType}}){{#if description}} — {{description}}{{/if}}
+{{/each}}
+{{/if}}
+
+Policies enforce:
+- USB mass storage device access restricted or blocked on managed endpoints
+- Removable media (USB drives, SD cards, external hard drives) require encryption before CUI transfer
+- CD/DVD burning disabled on endpoints processing CUI
+- Bluetooth file transfer disabled
+{{else}}
+Device configuration policies for removable media have not been established.
+{{/if}}
+
+{{#if appProtectionsActive}}
+**Mobile Removable Media:**
+Application protection policies prevent CUI from being saved to unprotected external storage on mobile devices.
+{{/if}}
+
+**Operational Procedure:**
+- **Action:** Quarterly review of removable media policy exceptions; annual audit of USB device access logs
+- **Frequency:** Quarterly exception review, annual audit
+- **Responsible Party:** {{variables.systemAdministrator}}
+- **Documentation:** Removable Media Policy v1.0, USB Device Access Procedure MP-007
+
+**Review Frequency:** Quarterly by ISSO
+
+**Verification Method:** Examine device configuration profiles for USB restrictions, Defender for Endpoint device control reports, and removable media exception records.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

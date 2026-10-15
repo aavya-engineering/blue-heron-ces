@@ -1,0 +1,1502 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/ces-mpt-executable-mission-plan.schema.json",
+  "title": "CES Executable Mission Plan (MPT) Schema",
+  "type": "object",
+  "required": [
+    "ces",
+    "inputs",
+    "markdown"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "ces": {
+      "type": "object",
+      "required": [
+        "artifact",
+        "version",
+        "generated_on",
+        "intent"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "artifact": {
+          "type": "string",
+          "const": "executable_mission_plan"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "generated_on": {
+          "type": "string",
+          "format": "date"
+        },
+        "intent": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "inputs": {
+      "$ref": "#/$defs/inputs_block",
+      "properties": {
+        "si_baseline_ref": {
+          "$ref": "#/$defs/artifact_ref"
+        },
+        "readiness_posture_ref": {
+          "$ref": "#/$defs/artifact_ref"
+        }
+      }
+    },
+    "markdown": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Rendered Markdown document containing the full executable plan with execution metadata."
+    }
+  },
+  "$defs": {
+    "tag_enum": {
+      "type": "string",
+      "enum": [
+        "FACT",
+        "INFERENCE",
+        "OPEN_QUESTION"
+      ]
+    },
+    "level_enum": {
+      "type": "string",
+      "enum": [
+        "L1",
+        "L2",
+        "L3"
+      ]
+    },
+    "method_enum": {
+      "type": "string",
+      "enum": [
+        "examine",
+        "interview",
+        "test"
+      ]
+    },
+    "priority_enum": {
+      "type": "string",
+      "enum": [
+        "p0",
+        "p1",
+        "p2",
+        "p3"
+      ]
+    },
+    "plan_mode_enum": {
+      "type": "string",
+      "enum": [
+        "build_new",
+        "harden_existing",
+        "migrate",
+        "hybrid"
+      ]
+    },
+    "support_type_enum": {
+      "type": "string",
+      "enum": [
+        "Overt",
+        "Configurable",
+        "Inherited",
+        "Partial",
+        "None"
+      ]
+    },
+    "task_type_enum": {
+      "type": "string",
+      "enum": [
+        "policy",
+        "configuration",
+        "process",
+        "monitoring",
+        "training",
+        "assessment",
+        "evidence_collection"
+      ]
+    },
+    "artifact_type_enum": {
+      "type": "string",
+      "enum": [
+        "policy",
+        "procedure",
+        "ssp",
+        "diagram",
+        "config_export",
+        "log_export",
+        "ticket_export",
+        "training_record",
+        "scan_report",
+        "attestation",
+        "other"
+      ]
+    },
+    "source_ref": {
+      "type": "object",
+      "required": [
+        "id",
+        "title"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "government",
+            "nist",
+            "vendor",
+            "internal"
+          ]
+        },
+        "version": {
+          "type": "string"
+        },
+        "published_date": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "inputs_block": {
+      "type": "object",
+      "required": [
+        "si_baseline",
+        "readiness_posture",
+        "authoritative_sources",
+        "vendor_capability_packages",
+        "assessor_knowledge"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "si_baseline": {
+          "type": "object",
+          "description": "Validated SI Baseline object (conforming to CES_SI_Baseline_Output.schema.json).",
+          "additionalProperties": true
+        },
+        "readiness_posture": {
+          "type": "object",
+          "required": [
+            "snapshot_id",
+            "as_of_date",
+            "control_status_summary",
+            "key_findings",
+            "constraints"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "snapshot_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "as_of_date": {
+              "type": "string",
+              "format": "date"
+            },
+            "control_status_summary": {
+              "type": "object",
+              "required": [
+                "level",
+                "met",
+                "partial",
+                "not_met",
+                "unknown"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "level": {
+                  "$ref": "#/$defs/level_enum"
+                },
+                "met": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "partial": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "not_met": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "unknown": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "key_findings": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/finding"
+              }
+            },
+            "constraints": {
+              "type": "object",
+              "required": [
+                "time",
+                "budget",
+                "tooling",
+                "staffing"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "time": {
+                  "type": "string"
+                },
+                "budget": {
+                  "type": "string"
+                },
+                "tooling": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "staffing": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "authoritative_sources": {
+          "type": "object",
+          "required": [
+            "government",
+            "nist"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "government": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/source_ref"
+              }
+            },
+            "nist": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/source_ref"
+              }
+            },
+            "assessor_guides": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/source_ref"
+              }
+            }
+          }
+        },
+        "vendor_capability_packages": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "tech_stack_id",
+              "name",
+              "vendor",
+              "fedramp_level",
+              "package_ref"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "tech_stack_id": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "vendor": {
+                "type": "string",
+                "minLength": 1
+              },
+              "fedramp_level": {
+                "type": "string",
+                "minLength": 1
+              },
+              "package_ref": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Pointer to the vendor capability YAML (path/url/id)."
+              }
+            }
+          }
+        },
+        "assessor_knowledge": {
+          "type": "object",
+          "required": [
+            "assessor_approach_ref",
+            "assessor_evidence_matrix_ref",
+            "design_for_assessment_rules"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "assessor_approach_ref": {
+              "type": "string",
+              "minLength": 1
+            },
+            "assessor_evidence_matrix_ref": {
+              "type": "string",
+              "minLength": 1
+            },
+            "design_for_assessment_rules": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/dfa_rule"
+              }
+            }
+          }
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "required": [
+        "id",
+        "control_id",
+        "title",
+        "status",
+        "severity",
+        "evidence_gaps",
+        "root_cause_hypothesis",
+        "recommended_actions"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "control_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "MET",
+            "PARTIAL",
+            "NOT_MET",
+            "UNKNOWN"
+          ]
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ]
+        },
+        "evidence_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "root_cause_hypothesis": {
+          "type": "string"
+        },
+        "recommended_actions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "dfa_rule": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "rule",
+        "verification",
+        "assessor_method_alignment",
+        "sources"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "verification": {
+          "type": "string",
+          "minLength": 1
+        },
+        "assessor_method_alignment": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/method_enum"
+          }
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "outputs_block": {
+      "type": "object",
+      "required": [
+        "human_readable_mission_plan",
+        "executable_plan",
+        "cost_proposal_sow",
+        "tenant_manifest"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "human_readable_mission_plan": {
+          "$ref": "#/$defs/human_plan"
+        },
+        "executable_plan": {
+          "$ref": "#/$defs/executable_plan"
+        },
+        "cost_proposal_sow": {
+          "$ref": "#/$defs/cost_proposal"
+        },
+        "tenant_manifest": {
+          "$ref": "#/$defs/tenant_manifest"
+        }
+      }
+    },
+    "human_plan": {
+      "type": "object",
+      "required": [
+        "plan_id",
+        "plan_mode",
+        "target_level",
+        "milestones",
+        "steps",
+        "assessor_alignment_notes"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "plan_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "plan_mode": {
+          "$ref": "#/$defs/plan_mode_enum"
+        },
+        "target_level": {
+          "$ref": "#/$defs/level_enum"
+        },
+        "milestones": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/milestone"
+          }
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/human_step"
+          }
+        },
+        "assessor_alignment_notes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "milestone": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "objective",
+        "exit_criteria",
+        "target_date"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "objective": {
+          "type": "string",
+          "minLength": 1
+        },
+        "exit_criteria": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "target_date": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "human_step": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "task_type",
+        "priority",
+        "control_coverage",
+        "what_to_do",
+        "how_to_verify",
+        "vendor_help_refs",
+        "expected_artifacts"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "task_type": {
+          "$ref": "#/$defs/task_type_enum"
+        },
+        "priority": {
+          "$ref": "#/$defs/priority_enum"
+        },
+        "control_coverage": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/control_coverage"
+          }
+        },
+        "what_to_do": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "how_to_verify": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "vendor_help_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/vendor_help_ref"
+          }
+        },
+        "expected_artifacts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/evidence_artifact"
+          }
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "estimated_effort_hours": {
+          "type": "number",
+          "minimum": 0
+        },
+        "effort_estimate": {
+          "type": "object",
+          "properties": {
+            "one_time_dev_loe": { "type": "number", "minimum": 0 },
+            "one_time_config_manual": { "type": "number", "minimum": 0 },
+            "one_time_config_automated": { "type": "number", "minimum": 0 },
+            "recurring_evidence_manual": { "type": "number", "minimum": 0 },
+            "recurring_evidence_automated": { "type": "number", "minimum": 0 }
+          },
+          "required": ["one_time_dev_loe", "one_time_config_manual", "one_time_config_automated", "recurring_evidence_manual", "recurring_evidence_automated"],
+          "additionalProperties": false
+        },
+        "owner_role": {
+          "type": "string"
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/step_action"
+          }
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "step_action": {
+      "type": "object",
+      "required": ["action_id", "action", "action_type", "evidence_outputs"],
+      "additionalProperties": false,
+      "properties": {
+        "action_id": { "type": "string", "minLength": 1 },
+        "action": { "type": "string", "minLength": 1 },
+        "action_type": { "type": "string", "minLength": 1 },
+        "evidence_outputs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "vendor": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "m365_service": { "type": "string" },
+            "implementation": { "type": "string" },
+            "portal_path": { "type": "string" },
+            "powershell": { "type": "array", "items": { "type": "string" } },
+            "evidence_commands": { "type": "array", "items": { "type": "string" } },
+            "notes": { "type": "string" }
+          }
+        }
+      }
+    },
+    "control_coverage": {
+      "type": "object",
+      "required": [
+        "control_id",
+        "support_type",
+        "gap_rationale"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "control_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "support_type": {
+          "$ref": "#/$defs/support_type_enum"
+        },
+        "gap_rationale": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "vendor_help_ref": {
+      "type": "object",
+      "required": [
+        "vendor",
+        "product",
+        "title"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "vendor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "product": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "path_hint": {
+          "type": "string",
+          "description": "Console/menu/API path hint for implementers."
+        }
+      }
+    },
+    "evidence_artifact": {
+      "type": "object",
+      "required": [
+        "artifact_id",
+        "artifact_type",
+        "description",
+        "collector",
+        "retention_days",
+        "storage_location_ref"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifact_type": {
+          "$ref": "#/$defs/artifact_type_enum"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "collector": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Human/system responsible for collection (e.g., evidence_ops, stamper, admin)."
+        },
+        "retention_days": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "storage_location_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "executable_plan": {
+      "type": "object",
+      "required": [
+        "plan_id",
+        "target_level",
+        "tech_stack_id",
+        "execution_graph",
+        "variables",
+        "prechecks",
+        "postchecks"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "plan_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target_level": {
+          "$ref": "#/$defs/level_enum"
+        },
+        "tech_stack_id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "execution_graph": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/exe_task"
+          }
+        },
+        "variables": {
+          "type": "object",
+          "description": "Parameter bag consumed by enclave stamper (tenant IDs, region, naming conventions, etc.)",
+          "additionalProperties": true
+        },
+        "prechecks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/check"
+          }
+        },
+        "postchecks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/check"
+          }
+        }
+      }
+    },
+    "exe_task": {
+      "type": "object",
+      "required": [
+        "id",
+        "type",
+        "priority",
+        "depends_on",
+        "action",
+        "inputs",
+        "outputs",
+        "controls",
+        "idempotency",
+        "rollback"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "$ref": "#/$defs/task_type_enum"
+        },
+        "priority": {
+          "$ref": "#/$defs/priority_enum"
+        },
+        "depends_on": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "action": {
+          "type": "object",
+          "required": [
+            "engine",
+            "command",
+            "args"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "engine": {
+              "type": "string",
+              "enum": [
+                "terraform",
+                "bicep",
+                "cloudformation",
+                "cli",
+                "powershell",
+                "api",
+                "manual_gate"
+              ]
+            },
+            "command": {
+              "type": "string",
+              "minLength": 1
+            },
+            "args": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "controls": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "idempotency": {
+          "type": "string",
+          "enum": [
+            "safe",
+            "best_effort",
+            "unsafe_requires_gate"
+          ]
+        },
+        "rollback": {
+          "type": "object",
+          "required": [
+            "strategy"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "strategy": {
+              "type": "string",
+              "enum": [
+                "none",
+                "reverse_task",
+                "restore_snapshot",
+                "manual"
+              ]
+            },
+            "notes": {
+              "type": "string"
+            }
+          }
+        },
+        "evidence_emit": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidence_artifact"
+          }
+        }
+      }
+    },
+    "check": {
+      "type": "object",
+      "required": [
+        "id",
+        "description",
+        "method",
+        "expected",
+        "on_fail"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "method": {
+          "type": "string",
+          "enum": [
+            "api_query",
+            "config_export",
+            "log_query",
+            "manual_attestation"
+          ]
+        },
+        "expected": {
+          "type": "string",
+          "minLength": 1
+        },
+        "on_fail": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "cost_proposal": {
+      "type": "object",
+      "required": [
+        "proposal_id",
+        "assumptions",
+        "line_items",
+        "sow"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "proposal_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "assumptions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "line_items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/price_line"
+          }
+        },
+        "sow": {
+          "$ref": "#/$defs/sow"
+        }
+      }
+    },
+    "price_line": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "type",
+        "qty",
+        "unit",
+        "unit_price",
+        "extended_price",
+        "mapping"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "labor",
+            "license",
+            "service",
+            "hardware",
+            "other"
+          ]
+        },
+        "qty": {
+          "type": "number",
+          "minimum": 0
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "unit_price": {
+          "type": "number",
+          "minimum": 0
+        },
+        "extended_price": {
+          "type": "number",
+          "minimum": 0
+        },
+        "mapping": {
+          "type": "object",
+          "required": [
+            "milestones",
+            "steps",
+            "controls"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "milestones": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "steps": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "controls": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "sow": {
+      "type": "object",
+      "required": [
+        "statement_of_work",
+        "deliverables",
+        "acceptance_criteria",
+        "out_of_scope",
+        "customer_dependencies"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "statement_of_work": {
+          "type": "string",
+          "minLength": 1
+        },
+        "deliverables": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "acceptance_criteria": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "out_of_scope": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "customer_dependencies": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "tenant_manifest": {
+      "type": "object",
+      "required": [
+        "manifest_id",
+        "tech_stack_id",
+        "normative_controls",
+        "assets",
+        "config_intents",
+        "evidence_monitors",
+        "drift_policies"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "manifest_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tech_stack_id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "normative_controls": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/normative_control"
+          }
+        },
+        "assets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/asset"
+          }
+        },
+        "config_intents": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/config_intent"
+          }
+        },
+        "evidence_monitors": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/evidence_monitor"
+          }
+        },
+        "drift_policies": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/drift_policy"
+          }
+        }
+      }
+    },
+    "normative_control": {
+      "type": "object",
+      "required": [
+        "control_id",
+        "required_state",
+        "verification",
+        "evidence_artifacts"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "control_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required_state": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Human-readable 'right' state."
+        },
+        "verification": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/check"
+          }
+        },
+        "evidence_artifacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidence_artifact"
+          }
+        }
+      }
+    },
+    "asset": {
+      "type": "object",
+      "required": [
+        "asset_id",
+        "asset_type",
+        "scope_category",
+        "tags"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "asset_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "asset_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope_category": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "owner": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "config_intent": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "control_ids",
+        "desired_config",
+        "source_of_truth",
+        "query_method"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "control_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "desired_config": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "source_of_truth": {
+          "type": "string",
+          "enum": [
+            "iac",
+            "policy_doc",
+            "platform_setting",
+            "manual_attestation"
+          ]
+        },
+        "query_method": {
+          "type": "string",
+          "enum": [
+            "api",
+            "export",
+            "log_query",
+            "manual"
+          ]
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "evidence_monitor": {
+      "type": "object",
+      "required": [
+        "id",
+        "control_ids",
+        "signal",
+        "collection_method",
+        "cadence",
+        "retention_days",
+        "on_drift"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "control_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "signal": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What evidence signal is monitored (e.g., audit event type, config state)."
+        },
+        "collection_method": {
+          "type": "string",
+          "enum": [
+            "api_poll",
+            "event_stream",
+            "scheduled_export",
+            "manual_attestation"
+          ]
+        },
+        "cadence": {
+          "type": "string",
+          "minLength": 1,
+          "description": "e.g., hourly, daily, weekly, realtime"
+        },
+        "retention_days": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "on_drift": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "drift_policy": {
+      "type": "object",
+      "required": [
+        "id",
+        "scope",
+        "severity",
+        "detection",
+        "response_playbook"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What is covered (control(s), config intents, assets)."
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ]
+        },
+        "detection": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "response_playbook": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "artifact_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_id",
+        "artifact_id",
+        "version",
+        "hash_sha256"
+      ],
+      "properties": {
+        "schema_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifact_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hash_sha256": {
+          "type": "string",
+          "minLength": 16
+        }
+      }
+    }
+  }
+}

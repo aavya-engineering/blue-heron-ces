@@ -1,0 +1,40 @@
+## Control {{controlId}}: Provide Controls on Tools, Techniques, Mechanisms, and Personnel Used for System Maintenance
+
+**Implementation Status:** {{status}}
+
+This organization controls maintenance tools, techniques, and personnel within the {{tenantName}} M365 GCC High tenant through approved tool inventories and personnel authorization documented in "Maintenance Controls Policy v1.0" maintained by {{variables.systemAdministrator}}.
+
+**Approved Maintenance Tools:**
+- **Administration Portals:** Azure Government portal, Microsoft 365 admin center, Exchange admin center, Intune admin console — all accessed via authenticated, encrypted sessions
+- **PowerShell Modules:** Microsoft Graph PowerShell SDK, Exchange Online Management, Teams PowerShell — approved versions maintained in tool inventory
+- **Remote Access:** Azure AD-joined management workstations with MFA and Conditional Access enforcement
+- **Diagnostics:** Microsoft Support and Recovery Assistant (SaRA), Microsoft 365 Network Connectivity Test
+
+**Personnel Authorization:**
+- Only personnel with designated administrative roles may perform maintenance
+- Maintenance personnel verified through background check and security clearance process
+- Vendor maintenance (Microsoft support) conducted under supervision with time-limited access
+
+{{#if pimConfigured}}
+**Privileged Maintenance Access:**
+PIM enforces just-in-time elevation for maintenance roles, ensuring maintenance access is time-bound and audited.
+{{/if}}
+
+**Operational Procedure:**
+- **Action:** Maintain approved tool inventory; annual review of maintenance tool authorization; vendor access requires written authorization
+- **Frequency:** Annual tool review, per-incident vendor authorization
+- **Responsible Party:** {{variables.systemAdministrator}}
+- **Documentation:** Maintenance Controls Policy v1.0, Approved Tool Inventory
+
+**Review Frequency:** Annually by ISSO
+
+**Verification Method:** Examine approved tool inventory, maintenance personnel authorization records, PIM activation logs for maintenance roles, and vendor access logs.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** Review approved tool inventory per procedure MA-002. {{evidenceArtifactUrl}}
+{{/if}}

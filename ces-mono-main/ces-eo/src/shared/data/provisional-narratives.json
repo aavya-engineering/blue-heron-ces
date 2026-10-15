@@ -1,0 +1,56 @@
+{
+  "narratives": [
+    {
+      "control_id": "IA.L2-3.5.8",
+      "narrative": "The organization enforces password reuse prevention through Microsoft Entra ID password protection policies. Entra ID is configured to remember 24 previous passwords, preventing reuse across that history window. Password protection settings are managed centrally through the Entra admin center (Protection > Authentication methods > Password protection). Custom banned password lists are maintained to prevent use of organization-specific terms. Evidence includes Entra ID domain password policy configuration export and administrative portal screenshot confirming enforcement."
+    },
+    {
+      "control_id": "CM.L2-3.4.4",
+      "narrative": "The organization conducts security impact analyses prior to changes to the information system. A documented SIA procedure requires assessment of confidentiality, integrity, and availability impacts for all system changes. The Evidence Ops production deployment was used as a baseline SIA, demonstrating analysis of Azure Blob Storage access, SharedKey authentication controls, and SAS token expiry enforcement. The SIA template includes affected systems, risk assessment by CIA dimension, mitigation controls, and ISSO approval. Evidence includes the completed SIA document with ISSO signature."
+    },
+    {
+      "control_id": "CM.L2-3.4.8",
+      "narrative": "The organization enforces application allow/deny policies through Microsoft Intune App Protection Policies and Microsoft Defender Application Control. Intune policies restrict managed device applications to an approved list. Defender Attack Surface Reduction rules block execution of untrusted processes and scripts. Application exception requests follow a documented approval workflow. Evidence includes Intune App Protection Policy configuration export and Defender ASR rule configuration."
+    },
+    {
+      "control_id": "AU.L2-3.3.6",
+      "narrative": "The organization provides audit reduction and report generation capability through Microsoft Purview Unified Audit Log and Microsoft Sentinel. Purview supports filtered search across Exchange, SharePoint, Entra ID, and Teams audit events with CSV export. Sentinel workbooks provide visual audit reduction with customizable time ranges, user filters, and activity-type aggregations. Evidence includes a sample audit log search export demonstrating the platform's audit reduction capability."
+    },
+    {
+      "control_id": "CA.L2-3.12.2",
+      "narrative": "The organization maintains a Plan of Action and Milestones (POA&M) document that identifies all controls not yet fully satisfied. The POA&M is generated through the Evidence Ops platform, which tracks control implementation status, assigns remediation timelines (90-day default), identifies responsible parties, and calculates SPRS score impact. The POA&M is reviewed and signed by the ISSO. Evidence includes the generated POA&M DOCX with open items, remediation dates, and ISSO signature."
+    },
+    {
+      "control_id": "CA.L2-3.12.4",
+      "narrative": "The organization maintains a System Security Plan (SSP) that describes the information system boundary, security categorization, and implementation of all 110 CMMC Level 2 controls. The SSP is generated through the Evidence Ops platform using evidence collected by Stamper from the M365 GCC High tenant. All 15 SSP sections are populated from assessment data, including Section 12 (Control Implementations) with per-control narratives and evidence references. The SSP is reviewed and signed by the System Owner and ISSO. Evidence includes the generated SSP DOCX."
+    },
+    {
+      "control_id": "RA.L2-3.11.2",
+      "narrative": "The organization conducts vulnerability scanning using Microsoft Defender for Cloud and Microsoft Defender Vulnerability Management. Defender for Cloud provides continuous vulnerability assessment of Azure resources with severity-rated recommendations. Defender Vulnerability Management scans endpoints for software vulnerabilities, misconfigurations, and missing patches. Scan results are exported as CSV/PDF reports and stored in the tenant evidence repository. Evidence includes the Defender for Cloud recommendations export."
+    },
+    {
+      "control_id": "PS.L2-3.9.1",
+      "narrative": "The organization screens individuals prior to authorizing access to the information system containing CUI. A documented Personnel Security Screening Procedure defines background check requirements for all personnel with CUI access, including process workflow, responsible parties (HR), and frequency (pre-hire and every 5 years). Screening records are maintained in the tenant evidence repository with SHA-256 integrity verification. Evidence includes the screening procedure document."
+    },
+    {
+      "control_id": "RA.L2-3.11.3",
+      "narrative": "The organization remediates vulnerabilities in accordance with a documented Vulnerability Remediation Procedure. Remediation timelines are defined by severity: Critical (15 days), High (30 days), Medium (90 days), Low (next maintenance window). Remediation is tracked through Defender for Cloud workbooks and Defender Vulnerability Management dashboard. Completed remediations are verified by re-scan. Evidence includes the remediation procedure document and a documented remediation of a real tenant finding showing vulnerability resolution."
+    },
+    {
+      "control_id": "SI.L2-3.14.3",
+      "narrative": "The organization monitors security alerts and advisories from Microsoft Security Response Center (MSRC), M365 Message Center, and MS-ISAC. A documented Security Advisory Consumption Procedure defines advisory sources, weekly review cadence, applicability assessment workflow, and response documentation requirements. M365 service announcement data is collected via Graph API. Evidence includes the advisory consumption procedure and a documented response to a real security advisory."
+    },
+    {
+      "control_id": "SI.L2-3.14.6",
+      "narrative": "The organization monitors inbound and outbound communications for attacks and indicators of potential attacks using Microsoft Defender for Office 365 and/or Exchange Online Protection. Anti-phish policies detect impersonation and spoofing attempts. Malware filter policies block malicious attachments. Content filter policies quarantine spam and high-confidence phishing. Evidence includes anti-phish, malware filter, and content filter policy configurations, plus a threat report demonstrating active blocking of malicious communications."
+    },
+    {
+      "control_id": "SI.L2-3.14.7",
+      "narrative": "The organization identifies unauthorized use of the information system through Microsoft Sentinel analytics rules and/or Microsoft Defender XDR custom detections. Detection rules cover impossible travel sign-ins, mass file downloads, and external email forwarding rule creation. Security alerts are collected via the Graph Security API and stored as evidence. Evidence includes analytics rule configurations and a 30-day alert summary demonstrating active monitoring for unauthorized use patterns."
+    },
+    {
+      "control_id": "PS.L2-3.9.2",
+      "narrative": "The organization ensures that individuals accessing information systems containing CUI meet appropriate personnel security criteria. A documented Personnel Security Criteria Policy defines requirements for CUI access authorization, including background check completion, security awareness training, NDA execution, and role-based authorization by system owner. Access authorization records are maintained in the tenant evidence repository. Evidence includes the personnel security criteria policy and sample access authorization records demonstrating criteria verification."
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+controlId: "AU.L2-3.3.1"
+relatedControlIds:
+  - "AU.L2-3.3.2"
+  - "AC.L2-3.1.7"
+practiceStatement: Create and retain system audit logs and records to the extent needed to enable the monitoring, analysis,
+  investigation, and reporting of unlawful or unauthorized system activity.
+useCaseId: E-07
+useCaseTitle: "Privileged Action Audit"
+domain: Audit & Logging
+priority: P2 High
+trigger: 'SCHEDULE: Weekly'
+sodTier: Tier 1
+entraRolesRequired:
+- Security Reader
+- Reports Reader
+approvalRequired: false
+services:
+- name: Entra ID -- audit logs
+  purpose: role assignment, PIM activation, directory changes
+- name: Privileged Identity Management -- activation history, justification records
+  purpose: ''
+- name: Microsoft Sentinel -- SecurityAlert, AuditLogs tables
+  purpose: ''
+- name: Exchange Online -- admin audit log
+  purpose: ''
+- name: SharePoint Online -- admin activity log
+  purpose: via OfficeActivity table
+configurationSteps:
+  portalPath: //entra.microsoft.us > Identity Governance > Privileged Identity Management > Entra roles > Audit. Filter to
+    the past 7 days. Export the PIM audit log showing all activations, including the role activated, the user, the justification,
+    the start time, and the end time.
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes AuditLog.Read.All, Directory.Read.All, RoleManagement.Read.All
+  - cmdlet: Get-MgAuditLogDirectoryAudit
+    parameters:
+    - -MgAuditLogDirectoryAudit
+    - -Filter
+    - -All
+    - -Object
+    - -Csv
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/auditLogs/directoryAudits?$filter=activityDisplayName
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-e-audit/E-07/{year}/{month}/
+  format: CSV (PIM activations, role changes, correlation report), JSON (raw audit log export)
+  filenamePattern: E-07_PrivilegedActionAudit_{YYYYMMDD}_{HHmmss}_PIMCorrelation.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |-
+    - PIM audit logs are fully available in GCC High via both the Entra Admin Center and the Graph API at `graph.microsoft.us`. The audit log schema is identical to commercial.
+    - Exchange admin audit logs in GCC High flow through the OfficeActivity table in Sentinel when the Office 365 data connector is active. Verify the `ExchangeAdmin` record type is included.
+    - PIM activation justification text is stored in the `AdditionalDetails` field of the audit record. Ensure this field is included in evidence exports, as C3PAO assessors may ask to see justification for each privileged action.
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

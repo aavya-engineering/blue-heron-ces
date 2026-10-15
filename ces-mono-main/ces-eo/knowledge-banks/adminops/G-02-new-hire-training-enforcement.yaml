@@ -1,0 +1,92 @@
+controlId: "AT.L2-3.2.2"
+relatedControlIds:
+  - "AT.L2-3.2.1"
+  - "PS.L2-3.9.2"  # [VERIFY] mapping not yet confirmed
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: G-02
+useCaseTitle: "New Hire Training Enforcement"
+domain: Personnel Security
+priority: P2 High
+trigger: 'ONBOARDING: New user account created in Entra ID (detected via `createdDateTime`)'
+sodTier: Tier 2 (Config Manager)
+entraRolesRequired:
+- User Administrator
+- Compliance Administrator
+approvalRequired: false
+services:
+- name: Entra ID -- user directory, security groups, Conditional Access policies, `createdDateTime` attribute
+  purpose: ''
+- name: LMS
+  purpose: vendor-agnostic) -- enrollment API or manual enrollment notification
+- name: Power Automate or Azure Logic Apps -- new user detection and enrollment automation
+  purpose: ''
+- name: Microsoft Sentinel -- optional alerting on new user creation for audit trail
+  purpose: ''
+configurationSteps:
+  portalPath: //entra.microsoft.us) > Users > All users.
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes User.Read.All
+  - cmdlet: Get-MgUser
+    parameters:
+    - -MgUser
+    - -Filter
+    - -Property
+    - -All
+    - -noncompliant
+  - cmdlet: Get-MgGroup
+    parameters:
+    - -MgGroup
+    - -Filter
+    - -noncompliant
+    - -MgGroupMember
+    - -GroupId
+  - cmdlet: Get-MgGroupMember
+    parameters:
+    - -MgGroupMember
+    - -GroupId
+    - -All
+    - -notin
+    - -MgGroupMemberByRef
+  - cmdlet: New-MgGroupMemberByRef
+    parameters:
+    - -MgGroupMemberByRef
+    - -GroupId
+    - -BodyParameter
+    - -Csv
+    - -Path
+  - cmdlet: Remove-MgGroupMemberByRef
+    parameters:
+    - -MgGroupMemberByRef
+    - -GroupId
+    - -DirectoryObjectId
+    - -Object
+    - -in
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/users?$filter=createdDateTime
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-g-personnel/G-02/{year}/{month}/
+  format: CSV (new hire enrollment status), JSON (CA policy snapshot confirming group targeting)
+  filenamePattern: G-02_NewHireTraining_{YYYYMMDD}_{HHmmss}_{Context}.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://flow.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: All Entra ID features used here -- user filtering by `createdDateTime`, security group management, and Conditional
+    Access -- are fully available in GCC High. Power Automate flows that detect new user creation events should use the Entra
+    ID connector within the GCC High Power Automate environment (`https://flow.microsoft.us`). The `createdDateTime` property
+    is available on the User resource in Graph API for GCC High (`graph.microsoft.us`). There are no endpoint deviations beyond
+    the standard `.us` suffix for this use case.
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

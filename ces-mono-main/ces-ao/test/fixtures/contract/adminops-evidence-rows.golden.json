@@ -1,0 +1,422 @@
+{
+  "success": {
+    "evidence": {
+      "rawResponse": "{\"ok\":true,\"sample\":\"golden\"}",
+      "outcome": "automated_success",
+      "outcomeRationale": "Command completed successfully (exit code 0)",
+      "complianceVerdict": "SAT",
+      "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+      "metadata": {
+        "controlIds": [
+          "AC.L1-3.1.1"
+        ],
+        "timestamp": "2026-09-28T17:55:36.824Z",
+        "executorIdentity": "cse-ao-service",
+        "commandExecuted": "Test Command",
+        "sha256Hash": "c43efd2e94ba783b3d645a9df5d22a5c24b1e3de9990e5eb30b0cf7148ee7b75",
+        "environment": "GCC-High",
+        "dryRun": false,
+        "mode": "live"
+      }
+    },
+    "metadata": {
+      "contractVersion": "1.3.0",
+      "commandId": "GOLD-SUCCESS",
+      "tenantId": "golden-sim-tenant",
+      "tenantSlug": "golden-sim",
+      "tenantKind": "sim",
+      "mode": "live",
+      "dryRun": false,
+      "outcome": "executed",
+      "controlIds": [
+        "AC.L1-3.1.1"
+      ],
+      "correlationId": "golden-corr-gold-success",
+      "requestorUPN": "requestor@golden.onmicrosoft.us",
+      "targetUPN": "target@golden.onmicrosoft.us",
+      "timestamp": "2026-09-28T17:55:36.824Z",
+      "verdict": "SAT",
+      "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+      "sha256": "c43efd2e94ba783b3d645a9df5d22a5c24b1e3de9990e5eb30b0cf7148ee7b75"
+    },
+    "ces": {
+      "tenantId": "golden-sim-tenant"
+    }
+  },
+  "failure": {
+    "evidence": {
+      "rawResponse": "",
+      "outcome": "failed_no_remediation",
+      "outcomeRationale": "Command failed: permissions",
+      "failureDiagnostics": {
+        "rootCause": "permissions",
+        "failureCategory": "FATAL",
+        "remediationSteps": [
+          "Grant required Graph API permissions in Azure Portal",
+          "Assign necessary directory roles",
+          "Verify service principal certificate is valid and not expired"
+        ]
+      },
+      "complianceVerdict": "NOT_SAT",
+      "verdictRationale": "Outcome 'failed_no_remediation' indicates compliance requirement is not yet satisfied",
+      "metadata": {
+        "controlIds": [
+          "AC.L1-3.1.1"
+        ],
+        "timestamp": "2026-09-28T17:55:36.841Z",
+        "executorIdentity": "cse-ao-service",
+        "commandExecuted": "Test Command",
+        "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "environment": "GCC-High",
+        "dryRun": false,
+        "mode": "live"
+      }
+    },
+    "metadata": {
+      "contractVersion": "1.3.0",
+      "commandId": "GOLD-FAILURE",
+      "tenantId": "golden-sim-tenant",
+      "tenantSlug": "golden-sim",
+      "tenantKind": "sim",
+      "mode": "live",
+      "dryRun": false,
+      "outcome": "failed",
+      "controlIds": [
+        "AC.L1-3.1.1"
+      ],
+      "correlationId": "golden-corr-gold-failure",
+      "requestorUPN": "requestor@golden.onmicrosoft.us",
+      "timestamp": "2026-09-28T17:55:36.841Z",
+      "verdict": "NOT_SAT",
+      "verdictRationale": "Outcome 'failed_no_remediation' indicates compliance requirement is not yet satisfied",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ces": {
+      "tenantId": "golden-sim-tenant"
+    }
+  },
+  "denied_cmmc": {
+    "evidence": {
+      "rawResponse": "",
+      "outcome": "denied_cmmc",
+      "outcomeRationale": "Command denied by CMMC scope gate — enforcement evidence",
+      "complianceVerdict": "NOT_APPLICABLE",
+      "verdictRationale": "This outcome is not a compliance determination",
+      "metadata": {
+        "controlIds": [
+          "AC.L2-3.1.5"
+        ],
+        "timestamp": "2026-09-28T17:55:36.842Z",
+        "executorIdentity": "cse-ao-service",
+        "commandExecuted": "Test Command",
+        "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "environment": "GCC-High",
+        "dryRun": false,
+        "mode": "live",
+        "cmmcGate": {
+          "allow": false,
+          "reason": "Command GOLD-DENIED-CMMC requires CMMC L2 practices but tenant \"golden-sim\" is scoped to L1.",
+          "strict": true,
+          "tenantCmmcLevel": "L1",
+          "tenantKind": "sim"
+        }
+      }
+    },
+    "metadata": {
+      "contractVersion": "1.3.0",
+      "commandId": "GOLD-DENIED-CMMC",
+      "tenantId": "golden-sim-tenant",
+      "tenantSlug": "golden-sim",
+      "tenantKind": "sim",
+      "mode": "live",
+      "dryRun": false,
+      "outcome": "denied_cmmc",
+      "controlIds": [
+        "AC.L2-3.1.5"
+      ],
+      "correlationId": "golden-corr-gold-denied-cmmc",
+      "requestorUPN": "requestor@golden.onmicrosoft.us",
+      "timestamp": "2026-09-28T17:55:36.842Z",
+      "verdict": "NOT_APPLICABLE",
+      "verdictRationale": "This outcome is not a compliance determination",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ces": {
+      "tenantId": "golden-sim-tenant"
+    }
+  },
+  "denied_cui": {
+    "evidence": {
+      "rawResponse": "",
+      "outcome": "denied_cui",
+      "outcomeRationale": "Command denied by CUI boundary — enforcement evidence",
+      "complianceVerdict": "NOT_APPLICABLE",
+      "verdictRationale": "This outcome is not a compliance determination",
+      "metadata": {
+        "controlIds": [
+          "SC.L2-3.13.16"
+        ],
+        "timestamp": "2026-09-28T17:55:36.843Z",
+        "executorIdentity": "cse-ao-service",
+        "commandExecuted": "Test Command",
+        "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "environment": "GCC-High",
+        "dryRun": false,
+        "mode": "live",
+        "cmmcGate": {
+          "allow": false,
+          "reason": "Resource param source \"resources.storageAccountName\" (value \"sa-outside-boundary\") is outside tenant \"golden-sim\"'s cuiBoundary (no resourceAllowlist or tag match).",
+          "strict": true,
+          "tenantCmmcLevel": "L2",
+          "tenantKind": "sim",
+          "cuiBoundaryCase": "out-of-boundary"
+        }
+      }
+    },
+    "metadata": {
+      "contractVersion": "1.3.0",
+      "commandId": "GOLD-DENIED-CUI",
+      "tenantId": "golden-sim-tenant",
+      "tenantSlug": "golden-sim",
+      "tenantKind": "sim",
+      "mode": "live",
+      "dryRun": false,
+      "outcome": "denied_cui",
+      "controlIds": [
+        "SC.L2-3.13.16"
+      ],
+      "correlationId": "golden-corr-gold-denied-cui",
+      "requestorUPN": "requestor@golden.onmicrosoft.us",
+      "timestamp": "2026-09-28T17:55:36.843Z",
+      "verdict": "NOT_APPLICABLE",
+      "verdictRationale": "This outcome is not a compliance determination",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ces": {
+      "tenantId": "golden-sim-tenant"
+    }
+  },
+  "dry_run": {
+    "evidence": {
+      "rawResponse": "",
+      "outcome": "dry_run",
+      "outcomeRationale": "Dry-run preview — no state change, no compliance determination",
+      "complianceVerdict": "NOT_APPLICABLE",
+      "verdictRationale": "A dry-run preview is not a compliance determination",
+      "metadata": {
+        "controlIds": [
+          "AC.L1-3.1.1"
+        ],
+        "timestamp": "2026-09-28T17:55:36.844Z",
+        "executorIdentity": "cse-ao-service",
+        "commandExecuted": "Test Command",
+        "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "environment": "GCC-High",
+        "dryRun": true,
+        "mode": "dry_run",
+        "stateReadError": "dry run did not read: empty get_command"
+      }
+    },
+    "metadata": {
+      "contractVersion": "1.3.0",
+      "commandId": "GOLD-DRY-RUN",
+      "tenantId": "golden-sim-tenant",
+      "tenantSlug": "golden-sim",
+      "tenantKind": "sim",
+      "mode": "dry_run",
+      "dryRun": true,
+      "outcome": "dry_run",
+      "controlIds": [
+        "AC.L1-3.1.1"
+      ],
+      "correlationId": "golden-corr-gold-dry-run",
+      "requestorUPN": "requestor@golden.onmicrosoft.us",
+      "timestamp": "2026-09-28T17:55:36.844Z",
+      "verdict": "NOT_APPLICABLE",
+      "verdictRationale": "A dry-run preview is not a compliance determination",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ces": {
+      "tenantId": "golden-sim-tenant"
+    }
+  },
+  "dry_run+deny": {
+    "evidence": {
+      "rawResponse": "",
+      "outcome": "denied_cmmc",
+      "outcomeRationale": "Command denied by CMMC scope gate — enforcement evidence",
+      "complianceVerdict": "NOT_APPLICABLE",
+      "verdictRationale": "This outcome is not a compliance determination",
+      "metadata": {
+        "controlIds": [
+          "AC.L2-3.1.5"
+        ],
+        "timestamp": "2026-09-28T17:55:36.845Z",
+        "executorIdentity": "cse-ao-service",
+        "commandExecuted": "Test Command",
+        "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "environment": "GCC-High",
+        "dryRun": true,
+        "mode": "dry_run",
+        "cmmcGate": {
+          "allow": false,
+          "reason": "Command GOLD-DRY-RUN-DENY requires CMMC L2 practices but tenant \"golden-sim\" is scoped to L1.",
+          "strict": true,
+          "tenantCmmcLevel": "L1",
+          "tenantKind": "sim"
+        }
+      }
+    },
+    "metadata": {
+      "contractVersion": "1.3.0",
+      "commandId": "GOLD-DRY-RUN-DENY",
+      "tenantId": "golden-sim-tenant",
+      "tenantSlug": "golden-sim",
+      "tenantKind": "sim",
+      "mode": "dry_run",
+      "dryRun": true,
+      "outcome": "denied_cmmc",
+      "controlIds": [
+        "AC.L2-3.1.5"
+      ],
+      "correlationId": "golden-corr-gold-dry-run-deny",
+      "requestorUPN": "requestor@golden.onmicrosoft.us",
+      "timestamp": "2026-09-28T17:55:36.845Z",
+      "verdict": "NOT_APPLICABLE",
+      "verdictRationale": "This outcome is not a compliance determination",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ces": {
+      "tenantId": "golden-sim-tenant"
+    }
+  },
+  "pending": {
+    "evidence": {
+      "rawResponse": "",
+      "outcome": "blocked_pending_approval",
+      "outcomeRationale": "Command blocked — awaiting second-person approval",
+      "complianceVerdict": "NOT_APPLICABLE",
+      "verdictRationale": "This outcome is not a compliance determination",
+      "metadata": {
+        "controlIds": [
+          "AC.L1-3.1.1"
+        ],
+        "timestamp": "2026-09-28T17:55:36.846Z",
+        "executorIdentity": "cse-ao-service",
+        "commandExecuted": "Test Command",
+        "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "environment": "GCC-High",
+        "dryRun": false,
+        "mode": "live"
+      }
+    },
+    "metadata": {
+      "contractVersion": "1.3.0",
+      "commandId": "GOLD-PENDING",
+      "tenantId": "golden-sim-tenant",
+      "tenantSlug": "golden-sim",
+      "tenantKind": "sim",
+      "mode": "live",
+      "dryRun": false,
+      "outcome": "blocked_pending_approval",
+      "controlIds": [
+        "AC.L1-3.1.1"
+      ],
+      "correlationId": "golden-corr-gold-pending",
+      "requestorUPN": "requestor@golden.onmicrosoft.us",
+      "timestamp": "2026-09-28T17:55:36.846Z",
+      "verdict": "NOT_APPLICABLE",
+      "verdictRationale": "This outcome is not a compliance determination",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ces": {
+      "tenantId": "golden-sim-tenant"
+    }
+  },
+  "rejected": {
+    "evidence": {
+      "rawResponse": "",
+      "outcome": "approval_rejected",
+      "outcomeRationale": "Approval request rejected by approver@golden.onmicrosoft.us: Golden fixture rejection",
+      "complianceVerdict": "NOT_APPLICABLE",
+      "verdictRationale": "A rejected approval is not a compliance determination",
+      "metadata": {
+        "controlIds": [
+          "AC.L2-3.1.5"
+        ],
+        "timestamp": "2026-09-28T17:55:36.848Z",
+        "executorIdentity": "ces-ao-approval-store",
+        "commandExecuted": "GOLD-REJECTED",
+        "sha256Hash": "c3ac68a4f8b3639c737d950be5d5225cd774d24c073762a05b202a9c6e08f8ed",
+        "dryRun": false,
+        "mode": "live",
+        "approverTokenId": null
+      }
+    },
+    "metadata": {
+      "contractVersion": "1.3.0",
+      "commandId": "GOLD-REJECTED",
+      "tenantId": "golden-sim-tenant",
+      "mode": "live",
+      "dryRun": false,
+      "outcome": "approval_rejected",
+      "controlIds": [
+        "AC.L2-3.1.5"
+      ],
+      "requestorUPN": "requestor@golden.onmicrosoft.us",
+      "approverUPN": "approver@golden.onmicrosoft.us",
+      "targetUPN": "target@golden.onmicrosoft.us",
+      "approvalId": "72badd2f-0c8a-4979-b781-554c9ccd6a86",
+      "timestamp": "2026-09-28T17:55:36.848Z",
+      "verdict": "NOT_APPLICABLE",
+      "verdictRationale": "A rejected approval is not a compliance determination",
+      "sha256": "c3ac68a4f8b3639c737d950be5d5225cd774d24c073762a05b202a9c6e08f8ed"
+    },
+    "ces": {
+      "tenantId": "golden-sim-tenant"
+    }
+  },
+  "sim-only refusal": {
+    "evidence": {
+      "rawResponse": "",
+      "outcome": "denied_sim_only",
+      "outcomeRationale": "CES_AO_SIM_ONLY=1 refuses non-sim tenant (kind: 'live')",
+      "complianceVerdict": "NOT_APPLICABLE",
+      "verdictRationale": "This outcome is not a compliance determination",
+      "metadata": {
+        "controlIds": [
+          "AC.L1-3.1.1"
+        ],
+        "timestamp": "2026-09-28T17:55:36.849Z",
+        "executorIdentity": "cse-ao-service",
+        "commandExecuted": "Test Command",
+        "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "environment": "GCC-High",
+        "dryRun": false,
+        "mode": "live"
+      }
+    },
+    "metadata": {
+      "contractVersion": "1.3.0",
+      "commandId": "GOLD-SIM-ONLY-REFUSAL",
+      "tenantId": "golden-sim-tenant",
+      "tenantSlug": "golden-sim",
+      "tenantKind": "live",
+      "mode": "live",
+      "dryRun": false,
+      "outcome": "denied_sim_only",
+      "controlIds": [
+        "AC.L1-3.1.1"
+      ],
+      "correlationId": "golden-corr-gold-sim-only-refusal",
+      "requestorUPN": "requestor@golden.onmicrosoft.us",
+      "timestamp": "2026-09-28T17:55:36.849Z",
+      "verdict": "NOT_APPLICABLE",
+      "verdictRationale": "This outcome is not a compliance determination",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ces": {
+      "tenantId": "golden-sim-tenant"
+    }
+  }
+}

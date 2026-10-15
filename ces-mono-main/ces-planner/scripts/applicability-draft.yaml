@@ -1,0 +1,3141 @@
+# SPDX-FileCopyrightText: Blue Heron Defense LLC and its licensors. All rights reserved.
+# SPDX-License-Identifier: LicenseRef-BHD-Proprietary
+# CONFIDENTIAL - TRADE SECRET. Unpublished work. Provided solely to perform work for Blue Heron Defense LLC at its direction.
+# Any other use, copying, disclosure, or reuse, in whole or in part, is prohibited.
+# Changes made to this file for Blue Heron Defense LLC are made on its behalf; it claims all rights in them.
+# Submitting a change to this repository means you accept TERMS.md.
+# Removing or altering this notice is prohibited (17 U.S.C. 1202). Ref: BHD-CES-MONO-2026A
+# See LICENSE and TERMS.md.
+
+summary:
+  total_activities: 165
+  activities_with_proposed_rules: 122
+  activities_unchanged: 43
+  coverage_percent: 73.9%
+  rule_hit_counts:
+    PE_DOMAIN: 10
+    MP_PHYSICAL_MEDIA: 7
+    MA_ONSITE: 4
+    CUI_IN_NAME: 5
+    MOBILE_DEVICE: 3
+    WIRELESS: 2
+    L2_CUI_ASSUMPTION: 110
+    REMOTE_ACCESS: 4
+    AUDIT_BOOST: 9
+    CA_CERTIFICATION: 5
+    CRYPTO_TENANT: 2
+    PS_CUI: 4
+    IR_CERTIFICATION: 5
+    MULTI_ENCLAVE_BOOST: 2
+  si_baseline_fields_used:
+    - deployment_posture
+    - cui_presence
+    - byod_posture
+    - boundary_strategy
+    - evidence_posture_target
+    - assessment_route
+    - tenant_model_preference
+  filter_type_breakdown:
+    excludes: 118
+    boost_when: 27
+    requires_any: 0
+activities:
+  - id: RR-ACT-UNIV-BOUNDARY
+    name: Define assessment boundary and in-scope assets
+    applies_to_levels:
+      - L1
+      - L2
+      - L3
+    domain: null
+    practice_id: null
+    current_mapped_requirements:
+      - FOUNDATION
+    proposed_applicability:
+      boost_when:
+        - boundary_strategy:
+            - multiple_enclaves
+            - hybrid_boundary
+    matched_rules:
+      - rule_id: MULTI_ENCLAVE_BOOST
+        confidence: medium
+        reason: Scoping activity — more critical for multi-enclave and hybrid boundary scenarios
+    needs_sme_review: true
+  - id: RR-ACT-UNIV-DATAFLOW
+    name: Document CUI/FCI data flows and touchpoints
+    applies_to_levels:
+      - L1
+      - L2
+      - L3
+    domain: null
+    practice_id: null
+    current_mapped_requirements:
+      - FOUNDATION
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+      boost_when:
+        - boundary_strategy:
+            - multiple_enclaves
+            - hybrid_boundary
+    matched_rules:
+      - rule_id: CUI_IN_NAME
+        confidence: high
+        reason: Activity name references CUI — not applicable when no CUI is present
+      - rule_id: MULTI_ENCLAVE_BOOST
+        confidence: medium
+        reason: Scoping activity — more critical for multi-enclave and hybrid boundary scenarios
+    needs_sme_review: true
+  - id: RR-ACT-UNIV-SSP
+    name: Confirm SSP existence and currency
+    applies_to_levels:
+      - L1
+      - L2
+      - L3
+    domain: null
+    practice_id: null
+    current_mapped_requirements:
+      - FOUNDATION
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-AC_L1_3_1_1
+    name: AC.L1-3.1.1 — Authorized
+    applies_to_levels:
+      - L1
+      - L2
+      - L3
+    domain: AC
+    practice_id: 3.1.1
+    current_mapped_requirements:
+      - AC.L1-3.1.1
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-AC_L1_3_1_2
+    name: AC.L1-3.1.2 — Transaction & Function Control
+    applies_to_levels:
+      - L1
+      - L2
+      - L3
+    domain: AC
+    practice_id: 3.1.2
+    current_mapped_requirements:
+      - AC.L1-3.1.2
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-AC_L1_3_1_20
+    name: AC.L1-3.1.20 — External Connections
+    applies_to_levels:
+      - L1
+      - L2
+      - L3
+    domain: AC
+    practice_id: 3.1.20
+    current_mapped_requirements:
+      - AC.L1-3.1.20
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-AC_L1_3_1_22
+    name: AC.L1-3.1.22 — Control Public Information
+    applies_to_levels:
+      - L1
+      - L2
+      - L3
+    domain: AC
+    practice_id: 3.1.22
+    current_mapped_requirements:
+      - AC.L1-3.1.22
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-IA_L1_3_5_1
+    name: IA.L1-3.5.1 — IA Practice IA.L1-3.5.1
+    applies_to_levels:
+      - L1
+      - L2
+      - L3
+    domain: IA
+    practice_id: 3.5.1
+    current_mapped_requirements:
+      - IA.L1-3.5.1
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-IA_L1_3_5_2
+    name: IA.L1-3.5.2 — Authentication
+    applies_to_levels:
+      - L1
+      - L2
+      - L3
+    domain: IA
+    practice_id: 3.5.2
+    current_mapped_requirements:
+      - IA.L1-3.5.2
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-MP_L1_3_8_3
+    name: MP.L1-3.8.3 — Media Disposal
+    applies_to_levels:
+      - L1
+      - L2
+      - L3
+    domain: MP
+    practice_id: 3.8.3
+    current_mapped_requirements:
+      - MP.L1-3.8.3
+    proposed_applicability:
+      excludes:
+        - deployment_posture:
+            - cloud_only
+    matched_rules:
+      - rule_id: MP_PHYSICAL_MEDIA
+        confidence: medium
+        reason: MP practice 3.8.3 covers physical media handling — not applicable to cloud-only deployments
+    needs_sme_review: true
+  - id: RR-ACT-PE_L1_3_10_1
+    name: PE.L1-3.10.1 — Limit Physical Access
+    applies_to_levels:
+      - L1
+      - L2
+      - L3
+    domain: PE
+    practice_id: 3.10.1
+    current_mapped_requirements:
+      - PE.L1-3.10.1
+    proposed_applicability:
+      excludes:
+        - deployment_posture:
+            - cloud_only
+    matched_rules:
+      - rule_id: PE_DOMAIN
+        confidence: high
+        reason: PE domain (Physical & Environmental Protection) requires on-prem or hybrid infrastructure
+    needs_sme_review: true
+  - id: RR-ACT-PE_L1_3_10_3
+    name: PE.L1-3.10.3 — Escort Visitors
+    applies_to_levels:
+      - L1
+      - L2
+      - L3
+    domain: PE
+    practice_id: 3.10.3
+    current_mapped_requirements:
+      - PE.L1-3.10.3
+    proposed_applicability:
+      excludes:
+        - deployment_posture:
+            - cloud_only
+    matched_rules:
+      - rule_id: PE_DOMAIN
+        confidence: high
+        reason: PE domain (Physical & Environmental Protection) requires on-prem or hybrid infrastructure
+    needs_sme_review: true
+  - id: RR-ACT-PE_L1_3_10_4
+    name: PE.L1-3.10.4 — Physical Access Logs
+    applies_to_levels:
+      - L1
+      - L2
+      - L3
+    domain: PE
+    practice_id: 3.10.4
+    current_mapped_requirements:
+      - PE.L1-3.10.4
+    proposed_applicability:
+      excludes:
+        - deployment_posture:
+            - cloud_only
+    matched_rules:
+      - rule_id: PE_DOMAIN
+        confidence: high
+        reason: PE domain (Physical & Environmental Protection) requires on-prem or hybrid infrastructure
+    needs_sme_review: true
+  - id: RR-ACT-PE_L1_3_10_5
+    name: PE.L1-3.10.5 — Manage Physical Access
+    applies_to_levels:
+      - L1
+      - L2
+      - L3
+    domain: PE
+    practice_id: 3.10.5
+    current_mapped_requirements:
+      - PE.L1-3.10.5
+    proposed_applicability:
+      excludes:
+        - deployment_posture:
+            - cloud_only
+    matched_rules:
+      - rule_id: PE_DOMAIN
+        confidence: high
+        reason: PE domain (Physical & Environmental Protection) requires on-prem or hybrid infrastructure
+    needs_sme_review: true
+  - id: RR-ACT-SC_L1_3_13_1
+    name: SC.L1-3.13.1 — Boundary Protection
+    applies_to_levels:
+      - L1
+      - L2
+      - L3
+    domain: SC
+    practice_id: 3.13.1
+    current_mapped_requirements:
+      - SC.L1-3.13.1
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-SC_L1_3_13_5
+    name: SC.L1-3.13.5 — Public-Access System Separation
+    applies_to_levels:
+      - L1
+      - L2
+      - L3
+    domain: SC
+    practice_id: 3.13.5
+    current_mapped_requirements:
+      - SC.L1-3.13.5
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-SI_L1_3_14_1
+    name: SI.L1-3.14.1 — Flaw Remediation
+    applies_to_levels:
+      - L1
+      - L2
+      - L3
+    domain: SI
+    practice_id: 3.14.1
+    current_mapped_requirements:
+      - SI.L1-3.14.1
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-SI_L1_3_14_2
+    name: SI.L1-3.14.2 — Malicious Code Proection
+    applies_to_levels:
+      - L1
+      - L2
+      - L3
+    domain: SI
+    practice_id: 3.14.2
+    current_mapped_requirements:
+      - SI.L1-3.14.2
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-SI_L1_3_14_4
+    name: SI.L1-3.14.4 — Update Malicious Code Protection
+    applies_to_levels:
+      - L1
+      - L2
+      - L3
+    domain: SI
+    practice_id: 3.14.4
+    current_mapped_requirements:
+      - SI.L1-3.14.4
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-SI_L1_3_14_5
+    name: SI.L1-3.14.5 — System & File Scanning
+    applies_to_levels:
+      - L1
+      - L2
+      - L3
+    domain: SI
+    practice_id: 3.14.5
+    current_mapped_requirements:
+      - SI.L1-3.14.5
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-AC_L2_3_1_1
+    name: AC.L2-3.1.1 — Limit system access to Account Management User
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AC
+    practice_id: 3.1.1
+    current_mapped_requirements:
+      - AC.L2-3.1.1
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-AC_L2_3_1_2
+    name: AC.L2-3.1.2 — Limit system access to the privileged access
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AC
+    practice_id: 3.1.2
+    current_mapped_requirements:
+      - AC.L2-3.1.2
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-AC_L2_3_1_3
+    name: AC.L2-3.1.3 — Control the flow of CUI in Information
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AC
+    practice_id: 3.1.3
+    current_mapped_requirements:
+      - AC.L2-3.1.3
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: CUI_IN_NAME
+        confidence: high
+        reason: Activity name references CUI — not applicable when no CUI is present
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-AC_L2_3_1_4
+    name: AC.L2-3.1.4 — Separate the duties of Separation of Duties
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AC
+    practice_id: 3.1.4
+    current_mapped_requirements:
+      - AC.L2-3.1.4
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-AC_L2_3_1_5
+    name: AC.L2-3.1.5 — Employ the principle of least Least Privilege
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AC
+    practice_id: 3.1.5
+    current_mapped_requirements:
+      - AC.L2-3.1.5
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-AC_L2_3_1_6
+    name: AC.L2-3.1.6 — Use non-privileged accounts (2) Least Privilege No
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AC
+    practice_id: 3.1.6
+    current_mapped_requirements:
+      - AC.L2-3.1.6
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-AC_L2_3_1_7
+    name: AC.L2-3.1.7 — Prevent non-privileged users (9) Least Privilege No
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AC
+    practice_id: 3.1.7
+    current_mapped_requirements:
+      - AC.L2-3.1.7
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-AC_L2_3_1_8
+    name: AC.L2-3.1.8 — Limit unsuccessful logon Unsuccessful Logon Secure logon
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AC
+    practice_id: 3.1.8
+    current_mapped_requirements:
+      - AC.L2-3.1.8
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-AC_L2_3_1_9
+    name: AC.L2-3.1.9 — Provide privacy and security System Use Notification
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AC
+    practice_id: 3.1.9
+    current_mapped_requirements:
+      - AC.L2-3.1.9
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-AC_L2_3_1_10
+    name: AC.L2-3.1.10 — Use session lock with pattern- Session Lock
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AC
+    practice_id: 3.1.10
+    current_mapped_requirements:
+      - AC.L2-3.1.10
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-AC_L2_3_1_11
+    name: AC.L2-3.1.11 — Terminate (automatically) a Session Termination No direct
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AC
+    practice_id: 3.1.11
+    current_mapped_requirements:
+      - AC.L2-3.1.11
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-AC_L2_3_1_12
+    name: AC.L2-3.1.12 — Monitor and control remote (1) Remote Access
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AC
+    practice_id: 3.1.12
+    current_mapped_requirements:
+      - AC.L2-3.1.12
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+      boost_when:
+        - deployment_posture:
+            - cloud_only
+            - hybrid
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+      - rule_id: REMOTE_ACCESS
+        confidence: medium
+        reason: Remote access control — higher priority for cloud/hybrid where remote access is primary
+    needs_sme_review: true
+  - id: RR-ACT-AC_L2_3_1_13
+    name: AC.L2-3.1.13 — Employ cryptographic (2) Remote Access No direct
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AC
+    practice_id: 3.1.13
+    current_mapped_requirements:
+      - AC.L2-3.1.13
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+      boost_when:
+        - deployment_posture:
+            - cloud_only
+            - hybrid
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+      - rule_id: REMOTE_ACCESS
+        confidence: medium
+        reason: Remote access control — higher priority for cloud/hybrid where remote access is primary
+    needs_sme_review: true
+  - id: RR-ACT-AC_L2_3_1_14
+    name: AC.L2-3.1.14 — Route remote access via (3) Remote Access
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AC
+    practice_id: 3.1.14
+    current_mapped_requirements:
+      - AC.L2-3.1.14
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+      boost_when:
+        - deployment_posture:
+            - cloud_only
+            - hybrid
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+      - rule_id: REMOTE_ACCESS
+        confidence: medium
+        reason: Remote access control — higher priority for cloud/hybrid where remote access is primary
+    needs_sme_review: true
+  - id: RR-ACT-AC_L2_3_1_15
+    name: AC.L2-3.1.15 — Authorize remote execution (4) Remote Access No
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AC
+    practice_id: 3.1.15
+    current_mapped_requirements:
+      - AC.L2-3.1.15
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+      boost_when:
+        - deployment_posture:
+            - cloud_only
+            - hybrid
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+      - rule_id: REMOTE_ACCESS
+        confidence: medium
+        reason: Remote access control — higher priority for cloud/hybrid where remote access is primary
+    needs_sme_review: true
+  - id: RR-ACT-AC_L2_3_1_16
+    name: AC.L2-3.1.16 — Authorize wireless access Wireless Access Mobile device
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AC
+    practice_id: 3.1.16
+    current_mapped_requirements:
+      - AC.L2-3.1.16
+    proposed_applicability:
+      excludes:
+        - byod_posture:
+            - not_allowed
+        - deployment_posture:
+            - cloud_only
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: MOBILE_DEVICE
+        confidence: high
+        reason: Mobile device control — not applicable when BYOD is not allowed
+      - rule_id: WIRELESS
+        confidence: medium
+        reason: Wireless access control — not applicable to cloud-only deployments
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-AC_L2_3_1_17
+    name: AC.L2-3.1.17 — Protect wireless access using (1) Wireless Access
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AC
+    practice_id: 3.1.17
+    current_mapped_requirements:
+      - AC.L2-3.1.17
+    proposed_applicability:
+      excludes:
+        - deployment_posture:
+            - cloud_only
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: WIRELESS
+        confidence: medium
+        reason: Wireless access control — not applicable to cloud-only deployments
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-AC_L2_3_1_18
+    name: AC.L2-3.1.18 — Control connection of mobile Access Control for
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AC
+    practice_id: 3.1.18
+    current_mapped_requirements:
+      - AC.L2-3.1.18
+    proposed_applicability:
+      excludes:
+        - byod_posture:
+            - not_allowed
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: MOBILE_DEVICE
+        confidence: high
+        reason: Mobile device control — not applicable when BYOD is not allowed
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-AC_L2_3_1_19
+    name: AC.L2-3.1.19 — Encrypt CUI on mobile (5) Access Control
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AC
+    practice_id: 3.1.19
+    current_mapped_requirements:
+      - AC.L2-3.1.19
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+        - byod_posture:
+            - not_allowed
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: CUI_IN_NAME
+        confidence: high
+        reason: Activity name references CUI — not applicable when no CUI is present
+      - rule_id: MOBILE_DEVICE
+        confidence: high
+        reason: Mobile device control — not applicable when BYOD is not allowed
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-AC_L2_3_1_20
+    name: AC.L2-3.1.20 — Verify and control/limit Use of External Systems
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AC
+    practice_id: 3.1.20
+    current_mapped_requirements:
+      - AC.L2-3.1.20
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-AC_L2_3_1_21
+    name: AC.L2-3.1.21 — Limit use of portable storage (2) Use
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AC
+    practice_id: 3.1.21
+    current_mapped_requirements:
+      - AC.L2-3.1.21
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-AC_L2_3_1_22
+    name: AC.L2-3.1.22 — Control CUI posted or Publicly Accessible No
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AC
+    practice_id: 3.1.22
+    current_mapped_requirements:
+      - AC.L2-3.1.22
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: CUI_IN_NAME
+        confidence: high
+        reason: Activity name references CUI — not applicable when no CUI is present
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-AT_L2_3_2_1
+    name: AT.L2-3.2.1 — Ensure that managers, Security Awareness Information security
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AT
+    practice_id: 3.2.1
+    current_mapped_requirements:
+      - AT.L2-3.2.1
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-AT_L2_3_2_2
+    name: AT.L2-3.2.2 — Ensure that personnel are training trained to
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AT
+    practice_id: 3.2.2
+    current_mapped_requirements:
+      - AT.L2-3.2.2
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-AT_L2_3_2_3
+    name: AT.L2-3.2.3 — Provide security awareness (2) Security Awareness No
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AT
+    practice_id: 3.2.3
+    current_mapped_requirements:
+      - AT.L2-3.2.3
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-AU_L2_3_3_1
+    name: AU.L2-3.3.1 — Create and retain system Event Logging No
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AU
+    practice_id: 3.3.1
+    current_mapped_requirements:
+      - AU.L2-3.3.1
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+      boost_when:
+        - evidence_posture_target:
+            - c3pao_ready
+            - continuous_compliance
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+      - rule_id: AUDIT_BOOST
+        confidence: medium
+        reason: Audit/logging practice — higher priority when evidence rigor target is C3PAO-ready or continuous
+    needs_sme_review: true
+  - id: RR-ACT-AU_L2_3_3_2
+    name: AU.L2-3.3.2 — Ensure that the actions of Information individual
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AU
+    practice_id: 3.3.2
+    current_mapped_requirements:
+      - AU.L2-3.3.2
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+      boost_when:
+        - evidence_posture_target:
+            - c3pao_ready
+            - continuous_compliance
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+      - rule_id: AUDIT_BOOST
+        confidence: medium
+        reason: Audit/logging practice — higher priority when evidence rigor target is C3PAO-ready or continuous
+    needs_sme_review: true
+  - id: RR-ACT-AU_L2_3_3_3
+    name: AU.L2-3.3.3 — Review and update logged (3) Event Logging
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AU
+    practice_id: 3.3.3
+    current_mapped_requirements:
+      - AU.L2-3.3.3
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+      boost_when:
+        - evidence_posture_target:
+            - c3pao_ready
+            - continuous_compliance
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+      - rule_id: AUDIT_BOOST
+        confidence: medium
+        reason: Audit/logging practice — higher priority when evidence rigor target is C3PAO-ready or continuous
+    needs_sme_review: true
+  - id: RR-ACT-AU_L2_3_3_4
+    name: AU.L2-3.3.4 — Alert in the event of an Response
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AU
+    practice_id: 3.3.4
+    current_mapped_requirements:
+      - AU.L2-3.3.4
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+      boost_when:
+        - evidence_posture_target:
+            - c3pao_ready
+            - continuous_compliance
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+      - rule_id: AUDIT_BOOST
+        confidence: medium
+        reason: Audit/logging practice — higher priority when evidence rigor target is C3PAO-ready or continuous
+    needs_sme_review: true
+  - id: RR-ACT-AU_L2_3_3_5
+    name: AU.L2-3.3.5 — Correlate audit record (3) Audit Record Review,
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AU
+    practice_id: 3.3.5
+    current_mapped_requirements:
+      - AU.L2-3.3.5
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+      boost_when:
+        - evidence_posture_target:
+            - c3pao_ready
+            - continuous_compliance
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+      - rule_id: AUDIT_BOOST
+        confidence: medium
+        reason: Audit/logging practice — higher priority when evidence rigor target is C3PAO-ready or continuous
+    needs_sme_review: true
+  - id: RR-ACT-AU_L2_3_3_6
+    name: AU.L2-3.3.6 — Provide audit record Audit Record Reduction No
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AU
+    practice_id: 3.3.6
+    current_mapped_requirements:
+      - AU.L2-3.3.6
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+      boost_when:
+        - evidence_posture_target:
+            - c3pao_ready
+            - continuous_compliance
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+      - rule_id: AUDIT_BOOST
+        confidence: medium
+        reason: Audit/logging practice — higher priority when evidence rigor target is C3PAO-ready or continuous
+    needs_sme_review: true
+  - id: RR-ACT-AU_L2_3_3_7
+    name: AU.L2-3.3.7 — Provide a system capability Time Stamps Clock
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AU
+    practice_id: 3.3.7
+    current_mapped_requirements:
+      - AU.L2-3.3.7
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+      boost_when:
+        - evidence_posture_target:
+            - c3pao_ready
+            - continuous_compliance
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+      - rule_id: AUDIT_BOOST
+        confidence: medium
+        reason: Audit/logging practice — higher priority when evidence rigor target is C3PAO-ready or continuous
+    needs_sme_review: true
+  - id: RR-ACT-AU_L2_3_3_8
+    name: AU.L2-3.3.8 — Protect audit information Protection of Audit Protection
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AU
+    practice_id: 3.3.8
+    current_mapped_requirements:
+      - AU.L2-3.3.8
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+      boost_when:
+        - evidence_posture_target:
+            - c3pao_ready
+            - continuous_compliance
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+      - rule_id: AUDIT_BOOST
+        confidence: medium
+        reason: Audit/logging practice — higher priority when evidence rigor target is C3PAO-ready or continuous
+    needs_sme_review: true
+  - id: RR-ACT-AU_L2_3_3_9
+    name: AU.L2-3.3.9 — Limit management of audit (4) Protection of
+    applies_to_levels:
+      - L2
+      - L3
+    domain: AU
+    practice_id: 3.3.9
+    current_mapped_requirements:
+      - AU.L2-3.3.9
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+      boost_when:
+        - evidence_posture_target:
+            - c3pao_ready
+            - continuous_compliance
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+      - rule_id: AUDIT_BOOST
+        confidence: medium
+        reason: Audit/logging practice — higher priority when evidence rigor target is C3PAO-ready or continuous
+    needs_sme_review: true
+  - id: RR-ACT-CM_L2_3_4_1
+    name: CM.L2-3.4.1 — Establish and maintain Baseline Configuration No direct
+    applies_to_levels:
+      - L2
+      - L3
+    domain: CM
+    practice_id: 3.4.1
+    current_mapped_requirements:
+      - CM.L2-3.4.1
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-CM_L2_3_4_2
+    name: CM.L2-3.4.2 — Establish and enforce security configuration settings for
+    applies_to_levels:
+      - L2
+      - L3
+    domain: CM
+    practice_id: 3.4.2
+    current_mapped_requirements:
+      - CM.L2-3.4.2
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-CM_L2_3_4_3
+    name: CM.L2-3.4.3 — Track, review, approve or Configuration Change Change
+    applies_to_levels:
+      - L2
+      - L3
+    domain: CM
+    practice_id: 3.4.3
+    current_mapped_requirements:
+      - CM.L2-3.4.3
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-CM_L2_3_4_4
+    name: CM.L2-3.4.4 — Analyze the security impact Security Impact Technical
+    applies_to_levels:
+      - L2
+      - L3
+    domain: CM
+    practice_id: 3.4.4
+    current_mapped_requirements:
+      - CM.L2-3.4.4
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-CM_L2_3_4_5
+    name: CM.L2-3.4.5 — Define, document, approve, Access Restrictions for Management
+    applies_to_levels:
+      - L2
+      - L3
+    domain: CM
+    practice_id: 3.4.5
+    current_mapped_requirements:
+      - CM.L2-3.4.5
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-CM_L2_3_4_6
+    name: CM.L2-3.4.6 — Employ the principle of least Least Functionality
+    applies_to_levels:
+      - L2
+      - L3
+    domain: CM
+    practice_id: 3.4.6
+    current_mapped_requirements:
+      - CM.L2-3.4.6
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-CM_L2_3_4_7
+    name: CM.L2-3.4.7 — Restrict, disable, or prevent (1) Least Functionality
+    applies_to_levels:
+      - L2
+      - L3
+    domain: CM
+    practice_id: 3.4.7
+    current_mapped_requirements:
+      - CM.L2-3.4.7
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-CM_L2_3_4_8
+    name: CM.L2-3.4.8 — Apply deny-by-exception (4) Least Functionality No direct
+    applies_to_levels:
+      - L2
+      - L3
+    domain: CM
+    practice_id: 3.4.8
+    current_mapped_requirements:
+      - CM.L2-3.4.8
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-CM_L2_3_4_9
+    name: CM.L2-3.4.9 — Control and monitor user- User-Installed Software Installation
+    applies_to_levels:
+      - L2
+      - L3
+    domain: CM
+    practice_id: 3.4.9
+    current_mapped_requirements:
+      - CM.L2-3.4.9
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-IA_L2_3_5_1
+    name: IA.L2-3.5.1 — Identify system users, Identification and User registration
+    applies_to_levels:
+      - L2
+      - L3
+    domain: IA
+    practice_id: 3.5.1
+    current_mapped_requirements:
+      - IA.L2-3.5.1
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-IA_L2_3_5_2
+    name: IA.L2-3.5.2 — Authenticate (or verify) the Device Identification and
+    applies_to_levels:
+      - L2
+      - L3
+    domain: IA
+    practice_id: 3.5.2
+    current_mapped_requirements:
+      - IA.L2-3.5.2
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-IA_L2_3_5_3
+    name: IA.L2-3.5.3 — Use multifactor (1) Identification and No direct
+    applies_to_levels:
+      - L2
+      - L3
+    domain: IA
+    practice_id: 3.5.3
+    current_mapped_requirements:
+      - IA.L2-3.5.3
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-IA_L2_3_5_4
+    name: IA.L2-3.5.4 — Employ replay-resistant (8) Identification and No direct
+    applies_to_levels:
+      - L2
+      - L3
+    domain: IA
+    practice_id: 3.5.4
+    current_mapped_requirements:
+      - IA.L2-3.5.4
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-IA_L2_3_5_5
+    name: IA.L2-3.5.5 — Prevent reuse of identifiers Identifier Management User
+    applies_to_levels:
+      - L2
+      - L3
+    domain: IA
+    practice_id: 3.5.5
+    current_mapped_requirements:
+      - IA.L2-3.5.5
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-IA_L2_3_5_6
+    name: IA.L2-3.5.6 — Disable identifiers after a Identifier Management User
+    applies_to_levels:
+      - L2
+      - L3
+    domain: IA
+    practice_id: 3.5.6
+    current_mapped_requirements:
+      - IA.L2-3.5.6
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-IA_L2_3_5_7
+    name: IA.L2-3.5.7 — Enforce a minimum password (1) Authenticator No
+    applies_to_levels:
+      - L2
+      - L3
+    domain: IA
+    practice_id: 3.5.7
+    current_mapped_requirements:
+      - IA.L2-3.5.7
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-IA_L2_3_5_8
+    name: IA.L2-3.5.8 — Prohibit password reuse for a specified number
+    applies_to_levels:
+      - L2
+      - L3
+    domain: IA
+    practice_id: 3.5.8
+    current_mapped_requirements:
+      - IA.L2-3.5.8
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-IA_L2_3_5_9
+    name: IA.L2-3.5.9 — Allow temporary password use for system logons
+    applies_to_levels:
+      - L2
+      - L3
+    domain: IA
+    practice_id: 3.5.9
+    current_mapped_requirements:
+      - IA.L2-3.5.9
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-IA_L2_3_5_10
+    name: IA.L2-3.5.10 — Store and transmit only cryptographically-protected passwords
+    applies_to_levels:
+      - L2
+      - L3
+    domain: IA
+    practice_id: 3.5.10
+    current_mapped_requirements:
+      - IA.L2-3.5.10
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-IA_L2_3_5_11
+    name: IA.L2-3.5.11 — Obscure feedback of Authenticator Feedback Secure logon
+    applies_to_levels:
+      - L2
+      - L3
+    domain: IA
+    practice_id: 3.5.11
+    current_mapped_requirements:
+      - IA.L2-3.5.11
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-IR_L2_3_6_1
+    name: IR.L2-3.6.1 — Establish an operational Incident Response * Information
+    applies_to_levels:
+      - L2
+      - L3
+    domain: IR
+    practice_id: 3.6.1
+    current_mapped_requirements:
+      - IR.L2-3.6.1
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+      boost_when:
+        - assessment_route:
+            - certification
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+      - rule_id: IR_CERTIFICATION
+        confidence: low
+        reason: IR practices gain scrutiny in C3PAO assessments — boost priority
+    needs_sme_review: true
+  - id: RR-ACT-IR_L2_3_6_2
+    name: IR.L2-3.6.2 — Track, document, and report events incidents to
+    applies_to_levels:
+      - L2
+      - L3
+    domain: IR
+    practice_id: 3.6.2
+    current_mapped_requirements:
+      - IR.L2-3.6.2
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+      boost_when:
+        - assessment_route:
+            - certification
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+      - rule_id: IR_CERTIFICATION
+        confidence: low
+        reason: IR practices gain scrutiny in C3PAO assessments — boost priority
+    needs_sme_review: true
+  - id: RR-ACT-IR_L2_3_6_3
+    name: IR.L2-3.6.3 — Test the organizational Incident Response No direct
+    applies_to_levels:
+      - L2
+      - L3
+    domain: IR
+    practice_id: 3.6.3
+    current_mapped_requirements:
+      - IR.L2-3.6.3
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+      boost_when:
+        - assessment_route:
+            - certification
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+      - rule_id: IR_CERTIFICATION
+        confidence: low
+        reason: IR practices gain scrutiny in C3PAO assessments — boost priority
+    needs_sme_review: true
+  - id: RR-ACT-MA_L2_3_7_1
+    name: MA.L2-3.7.1 — Perform maintenance on Controlled * Equipment organizational
+    applies_to_levels:
+      - L2
+      - L3
+    domain: MA
+    practice_id: 3.7.1
+    current_mapped_requirements:
+      - MA.L2-3.7.1
+    proposed_applicability:
+      excludes:
+        - deployment_posture:
+            - cloud_only
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: MA_ONSITE
+        confidence: medium
+        reason: MA practice 3.7.1 covers on-site maintenance — not applicable to cloud-only
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-MA_L2_3_7_2
+    name: MA.L2-3.7.2 — Provide controls on the * Removal of
+    applies_to_levels:
+      - L2
+      - L3
+    domain: MA
+    practice_id: 3.7.2
+    current_mapped_requirements:
+      - MA.L2-3.7.2
+    proposed_applicability:
+      excludes:
+        - deployment_posture:
+            - cloud_only
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: MA_ONSITE
+        confidence: medium
+        reason: MA practice 3.7.2 covers on-site maintenance — not applicable to cloud-only
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-MA_L2_3_7_3
+    name: MA.L2-3.7.3 — Ensure equipment removed Controlled * Equipment for
+    applies_to_levels:
+      - L2
+      - L3
+    domain: MA
+    practice_id: 3.7.3
+    current_mapped_requirements:
+      - MA.L2-3.7.3
+    proposed_applicability:
+      excludes:
+        - deployment_posture:
+            - cloud_only
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: MA_ONSITE
+        confidence: medium
+        reason: MA practice 3.7.3 covers on-site maintenance — not applicable to cloud-only
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-MA_L2_3_7_4
+    name: MA.L2-3.7.4 — Check media containing (2) Maintenance Tools No
+    applies_to_levels:
+      - L2
+      - L3
+    domain: MA
+    practice_id: 3.7.4
+    current_mapped_requirements:
+      - MA.L2-3.7.4
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-MA_L2_3_7_5
+    name: MA.L2-3.7.5 — Require multifactor Nonlocal Maintenance No direct mapping
+    applies_to_levels:
+      - L2
+      - L3
+    domain: MA
+    practice_id: 3.7.5
+    current_mapped_requirements:
+      - MA.L2-3.7.5
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-MA_L2_3_7_6
+    name: MA.L2-3.7.6 — Supervise the maintenance Maintenance Personnel No direct
+    applies_to_levels:
+      - L2
+      - L3
+    domain: MA
+    practice_id: 3.7.6
+    current_mapped_requirements:
+      - MA.L2-3.7.6
+    proposed_applicability:
+      excludes:
+        - deployment_posture:
+            - cloud_only
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: MA_ONSITE
+        confidence: medium
+        reason: MA practice 3.7.6 covers on-site maintenance — not applicable to cloud-only
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-MP_L2_3_8_1
+    name: MP.L2-3.8.1 — Protect (ie, physically Media Access Handling of
+    applies_to_levels:
+      - L2
+      - L3
+    domain: MP
+    practice_id: 3.8.1
+    current_mapped_requirements:
+      - MP.L2-3.8.1
+    proposed_applicability:
+      excludes:
+        - deployment_posture:
+            - cloud_only
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: MP_PHYSICAL_MEDIA
+        confidence: medium
+        reason: MP practice 3.8.1 covers physical media handling — not applicable to cloud-only deployments
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-MP_L2_3_8_2
+    name: MP.L2-3.8.2 — Limit access to CUI on Media Storage
+    applies_to_levels:
+      - L2
+      - L3
+    domain: MP
+    practice_id: 3.8.2
+    current_mapped_requirements:
+      - MP.L2-3.8.2
+    proposed_applicability:
+      excludes:
+        - deployment_posture:
+            - cloud_only
+        - cui_presence:
+            - no_cui
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: MP_PHYSICAL_MEDIA
+        confidence: medium
+        reason: MP practice 3.8.2 covers physical media handling — not applicable to cloud-only deployments
+      - rule_id: CUI_IN_NAME
+        confidence: high
+        reason: Activity name references CUI — not applicable when no CUI is present
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-MP_L2_3_8_3
+    name: MP.L2-3.8.3 — Sanitize or destroy Clear desk and clear
+    applies_to_levels:
+      - L2
+      - L3
+    domain: MP
+    practice_id: 3.8.3
+    current_mapped_requirements:
+      - MP.L2-3.8.3
+    proposed_applicability:
+      excludes:
+        - deployment_posture:
+            - cloud_only
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: MP_PHYSICAL_MEDIA
+        confidence: medium
+        reason: MP practice 3.8.3 covers physical media handling — not applicable to cloud-only deployments
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-MP_L2_3_8_4
+    name: MP.L2-3.8.4 — Mark media with Media Marking Labelling of
+    applies_to_levels:
+      - L2
+      - L3
+    domain: MP
+    practice_id: 3.8.4
+    current_mapped_requirements:
+      - MP.L2-3.8.4
+    proposed_applicability:
+      excludes:
+        - deployment_posture:
+            - cloud_only
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: MP_PHYSICAL_MEDIA
+        confidence: medium
+        reason: MP practice 3.8.4 covers physical media handling — not applicable to cloud-only deployments
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-MP_L2_3_8_5
+    name: MP.L2-3.8.5 — Control access to media Media Transport Handling
+    applies_to_levels:
+      - L2
+      - L3
+    domain: MP
+    practice_id: 3.8.5
+    current_mapped_requirements:
+      - MP.L2-3.8.5
+    proposed_applicability:
+      excludes:
+        - deployment_posture:
+            - cloud_only
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: MP_PHYSICAL_MEDIA
+        confidence: medium
+        reason: MP practice 3.8.5 covers physical media handling — not applicable to cloud-only deployments
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-MP_L2_3_8_6
+    name: MP.L2-3.8.6 — Implement cryptographic (4) Media Transport No direct
+    applies_to_levels:
+      - L2
+      - L3
+    domain: MP
+    practice_id: 3.8.6
+    current_mapped_requirements:
+      - MP.L2-3.8.6
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-MP_L2_3_8_7
+    name: MP.L2-3.8.7 — Control the use of Media Use Handling
+    applies_to_levels:
+      - L2
+      - L3
+    domain: MP
+    practice_id: 3.8.7
+    current_mapped_requirements:
+      - MP.L2-3.8.7
+    proposed_applicability:
+      excludes:
+        - deployment_posture:
+            - cloud_only
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: MP_PHYSICAL_MEDIA
+        confidence: medium
+        reason: MP practice 3.8.7 covers physical media handling — not applicable to cloud-only deployments
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-MP_L2_3_8_8
+    name: MP.L2-3.8.8 — Prohibit the use of (1) Media Use
+    applies_to_levels:
+      - L2
+      - L3
+    domain: MP
+    practice_id: 3.8.8
+    current_mapped_requirements:
+      - MP.L2-3.8.8
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-MP_L2_3_8_9
+    name: MP.L2-3.8.9 — Protect the System Backup Information backup confidentiality
+    applies_to_levels:
+      - L2
+      - L3
+    domain: MP
+    practice_id: 3.8.9
+    current_mapped_requirements:
+      - MP.L2-3.8.9
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-PS_L2_3_9_1
+    name: PS.L2-3.9.1 — Screen individuals prior to Personnel Screening Screening
+    applies_to_levels:
+      - L2
+      - L3
+    domain: PS
+    practice_id: 3.9.1
+    current_mapped_requirements:
+      - PS.L2-3.9.1
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+        - cui_presence:
+            - no_cui
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+      - rule_id: PS_CUI
+        confidence: medium
+        reason: Personnel security practice for CUI environments — not applicable when no CUI
+    needs_sme_review: true
+  - id: RR-ACT-PS_L2_3_9_2
+    name: PS.L2-3.9.2 — Ensure that organizational Return of assets systems
+    applies_to_levels:
+      - L2
+      - L3
+    domain: PS
+    practice_id: 3.9.2
+    current_mapped_requirements:
+      - PS.L2-3.9.2
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+        - cui_presence:
+            - no_cui
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+      - rule_id: PS_CUI
+        confidence: medium
+        reason: Personnel security practice for CUI environments — not applicable when no CUI
+    needs_sme_review: true
+  - id: RR-ACT-PE_L2_3_10_1
+    name: PE.L2-3.10.1 — Limit physical access to Physical Access *
+    applies_to_levels:
+      - L2
+      - L3
+    domain: PE
+    practice_id: 3.10.1
+    current_mapped_requirements:
+      - PE.L2-3.10.1
+    proposed_applicability:
+      excludes:
+        - deployment_posture:
+            - cloud_only
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: PE_DOMAIN
+        confidence: high
+        reason: PE domain (Physical & Environmental Protection) requires on-prem or hybrid infrastructure
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-PE_L2_3_10_2
+    name: PE.L2-3.10.2 — Protect and monitor the rooms, and facilities
+    applies_to_levels:
+      - L2
+      - L3
+    domain: PE
+    practice_id: 3.10.2
+    current_mapped_requirements:
+      - PE.L2-3.10.2
+    proposed_applicability:
+      excludes:
+        - deployment_posture:
+            - cloud_only
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: PE_DOMAIN
+        confidence: high
+        reason: PE domain (Physical & Environmental Protection) requires on-prem or hybrid infrastructure
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-PE_L2_3_10_3
+    name: PE.L2-3.10.3 — Escort visitors and monitor Physical Access Control
+    applies_to_levels:
+      - L2
+      - L3
+    domain: PE
+    practice_id: 3.10.3
+    current_mapped_requirements:
+      - PE.L2-3.10.3
+    proposed_applicability:
+      excludes:
+        - deployment_posture:
+            - cloud_only
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: PE_DOMAIN
+        confidence: high
+        reason: PE domain (Physical & Environmental Protection) requires on-prem or hybrid infrastructure
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-PE_L2_3_10_4
+    name: PE.L2-3.10.4 — Maintain audit logs of Securing offices, physical
+    applies_to_levels:
+      - L2
+      - L3
+    domain: PE
+    practice_id: 3.10.4
+    current_mapped_requirements:
+      - PE.L2-3.10.4
+    proposed_applicability:
+      excludes:
+        - deployment_posture:
+            - cloud_only
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: PE_DOMAIN
+        confidence: high
+        reason: PE domain (Physical & Environmental Protection) requires on-prem or hybrid infrastructure
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-PE_L2_3_10_5
+    name: PE.L2-3.10.5 — Control and manage physical access devices
+    applies_to_levels:
+      - L2
+      - L3
+    domain: PE
+    practice_id: 3.10.5
+    current_mapped_requirements:
+      - PE.L2-3.10.5
+    proposed_applicability:
+      excludes:
+        - deployment_posture:
+            - cloud_only
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: PE_DOMAIN
+        confidence: high
+        reason: PE domain (Physical & Environmental Protection) requires on-prem or hybrid infrastructure
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-PE_L2_3_10_6
+    name: PE.L2-3.10.6 — Enforce safeguarding Alternate Work Site Teleworking measures
+    applies_to_levels:
+      - L2
+      - L3
+    domain: PE
+    practice_id: 3.10.6
+    current_mapped_requirements:
+      - PE.L2-3.10.6
+    proposed_applicability:
+      excludes:
+        - deployment_posture:
+            - cloud_only
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: PE_DOMAIN
+        confidence: high
+        reason: PE domain (Physical & Environmental Protection) requires on-prem or hybrid infrastructure
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-RA_L2_3_11_1
+    name: RA.L2-3.11.1 — Periodically assess the risk Risk Assessment *
+    applies_to_levels:
+      - L2
+      - L3
+    domain: RA
+    practice_id: 3.11.1
+    current_mapped_requirements:
+      - RA.L2-3.11.1
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-RA_L2_3_11_2
+    name: RA.L2-3.11.2 — Scan for vulnerabilities in Vulnerability Scanning *
+    applies_to_levels:
+      - L2
+      - L3
+    domain: RA
+    practice_id: 3.11.2
+    current_mapped_requirements:
+      - RA.L2-3.11.2
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-RA_L2_3_11_3
+    name: RA.L2-3.11.3 — Remediate vulnerabilities in Vulnerability Scanning * Management
+    applies_to_levels:
+      - L2
+      - L3
+    domain: RA
+    practice_id: 3.11.3
+    current_mapped_requirements:
+      - RA.L2-3.11.3
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-CA_L2_3_12_1
+    name: CA.L2-3.12.1 — Periodically assess the Security Assessments System security
+    applies_to_levels:
+      - L2
+      - L3
+    domain: CA
+    practice_id: 3.12.1
+    current_mapped_requirements:
+      - CA.L2-3.12.1
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+      boost_when:
+        - assessment_route:
+            - certification
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+      - rule_id: CA_CERTIFICATION
+        confidence: medium
+        reason: Security assessment practice — higher priority when targeting external certification
+    needs_sme_review: true
+  - id: RR-ACT-CA_L2_3_12_2
+    name: CA.L2-3.12.2 — Develop and implement Plan of Action and
+    applies_to_levels:
+      - L2
+      - L3
+    domain: CA
+    practice_id: 3.12.2
+    current_mapped_requirements:
+      - CA.L2-3.12.2
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+      boost_when:
+        - assessment_route:
+            - certification
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+      - rule_id: CA_CERTIFICATION
+        confidence: medium
+        reason: Security assessment practice — higher priority when targeting external certification
+    needs_sme_review: true
+  - id: RR-ACT-CA_L2_3_12_3
+    name: CA.L2-3.12.3 — Monitor security controls on an ongoing basis
+    applies_to_levels:
+      - L2
+      - L3
+    domain: CA
+    practice_id: 3.12.3
+    current_mapped_requirements:
+      - CA.L2-3.12.3
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+      boost_when:
+        - assessment_route:
+            - certification
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+      - rule_id: CA_CERTIFICATION
+        confidence: medium
+        reason: Security assessment practice — higher priority when targeting external certification
+    needs_sme_review: true
+  - id: RR-ACT-CA_L2_3_12_4
+    name: CA.L2-3.12.4 — Develop, document, and periodically update system security
+    applies_to_levels:
+      - L2
+      - L3
+    domain: CA
+    practice_id: 3.12.4
+    current_mapped_requirements:
+      - CA.L2-3.12.4
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+      boost_when:
+        - assessment_route:
+            - certification
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+      - rule_id: CA_CERTIFICATION
+        confidence: medium
+        reason: Security assessment practice — higher priority when targeting external certification
+    needs_sme_review: true
+  - id: RR-ACT-SC_L2_3_13_1
+    name: SC.L2-3.13.1 — Monitor, control, and protect Boundary Protection Network
+    applies_to_levels:
+      - L2
+      - L3
+    domain: SC
+    practice_id: 3.13.1
+    current_mapped_requirements:
+      - SC.L2-3.13.1
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-SC_L2_3_13_2
+    name: SC.L2-3.13.2 — Employ architectural designs, Security Engineering Secure system
+    applies_to_levels:
+      - L2
+      - L3
+    domain: SC
+    practice_id: 3.13.2
+    current_mapped_requirements:
+      - SC.L2-3.13.2
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-SC_L2_3_13_3
+    name: SC.L2-3.13.3 — Separate user functionality Application Partitioning No direct
+    applies_to_levels:
+      - L2
+      - L3
+    domain: SC
+    practice_id: 3.13.3
+    current_mapped_requirements:
+      - SC.L2-3.13.3
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-SC_L2_3_13_4
+    name: SC.L2-3.13.4 — Prevent unauthorized and Information in Shared No
+    applies_to_levels:
+      - L2
+      - L3
+    domain: SC
+    practice_id: 3.13.4
+    current_mapped_requirements:
+      - SC.L2-3.13.4
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-SC_L2_3_13_5
+    name: SC.L2-3.13.5 — Implement subnetworks for Boundary Protection Network controls
+    applies_to_levels:
+      - L2
+      - L3
+    domain: SC
+    practice_id: 3.13.5
+    current_mapped_requirements:
+      - SC.L2-3.13.5
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-SC_L2_3_13_6
+    name: SC.L2-3.13.6 — Deny network (5) Boundary Protection No direct
+    applies_to_levels:
+      - L2
+      - L3
+    domain: SC
+    practice_id: 3.13.6
+    current_mapped_requirements:
+      - SC.L2-3.13.6
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-SC_L2_3_13_7
+    name: SC.L2-3.13.7 — Prevent remote devices from (7) Boundary Protection
+    applies_to_levels:
+      - L2
+      - L3
+    domain: SC
+    practice_id: 3.13.7
+    current_mapped_requirements:
+      - SC.L2-3.13.7
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-SC_L2_3_13_8
+    name: SC.L2-3.13.8 — Implement cryptographic Transmission Handling of Assets mechanisms
+    applies_to_levels:
+      - L2
+      - L3
+    domain: SC
+    practice_id: 3.13.8
+    current_mapped_requirements:
+      - SC.L2-3.13.8
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-SC_L2_3_13_9
+    name: SC.L2-3.13.9 — Terminate network Network Disconnect Network controls connections
+    applies_to_levels:
+      - L2
+      - L3
+    domain: SC
+    practice_id: 3.13.9
+    current_mapped_requirements:
+      - SC.L2-3.13.9
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-SC_L2_3_13_10
+    name: SC.L2-3.13.10 — Establish and manage Cryptographic Key Key Management
+    applies_to_levels:
+      - L2
+      - L3
+    domain: SC
+    practice_id: 3.13.10
+    current_mapped_requirements:
+      - SC.L2-3.13.10
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+      boost_when:
+        - tenant_model_preference:
+            - gcc_high
+            - dod_il5
+            - dod_il6
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+      - rule_id: CRYPTO_TENANT
+        confidence: medium
+        reason: Cryptographic practice — higher priority for GCC-High/IL5+ where FIPS requirements are strict
+    needs_sme_review: true
+  - id: RR-ACT-SC_L2_3_13_11
+    name: SC.L2-3.13.11 — Employ FIPS-validated Cryptographic Policy on the use
+    applies_to_levels:
+      - L2
+      - L3
+    domain: SC
+    practice_id: 3.13.11
+    current_mapped_requirements:
+      - SC.L2-3.13.11
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+      boost_when:
+        - tenant_model_preference:
+            - gcc_high
+            - dod_il5
+            - dod_il6
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+      - rule_id: CRYPTO_TENANT
+        confidence: medium
+        reason: Cryptographic practice — higher priority for GCC-High/IL5+ where FIPS requirements are strict
+    needs_sme_review: true
+  - id: RR-ACT-SC_L2_3_13_12
+    name: SC.L2-3.13.12 — Prohibit remote activation of Collaborative * Information
+    applies_to_levels:
+      - L2
+      - L3
+    domain: SC
+    practice_id: 3.13.12
+    current_mapped_requirements:
+      - SC.L2-3.13.12
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-SC_L2_3_13_13
+    name: SC.L2-3.13.13 — Control and monitor the use Mobile Code
+    applies_to_levels:
+      - L2
+      - L3
+    domain: SC
+    practice_id: 3.13.13
+    current_mapped_requirements:
+      - SC.L2-3.13.13
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-SC_L2_3_13_14
+    name: SC.L2-3.13.14 — Control and monitor the use Voice over
+    applies_to_levels:
+      - L2
+      - L3
+    domain: SC
+    practice_id: 3.13.14
+    current_mapped_requirements:
+      - SC.L2-3.13.14
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-SC_L2_3_13_15
+    name: SC.L2-3.13.15 — Protect the authenticity of Session Authenticity No
+    applies_to_levels:
+      - L2
+      - L3
+    domain: SC
+    practice_id: 3.13.15
+    current_mapped_requirements:
+      - SC.L2-3.13.15
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-SC_L2_3_13_16
+    name: SC.L2-3.13.16 — Protect the confidentiality of Protection of *
+    applies_to_levels:
+      - L2
+      - L3
+    domain: SC
+    practice_id: 3.13.16
+    current_mapped_requirements:
+      - SC.L2-3.13.16
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-SI_L2_3_14_1
+    name: SI.L2-3.14.1 — Identify, report, and correct Flaw Remediation Management
+    applies_to_levels:
+      - L2
+      - L3
+    domain: SI
+    practice_id: 3.14.1
+    current_mapped_requirements:
+      - SI.L2-3.14.1
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-SI_L2_3_14_2
+    name: SI.L2-3.14.2 — Provide protection from procedures malicious code at
+    applies_to_levels:
+      - L2
+      - L3
+    domain: SI
+    practice_id: 3.14.2
+    current_mapped_requirements:
+      - SI.L2-3.14.2
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-SI_L2_3_14_3
+    name: SI.L2-3.14.3 — Monitor system security changes alerts and advisories
+    applies_to_levels:
+      - L2
+      - L3
+    domain: SI
+    practice_id: 3.14.3
+    current_mapped_requirements:
+      - SI.L2-3.14.3
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-SI_L2_3_14_4
+    name: SI.L2-3.14.4 — Update malicious code Malicious Code Protection Controls
+    applies_to_levels:
+      - L2
+      - L3
+    domain: SI
+    practice_id: 3.14.4
+    current_mapped_requirements:
+      - SI.L2-3.14.4
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-SI_L2_3_14_5
+    name: SI.L2-3.14.5 — Perform periodic scans of organizational systems and
+    applies_to_levels:
+      - L2
+      - L3
+    domain: SI
+    practice_id: 3.14.5
+    current_mapped_requirements:
+      - SI.L2-3.14.5
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-SI_L2_3_14_6
+    name: SI.L2-3.14.6 — Monitor organizational System Monitoring No direct mapping
+    applies_to_levels:
+      - L2
+      - L3
+    domain: SI
+    practice_id: 3.14.6
+    current_mapped_requirements:
+      - SI.L2-3.14.6
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-SI_L2_3_14_7
+    name: SI.L2-3.14.7 — Identify unauthorized use of System Monitoring No
+    applies_to_levels:
+      - L2
+      - L3
+    domain: SI
+    practice_id: 3.14.7
+    current_mapped_requirements:
+      - SI.L2-3.14.7
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+            - fci_only
+    matched_rules:
+      - rule_id: L2_CUI_ASSUMPTION
+        confidence: medium
+        reason: L2-only practice — CUI protection intent; not needed for FCI-only or no-CUI orgs
+    needs_sme_review: true
+  - id: RR-ACT-AC_L3_3_1_1e
+    name: AC.L3-3.1.1e — Employ dual authorization to execute critical or
+    applies_to_levels:
+      - L3
+    domain: AC
+    practice_id: 3.1.1
+    current_mapped_requirements:
+      - AC.L3-3.1.1e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-AC_L3_3_1_2e
+    name: AC.L3-3.1.2e — Restrict access to systems and system components
+    applies_to_levels:
+      - L3
+    domain: AC
+    practice_id: 3.1.2
+    current_mapped_requirements:
+      - AC.L3-3.1.2e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-AC_L3_3_1_3e
+    name: 'AC.L3-3.1.3e — Employ [Assignment: organization-defined secure information transfer solutions]'
+    applies_to_levels:
+      - L3
+    domain: AC
+    practice_id: 3.1.3
+    current_mapped_requirements:
+      - AC.L3-3.1.3e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-AT_L3_3_2_1e
+    name: 'AT.L3-3.2.1e — Provide awareness training [Assignment: organization-defined frequency] focused'
+    applies_to_levels:
+      - L3
+    domain: AT
+    practice_id: 3.2.1
+    current_mapped_requirements:
+      - AT.L3-3.2.1e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-AT_L3_3_2_2e
+    name: AT.L3-3.2.2e — Include practical exercises in awareness training for
+    applies_to_levels:
+      - L3
+    domain: AT
+    practice_id: 3.2.2
+    current_mapped_requirements:
+      - AT.L3-3.2.2e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-CM_L3_3_4_1e
+    name: CM.L3-3.4.1e — Establish and maintain an authoritative source and
+    applies_to_levels:
+      - L3
+    domain: CM
+    practice_id: 3.4.1
+    current_mapped_requirements:
+      - CM.L3-3.4.1e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-CM_L3_3_4_2e
+    name: CM.L3-3.4.2e — Employ automated mechanisms to detect misconfigured or
+    applies_to_levels:
+      - L3
+    domain: CM
+    practice_id: 3.4.2
+    current_mapped_requirements:
+      - CM.L3-3.4.2e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-CM_L3_3_4_3e
+    name: CM.L3-3.4.3e — Employ automated discovery and management tools to
+    applies_to_levels:
+      - L3
+    domain: CM
+    practice_id: 3.4.3
+    current_mapped_requirements:
+      - CM.L3-3.4.3e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-IA_L3_3_5_1e
+    name: 'IA.L3-3.5.1e — Identify and authenticate [Assignment: organization-defined systems and'
+    applies_to_levels:
+      - L3
+    domain: IA
+    practice_id: 3.5.1
+    current_mapped_requirements:
+      - IA.L3-3.5.1e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-IA_L3_3_5_2e
+    name: IA.L3-3.5.2e — Employ automated mechanisms for the generation, protection,
+    applies_to_levels:
+      - L3
+    domain: IA
+    practice_id: 3.5.2
+    current_mapped_requirements:
+      - IA.L3-3.5.2e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-IA_L3_3_5_3e
+    name: IA.L3-3.5.3e — Employ automated or manual/procedural mechanisms to prohibit
+    applies_to_levels:
+      - L3
+    domain: IA
+    practice_id: 3.5.3
+    current_mapped_requirements:
+      - IA.L3-3.5.3e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-IR_L3_3_6_1e
+    name: IR.L3-3.6.1e — Establish and maintain a security operations center
+    applies_to_levels:
+      - L3
+    domain: IR
+    practice_id: 3.6.1
+    current_mapped_requirements:
+      - IR.L3-3.6.1e
+    proposed_applicability:
+      boost_when:
+        - assessment_route:
+            - certification
+    matched_rules:
+      - rule_id: IR_CERTIFICATION
+        confidence: low
+        reason: IR practices gain scrutiny in C3PAO assessments — boost priority
+    needs_sme_review: true
+  - id: RR-ACT-IR_L3_3_6_2e
+    name: IR.L3-3.6.2e — Establish and maintain a cyber incident response
+    applies_to_levels:
+      - L3
+    domain: IR
+    practice_id: 3.6.2
+    current_mapped_requirements:
+      - IR.L3-3.6.2e
+    proposed_applicability:
+      boost_when:
+        - assessment_route:
+            - certification
+    matched_rules:
+      - rule_id: IR_CERTIFICATION
+        confidence: low
+        reason: IR practices gain scrutiny in C3PAO assessments — boost priority
+    needs_sme_review: true
+  - id: RR-ACT-PS_L3_3_9_1e
+    name: 'PS.L3-3.9.1e — Conduct [Assignment: organization-defined enhanced personnel screening] for'
+    applies_to_levels:
+      - L3
+    domain: PS
+    practice_id: 3.9.1
+    current_mapped_requirements:
+      - PS.L3-3.9.1e
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+    matched_rules:
+      - rule_id: PS_CUI
+        confidence: medium
+        reason: Personnel security practice for CUI environments — not applicable when no CUI
+    needs_sme_review: true
+  - id: RR-ACT-PS_L3_3_9_2e
+    name: PS.L3-3.9.2e — Ensure that organizational systems are protected if
+    applies_to_levels:
+      - L3
+    domain: PS
+    practice_id: 3.9.2
+    current_mapped_requirements:
+      - PS.L3-3.9.2e
+    proposed_applicability:
+      excludes:
+        - cui_presence:
+            - no_cui
+    matched_rules:
+      - rule_id: PS_CUI
+        confidence: medium
+        reason: Personnel security practice for CUI environments — not applicable when no CUI
+    needs_sme_review: true
+  - id: RR-ACT-RA_L3_3_11_1e
+    name: 'RA.L3-3.11.1e — Employ [Assignment: organization-defined sources of threat intelligence]'
+    applies_to_levels:
+      - L3
+    domain: RA
+    practice_id: 3.11.1
+    current_mapped_requirements:
+      - RA.L3-3.11.1e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-RA_L3_3_11_2e
+    name: RA.L3-3.11.2e — Conduct cyber threat hunting activities [Selection (one
+    applies_to_levels:
+      - L3
+    domain: RA
+    practice_id: 3.11.2
+    current_mapped_requirements:
+      - RA.L3-3.11.2e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-RA_L3_3_11_3e
+    name: RA.L3-3.11.3e — Employ advanced automation and analytics capabilities in
+    applies_to_levels:
+      - L3
+    domain: RA
+    practice_id: 3.11.3
+    current_mapped_requirements:
+      - RA.L3-3.11.3e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-RA_L3_3_11_4e
+    name: RA.L3-3.11.4e — Document or reference in the system security
+    applies_to_levels:
+      - L3
+    domain: RA
+    practice_id: 3.11.4
+    current_mapped_requirements:
+      - RA.L3-3.11.4e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-RA_L3_3_11_5e
+    name: 'RA.L3-3.11.5e — Assess the effectiveness of security solutions [Assignment:'
+    applies_to_levels:
+      - L3
+    domain: RA
+    practice_id: 3.11.5
+    current_mapped_requirements:
+      - RA.L3-3.11.5e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-RA_L3_3_11_6e
+    name: RA.L3-3.11.6e — Assess, respond to, and monitor supply chain
+    applies_to_levels:
+      - L3
+    domain: RA
+    practice_id: 3.11.6
+    current_mapped_requirements:
+      - RA.L3-3.11.6e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-RA_L3_3_11_7e
+    name: RA.L3-3.11.7e — Develop a plan for managing supply chain
+    applies_to_levels:
+      - L3
+    domain: RA
+    practice_id: 3.11.7
+    current_mapped_requirements:
+      - RA.L3-3.11.7e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-CA_L3_3_12_1e
+    name: 'CA.L3-3.12.1e — Conduct penetration testing [Assignment: organization-defined frequency], leveraging'
+    applies_to_levels:
+      - L3
+    domain: CA
+    practice_id: 3.12.1
+    current_mapped_requirements:
+      - CA.L3-3.12.1e
+    proposed_applicability:
+      boost_when:
+        - assessment_route:
+            - certification
+    matched_rules:
+      - rule_id: CA_CERTIFICATION
+        confidence: medium
+        reason: Security assessment practice — higher priority when targeting external certification
+    needs_sme_review: true
+  - id: RR-ACT-SC_L3_3_13_1e
+    name: 'SC.L3-3.13.1e — Create diversity in [Assignment: organization-defined system components]'
+    applies_to_levels:
+      - L3
+    domain: SC
+    practice_id: 3.13.1
+    current_mapped_requirements:
+      - SC.L3-3.13.1e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-SC_L3_3_13_2e
+    name: SC.L3-3.13.2e — Implement the following changes to organizational systems
+    applies_to_levels:
+      - L3
+    domain: SC
+    practice_id: 3.13.2
+    current_mapped_requirements:
+      - SC.L3-3.13.2e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-SC_L3_3_13_3e
+    name: 'SC.L3-3.13.3e — Employ [Assignment: organization-defined technical and procedural means]'
+    applies_to_levels:
+      - L3
+    domain: SC
+    practice_id: 3.13.3
+    current_mapped_requirements:
+      - SC.L3-3.13.3e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-SC_L3_3_13_4e
+    name: 'SC.L3-3.13.4e — Employ [Selection: (one or more): [Assignment: organization-defined'
+    applies_to_levels:
+      - L3
+    domain: SC
+    practice_id: 3.13.4
+    current_mapped_requirements:
+      - SC.L3-3.13.4e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-SC_L3_3_13_5e
+    name: SC.L3-3.13.5e — Distribute and relocate the following system functions
+    applies_to_levels:
+      - L3
+    domain: SC
+    practice_id: 3.13.5
+    current_mapped_requirements:
+      - SC.L3-3.13.5e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-SI_L3_3_14_1e
+    name: 'SI.L3-3.14.1e — Verify the integrity of [Assignment: organization-defined security'
+    applies_to_levels:
+      - L3
+    domain: SI
+    practice_id: 3.14.1
+    current_mapped_requirements:
+      - SI.L3-3.14.1e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-SI_L3_3_14_2e
+    name: SI.L3-3.14.2e — Monitor organizational systems and system components on
+    applies_to_levels:
+      - L3
+    domain: SI
+    practice_id: 3.14.2
+    current_mapped_requirements:
+      - SI.L3-3.14.2e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-SI_L3_3_14_3e
+    name: 'SI.L3-3.14.3e — Ensure that [Assignment: organization-defined systems and system'
+    applies_to_levels:
+      - L3
+    domain: SI
+    practice_id: 3.14.3
+    current_mapped_requirements:
+      - SI.L3-3.14.3e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-SI_L3_3_14_4e
+    name: 'SI.L3-3.14.4e — Refresh [Assignment: organization-defined systems and system components]'
+    applies_to_levels:
+      - L3
+    domain: SI
+    practice_id: 3.14.4
+    current_mapped_requirements:
+      - SI.L3-3.14.4e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-SI_L3_3_14_5e
+    name: SI.L3-3.14.5e — Conduct reviews of persistent organizational storage locations
+    applies_to_levels:
+      - L3
+    domain: SI
+    practice_id: 3.14.5
+    current_mapped_requirements:
+      - SI.L3-3.14.5e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-SI_L3_3_14_6e
+    name: SI.L3-3.14.6e — Use threat indicator information and effective mitigations
+    applies_to_levels:
+      - L3
+    domain: SI
+    practice_id: 3.14.6
+    current_mapped_requirements:
+      - SI.L3-3.14.6e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false
+  - id: RR-ACT-SI_L3_3_14_7e
+    name: 'SI.L3-3.14.7e — Verify the correctness of [Assignment: organization-defined security'
+    applies_to_levels:
+      - L3
+    domain: SI
+    practice_id: 3.14.7
+    current_mapped_requirements:
+      - SI.L3-3.14.7e
+    proposed_applicability: null
+    matched_rules: []
+    needs_sme_review: false

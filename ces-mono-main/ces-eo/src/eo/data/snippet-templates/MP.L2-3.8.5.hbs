@@ -1,0 +1,35 @@
+## Control {{controlId}}: Control Access to Media Containing CUI and Maintain Accountability During Transport
+
+**Implementation Status:** {{status}}
+
+This organization controls access to CUI media during transport within the {{tenantName}} M365 GCC High tenant through encryption, chain-of-custody procedures, and transport tracking documented in "Media Transport Policy v1.0" maintained by {{variables.systemAdministrator}}.
+
+**Digital Media Transport:**
+- CUI transmitted electronically uses TLS 1.2+ encryption for all M365 GCC High communications
+- Email attachments containing CUI are protected by sensitivity label encryption during transit
+- File transfers to external parties require approved secure channels (encrypted email, approved file sharing)
+
+**Physical Media Transport:**
+- Physical media (USB drives, hard drives, paper) containing CUI transported using tamper-evident containers
+- Chain-of-custody forms document media handler, origin, destination, date/time, and contents description
+- Authorized courier services or hand-delivery by cleared personnel required for media transport
+- Receipt confirmation required from receiving party within 24 hours
+
+**Operational Procedure:**
+- **Action:** Maintain media transport log documenting all CUI media movements; quarterly review of transport records
+- **Frequency:** Per transport event, quarterly audit
+- **Responsible Party:** {{variables.systemAdministrator}}
+- **Documentation:** Media Transport Policy v1.0, Chain of Custody Form MP-005
+
+**Review Frequency:** Quarterly by ISSO
+
+**Verification Method:** Examine chain-of-custody records, media transport logs, encryption configuration for digital transport, and receipt confirmations.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** Review media transport records per procedure MP-005. No automated evidence collection available for this procedural control. {{evidenceArtifactUrl}}
+{{/if}}

@@ -1,0 +1,43 @@
+## Control {{controlId}}: Test the Organizational Incident Response Capability
+
+**Implementation Status:** {{status}}
+
+This organization tests incident response capability for the {{tenantName}} M365 GCC High tenant through attack simulations, tabletop exercises, and functional testing documented in "Incident Response Test Plan v1.0" maintained by {{variables.systemAdministrator}}.
+
+{{#if attackSimulationsActive}}
+**Attack Simulation Training:**
+{{attackSimulationsCount}} attack simulations conducted to test user awareness and incident reporting:
+{{#if simulations}}
+{{#each simulations}}
+- **{{displayName}}** — Technique: {{attackTechnique}} — Status: {{status}} — Last modified: {{lastModifiedDateTime}}
+{{/each}}
+{{/if}}
+
+Simulations validate that users recognize and report phishing attempts, social engineering, and suspicious activity through established incident reporting channels.
+{{else}}
+Attack simulation training has not been conducted.
+{{/if}}
+
+**Testing Program:**
+- **Tabletop Exercises:** Annual scenario-based exercises with incident response team addressing CUI-specific scenarios (unauthorized access, data exfiltration, ransomware)
+- **Functional Tests:** Semi-annual tests of incident detection, notification, containment, and recovery procedures using simulated incidents
+- **After-Action Reviews:** Test results documented with lessons learned, improvement recommendations, and plan updates
+
+**Operational Procedure:**
+- **Action:** Conduct annual tabletop exercises and semi-annual functional tests; document results and update incident response plan
+- **Frequency:** Annually (tabletop), semi-annually (functional), continuous (attack simulation)
+- **Responsible Party:** {{variables.systemAdministrator}}
+- **Documentation:** Incident Response Test Plan v1.0, After-Action Report Template
+
+**Review Frequency:** Annually by ISSO
+
+**Verification Method:** Examine attack simulation results, tabletop exercise records, after-action reports, and incident response plan update history.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** Review test records per procedure IR-003. {{evidenceArtifactUrl}}
+{{/if}}

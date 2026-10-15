@@ -1,0 +1,31 @@
+## Control {{controlId}}: Limit physical access to organizational information systems, equipment, and the respective operating environments to authorized individuals.
+
+**Implementation Status:** {{status}}
+
+{{#if tenantName}}
+{{tenantName}} limits physical access to information systems and equipment to authorized individuals. The {{primaryDomain}} CUI environment is hosted in {{#if cloudEnvironment}}{{cloudEnvironment}}{{else}}cloud{{/if}} data centers managed by Microsoft, which maintain FedRAMP High authorization and physical security controls including biometric access, 24/7 surveillance, and mantrap entry points.
+{{/if}}
+
+{{#if approvedIpRange}}
+Network access is restricted to the approved IP range ({{approvedIpRange}}), providing an additional layer of logical access control that complements physical security measures.
+{{/if}}
+
+{{#if wifiSsid}}
+{{#if (eq wifiSsid "no-wifi")}}
+Wireless network access is prohibited in areas where CUI is processed or stored, eliminating wireless attack vectors against physical access controls.
+{{else}}
+Wireless access is limited to the authorized SSID ({{wifiSsid}}) with enterprise-grade authentication and encryption.
+{{/if}}
+{{/if}}
+
+{{#if implementationGuidance}}
+
+**Implementation Guidance:**
+{{implementationGuidance}}
+{{/if}}
+
+{{#unless tenantName}}
+MANUAL INPUT REQUIRED: Provide organization name, physical access control policies, facility security documentation, authorized personnel lists, and evidence artifacts (access logs, badge reader reports, surveillance records).
+{{/unless}}
+
+**Evidence:** {{evidenceArtifactUrl}}

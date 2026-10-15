@@ -1,0 +1,76 @@
+controlId: "SI.L1-3.14.5"
+relatedControlIds:
+  - "CM.L2-3.4.1"
+  - "CM.L2-3.4.2"
+  - "SI.L1-3.14.2"
+  - "SI.L2-3.14.6"  # [VERIFY] mapping not yet confirmed
+practiceStatement: Establish and maintain baseline configurations and inventories of organizational systems throughout the
+  respective system development life cycles.
+useCaseId: F-03
+useCaseTitle: "ASR Rule Audit"
+domain: Security Operations
+priority: P4 Standard
+trigger: 'SCHEDULE: Quarterly'
+sodTier: Tier 1 (per SoD model in front matter)
+entraRolesRequired:
+- Security Reader
+- Reports Reader
+approvalRequired: false
+services:
+- name: Microsoft Defender Portal -- Attack Surface Reduction rules dashboard
+  purpose: ''
+- name: Microsoft Intune -- ASR rule configuration profiles
+  purpose: ''
+- name: Microsoft Defender for Endpoint -- Advanced Hunting
+  purpose: DeviceEvents table
+- name: Microsoft Sentinel -- Log Analytics for aggregated ASR metrics
+  purpose: ''
+- name: Azure Immutable Blob Storage -- evidence artifact storage
+  purpose: ''
+configurationSteps:
+  portalPath: //security.microsoft.us > Endpoints > Configuration management > Attack surface reduction.
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes DeviceManagementConfiguration.Read.All
+  - cmdlet: Get-MgDeviceManagementDeviceConfiguration
+    parameters:
+    - -MgDeviceManagementDeviceConfiguration
+    - -Filter
+    - -All
+    - -MgDeviceManagementDeviceConfigurationAssignment
+    - -DeviceConfigurationId
+  - cmdlet: Get-MgDeviceManagementDeviceConfigurationAssignment
+    parameters:
+    - -MgDeviceManagementDeviceConfigurationAssignment
+    - -DeviceConfigurationId
+    - -Object
+    - -join
+    - -Object
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations?$filter=contains(displayName,'ASR')
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-f-security/F-03/2026/03/
+  format: CSV
+  filenamePattern: F-03_ASRAudit_{YYYYMMDD}_{HHmmss}_ProfileSummary.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |-
+    - ASR rules and Advanced Hunting are fully available in GCC High via `security.microsoft.us`. The `DeviceEvents` table in Advanced Hunting uses the same schema as commercial.
+    - Intune ASR profiles deploy identically in GCC High. Ensure the Defender for Endpoint onboarding package used was the GCC High-specific package (downloaded from `security.microsoft.us`).
+    - Some ASR rule documentation on Microsoft Learn references `.com` portal URLs. Always substitute `security.microsoft.us` for `security.microsoft.com`.
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

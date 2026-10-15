@@ -1,0 +1,81 @@
+controlId: "AC.L2-3.1.6"
+relatedControlIds:
+  - "CM.L2-3.4.8"
+  - "AC.L1-3.1.1"
+  - "AC.L2-3.1.3"  # [VERIFY] mapping not yet confirmed
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: F-10
+useCaseTitle: "Third-Party App Consent Audit"
+domain: Security Operations
+priority: P4 Standard
+trigger: 'SCHEDULE: Monthly (third Monday of each month)'
+sodTier: Tier 2 (per SoD model in front matter)
+entraRolesRequired:
+- Security Administrator
+- Application Administrator
+approvalRequired: true
+services:
+- name: Entra Admin Center -- Enterprise applications, App registrations
+  purpose: ''
+- name: Microsoft Graph API -- `servicePrincipals`, `applications`, `oauth2PermissionGrants`, `appRoleAssignments` endpoints
+  purpose: ''
+- name: Microsoft Defender for Cloud Apps -- OAuth app governance
+  purpose: if configured
+- name: Microsoft Sentinel -- alert for new high-risk app consent events
+  purpose: ''
+- name: Azure Immutable Blob Storage -- evidence artifact storage
+  purpose: ''
+configurationSteps:
+  portalPath: //entra.microsoft.us > Applications > Enterprise applications > All applications.
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes Application.Read.All, DelegatedPermissionGrant.Read.All, Directory.Read.All
+  - cmdlet: Get-MgServicePrincipal
+    parameters:
+    - -MgServicePrincipal
+    - -All
+    - -Filter
+    - -MgOauth2PermissionGrant
+    - -All
+  - cmdlet: Get-MgOauth2PermissionGrant
+    parameters:
+    - -MgOauth2PermissionGrant
+    - -All
+    - -Object
+    - -eq
+    - -MgServicePrincipalAppRoleAssignment
+  - cmdlet: Get-MgServicePrincipalAppRoleAssignment
+    parameters:
+    - -MgServicePrincipalAppRoleAssignment
+    - -ServicePrincipalId
+    - -All
+    - -split
+    - -Object
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/servicePrincipals?$filter=tags/any(t:t
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-f-security/F-10/2026/03/
+  format: CSV
+  filenamePattern: F-10_AppConsentAudit_{YYYYMMDD}_{HHmmss}_FullInventory.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://entra.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: "- The `servicePrincipals`, `oauth2PermissionGrants`, and `appRoleAssignments` endpoints are fully available in GCC\
+    \ High at `graph.microsoft.us`.\n- Defender for Cloud Apps OAuth app governance is available in GCC High (`security.microsoft.us`\
+    \ > Cloud Apps > OAuth apps) and can provide an additional UI-based view of consented app permissions. [VERIFY] -- Confirm\
+    \ OAuth app governance availability in your GCC High tenant. **Workaround:** If OAuth app governance is unavailable, rely\
+    \ on the Graph API inventory approach documented above, which provides equivalent data.\n- User consent settings in GCC "
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

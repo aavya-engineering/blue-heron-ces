@@ -1,0 +1,51 @@
+## Control {{controlId}}: Control and Monitor User-Installed Software
+
+**Implementation Status:** {{status}}
+
+This organization controls and monitors user-installed software within the {{tenantName}} M365 GCC High tenant through Intune application management, update ring policies, and detected application monitoring managed by {{variables.systemAdministrator}}.
+
+{{#if detectedAppsMonitored}}
+**Software Monitoring:**
+{{detectedAppsCount}} applications detected across managed endpoints are continuously inventoried:
+{{#if apps}}
+{{#each apps}}
+- **{{displayName}}** v{{version}} — Publisher: {{publisher}} — Installed on {{deviceCount}} devices
+{{/each}}
+{{/if}}
+
+User-installed applications not deployed through Intune are flagged for review. Unauthorized software is remediated per the software compliance procedure.
+{{else}}
+Application detection and monitoring has not been confirmed.
+{{/if}}
+
+{{#if updateRingsConfigured}}
+**Patch Management:**
+{{updateRingsCount}} Windows Update ring policies manage software updates and patches:
+{{#if rings}}
+{{#each rings}}
+- **{{displayName}}** — Deferral: {{deploymentDeferralInDays}} days — Update mode: {{automaticUpdateMode}}
+{{/each}}
+{{/if}}
+
+Update rings enforce timely patching while allowing controlled rollout through deferral periods for testing.
+{{else}}
+Windows Update ring policies have not been configured. Patch management enforcement is not verified.
+{{/if}}
+
+{{#if deviceConfigurationsActive}}
+**Installation Restrictions:**
+Device configuration policies restrict standard users from installing software without administrator approval. Local administrator privileges are removed from standard user accounts to prevent unauthorized software installation.
+{{/if}}
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine detected application reports, update ring configurations, software installation restriction policies, and user software compliance audit logs.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

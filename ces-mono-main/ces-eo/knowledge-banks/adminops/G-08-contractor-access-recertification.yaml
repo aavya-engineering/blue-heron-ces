@@ -1,0 +1,90 @@
+controlId: "AC.L2-3.1.3"
+relatedControlIds:
+  - "AC.L1-3.1.1"
+  - "AC.L2-3.1.5"
+  - "PS.L2-3.9.2"  # [VERIFY] mapping not yet confirmed
+practiceStatement: Limit system access to authorized users, processes acting on behalf of users, and devices.
+useCaseId: G-08
+useCaseTitle: "Contractor Access Recertification"
+domain: Personnel Security
+priority: P4 Standard
+trigger: 'SCHEDULE: Quarterly access review cycle for guest and contractor accounts'
+sodTier: Tier 2 (Config Manager)
+entraRolesRequired:
+- User Administrator
+- Identity Governance Administrator
+approvalRequired: true
+services:
+- name: Entra ID Governance -- Access Reviews
+  purpose: ''
+- name: Entra ID -- guest/external user accounts, security groups, B2B collaboration settings
+  purpose: ''
+- name: Power Automate -- optional notification and follow-up workflows
+  purpose: ''
+- name: Microsoft Sentinel -- optional alerting on stale guest accounts
+  purpose: ''
+- name: Azure Immutable Blob Storage -- evidence retention
+  purpose: ''
+configurationSteps:
+  portalPath: //entra.microsoft.us) > Identity Governance > Access reviews.
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes AccessReview.ReadWrite.All
+  - cmdlet: New-MgIdentityGovernanceAccessReviewDefinition
+    parameters:
+    - -MgIdentityGovernanceAccessReviewDefinition
+    - -BodyParameter
+    - -MgUser
+    - -Filter
+    - -Property
+  - cmdlet: Get-MgUser
+    parameters:
+    - -MgUser
+    - -Filter
+    - -Property
+    - -All
+    - -in
+  - cmdlet: Get-MgIdentityGovernanceAccessReviewDefinitionInstance
+    parameters:
+    - -MgIdentityGovernanceAccessReviewDefinitionInstance
+    - -AccessReviewScheduleDefinitionId
+    - -All
+    - -MgIdentityGovernanceAccessReviewDefinitionInstanceDecision
+    - -AccessReviewScheduleDefinitionId
+  - cmdlet: Get-MgIdentityGovernanceAccessReviewDefinitionInstanceDecision
+    parameters:
+    - -MgIdentityGovernanceAccessReviewDefinitionInstanceDecision
+    - -AccessReviewScheduleDefinitionId
+    - -AccessReviewInstanceId
+    - -All
+    - -08_ContractorRecertification_
+  graphApiEndpoint: POST https://graph.microsoft.us/v1.0/identityGovernance/accessReviews/definitions
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-g-personnel/G-08/{year}/{month}/
+  format: CSV (guest account inventory), CSV (access review decisions), JSON (access review definition export)
+  filenamePattern: G-08_ContractorRecertification_{YYYYMMDD}_{HHmmss}_{Context}.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: Entra ID Governance, including Access Reviews, is fully available in GCC High. The access review feature supports
+    guest user filtering, manager-as-reviewer, auto-apply decisions, and quarterly recurrence. All Graph API endpoints for
+    access reviews use `graph.microsoft.us`. Ensure that guest/contractor accounts have a valid `manager` property set in
+    Entra ID; otherwise, the `./manager` reviewer query will fail for those accounts and they will fall to the default decision
+    (deny). For contractors without a manager assignment, designate a fallback reviewer (e.g., the IT security team group)
+    in the
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

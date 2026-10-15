@@ -1,0 +1,94 @@
+controlId: "AC.L1-3.1.2"
+relatedControlIds:
+  - "AC.L1-3.1.1"
+  - "PS.L2-3.9.2"
+  - "AC.L2-3.1.5"
+
+practiceStatement: "Limit system access to authorized users, processes acting on behalf of users, and devices."
+
+useCaseId: "A-03"
+useCaseTitle: "User Offboarding -- Hard Delete"
+domain: "Identity & Access Management"
+priority: "P2 High"
+trigger: "SCHEDULE: 30 days after A-02 disable (or per organizational retention policy)"
+
+sodTier: "Tier 3 -- Privileged Admin"
+entraRolesRequired:
+  - "Global Administrator"
+
+approvalRequired: true
+
+services:
+  - name: "Entra ID"
+    purpose: "Permanent user deletion"
+  - name: "PIM"
+    purpose: "Tier 3 Global Administrator activation"
+  - name: "Exchange Online"
+    purpose: "Mailbox archive export"
+  - name: "Microsoft Graph PowerShell"
+    modules:
+      - "Microsoft.Graph.Users"
+  - name: "Azure Blob Storage"
+    purpose: "Archive destination"
+
+configurationSteps:
+  portalPath: "https://entra.microsoft.us > Identity Governance > Privileged Identity Management > My roles > Entra roles > Global Administrator > Activate"
+
+  powershellCmdlets:
+    - cmdlet: "Connect-MgGraph"
+      parameters:
+        - "-Environment USGov"
+        - "-Scopes User.ReadWrite.All,Directory.ReadWrite.All"
+    - cmdlet: "Get-MgDirectoryDeletedItemAsUser"
+      parameters:
+        - "-DirectoryObjectId"
+    - cmdlet: "Remove-MgDirectoryDeletedItem"
+      parameters:
+        - "-DirectoryObjectId"
+    - cmdlet: "Get-MgSubscribedSku"
+      parameters: []
+
+  graphApiEndpoint: "DELETE https://graph.microsoft.us/v1.0/directory/deletedItems/{userId}"
+  graphApiPayloadExample: {}
+
+  requiredPermissions:
+    - "User.ReadWrite.All"
+    - "Directory.ReadWrite.All"
+
+evidenceArtifacts:
+  - type: "Azure AD Audit Logs"
+    retentionPeriod: "7 years"
+    storageLocation: "evidence-store/domain-a-identity/A-03/{year}/{month}/"
+    query: "Activity: Permanent delete user"
+  - type: "Stamper Execution Evidence"
+    hashAlgorithm: "SHA-256"
+    storageLocation: "evidence-store/domain-a-identity/A-03/{year}/{month}/"
+    format: "JSON (deletion confirmation, license reclamation verification, PIM activation record)"
+    filenamePattern: "A-03_UserHardDeleted_{YYYYMMDD}_{HHmmss}_{UPN}.json"
+
+gccHighSpecifics:
+  endpoints:
+    - "https://graph.microsoft.us"
+    - "https://entra.microsoft.us"
+    - "https://compliance.microsoft.us"
+  complianceBoundary: "FedRAMP High + CMMC L2"
+  endpointValidation: "All endpoints use .microsoft.us domains"
+  notes: "Permanent deletion follows 30-day soft-delete retention window. After deletion, user object and all associated data are irrecoverable. Mailbox content under litigation hold remains accessible via eDiscovery."
+
+relatedPolicies:
+  - "AC-001 Access Control Policy"
+  - "PS-001 Personnel Security Policy"
+
+odpValues: []
+
+dependencies:
+  hardDependencies:
+    - useCaseId: "A-02"
+      reason: "User must be disabled and in soft-deleted state"
+  softDependencies:
+    - useCaseId: "B-05"
+      reason: "Device wipe should have completed"
+    - useCaseId: "D-07"
+      reason: "Retention policy should cover archived content"
+
+notes: "Destructive and irreversible operation requiring Tier 3 SoD with two-person approval. License reclamation is automatic upon permanent deletion. PIM activation workflow is configured with a second Tier 3-eligible approver."

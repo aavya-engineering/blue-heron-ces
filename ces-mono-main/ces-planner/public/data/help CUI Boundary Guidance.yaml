@@ -1,0 +1,399 @@
+schema_version: '1.0'
+module: CUI_Boundary_Help
+
+questions:
+  CUI.CAT.001:
+    guidance:
+      description: 'Identifies which CUI categories are present in your environment and subject to CMMC controls.'
+      why_it_matters: 'Categories determine which NIST 800-171 controls apply, what evidence assessors demand, and how the CUI manifest is scoped.'
+      implications: 'Selected categories flow into the CUI manifest and policy scaffolding. ITAR/EAR selections trigger export-control boundary hardening and US-person-only access requirements.'
+      common_pitfalls:
+        - "Missing 'Security / IT artifacts containing CUI' — config exports, audit logs, and vulnerability reports are often overlooked."
+        - "Treating 'Other' as a catch-all without specifying the contract or prime that designates the category."
+      btc_impact: 'BTC will verify each selected category has appropriate storage, labeling, and access controls in place.'
+    options:
+      'Controlled Technical Information (CTI)':
+        description: 'Engineering drawings, specifications, manuals, and technical data marked as CTI.'
+        implication: 'Highest-volume category — requires controlled storage with need-to-know access enforcement.'
+      'Technical drawings / engineering data':
+        description: 'CAD files, schematics, BOMs, and engineering analysis outputs.'
+        implication: 'Often large files stored in specialized tools — verify those tools are within the boundary.'
+      'Source code':
+        description: 'Software source code, scripts, and build configurations related to contract deliverables.'
+        implication: 'Brings repositories, CI/CD pipelines, and developer workstations into scope.'
+      'Program/project documentation':
+        description: 'Contracts, SOWs, schedules, status reports, and deliverable documentation containing CUI.'
+        implication: 'Typically stored in SharePoint/Teams — verify site-level access controls and sensitivity labels.'
+      'Security / IT artifacts containing CUI':
+        description: 'Security scan results, SSPs, configuration baselines, incident reports, and audit evidence.'
+        implication: 'Meta-CUI — security documentation about CUI systems is itself CUI. Often stored outside the primary boundary.'
+      'Contract deliverables containing CUI':
+        description: 'Final deliverable packages submitted to the government or prime contractor.'
+        implication: 'Egress path — requires controlled sharing with recipient verification and transfer logging.'
+      'Export-controlled data (ITAR)':
+        description: 'Defense articles and data subject to International Traffic in Arms Regulations.'
+        implication: 'Triggers US-person-only access, geographic data residency, and enhanced logging requirements.'
+      'Export-controlled data (EAR)':
+        description: 'Dual-use items and technology subject to Export Administration Regulations.'
+        implication: 'May require denied-party screening and end-use certification in addition to CUI controls.'
+      'Other (specify)':
+        description: 'CUI categories not listed above — identify the contract, prime, or regulation that designates them.'
+
+  CUI.CONTRACT.001:
+    guidance:
+      description: 'Establishes the contractual basis for CUI handling requirements in your environment.'
+      why_it_matters: 'DFARS clauses define mandatory cyber requirements, incident reporting timelines, and assessment obligations. Missing a clause means missing requirements.'
+      implications: 'The contract list anchors the CUI boundary scope — every system touching contract deliverables is in scope.'
+      common_pitfalls:
+        - 'Forgetting subcontract flow-downs that inherit DFARS clauses from a prime.'
+        - 'Missing addenda or modifications that add CUI clauses to existing contracts.'
+      btc_impact: 'BTC will cross-reference declared contracts against CUI data flows to confirm boundary completeness.'
+
+  CUI.GEN.001:
+    guidance:
+      description: 'Determines whether CUI originates inside your organization or only enters from external sources.'
+      why_it_matters: 'Internal generation means your development and engineering processes create CUI — significantly expanding scope beyond just receiving and storing it.'
+      implications: "If CUI is generated internally, all authoring tools, development environments, and approval workflows become in-scope boundary elements."
+      common_pitfalls:
+        - 'Assuming CUI is only "received" when engineers create derivative works (analyses, redesigns) from received CUI.'
+        - 'Overlooking that compiled outputs and test results from CUI inputs are themselves CUI.'
+      btc_impact: 'BTC will verify that CUI generation workflows have appropriate controls, including labeling at point of creation.'
+
+  CUI.GEN.002:
+    guidance:
+      description: 'Identifies which internal teams are responsible for creating CUI artifacts.'
+      why_it_matters: 'Each generating function brings its tools, processes, and personnel into the CUI boundary scope.'
+      implications: 'Selected functions will require CUI awareness training, tool boundary verification, and role-based access auditing.'
+      common_pitfalls:
+        - 'Missing Security/IT as a generator — security assessments and SSPs about CUI systems are themselves CUI.'
+      btc_impact: 'BTC will verify each generating function has appropriate controls and training.'
+
+  CUI.LC.ING.001:
+    guidance:
+      description: 'Maps all channels through which CUI enters your environment from external sources.'
+      why_it_matters: 'Each ingress channel is a boundary entry point that must be controlled, logged, and monitored. Unmapped channels are uncontrolled channels.'
+      implications: 'All selected channels require encryption in transit, sender verification, and ingestion logging.'
+      common_pitfalls:
+        - 'Forgetting ad-hoc channels like personal email forwards or USB drives brought to meetings.'
+        - "Not accounting for 'reply-all' chains that pull CUI into non-CUI mailboxes."
+      btc_impact: 'BTC will verify that each declared ingress channel has transport encryption and access controls.'
+    options:
+      'Encrypted email':
+        description: 'S/MIME or TLS-encrypted email from primes, customers, or partners.'
+        implication: 'Requires email gateway encryption enforcement and recipient verification.'
+      'Prime/customer portal':
+        description: 'Web portals operated by the prime or government customer for secure file exchange.'
+        implication: 'Access credentials and session management become in-scope.'
+      'Secure file transfer (SFTP/FTPS)':
+        description: 'Encrypted file transfer protocols for batch or automated data exchange.'
+        implication: 'Server endpoints, credentials, and transfer logs must be within the boundary.'
+      'Teams/SharePoint sharing':
+        description: 'Files shared via Teams channels or SharePoint sites from external organizations.'
+        implication: 'External sharing policies and guest access controls must be configured.'
+      'API integration':
+        description: 'Automated data feeds from external systems via REST/SOAP APIs.'
+        implication: 'Service principals, API keys, and data transformation pipelines enter scope.'
+      'Physical media':
+        description: 'USB drives, DVDs, or printed materials received physically.'
+        implication: 'Requires physical security controls, media tracking, and secure disposal procedures.'
+      'Other':
+        description: 'Any ingress channel not listed — describe the channel and its controls.'
+
+  CUI.LC.STO.001:
+    guidance:
+      description: 'Identifies all locations where CUI persists at rest within your environment.'
+      why_it_matters: 'Each storage location must enforce encryption at rest, access controls, and data classification. Unmapped storage is uncontrolled CUI.'
+      implications: 'All selected locations become boundary assets requiring configuration validation, monitoring, and retention management.'
+      common_pitfalls:
+        - 'Forgetting local caches, temp folders, and browser downloads on endpoint devices.'
+        - 'Not accounting for email attachments that persist in Exchange mailboxes outside SharePoint.'
+      btc_impact: 'BTC will verify encryption, access controls, and sensitivity labels for each storage location.'
+    options:
+      'SharePoint Online (GCC High)':
+        description: 'Document libraries in GCC High SharePoint sites with sensitivity labels and access controls.'
+        implication: 'Primary CUI repository — requires site-level permissions, sensitivity labels, and DLP policies.'
+      'OneDrive (GCC High)':
+        description: 'Individual user cloud storage in GCC High with sync and sharing controls.'
+        implication: 'Requires Known Folder Move, sync restrictions, and sharing policies.'
+      'Exchange mailboxes':
+        description: 'Email messages and attachments stored in user or shared mailboxes.'
+        implication: 'Requires retention policies, DLP scanning, and sensitivity label enforcement.'
+      'Teams file libraries':
+        description: 'Files shared within Teams channels, backed by SharePoint document libraries.'
+        implication: 'Team membership controls access — verify channel permissions match need-to-know.'
+      'Azure Storage':
+        description: 'Blob, file, or table storage in Azure accounts within the boundary.'
+        implication: 'Requires encryption with customer-managed keys, network access rules, and RBAC.'
+      'On-prem file server':
+        description: 'Physical or virtual file servers on the local network hosting CUI files.'
+        implication: 'Requires BitLocker/LUKS encryption, ACLs, and network segmentation.'
+      'Git repositories':
+        description: 'Source code repositories containing CUI code, configs, or documentation.'
+        implication: 'Brings the entire Git platform and CI/CD pipeline into the boundary.'
+      'External SaaS (specify)':
+        description: 'Third-party cloud applications storing CUI — specify vendor and region.'
+        implication: 'Triggers vendor assessment, data residency verification, and boundary extension.'
+
+  CUI.LC.PROC.001:
+    guidance:
+      description: 'Catalogs all tools and processes that actively read, modify, transform, or analyze CUI.'
+      why_it_matters: 'Processing tools handle CUI in an unencrypted state — they are high-value targets and must be within the controlled boundary.'
+      implications: 'All listed tools require licensing in GCC High (if M365), endpoint protection, and user access auditing.'
+      common_pitfalls:
+        - 'Forgetting browser-based tools that process CUI in memory without saving locally.'
+        - 'Not listing admin tools (PowerShell, Graph Explorer) that can read CUI data stores.'
+      btc_impact: 'BTC will verify each processing tool is within the boundary and subject to endpoint protection.'
+
+  CUI.LC.EGR.001:
+    guidance:
+      description: 'Determines whether CUI leaves your controlled enclave to external parties.'
+      why_it_matters: 'Egress is the highest-risk data flow — once CUI leaves the boundary, your control diminishes significantly.'
+      implications: 'Any external sharing requires contractual safeguards, transfer encryption, recipient verification, and audit logging.'
+      common_pitfalls:
+        - 'Not considering email replies with quoted CUI content as egress events.'
+        - 'Assuming vendor/MSP access is "internal" when they operate outside your boundary.'
+      btc_impact: 'BTC will verify external sharing controls, DLP rules, and guest access governance for each egress path.'
+    options:
+      'No':
+        description: 'CUI stays entirely within the boundary — no external sharing.'
+      'Yes – controlled external sharing':
+        description: 'CUI is shared with authorized external parties through controlled channels.'
+        implication: 'Requires external sharing policies, recipient domains allowlists, and transfer logging.'
+      'Yes – subcontractor access':
+        description: 'Subcontractors access CUI within your environment or receive CUI deliverables.'
+        implication: 'Requires DFARS flow-down verification and subcontractor boundary assessment.'
+      'Yes – vendor/MSP access':
+        description: 'Managed service providers or vendors have access to CUI systems or data.'
+        implication: 'Requires vendor risk assessment, access controls, and contractual CUI handling obligations.'
+
+  CUI.LC.RET.001:
+    guidance:
+      description: 'Establishes the governing model for how long CUI is retained and how it is destroyed.'
+      why_it_matters: 'Retention policy determines storage duration, legal hold obligations, and destruction procedures. "Undefined" is a compliance gap.'
+      implications: 'The selected model drives retention label policies, destruction workflows, and evidence retention for assessors.'
+      common_pitfalls:
+        - 'Having retention policies defined but not actually enforced via Purview retention labels.'
+        - 'Forgetting that backups extend effective retention beyond primary storage policies.'
+      btc_impact: 'BTC will verify that retention labels are applied and destruction procedures are documented and tested.'
+    options:
+      'Standard retention schedule':
+        description: 'Organizational default retention applied uniformly across CUI repositories.'
+      'Contract-specific retention':
+        description: 'Retention periods defined per contract, often varying by deliverable type.'
+        implication: 'Requires per-site or per-label retention policies matching contract terms.'
+      'Legal hold dependent':
+        description: 'Retention driven by active legal holds or litigation preservation notices.'
+        implication: 'Requires eDiscovery case management and hold notification tracking.'
+      'Undefined':
+        description: 'No formal retention model defined for CUI.'
+        implication: 'Compliance gap — BTC will flag for immediate remediation before boundary confirmation.'
+
+  CUI.USR.001:
+    guidance:
+      description: 'Maps all user roles that interact with CUI in any capacity.'
+      why_it_matters: 'Every role with CUI access is an attack surface. Role mapping drives access control design, training requirements, and monitoring scope.'
+      implications: 'All selected roles require CUI awareness training, background checks (if contractually required), and role-based access provisioning.'
+      common_pitfalls:
+        - 'Forgetting IT admins who can access CUI through their administrative privileges even if they do not "use" it.'
+        - 'Not accounting for contractors and subcontractors who access CUI environments remotely.'
+      btc_impact: 'BTC will verify access controls, training records, and monitoring coverage for each declared role.'
+
+  CUI.USR.002:
+    guidance:
+      description: 'Establishes the approximate headcount of users operating within the CUI boundary.'
+      why_it_matters: 'User count drives licensing costs, monitoring capacity, training logistics, and assessment scope estimation.'
+      implications: 'The declared count becomes the basis for user-based license provisioning and Conditional Access policy design.'
+      common_pitfalls:
+        - 'Undercounting by excluding contractors, temps, or part-time personnel with CUI access.'
+      btc_impact: 'BTC will cross-reference the declared count against actual Entra user enumeration.'
+
+  CUI.ID.001:
+    guidance:
+      description: 'Determines whether CUI is processed in a dedicated GCC High tenant or shares a tenant with non-CUI workloads.'
+      why_it_matters: 'Tenant isolation is the strongest boundary mechanism. Shared tenants require complex Conditional Access and DLP configurations to maintain separation.'
+      implications: 'Dedicated tenants simplify compliance but increase operational overhead. Shared tenants require extensive policy hardening.'
+      common_pitfalls:
+        - 'Planning a dedicated tenant without budgeting for the separate admin overhead and identity sync complexity.'
+      btc_impact: 'BTC verification depth increases significantly for shared tenants — every policy must prove CUI isolation.'
+
+  CUI.ID.002:
+    guidance:
+      description: 'Determines whether users authenticate with the same identity across CUI and non-CUI environments.'
+      why_it_matters: 'Shared identity means a compromise in the commercial environment can pivot to CUI access. Separate identities provide credential isolation.'
+      implications: 'Shared identity requires Conditional Access to differentiate CUI access, plus enhanced monitoring for cross-environment credential use.'
+      common_pitfalls:
+        - 'Assuming Azure AD Connect sync between tenants provides adequate isolation — it shares the credential.'
+      btc_impact: 'BTC will verify Conditional Access policies enforce appropriate controls when identity is shared.'
+
+  CUI.DEV.001:
+    guidance:
+      description: 'Establishes the device access model for CUI — managed-only, VDI-based BYOD, or direct BYOD access.'
+      why_it_matters: 'Device trust is a foundational boundary control. Unmanaged devices accessing CUI bypass endpoint protection, DLP, and compliance checks.'
+      implications: 'Managed-only is simplest to defend. VDI provides isolation but adds infrastructure. Direct BYOD is highest risk and highest evidence burden.'
+      common_pitfalls:
+        - 'Declaring "managed only" when executives or travelers use personal devices for "quick checks" via OWA or Teams web.'
+      btc_impact: 'BTC will verify Conditional Access device compliance policies match the declared model.'
+    options:
+      'Yes – managed only':
+        description: 'Only Intune-enrolled, compliant devices can access CUI resources.'
+      'BYOD via VDI/Cloud PC':
+        description: 'Personal devices access CUI through virtual desktops — no local data storage.'
+        implication: 'Requires VDI/Cloud PC infrastructure within GCC High and session-based access controls.'
+      'BYOD direct access allowed':
+        description: 'Personal devices connect directly to CUI resources (SharePoint, Teams, email).'
+        implication: 'Highest boundary risk — requires MAM policies, DLP, and extensive Conditional Access hardening.'
+      'Unknown':
+        description: 'Device access model has not been formally defined.'
+        implication: 'Must be resolved before boundary can be confirmed — BTC will block on this.'
+
+  CUI.DEV.002:
+    guidance:
+      description: 'Determines whether privileged administrators use dedicated, hardened workstations for admin tasks.'
+      why_it_matters: 'Admin credentials on general-purpose devices are vulnerable to credential theft, keyloggers, and lateral movement attacks.'
+      implications: 'PAW/SAW isolation reduces the attack surface for the most privileged accounts in the environment.'
+      common_pitfalls:
+        - 'Having PAWs deployed but allowing admin portal access from non-PAW devices via browser.'
+      btc_impact: 'BTC will verify PAW configuration, Conditional Access restrictions, and admin device compliance.'
+
+  CUI.DEVOPS.001:
+    guidance:
+      description: 'Determines whether software development and operations processes handle CUI.'
+      why_it_matters: 'DevOps in scope means repositories, CI/CD pipelines, build artifacts, container registries, and secrets management all become boundary elements.'
+      implications: 'Fully in-scope DevOps requires all tooling within GCC High or equivalent boundary-controlled platforms.'
+      common_pitfalls:
+        - "Answering 'No' when developers create derivative works or test data derived from CUI."
+      btc_impact: 'BTC will activate the DevOps verification section to confirm pipeline and repository boundary compliance.'
+
+  CUI.DEVOPS.002:
+    guidance:
+      description: 'Identifies where source code repositories containing CUI are hosted.'
+      why_it_matters: 'Repositories on commercial platforms (GitHub.com, Azure DevOps commercial) store CUI outside the controlled boundary.'
+      implications: 'Commercial platform repositories will likely require migration to GCC High equivalents or documented compensating controls.'
+      common_pitfalls:
+        - 'Having the main repo in GCC High but feature branches or forks on commercial platforms.'
+        - 'Using GitHub Actions runners hosted outside the boundary to build CUI code.'
+      btc_impact: 'BTC will verify each repository platform is within the declared boundary and has appropriate access controls.'
+    options:
+      'Azure DevOps (GCC High)':
+        description: 'Repositories hosted in the Azure DevOps GCC High environment.'
+      'GitHub Enterprise (Gov)':
+        description: 'Repositories in GitHub Enterprise Government cloud with FedRAMP authorization.'
+      'Commercial GitHub':
+        description: 'Repositories on github.com commercial — outside GCC High boundary.'
+        implication: 'CUI on commercial platforms triggers risk flag and likely requires remediation.'
+      'Commercial Azure DevOps':
+        description: 'Repositories on dev.azure.com commercial — outside GCC High boundary.'
+        implication: 'Same boundary violation as commercial GitHub — requires migration or compensating controls.'
+      'Other':
+        description: 'Other Git platforms — specify and confirm boundary status.'
+
+  CUI.INT.001:
+    guidance:
+      description: 'Creates a comprehensive inventory of third-party systems connected to in-scope CUI systems.'
+      why_it_matters: 'Each integration is a potential data flow path. Unapproved or unmonitored integrations can silently leak CUI outside the boundary.'
+      implications: 'All listed integrations require vendor assessment, API security review, and boundary classification.'
+      common_pitfalls:
+        - 'Forgetting OAuth apps that users consented to individually (not admin-approved).'
+        - 'Missing monitoring agents and backup tools that have read access to CUI data stores.'
+      btc_impact: 'BTC will verify each integration is inventoried, approved, and operating within the declared boundary.'
+
+  CUI.INT.002:
+    guidance:
+      description: 'Determines whether email forwarding rules could route CUI outside the boundary.'
+      why_it_matters: 'Email forwarding is one of the most common CUI exfiltration vectors — both intentional and accidental.'
+      implications: 'Unrestricted forwarding requires immediate remediation. Restricted forwarding requires proof of transport rules and DLP enforcement.'
+      common_pitfalls:
+        - 'Blocking external forwarding but allowing internal forwarding to non-CUI mailboxes.'
+        - 'Not checking for Outlook rules that auto-forward to personal email accounts.'
+      btc_impact: 'BTC will verify Exchange transport rules and Outlook forwarding restrictions match the declared policy.'
+    options:
+      'No':
+        description: 'All email forwarding is disabled for in-scope users.'
+      'Yes – restricted':
+        description: 'Forwarding is allowed to approved domains/recipients only, enforced by transport rules.'
+        implication: 'Requires proof of transport rule configuration and domain allowlist.'
+      'Yes – unrestricted':
+        description: 'No forwarding restrictions in place — users can forward to any address.'
+        implication: 'Significant exfiltration risk — BTC will flag for immediate remediation.'
+
+  CUI.INT.003:
+    guidance:
+      description: 'Identifies whether automated processes use service principals or API tokens to move CUI between systems.'
+      why_it_matters: 'Automated CUI movement bypasses user-based controls. Over-privileged or unmonitored service principals are a silent exfiltration risk.'
+      implications: 'All service principals moving CUI require least-privilege scoping, credential rotation, and activity monitoring.'
+      common_pitfalls:
+        - 'Using application-level permissions (not delegated) that bypass user consent and access controls.'
+      btc_impact: 'BTC will verify service principal inventory, permission scoping, and monitoring configuration.'
+
+  CUI.BKP.001:
+    guidance:
+      description: 'Determines how CUI data is backed up and whether backup infrastructure is within the boundary.'
+      why_it_matters: 'Backups are full copies of CUI at rest. If backup infrastructure is outside the boundary, CUI is effectively stored in an uncontrolled location.'
+      implications: 'Third-party backups outside scope require either boundary extension or documented compensating controls with risk acceptance.'
+      common_pitfalls:
+        - 'Assuming M365 native retention is equivalent to backup — it protects against deletion but not ransomware or corruption.'
+        - 'Not verifying that third-party backup vendors store data within FedRAMP-authorized infrastructure.'
+      btc_impact: 'BTC will verify backup storage locations, encryption, and access controls for CUI data.'
+    options:
+      'M365 native only':
+        description: 'Relying on M365 built-in retention and recoverability (recycle bin, version history, retention policies).'
+      'Third-party backup (in scope)':
+        description: 'Third-party backup solution operating within the declared CUI boundary.'
+        implication: 'Requires vendor assessment and confirmation of data residency within FedRAMP-authorized infrastructure.'
+      'Third-party backup (out of scope)':
+        description: 'Third-party backup solution operating outside the declared boundary.'
+        implication: 'Significant boundary gap — CUI at rest outside the controlled environment.'
+
+  CUI.OOS.001:
+    guidance:
+      description: 'Documents systems and services explicitly excluded from the CUI boundary with justification.'
+      why_it_matters: 'Clear out-of-scope declarations prevent scope creep and establish what does NOT need to be assessed, while ensuring nothing is accidentally excluded.'
+      implications: 'Each exclusion must have a documented rationale and confirmed technical controls preventing CUI from reaching excluded systems.'
+      common_pitfalls:
+        - 'Declaring systems out of scope without verifying CUI cannot reach them through transitive data flows.'
+        - 'Excluding HR/finance systems that process CUI-adjacent data (personnel clearances, contract financials).'
+      btc_impact: 'BTC will verify that technical controls actually prevent CUI from entering declared out-of-scope systems.'
+
+  CUI.OOS.002:
+    guidance:
+      description: 'Describes the technical enforcement mechanisms that prevent CUI from leaking into out-of-scope systems.'
+      why_it_matters: 'Out-of-scope declarations are only valid if backed by enforceable technical controls — policy statements alone are insufficient for assessors.'
+      implications: 'The described controls become evidence targets for BTC verification and assessor scrutiny.'
+      common_pitfalls:
+        - 'Describing intended controls that are not yet implemented or enforced.'
+        - 'Listing DLP policies that are in "test mode" without enforcement actions.'
+      btc_impact: 'BTC will verify each described control is actually configured and functioning as declared.'
+
+  CUI.ENF.001:
+    guidance:
+      description: 'Identifies the technical mechanisms relied upon to enforce the CUI boundary.'
+      why_it_matters: 'These mechanisms are the actual boundary — not network diagrams or policy documents. Assessors will test each one.'
+      implications: 'All selected mechanisms require configuration evidence, testing proof, and ongoing monitoring.'
+      common_pitfalls:
+        - 'Selecting mechanisms that are licensed but not configured or are in audit-only mode.'
+        - 'Missing the interaction between mechanisms (e.g., Conditional Access without Intune compliance policies has no device trust signal).'
+      btc_impact: 'BTC will verify every selected enforcement mechanism is configured, active, and producing expected results.'
+    options:
+      'Conditional Access':
+        description: 'Entra ID policies controlling access based on user, device, location, and risk signals.'
+        implication: 'Foundation of zero-trust boundary — requires comprehensive policy coverage and regular review.'
+      'Intune compliance enforcement':
+        description: 'Device compliance policies marking devices as compliant/non-compliant for Conditional Access decisions.'
+        implication: 'Must be paired with Conditional Access — compliance policies alone do not block access.'
+      'DLP policies':
+        description: 'Data Loss Prevention rules detecting and blocking unauthorized CUI sharing.'
+        implication: 'Requires sensitivity labels to be applied — DLP rules match on label, not content scanning alone.'
+      'Sensitivity labels':
+        description: 'Microsoft Purview labels classifying and protecting CUI documents and emails.'
+        implication: 'Labels must be published, default-applied, and enforced — optional labeling is insufficient.'
+      'External sharing restrictions':
+        description: 'SharePoint/Teams policies limiting external sharing to approved domains or blocking it entirely.'
+        implication: 'Must be set at both tenant and site/team level — tenant-level alone can be overridden.'
+      'Defender policies':
+        description: 'Microsoft Defender for Endpoint/Office/Cloud Apps policies providing threat protection and monitoring.'
+        implication: 'Requires onboarding of all in-scope devices and configuration of alert policies.'
+      'Network segmentation':
+        description: 'Network-level isolation separating CUI systems from non-CUI systems.'
+        implication: 'Primarily relevant for on-premises or hybrid environments with physical network boundaries.'
+      'Other':
+        description: 'Additional enforcement mechanisms not listed — describe the mechanism and its role.'

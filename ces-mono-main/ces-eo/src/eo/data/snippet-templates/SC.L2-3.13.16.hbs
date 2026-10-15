@@ -1,0 +1,41 @@
+## Control {{controlId}}: Protect the Confidentiality of CUI on Public-Access Systems
+
+**Implementation Status:** {{status}}
+
+This organization protects CUI confidentiality on publicly accessible system components within the {{tenantName}} M365 GCC High tenant through SharePoint sharing restrictions, guest access controls, and Conditional Access policies managed by {{variables.accessControlAdministrator}}.
+
+{{#if sharepointConfigured}}
+**SharePoint External Sharing Controls:**
+External sharing capability is set to **{{sharingCapability}}**. {{#if externalSharingEnabled}}External sharing is permitted with the following restrictions:{{else}}External sharing is disabled, preventing CUI exposure on public-access surfaces.{{/if}}
+- Default sharing link type: **{{defaultSharingLinkType}}**
+{{#if ippProtectionEnabled}}- Information Protection Policy (IPP) enforcement is active, applying sensitivity-based access controls to shared content{{/if}}
+- Anonymous access links are prohibited for sites containing CUI
+- Guest access requires authentication and is scoped to specific sites/documents
+{{else}}
+SharePoint sharing configuration has not been confirmed. Public access controls for CUI require verification.
+{{/if}}
+
+{{#if conditionalAccessActive}}
+**Guest Access Enforcement:**
+Conditional Access policies enforce additional controls for guest and external users:
+{{#each policies}}
+- **{{displayName}}** ({{state}}): Requires {{#each grantControls.builtInControls}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+{{/each}}
+
+Guest users are subject to MFA requirements, compliant device checks, and session restrictions before accessing any organizational content.
+{{else}}
+Conditional Access enforcement for guest access has not been configured.
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Examine SharePoint sharing settings, guest access policies, Conditional Access configurations for external users, and anonymous link audit logs.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

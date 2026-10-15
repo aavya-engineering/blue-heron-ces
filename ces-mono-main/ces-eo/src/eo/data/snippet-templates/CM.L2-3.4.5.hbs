@@ -1,0 +1,46 @@
+## Control {{controlId}}: Define, Document, Approve, and Enforce Access Restrictions Associated with Changes to Organizational Systems
+
+**Implementation Status:** {{status}}
+
+This organization enforces access restrictions for system changes within the {{tenantName}} M365 GCC High tenant through role-based access control, Privileged Identity Management, and configuration change authorization managed by {{variables.accessControlAdministrator}}.
+
+{{#if roleAssignmentsConfigured}}
+**Role-Based Change Authorization:**
+{{roleAssignmentsCount}} role assignments define who can make configuration changes to the CUI environment:
+{{#if assignments}}
+{{#each assignments}}
+- **{{principalDisplayName}}** — Role: {{roleDefinitionName}} (Scope: {{scope}})
+{{/each}}
+{{/if}}
+
+Only personnel with designated administrative roles can modify system configurations. Changes are restricted to the minimum scope required for the authorized modification.
+{{else}}
+Privileged role assignments for change authorization have not been confirmed.
+{{/if}}
+
+{{#if pimConfigured}}
+**Just-in-Time Change Access:**
+PIM enforces time-bound, approval-gated access for configuration changes:
+{{#if policies}}
+{{#each policies}}
+- **{{roleDisplayName}}** — Approval required: {{#if approvalRequired}}Yes{{else}}No{{/if}}, MFA required: {{#if mfaRequired}}Yes{{else}}No{{/if}}, Max duration: {{activationDuration}}
+{{/each}}
+{{/if}}
+
+Administrators must activate privileged roles through PIM before making system changes, creating an auditable approval chain for every configuration modification.
+{{else}}
+PIM has not been configured. Change access restrictions rely on static role assignments.
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Examine role assignment reports, PIM activation logs, change authorization records, and Entra ID audit logs for configuration modifications.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

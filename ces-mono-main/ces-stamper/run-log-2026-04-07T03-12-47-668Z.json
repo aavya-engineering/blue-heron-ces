@@ -1,0 +1,91 @@
+{
+  "executionMetadata": {
+    "planId": "unknown",
+    "tenant": "vfsgov-xtra",
+    "timestamp": "2026-04-07T03:12:47.624Z",
+    "operator": "unknown",
+    "sha256Hash": "bea67e905031c039a851b09d5bb32a303264f4f3f01ed773864050622ad3c026"
+  },
+  "resources": [
+    {
+      "category": "discovered",
+      "type": "$connector",
+      "path": "AZ-SEN-002",
+      "step": "step_task_SI.L1-3.14.1_mnkmi5kr_ggnyzxm",
+      "timestamp": "2026-04-07T03:08:25.406Z",
+      "cmdlet": "$connector = Get-AzSentinelDataConnector -ResourceGroupName rg-eo-prod -WorkspaceName vfsgov-law-prod | Where-Object Kind -eq 'AzureActivity'; if ($connector -and $connector.SubscriptionId -eq '668a730f-12a1-4c80-9734-89c621e98115') { $connector } else { $null }"
+    },
+    {
+      "category": "discovered",
+      "type": "$connector",
+      "path": "AZ-SEN-002",
+      "step": "step_task_SI.L1-3.14.1_mnkmi5kr_ggnyzxm",
+      "timestamp": "2026-04-07T03:08:25.408Z",
+      "cmdlet": "$connector = Get-AzSentinelDataConnector -ResourceGroupName rg-eo-prod -WorkspaceName vfsgov-law-prod | Where-Object Kind -eq 'AzureActivity'; if ($connector -and $connector.SubscriptionId -eq '668a730f-12a1-4c80-9734-89c621e98115') { $connector } else { $null }"
+    },
+    {
+      "category": "created",
+      "type": "AzSentinelDataConnector",
+      "path": "AZ-SEN-003",
+      "step": "step_task_SI.L1-3.14.1_mnkmi5kr_ggnyzxm",
+      "timestamp": "2026-04-07T03:08:26.550Z",
+      "cmdlet": "New-AzSentinelDataConnector -ResourceGroupName rg-eo-prod -WorkspaceName vfsgov-law-prod -Kind 'MicrosoftDefenderAdvancedThreatProtection'"
+    },
+    {
+      "category": "created",
+      "type": "AzResourceGroup",
+      "path": "AZ-FOUND-001",
+      "step": "step_task_SC.L1-3.13.1_mnkmi5ko_q2jm96e",
+      "timestamp": "2026-04-07T03:10:03.626Z",
+      "cmdlet": "New-AzResourceGroup -Name rg-eo-prod -Location usgovvirginia -Tag @{environment='cmmc-l2'; managed_by='bhd-stamper'}"
+    },
+    {
+      "category": "created",
+      "type": "AzVirtualNetwork",
+      "path": "AZ-NET-001",
+      "step": "step_task_SC.L1-3.13.5_mnkmi5ko_17989tj",
+      "timestamp": "2026-04-07T03:10:05.883Z",
+      "cmdlet": "New-AzVirtualNetwork -ResourceGroupName rg-eo-prod -Name vfsgov-vnet-eo -Location usgovvirginia -AddressPrefix 10.0.0.0/16"
+    },
+    {
+      "category": "created",
+      "type": "AzVirtualNetwork",
+      "path": "AZ-NET-001",
+      "step": "step_task_SC.L2-3.13.6_mnkmi5kp_7zjpwo0",
+      "timestamp": "2026-04-07T03:10:16.089Z",
+      "cmdlet": "New-AzVirtualNetwork -ResourceGroupName rg-eo-prod -Name vfsgov-vnet-eo -Location usgovvirginia -AddressPrefix 10.0.0.0/16"
+    },
+    {
+      "category": "created",
+      "type": "MgAgreement",
+      "path": "AC.L2-3.1.9.terms-of-use",
+      "step": "step_task_AC.L2-3.1.9_mnkmi5kn_pg22rhb",
+      "timestamp": "2026-04-07T03:10:23.696Z",
+      "cmdlet": "New-MgAgreement -BodyParameter @{displayName='CUI System Access Notice';isViewingBeforeAcceptanceRequired=$true;files=@(@{fileName='CUI-System-Access-Notice.pdf';language='en';isDefault=$true;fileData=@{data=[System.Convert]::FromBase64String('JVBERi0xLjQKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4KZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4KZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWzAgMCA2MTIgNzkyXSAvQ29udGVudHMgNCAwIFIgL1Jlc291cmNlcyA8PCAvRm9udCA8PCAvRjEgNSAwIFIgL0YyIDYgMCBSID4+ID4+ID4+CmVuZG9iago0IDAgb2JqCjw8IC9MZW5ndGggMzM0OSA+PgpzdHJlYW0KQlQgL0YyIDE2IFRmIDYwIDczMi4wIFRkIChDVUkgU1lTVEVNIEFDQ0VTUyBOT1RJQ0UpIFRqIEVUCkJUIC9GMiAxNiBUZiA2MCA3MTguMCBUZCAoVGVybXMgb2YgVXNlIEFncmVlbWVudCkgVGogRVQKQlQgL0YyIDExIFRmIDYwIDY5MC4wIFRkICgxLiAgQVVUSE9SSVpFRCBVU0UgT05MWSkgVGogRVQKQlQgL0YxIDEwIFRmIDYwIDY3NC4wIFRkIChUaGlzIGluZm9ybWF0aW9uIHN5c3RlbSBwcm9jZXNzZXMsIHN0b3JlcywgYW5kIHRyYW5zbWl0cyBDb250cm9sbGVkKSBUaiBFVApCVCAvRjEgMTAgVGYgNjAgNjYwLjAgVGQgKFVuY2xhc3NpZmllZCBJbmZvcm1hdGlvbiBcKENVSVwpIGFuZCBpcyBkZXNpZ25hdGVkIGZvciBBVVRIT1JJWkVEIFVTRSBPTkxZLikgVGogRVQKQlQgL0YxIDEwIFRmIDYwIDY0Ni4wIFRkIChBY2Nlc3MgaXMgcmVzdHJpY3RlZCB0byBwZXJzb25uZWwgd2hvIGhhdmUgYmVlbiBncmFudGVkIGV4cGxpY2l0KSBUaiBFVApCVCAvRjEgMTAgVGYgNjAgNjMyLjAgVGQgKGF1dGhvcml6YXRpb24gaW4gYWNjb3JkYW5jZSB3aXRoIDMyIENGUiBQYXJ0IDIwMDIgYW5kIE5JU1QgU1AgODAwLTE3MS4pIFRqIEVUCkJUIC9GMSAxMCBUZiA2MCA2MTguMCBUZCAoVW5hdXRob3JpemVkIGFjY2VzcywgdXNlLCBvciBtb2RpZmljYXRpb24gaXMgc3RyaWN0bHkgcHJvaGliaXRlZCBhbmQgbWF5KSBUaiBFVApCVCAvRjEgMTAgVGYgNjAgNjA0LjAgVGQgKHJlc3VsdCBpbiBkaXNjaXBsaW5hcnkgYWN0aW9uLCBjaXZpbCBwZW5hbHRpZXMsIGFuZC9vciBjcmltaW5hbCBwcm9zZWN1dGlvbi4pIFRqIEVUCkJUIC9GMiAxMSBUZiA2MCA1ODEuNiBUZCAoMi4gIENVSSBIQU5ETElORyBPQkxJR0FUSU9OUykgVGogRVQKQlQgL0YxIDEwIFRmIDYwIDU2NS42IFRkIChBbGwgdXNlcnMgbXVzdCBjb21wbHkgd2l0aCB0aGUgZm9sbG93aW5nIENVSSBoYW5kbGluZyByZXF1aXJlbWVudHM6KSBUaiBFVApCVCAvRjEgMTAgVGYgNjAgNTQ0LjYgVGQgKCAgLSBNYXJrIGFsbCBDVUkgZG9jdW1lbnRzIHdpdGggdGhlIGFwcHJvcHJpYXRlIENVSSBiYW5uZXIgYW5kIGNhdGVnb3J5LikgVGogRVQKQlQgL0YxIDEwIFRmIDYwIDUzMC42IFRkICggIC0gU3RvcmUgQ1VJIG9ubHkgb24gYXV0aG9yaXplZCBzeXN0ZW1zIG1lZXRpbmcgTklTVCBTUCA4MDAtMTcxIGNvbnRyb2xzLikgVGogRVQKQlQgL0YxIDEwIFRmIDYwIDUxNi42IFRkICggIC0gVHJhbnNtaXQgQ1VJIG9ubHkgdmlhIGVuY3J5cHRlZCBjaGFubmVscyBcKFRMUyAxLjIrIG9yIGVxdWl2YWxlbnRcKS4pIFRqIEVUCkJUIC9GMSAxMCBUZiA2MCA1MDIuNiBUZCAoICAtIERlc3Ryb3kgQ1VJIG1lZGlhIGluIGFjY29yZGFuY2Ugd2l0aCBOSVNUIFNQIDgwMC04OCBndWlkZWxpbmVzLikgVGogRVQKQlQgL0YxIDEwIFRmIDYwIDQ4OC42IFRkICggIC0gRG8gbm90IGZvcndhcmQsIGNvcHksIG9yIHNoYXJlIENVSSB3aXRoIHVuYXV0aG9yaXplZCBpbmRpdmlkdWFscy4pIFRqIEVUCkJUIC9GMiAxMSBUZiA2MCA0NjYuMiBUZCAoMy4gIE1PTklUT1JJTkcgQU5EIENPTlNFTlQpIFRqIEVUCkJUIC9GMSAxMCBUZiA2MCA0NTAuMiBUZCAoQnkgYWNjZXNzaW5nIHRoaXMgc3lzdGVtIHlvdSBjb25zZW50IHRvIHRoZSBmb2xsb3dpbmc6KSBUaiBFVApCVCAvRjEgMTAgVGYgNjAgNDI5LjIgVGQgKCAgLSBBbGwgYWN0aXZpdHkgb24gdGhpcyBzeXN0ZW0gbWF5IGJlIG1vbml0b3JlZCwgcmVjb3JkZWQsIGFuZCBhdWRpdGVkLikgVGogRVQKQlQgL0YxIDEwIFRmIDYwIDQxNS4yIFRkICggIC0gVGhlcmUgaXMgbm8gZXhwZWN0YXRpb24gb2YgcHJpdmFjeSB3aGVuIHVzaW5nIHRoaXMgc3lzdGVtLikgVGogRVQKQlQgL0YxIDEwIFRmIDYwIDQwMS4yIFRkICggIC0gRXZpZGVuY2Ugb2YgdW5hdXRob3JpemVkIGFjdGl2aXR5IG1heSBiZSBwcm92aWRlZCB0byBsYXcgZW5mb3JjZW1lbnQuKSBUaiBFVApCVCAvRjEgMTAgVGYgNjAgMzg3LjIgVGQgKCAgLSBNb25pdG9yaW5nIGluY2x1ZGVzIGJ1dCBpcyBub3QgbGltaXRlZCB0bzogc2lnbi1pbiBldmVudHMsIGZpbGUgYWNjZXNzLCkgVGogRVQKQlQgL0YxIDEwIFRmIDYwIDM3My4yIFRkICggICAgZW1haWwgYW5kIG1lc3NhZ2luZyBjb250ZW50LCBhbmQgYWRtaW5pc3RyYXRpdmUgYWN0aW9ucy4pIFRqIEVUCkJUIC9GMiAxMSBUZiA2MCAzNTAuOCBUZCAoNC4gIElOQ0lERU5UIFJFUE9SVElORykgVGogRVQKQlQgL0YxIDEwIFRmIDYwIDMzNC44IFRkIChVc2VycyBtdXN0IGltbWVkaWF0ZWx5IHJlcG9ydCBhbnkgc3VzcGVjdGVkIG9yIGNvbmZpcm1lZCBzZWN1cml0eSBpbmNpZGVudCkgVGogRVQKQlQgL0YxIDEwIFRmIDYwIDMyMC44IFRkICh0byB0aGUgSW5mb3JtYXRpb24gU3lzdGVtIFNlY3VyaXR5IE9mZmljZXIgXChJU1NPXCkuIFJlcG9ydGFibGUgZXZlbnRzIGluY2x1ZGU6KSBUaiBFVApCVCAvRjEgMTAgVGYgNjAgMjk5LjggVGQgKCAgLSBVbmF1dGhvcml6ZWQgYWNjZXNzIHRvIENVSSBvciBDVUkgc3lzdGVtcy4pIFRqIEVUCkJUIC9GMSAxMCBUZiA2MCAyODUuOCBUZCAoICAtIExvc3Mgb3IgdGhlZnQgb2YgZGV2aWNlcyBjb250YWluaW5nIENVSS4pIFRqIEVUCkJUIC9GMSAxMCBUZiA2MCAyNzEuOCBUZCAoICAtIFN1c3BlY3RlZCBtYWx3YXJlLCBwaGlzaGluZywgb3Igc29jaWFsIGVuZ2luZWVyaW5nIGF0dGVtcHRzLikgVGogRVQKQlQgL0YxIDEwIFRmIDYwIDI1Ny44IFRkICggIC0gQW55IGRldmlhdGlvbiBmcm9tIGVzdGFibGlzaGVkIENVSSBoYW5kbGluZyBwcm9jZWR1cmVzLikgVGogRVQKQlQgL0YxIDEwIFRmIDYwIDIzNi44IFRkIChGYWlsdXJlIHRvIHJlcG9ydCBpbmNpZGVudHMgbWF5IGl0c2VsZiBjb25zdGl0dXRlIGEgdmlvbGF0aW9uLikgVGogRVQKQlQgL0YyIDExIFRmIDYwIDIxNC40IFRkICg1LiAgQUNLTk9XTEVER01FTlQpIFRqIEVUCkJUIC9GMSAxMCBUZiA2MCAxOTguNCBUZCAoQnkgcHJvY2VlZGluZyBwYXN0IHRoaXMgbm90aWNlLCBJIGFja25vd2xlZGdlIHRoYXQgSSBoYXZlIHJlYWQsIHVuZGVyc3RhbmQsKSBUaiBFVApCVCAvRjEgMTAgVGYgNjAgMTg0LjQgVGQgKGFuZCBhZ3JlZSB0byBjb21wbHkgd2l0aCBhbGwgdGVybXMgc3RhdGVkIGFib3ZlLiBJIHVuZGVyc3RhbmQgdGhhdCB2aW9sYXRpb24pIFRqIEVUCkJUIC9GMSAxMCBUZiA2MCAxNzAuNCBUZCAob2YgdGhlc2UgdGVybXMgbWF5IHJlc3VsdCBpbiByZXZvY2F0aW9uIG9mIGFjY2VzcywgZGlzY2lwbGluYXJ5IGFjdGlvbiwgYW5kKSBUaiBFVApCVCAvRjEgMTAgVGYgNjAgMTU2LjQgVGQgKHJlZmVycmFsIGZvciBjcmltaW5hbCBwcm9zZWN1dGlvbiB1bmRlciBhcHBsaWNhYmxlIGZlZGVyYWwgc3RhdHV0ZXMuKSBUaiBFVAplbmRzdHJlYW0KZW5kb2JqCjUgMCBvYmoKPDwgL1R5cGUgL0ZvbnQgL1N1YnR5cGUgL1R5cGUxIC9CYXNlRm9udCAvSGVsdmV0aWNhID4+CmVuZG9iago2IDAgb2JqCjw8IC9UeXBlIC9Gb250IC9TdWJ0eXBlIC9UeXBlMSAvQmFzZUZvbnQgL0hlbHZldGljYS1Cb2xkID4+CmVuZG9iagp4cmVmCjAgNwowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwMDkgMDAwMDAgbiAKMDAwMDAwMDA1OCAwMDAwMCBuIAowMDAwMDAwMTE1IDAwMDAwIG4gCjAwMDAwMDAyNTEgMDAwMDAgbiAKMDAwMDAwMzY1MiAwMDAwMCBuIAowMDAwMDAzNzIyIDAwMDAwIG4gCnRyYWlsZXIKPDwgL1NpemUgNyAvUm9vdCAxIDAgUiA+PgpzdGFydHhyZWYKMzc5NwolJUVPRgo=')}})}"
+    },
+    {
+      "category": "created",
+      "type": "AzOperationalInsightsWorkspace",
+      "path": "AZ-LOG-001",
+      "step": "step_task_AU.L2-3.3.1_mnkmi5kq_zkaoqzy",
+      "timestamp": "2026-04-07T03:10:45.213Z",
+      "cmdlet": "New-AzOperationalInsightsWorkspace -ResourceGroupName rg-eo-prod -Name vfsgov-law-prod -Location usgovvirginia -Sku 'PerGB2018' -RetentionInDays 365"
+    },
+    {
+      "category": "created",
+      "type": "AzOperationalInsightsWorkspace",
+      "path": "AZ-LOG-001",
+      "step": "step_task_AU.L2-3.3.2_mnkmi5kq_w4ny7oc",
+      "timestamp": "2026-04-07T03:11:01.913Z",
+      "cmdlet": "New-AzOperationalInsightsWorkspace -ResourceGroupName rg-eo-prod -Name vfsgov-law-prod -Location usgovvirginia -Sku 'PerGB2018' -RetentionInDays 365"
+    },
+    {
+      "category": "created",
+      "type": "AzSentinelDataConnector",
+      "path": "AU.L2-3.3.3.sentinel-connector",
+      "step": "step_task_AU.L2-3.3.3_mnkmi5kq_jibrqu9",
+      "timestamp": "2026-04-07T03:11:04.449Z",
+      "cmdlet": "New-AzSentinelDataConnector -ResourceGroupName rg-eo-prod -WorkspaceName vfsgov-law-prod -Kind 'Office365' -Exchange 'Enabled' -SharePoint 'Enabled' -Teams 'Enabled'"
+    }
+  ]
+}

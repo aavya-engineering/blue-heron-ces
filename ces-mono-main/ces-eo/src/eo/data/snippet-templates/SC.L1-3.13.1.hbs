@@ -1,0 +1,21 @@
+## Control {{controlId}}: Monitor, control and protect organizational communications (e.g., information transmitted or received by organizational information systems) at the external boundaries and key internal boundaries of the information systems.
+
+**Implementation Status:** {{status}}
+
+{{#if conditionalAccessActive}}
+The organization monitors and controls communications at system boundaries through {{caPoliciesTotalCount}} active Conditional Access policies enforcing access restrictions at network boundaries.
+{{/if}}
+
+{{#if deviceConfigurationsActive}}
+Device configurations enforce boundary protection across {{deviceConfigurationsCount}} managed endpoint policies.
+{{/if}}
+
+{{#if namedLocationsConfigured}}
+Network boundaries are defined through {{namedLocationsCount}} named location policies in Microsoft Entra ID.
+{{/if}}
+
+{{#unless conditionalAccessActive}}
+Boundary protection controls have not been confirmed through Conditional Access policy enforcement.
+{{/unless}}
+
+**Evidence:** {{evidenceArtifactUrl}}

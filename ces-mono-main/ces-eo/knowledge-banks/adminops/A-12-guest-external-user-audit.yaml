@@ -1,0 +1,110 @@
+controlId: "AC.L1-3.1.2"
+relatedControlIds:
+  - "AC.L1-3.1.1"
+  - "AC.L2-3.1.3"
+  - "AC.L1-3.1.20"
+  - "AC.L1-3.1.22"
+
+practiceStatement: "Limit system access to authorized users, processes acting on behalf of users, and devices."
+
+useCaseId: "A-12"
+useCaseTitle: "Guest / External User Audit"
+domain: "Identity & Access Management"
+priority: "P2 High"
+trigger: "SCHEDULE: Quarterly (every 90 days)"
+
+sodTier: "Tier 2 -- Config Manager"
+entraRolesRequired:
+  - "User Administrator"
+  - "External Identity Provider Administrator"
+
+approvalRequired: false
+
+services:
+  - name: "Entra ID"
+    purpose: "Guest user inventory, access reviews, cross-tenant access policies"
+  - name: "Entra ID External Identities"
+    purpose: "B2B cross-tenant access settings"
+  - name: "Microsoft Graph PowerShell"
+    modules:
+      - "Microsoft.Graph.Users"
+      - "Microsoft.Graph.Identity.Governance"
+  - name: "SharePoint Online"
+    purpose: "Guest access to CUI sites"
+
+configurationSteps:
+  portalPath: "https://entra.microsoft.us > Identity > Users > All users > filter by User type: Guest"
+
+  powershellCmdlets:
+    - cmdlet: "Connect-MgGraph"
+      parameters:
+        - "-Environment USGov"
+        - "-Scopes User.Read.All,AccessReview.ReadWrite.All,Policy.ReadWrite.CrossTenantAccess"
+    - cmdlet: "Get-MgUser"
+      parameters:
+        - "-All"
+        - "-Filter userType eq 'Guest'"
+        - "-Property id,displayName,userPrincipalName,mail,createdDateTime,signInActivity,externalUserState"
+    - cmdlet: "New-MgIdentityGovernanceAccessReviewDefinition"
+      parameters:
+        - "-BodyParameter"
+    - cmdlet: "Get-MgPolicyCrossTenantAccessPolicyPartner"
+      parameters:
+        - "-All"
+
+  graphApiEndpoint: "GET https://graph.microsoft.us/v1.0/users"
+  graphApiPayloadExample:
+    $filter: "userType eq 'Guest'"
+    $select: "id,displayName,mail,createdDateTime,signInActivity,externalUserState"
+
+  requiredPermissions:
+    - "User.Read.All"
+    - "AuditLog.Read.All"
+    - "AccessReview.ReadWrite.All"
+    - "Policy.Read.All"
+    - "Policy.ReadWrite.CrossTenantAccess"
+
+evidenceArtifacts:
+  - type: "CSV"
+    retentionPeriod: "7 years"
+    storageLocation: "evidence-store/domain-a-identity/A-12/{year}/{month}/"
+    format: "Guest inventory"
+    filenamePattern: "A-12_GuestAudit_{YYYYMMDD}_{HHmmss}_Quarterly.csv"
+  - type: "JSON"
+    retentionPeriod: "7 years"
+    storageLocation: "evidence-store/domain-a-identity/A-12/{year}/{month}/"
+    format: "Access review definition and results, cross-tenant policy export"
+    hashAlgorithm: "SHA-256"
+
+gccHighSpecifics:
+  endpoints:
+    - "https://graph.microsoft.us"
+    - "https://entra.microsoft.us"
+  complianceBoundary: "FedRAMP High + CMMC L2"
+  endpointValidation: "All endpoints use .microsoft.us or .usgovcloudapi.net domains"
+  notes: "B2B guest access in GCC High is limited to collaboration with other GCC High tenants and Azure Government tenants by default. Cross-cloud B2B requires explicit cross-tenant access policy configuration. Access reviews function identically in GCC High. Default cross-tenant access policy should block inbound access from non-approved organizations. Verify B2B direct connect (Teams shared channels) is restricted for CUI resources."
+
+relatedPolicies:
+  - "AC-001 Access Control Policy"
+  - "IA-002 Identification and Authentication Policy"
+
+odpValues:
+  - odpId: "AC.L2-3.1.3_ODP_01"
+    description: "Approved partner organizations for B2B collaboration"
+    value: "Explicitly allowed partner tenant IDs in cross-tenant access policy"
+    rationale: "Controls CUI flow to external organizations; default deny-all with explicit allow-list"
+    enforcementMechanism: "Entra ID cross-tenant access policies"
+
+dependencies:
+  hardDependencies: []
+  softDependencies:
+    - useCaseId: "D-04"
+      reason: "External sharing audit should be aligned with guest user audit"
+    - useCaseId: "D-05"
+      reason: "CUI site membership recertification may overlap"
+    - useCaseId: "G-08"
+      reason: "Contractor access recertification"
+    - useCaseId: "E-09"
+      reason: "Guest audit feeds C3PAO package"
+
+notes: "External users represent high-risk access vector because they are managed by external identity providers. CMMC AC.L2-3.1.3 requires explicit management of external access to CUI resources. Access reviews auto-apply after 14 days with default deny decision. Guest user signInActivity available for stale guest detection."

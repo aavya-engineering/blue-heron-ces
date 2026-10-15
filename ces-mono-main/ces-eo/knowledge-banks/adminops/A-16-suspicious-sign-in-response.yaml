@@ -1,0 +1,109 @@
+controlId: "SI.L1-3.14.2"
+relatedControlIds:
+  - "AC.L1-3.1.1"
+  - "IR.L2-3.6.1"
+  - "IR.L2-3.6.2"
+  - "SI.L2-3.14.6"
+
+practiceStatement: "Limit system access to authorized users, processes acting on behalf of users, and devices."
+
+useCaseId: "A-16"
+useCaseTitle: "Suspicious Sign-In Response"
+domain: "Identity & Access Management"
+priority: "P1 Critical"
+trigger: "INCIDENT: Entra ID Identity Protection risk detection or Sentinel alert"
+
+sodTier: "Tier 2 -- Config Manager (initial response), Tier 3 -- Privileged Admin (if escalation to H-02)"
+entraRolesRequired:
+  - "Security Administrator"
+
+approvalRequired: false
+
+services:
+  - name: "Entra ID Identity Protection"
+    purpose: "Risky user confirmation, risk dismissal"
+  - name: "Entra ID"
+    purpose: "Session revocation, password reset"
+  - name: "Microsoft Sentinel"
+    purpose: "Alert correlation, incident creation"
+  - name: "Microsoft Graph PowerShell"
+    modules:
+      - "Microsoft.Graph.Identity.SignIns"
+      - "Microsoft.Graph.Users"
+
+configurationSteps:
+  portalPath: "https://entra.microsoft.us > Protection > Identity Protection > Risky users"
+
+  powershellCmdlets:
+    - cmdlet: "Connect-MgGraph"
+      parameters:
+        - "-Environment USGov"
+        - "-Scopes IdentityRiskyUser.ReadWrite.All,User.ReadWrite.All,Directory.ReadWrite.All"
+    - cmdlet: "Get-MgRiskyUser"
+      parameters:
+        - "-Filter"
+    - cmdlet: "Confirm-MgRiskyUserCompromised"
+      parameters:
+        - "-UserIds"
+    - cmdlet: "Revoke-MgUserSignInSession"
+      parameters:
+        - "-UserId"
+    - cmdlet: "Update-MgUser"
+      parameters:
+        - "-UserId"
+        - "-PasswordProfile"
+    - cmdlet: "Get-MgRiskyUserHistory"
+      parameters:
+        - "-RiskyUserId"
+
+  graphApiEndpoint: "GET https://graph.microsoft.us/v1.0/identityProtection/riskyUsers"
+  graphApiPayloadExample:
+    $filter: "riskLevel eq 'high' or riskLevel eq 'medium'"
+
+  requiredPermissions:
+    - "IdentityRiskyUser.Read.All"
+    - "IdentityRiskyUser.ReadWrite.All"
+    - "User.ReadWrite.All"
+
+evidenceArtifacts:
+  - type: "JSON"
+    retentionPeriod: "7 years"
+    storageLocation: "evidence-store/domain-a-identity/A-16/{year}/{month}/"
+    format: "Risk detection details, confirmation action, session revocation result, escalation status"
+    filenamePattern: "A-16_SuspiciousSignIn_{YYYYMMDD}_{HHmmss}_{UPN}.json"
+    hashAlgorithm: "SHA-256"
+
+gccHighSpecifics:
+  endpoints:
+    - "https://graph.microsoft.us"
+    - "https://entra.microsoft.us"
+    - "https://portal.azure.us"
+  complianceBoundary: "FedRAMP High + CMMC L2"
+  endpointValidation: "All endpoints use .microsoft.us or .usgovcloudapi.net domains"
+  notes: "Entra ID Identity Protection fully available in GCC High with Entra ID P2. Risk detections including impossible travel, anonymous IP, and leaked credential detection function identically to commercial. Confirm-MgRiskyUserCompromised works via graph.microsoft.us and triggers CA risk-based policies if configured. Session revocation token propagation takes up to 1 hour for cached tokens; for immediate containment, combine with account disable (escalate to H-02). Sentinel integration uses Entra ID connector to correlate risky sign-in events with other security signals."
+
+relatedPolicies:
+  - "AC-001 Access Control Policy"
+  - "IR-001 Incident Response Policy"
+  - "SI-001 System and Information Integrity Policy"
+
+odpValues:
+  - odpId: "IR.L2-3.6.1_ODP_01"
+    description: "Incident response actions for identity threats"
+    value: "Confirm user compromised, revoke sessions, force password reset, escalate to H-02 if High risk or CUI access involved"
+    rationale: "First-line response to identity-based threats prevents continued attacker access"
+    enforcementMechanism: "Identity Protection API + manual responder actions"
+
+dependencies:
+  hardDependencies: []
+  softDependencies:
+    - useCaseId: "E-08"
+      reason: "Sign-in log anomaly sweep may have identified the risk"
+    - useCaseId: "A-07"
+      reason: "MFA policy should already be enforced"
+    - useCaseId: "H-02"
+      reason: "Escalation for confirmed compromises requiring full incident response"
+    - useCaseId: "H-04"
+      reason: "Evidence preservation if incident is declared"
+
+notes: "Triggered by Entra ID Identity Protection risk detections (medium or high-risk sign-ins, impossible travel, anonymous IP, leaked credentials) or Sentinel alerts. Responder confirms user as compromised, revokes all active sessions, forces password reset, and escalates to H-02 if risk level warrants full incident response. First-line response to identity-based threats. Review sign-in details, IP address, location, risk level, detection type before confirming compromise. If risk level High or CUI access involved, escalate to H-02 for full incident response including account disable, device inspection, and evidence preservation."

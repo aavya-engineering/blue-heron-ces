@@ -1,0 +1,103 @@
+{
+  "_generated": "2026-04-19",
+  "_source": "NIST CMVP validated modules search (https://csrc.nist.gov/projects/cryptographic-module-validation-program/validated-modules/search)",
+  "_selection_rule": "Most recent active validation date per module family as of 2026-04-19",
+  "modules": [
+    {
+      "module_name": "Cryptographic Primitives Library",
+      "binary": "bcryptprimitives.dll, ncryptsslp.dll",
+      "vendor": "Microsoft Corporation",
+      "cert_number": 4536,
+      "fips_standard": "FIPS 140-2",
+      "overall_level": 1,
+      "validation_date": "2023-06-15",
+      "status": "Active",
+      "sunset_date": "2026-09-21",
+      "cmvp_url": "https://csrc.nist.gov/projects/cryptographic-module-validation-program/certificate/4536",
+      "azure_services": ["Azure Storage (SSE via BCryptPrimitives)", "Azure SQL TDE", "M365 GCC High at-rest encryption"],
+      "notes": "Azure Storage service encryption uses this library to provide AES-256 data encryption at rest. Azure services rely on FIPS 140 validated encryption by using the FIPS 140 validated cryptographic modules in the underlying Windows OS."
+    },
+    {
+      "module_name": "Cryptographic Primitives Library (Windows 11)",
+      "binary": "bcryptprimitives.dll, ncryptsslp.dll",
+      "vendor": "Microsoft Corporation",
+      "cert_number": 4825,
+      "fips_standard": "FIPS 140-2",
+      "overall_level": 1,
+      "validation_date": "2024-08-09",
+      "status": "Active",
+      "sunset_date": "2026-09-21",
+      "cmvp_url": "https://csrc.nist.gov/projects/cryptographic-module-validation-program/certificate/4825",
+      "azure_services": ["TLS 1.2+ transport (user browser to M365 GCC High)"],
+      "notes": "Most recent active cert for the Cryptographic Primitives Library family. Covers TLS transport cryptographic operations."
+    },
+    {
+      "module_name": "Kernel Mode Cryptographic Primitives Library",
+      "binary": "CNG.sys",
+      "vendor": "Microsoft Corporation",
+      "cert_number": 4766,
+      "fips_standard": "FIPS 140-2",
+      "overall_level": 1,
+      "validation_date": "2024-08-09",
+      "status": "Active",
+      "sunset_date": "2026-09-21",
+      "cmvp_url": "https://csrc.nist.gov/projects/cryptographic-module-validation-program/certificate/4766",
+      "azure_services": ["Kernel-level crypto for Azure host OS"],
+      "notes": "Kernel mode companion to the Cryptographic Primitives Library."
+    },
+    {
+      "module_name": "CNN35XX-NFBE HSM Family (Marvell LiquidSecurity)",
+      "binary": "Hardware HSM",
+      "vendor": "Marvell Semiconductor, Inc.",
+      "cert_number": 3718,
+      "fips_standard": "FIPS 140-2",
+      "overall_level": 3,
+      "validation_date": "2020-06-16",
+      "status": "Active",
+      "sunset_date": "2026-09-21",
+      "cmvp_url": "https://csrc.nist.gov/projects/cryptographic-module-validation-program/certificate/3718",
+      "azure_services": ["Azure Key Vault Premium (hsmPlatform 2)"],
+      "notes": "Marvell CNN35XX-NFBE HSM used in Azure Key Vault Premium for hsmPlatform 2 keys. FIPS 140-2 Level 3. Keys with hsmPlatform 2 are Level 3 compliant."
+    },
+    {
+      "module_name": "Marvell LiquidSecurity HSM (FIPS 140-3)",
+      "binary": "Hardware HSM",
+      "vendor": "Marvell Semiconductor, Inc.",
+      "cert_number": 4700,
+      "fips_standard": "FIPS 140-3",
+      "overall_level": 3,
+      "validation_date": "2024-06-01",
+      "status": "Active",
+      "cmvp_url": "https://csrc.nist.gov/projects/cryptographic-module-validation-program/certificate/4700",
+      "azure_services": ["Azure Key Vault Managed HSM"],
+      "notes": "FIPS 140-3 Level 3 validated. Used by Azure Key Vault Managed HSM service. Most recent HSM validation for Azure Key Vault family."
+    }
+  ],
+  "mapping_for_datasets": {
+    "tls_transport": {
+      "description": "TLS 1.2+ between user browser and M365 GCC High / Azure Gov services",
+      "module": "Cryptographic Primitives Library",
+      "cert_reference": "Cert #4536",
+      "notes": "Azure and M365 services use Windows Cryptographic Primitives Library for TLS operations"
+    },
+    "m365_at_rest": {
+      "description": "M365 GCC High at-rest encryption (SPO, OneDrive, Exchange, Teams)",
+      "module": "Cryptographic Primitives Library",
+      "cert_reference": "Cert #4536",
+      "notes": "M365 services use the same BCryptPrimitives.dll for AES-256 encryption at rest"
+    },
+    "azure_storage_at_rest": {
+      "description": "Azure Storage service encryption (AES-256-GCM with CMK)",
+      "module": "Cryptographic Primitives Library",
+      "cert_reference": "Cert #4536",
+      "notes": "Azure Storage SSE uses BCryptPrimitives.dll. CMK wrapping performed by Key Vault HSM."
+    },
+    "key_vault_hsm": {
+      "description": "Azure Key Vault Premium HSM-backed key operations",
+      "module": "CNN35XX-NFBE HSM Family (Marvell) / Marvell LiquidSecurity HSM",
+      "cert_reference_level2": "Cert #3718 (FIPS 140-2 Level 3, hsmPlatform 2)",
+      "cert_reference_managed_hsm": "Cert #4700 (FIPS 140-3 Level 3)",
+      "notes": "Key Vault Premium uses Marvell HSMs. hsmPlatform 2 keys use Cert #3718 (Level 3). Managed HSM uses Cert #4700 (FIPS 140-3 Level 3)."
+    }
+  }
+}

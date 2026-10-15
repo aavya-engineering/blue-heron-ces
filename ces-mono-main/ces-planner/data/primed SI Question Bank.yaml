@@ -1,0 +1,710 @@
+ces:
+  artifact: ces_sit_question_bank_cmmc20_primed
+  version: 0.3.0
+  generated_on: '2026-02-04'
+  intent: Reduced Strategic Intent (SI) Question Bank for CES SIT. Captures essential destination-level compliance intent and constraints; designed to prune RR selection and drive MPT gating. High-advisory mode.
+  authoritative_sources:
+  - id: dod_cmmc_model_v2
+    title: DoD CMMC 2.0 Model & Program Guidance
+    type: government
+  - id: dod_cmmc_assessment_guides
+    title: "DoD CMMC Assessment Guides (Levels 1\u20133)"
+    type: government
+  - id: far_52_204_21
+    title: FAR 52.204-21 Basic Safeguarding of Covered Contractor Information Systems
+    type: government
+  - id: nist_800_171
+    title: NIST SP 800-171 Protecting Controlled Unclassified Information in Nonfederal Systems and Organizations
+    type: government
+  - id: nist_800_172
+    title: NIST SP 800-172 Enhanced Security Requirements for Protecting CUI
+    type: government
+  governance:
+    tag_policy:
+      FACT: Directly sourced from authoritative government publications.
+      INFERENCE: Widely accepted interpretation; must be validated during RR.
+      OPEN_QUESTION: Ambiguous/evolving; record explicitly and validate.
+    change_control: Treat this as a primed canonical bank; version changes must preserve IDs when semantics are unchanged.
+  its_fields:
+    si_baseline_target:
+      description: Destination compliance target and data classification intent.
+      fields:
+      - si_baseline.target.target_cmmc_level
+      - si_baseline.target.cui_presence
+      - si_baseline.target.cui_types
+      - si_baseline.target.regulated_data_notes
+    si_baseline_assessment:
+      description: Assessment route, assessing body, timing.
+      fields:
+      - si_baseline.assessment.assessment_route
+      - si_baseline.assessment.assessment_body
+      - si_baseline.assessment.certification_timing_goal
+    si_baseline_scope:
+      description: Boundary and scope posture intent.
+      fields:
+      - si_baseline.scope.boundary_strategy
+      - si_baseline.scope.deployment_posture
+      - si_baseline.scope.in_scope_users_estimate
+      - si_baseline.scope.in_scope_endpoints_estimate
+    si_baseline_operations:
+      description: Operational mode constraints (collaboration, BYOD).
+      fields:
+      - si_baseline.operations.collaboration_mode
+      - si_baseline.operations.byod_posture
+    si_baseline_evidence:
+      description: Evidence posture constraints.
+      fields:
+      - si_baseline.evidence.evidence_posture_target
+    si_baseline_dependencies:
+      description: Tenant/tooling constraints.
+      fields:
+      - si_baseline.dependencies.tenant_model_preference
+    si_baseline_risk_acceptance:
+      description: POA&M posture.
+      fields:
+      - si_baseline.risk_acceptance.poam_policy_intent
+  question_bank:
+    description: Essential SI questions (destination/constraints). Presented one-per-page by SIT; includes high-advisory guidance and downstream implications.
+    questions:
+    - id: G-01
+      text: What CMMC level is the target compliance destination for this effort?
+      applies_to_levels: &id001
+      - L1
+      - L2
+      - L3
+      sets_its_fields:
+      - si_baseline.target.target_cmmc_level
+      required: true
+      provenance:
+        primary: client_assertion
+        validation_in_rrt: true
+        may_reference_sources:
+        - dod_cmmc_model_v2
+      advisor_description: Defines the compliance destination (L1/L2/L3) that constrains all downstream scoping, RR selection, and mission planning.
+      advisor_reason_its: Target level is the primary selector for required practices, evidence rigor, and assessment route feasibility.
+      advisor_cmmc_impact: Choosing a higher level increases required control outcomes, evidence expectations, and operating discipline. L3 introduces additional depth derived from NIST SP 800-172 and evolving DoD guidance.
+      advisor_pitfalls:
+      - Selecting L2/L3 without confirming whether CUI is present or contractually required.
+      - Assuming L3 is a simple increment over L2; it typically implies stronger governance, detection, and resilience.
+      - Treating the target level as flexible after RR begins; changes redefine scope and plan.
+      advisor_rr_implications:
+      - RR activity selection expands to the full set of practices required for the chosen level.
+      - Sampling and evidence expectations change materially with level.
+      advisor_mpt_gate_implications:
+      - Mission Plan gates and sequencing depend on target level; higher levels generally require earlier governance and monitoring enablement.
+      answer:
+        type: enum
+        options:
+        - value: L1
+          description: CMMC Level 1 target.
+          cmmc_attainment_impact: Applies FAR 52.204-21 (FCI baseline).
+          advisor_notes: Use when only FCI is handled and contract requires L1.
+        - value: L2
+          description: CMMC Level 2 target.
+          cmmc_attainment_impact: Applies NIST SP 800-171 (CUI baseline).
+          advisor_notes: Typical requirement for CUI-handling DoD contractors.
+        - value: L3
+          description: CMMC Level 3 target.
+          cmmc_attainment_impact: Adds advanced protections derived from NIST SP 800-172; final practice set may evolve.
+          advisor_notes: Record program/contract driver and accept truth-tag caveats.
+        guidance:
+          description: Select the target destination level. If contract-dependent, select the best-known target and record uncertainty in notes.
+          cmmc_attainment_impact: Locks the destination required outcomes.
+          advisor_notes: If uncertain, treat as a gate and trigger an RR task to confirm contractual requirement.
+    - id: G-02
+      text: What is the CUI/FCI presence expectation for the in-scope environment?
+      applies_to_levels: *id001
+      sets_its_fields:
+      - si_baseline.target.cui_presence
+      required: true
+      provenance:
+        primary: client_assertion
+        validation_in_rrt: true
+        may_reference_sources:
+        - far_52_204_21
+        - nist_800_171
+      advisor_description: Determines whether the target scope must support CUI handling (L2/L3) or only FCI (L1).
+      advisor_reason_its: Data classification expectation drives scoping, boundary design, allowable channels, and inherited responsibility assumptions.
+      advisor_cmmc_impact: If CUI is present or expected, the environment must meet CUI protections; if FCI-only, L1 baseline may apply depending on contract.
+      advisor_pitfalls:
+      - "Assuming 'we don\u2019t handle CUI' without reviewing contract deliverables and flow paths."
+      - Treating CUI as only documents; CUI can appear in tickets, chats, code, screenshots, exports.
+      - Not distinguishing 'unknown' (risk) from 'no_cui' (asserted).
+      advisor_rr_implications:
+      - RR must validate the assertion by inspecting contracts, repositories, and actual data flows.
+      - CUI presence expands scoping to include CUI assets, security protection assets, and relevant service provider dependencies.
+      advisor_mpt_gate_implications:
+      - If CUI is present, MPT must prioritize boundary and channel enforcement controls and evidence mechanisms.
+      answer:
+        type: enum
+        options:
+        - value: no_cui
+          description: No CUI expected; may still have FCI.
+          cmmc_attainment_impact: May align to L1 depending on contract.
+          advisor_notes: RR should still validate via contract/data flow review.
+        - value: fci_only
+          description: FCI only (no CUI).
+          cmmc_attainment_impact: L1 baseline can apply; confirm contract requirements.
+          advisor_notes: Validate via contract clauses.
+        - value: cui_present
+          description: CUI expected or present.
+          cmmc_attainment_impact: Triggers L2/L3 expectations.
+          advisor_notes: Capture CUI categories next.
+        - value: cui_plus_other_sensitive
+          description: CUI plus other regulated/sensitive data.
+          cmmc_attainment_impact: May introduce additional constraints beyond CMMC.
+          advisor_notes: Document regulated data notes.
+        - value: unknown
+          description: Unclear; needs confirmation.
+          cmmc_attainment_impact: High planning risk; treat as gating risk.
+          advisor_notes: Trigger RR contract/CUI register review.
+        guidance:
+          description: Select the best available classification expectation for the target environment.
+          cmmc_attainment_impact: Sets scoping and handling assumptions.
+          advisor_notes: Unknown should be rare; treat as a gate when timeline is tight.
+    - id: G-03
+      text: What CUI categories/types are expected in the intended scope (if any)?
+      applies_to_levels: *id001
+      sets_its_fields:
+      - si_baseline.target.cui_types
+      required: false
+      provenance:
+        primary: client_assertion
+        validation_in_rrt: true
+        may_reference_sources:
+        - nist_800_171
+      advisor_description: Captures expected CUI categories to inform handling constraints and RR focus areas.
+      advisor_reason_its: Some CUI types impose customer or contractual constraints on sharing, storage, and access patterns.
+      advisor_cmmc_impact: Does not change baseline practices, but can alter scoping boundary decisions and operational channel controls.
+      advisor_pitfalls:
+      - Inferring CUI types without client confirmation.
+      - Failing to capture where CUI appears beyond documents (tickets, chats, code).
+      advisor_rr_implications:
+      - RR should validate CUI categories against contract language and actual repositories/data flows.
+      advisor_mpt_gate_implications:
+      - MPT may need explicit channel restrictions and DLP/labeling patterns depending on CUI types.
+      answer:
+        type: multi_select
+        options:
+        - value: cui_basic
+          description: CUI Basic (general controlled unclassified information)
+          cmmc_attainment_impact: Standard CUI handling requirements apply.
+          advisor_notes: Most common category requiring NIST SP 800-171 controls.
+        - value: cui_specified
+          description: CUI Specified (additional safeguarding or dissemination controls)
+          cmmc_attainment_impact: May require additional handling markings and controls.
+          advisor_notes: Check contract for specific requirements.
+        - value: export_controlled
+          description: Export Controlled (ITAR, EAR)
+          cmmc_attainment_impact: Requires strict access controls and audit trails.
+          advisor_notes: May restrict use of foreign nationals and cloud regions.
+        - value: proprietary
+          description: Proprietary/Trade Secret
+          cmmc_attainment_impact: Additional non-disclosure and separation requirements.
+          advisor_notes: Customer-specific handling requirements may apply.
+        - value: pii
+          description: PII/Privacy-sensitive
+          cmmc_attainment_impact: May trigger additional privacy controls.
+          advisor_notes: Consider state/federal privacy regulations.
+        - value: critical_infrastructure
+          description: Critical Infrastructure Information (PCII, CII)
+          cmmc_attainment_impact: Enhanced protection and disclosure restrictions.
+          advisor_notes: Check DHS guidelines for handling.
+        - value: law_enforcement_sensitive
+          description: Law Enforcement Sensitive
+          cmmc_attainment_impact: Need-to-know and dissemination controls.
+          advisor_notes: Coordinate with law enforcement agency requirements.
+        - value: other
+          description: Other CUI category
+          cmmc_attainment_impact: Varies by category.
+          advisor_notes: Document in notes field.
+        - value: unknown
+          description: Unknown/To be determined
+          cmmc_attainment_impact: High planning risk.
+          advisor_notes: Create RR task to resolve.
+        min_selections: 0
+        max_selections: 10
+        guidance:
+          description: Select all CUI categories/types expected in scope based on contract and customer requirements.
+          cmmc_attainment_impact: Clarifies which flows must be controlled and where separation is required.
+          advisor_notes: If unknown, select 'unknown' and create an RR task to resolve.
+      conditional_required_if:
+        field: si_baseline.target.cui_presence
+        equals_any:
+        - cui_present
+        - cui_plus_other_sensitive
+    - id: G-04
+      text: Are there other regulated or sensitive data constraints that must be honored (ITAR, EAR, privacy, export controls, etc.)?
+      applies_to_levels: *id001
+      sets_its_fields:
+      - si_baseline.target.regulated_data_notes
+      required: true
+      provenance:
+        primary: client_assertion
+        validation_in_rrt: true
+      advisor_description: Captures non-CMMC regulatory constraints that may further restrict architecture and data handling.
+      advisor_reason_its: Regulated data constraints can eliminate otherwise-compliant deployment options and introduce additional audit/evidence needs.
+      advisor_cmmc_impact: May require additional controls or boundary patterns beyond CMMC to satisfy client/regulatory obligations.
+      advisor_pitfalls:
+      - Ignoring export-control or residency requirements until late in design.
+      - Assuming FedRAMP/GCC High automatically satisfies all non-CMMC requirements.
+      advisor_rr_implications:
+      - RR should confirm constraints via contract clauses, customer security addenda, and legal/compliance inputs.
+      advisor_mpt_gate_implications:
+      - MPT may require early architectural decisions (tenant model, residency, separation) and explicit acceptance criteria.
+      answer:
+        type: multi_select
+        options:
+        - value: none
+          description: No additional regulatory constraints
+          cmmc_attainment_impact: CMMC requirements only.
+          advisor_notes: Standard CMMC compliance path.
+        - value: itar
+          description: ITAR (International Traffic in Arms Regulations)
+          cmmc_attainment_impact: Requires strict access controls, audit trails, and foreign national restrictions.
+          advisor_notes: May restrict cloud regions and require US-only support.
+        - value: ear
+          description: EAR (Export Administration Regulations)
+          cmmc_attainment_impact: Export controls and technology transfer restrictions.
+          advisor_notes: Coordinate with export compliance office.
+        - value: hipaa
+          description: HIPAA (Health Insurance Portability and Accountability Act)
+          cmmc_attainment_impact: PHI protection requirements beyond CMMC.
+          advisor_notes: Requires BAA and additional safeguards.
+        - value: pci_dss
+          description: PCI DSS (Payment Card Industry Data Security Standard)
+          cmmc_attainment_impact: Cardholder data protection requirements.
+          advisor_notes: Requires network segmentation and quarterly scanning.
+        - value: gdpr
+          description: GDPR (General Data Protection Regulation)
+          cmmc_attainment_impact: EU data subject rights and privacy requirements.
+          advisor_notes: May require data residency and DPO.
+        - value: ccpa
+          description: CCPA/CPRA (California Consumer Privacy Act)
+          cmmc_attainment_impact: California consumer privacy rights.
+          advisor_notes: Privacy notices and opt-out mechanisms required.
+        - value: sox
+          description: SOX (Sarbanes-Oxley Act)
+          cmmc_attainment_impact: Financial controls and audit requirements.
+          advisor_notes: ITGC and change control rigor.
+        - value: fedramp
+          description: FedRAMP authorization required
+          cmmc_attainment_impact: Must use FedRAMP authorized cloud services.
+          advisor_notes: Check authorization level (Low/Moderate/High).
+        - value: cmvp_fips140
+          description: FIPS 140-2/140-3 cryptographic requirements
+          cmmc_attainment_impact: Validated cryptographic modules required.
+          advisor_notes: May limit encryption product choices.
+        - value: data_residency
+          description: Data residency/sovereignty requirements
+          cmmc_attainment_impact: Geographic restrictions on data storage/processing.
+          advisor_notes: Document required regions.
+        - value: sector_specific
+          description: Sector-specific regulations (NERC CIP, FDA, etc.)
+          cmmc_attainment_impact: Industry-specific requirements.
+          advisor_notes: Document specific regulation and applicability.
+        - value: customer_specific
+          description: Customer-specific contractual requirements
+          cmmc_attainment_impact: Varies by customer contract.
+          advisor_notes: Document in contract clauses.
+        - value: other
+          description: Other regulatory constraint
+          cmmc_attainment_impact: Varies.
+          advisor_notes: Document specific requirement.
+        min_selections: 1
+        max_selections: 15
+        guidance:
+          description: Select all applicable regulatory constraints that apply to this environment beyond CMMC.
+          cmmc_attainment_impact: May materially constrain solution space and evidence approach.
+          advisor_notes: Be explicit about which constraints are non-negotiable.
+    - id: G-05
+      text: What assessment route is intended (self-assessment vs certification), and who is the anticipated assessment body?
+      applies_to_levels: *id001
+      sets_its_fields:
+      - si_baseline.assessment.assessment_route
+      - si_baseline.assessment.assessment_body
+      required: true
+      provenance:
+        primary: client_assertion
+        validation_in_rrt: true
+        may_reference_sources:
+        - dod_cmmc_model_v2
+      advisor_description: Defines how the compliance destination will be evaluated and by whom.
+      advisor_reason_its: Assessment route determines evidence rigor, documentation expectations, and risk posture.
+      advisor_cmmc_impact: Certification generally requires higher assessor-ready evidence and more disciplined operating processes.
+      advisor_pitfalls:
+      - Assuming 'self' when contract requires certification.
+      - Not identifying who will perform/oversee assessments (internal, prime, third-party).
+      advisor_rr_implications:
+      - RR must shape evidence collection depth based on route; certification generally expands examine/test requirements.
+      advisor_mpt_gate_implications:
+      - MPT must plan deliverables and acceptance criteria consistent with the assessment route.
+      answer:
+        type: structured_object
+        schema:
+          assessment_route:
+            type: enum
+            options:
+            - self
+            - certification
+            - unknown_contract_dependent
+          assessment_body:
+            type: enum
+            options:
+            - c3pao
+            - dcma_dibcac
+            - prime_contractor_assessor
+            - internal_self_assessment
+            - customer_agency_assessor
+            - other
+            - unknown
+        guidance:
+          description: Select route and identify expected assessing body if known.
+          cmmc_attainment_impact: Sets evidence rigor and documentation demands.
+          advisor_notes: If unknown, treat as a gate when timeline is short.
+    - id: G-06
+      text: What is the certification timing goal (by date / within days / ASAP), and what is the driver?
+      applies_to_levels: *id001
+      sets_its_fields:
+      - si_baseline.assessment.certification_timing_goal
+      required: true
+      provenance:
+        primary: client_assertion
+        validation_in_rrt: true
+      advisor_description: Sets the time constraint that governs feasibility, sequencing, and the minimum viable architecture path.
+      advisor_reason_its: Schedule is a top constraint; it determines whether to stabilize or redesign the environment and how aggressive evidence automation must be.
+      advisor_cmmc_impact: Tight timelines increase the value of standard patterns and reduce tolerance for architectural churn.
+      advisor_pitfalls:
+      - Stating 'ASAP' without a business driver; it hides real constraints.
+      - Not aligning timeline with procurement lead times (licenses, devices, VDI capacity).
+      advisor_rr_implications:
+      - RR must prioritize high-risk gaps and scoping ambiguities early when timelines are tight.
+      advisor_mpt_gate_implications:
+      - MPT will front-load gates like boundary definition, identity hardening, and logging enablement when timeline is constrained.
+      answer:
+        type: structured_object
+        schema:
+          goal_type:
+            type: enum
+            options:
+            - by_date
+            - within_days
+            - asap
+            - unknown
+          by_date:
+            type: date
+          within_days:
+            type: integer
+          driver:
+            type: text
+        guidance:
+          description: Provide the best-known timing goal and business driver (RFP, award, renewal, customer deadline).
+          cmmc_attainment_impact: Drives feasibility and sequencing.
+          advisor_notes: If unknown, capture the next decision milestone date.
+    - id: G-07
+      text: What is the intended boundary strategy for the in-scope environment?
+      applies_to_levels: *id001
+      sets_its_fields:
+      - si_baseline.scope.boundary_strategy
+      required: true
+      provenance:
+        primary: client_assertion
+        validation_in_rrt: true
+      advisor_description: Defines how the in-scope environment will be bounded (single enclave, multiple enclaves, hybrid).
+      advisor_reason_its: Boundary strategy is the foundation for scoping, inheritance assumptions, and evidence collection strategy.
+      advisor_cmmc_impact: Multi-enclave and hybrid boundaries increase complexity; they can reduce scope but increase engineering and governance overhead.
+      advisor_pitfalls:
+      - Choosing multiple enclaves without clear separation and governance.
+      - Assuming shared services can be out-of-scope without clear separation evidence.
+      advisor_rr_implications:
+      - RR must validate the implemented boundary and inventories against the intent.
+      advisor_mpt_gate_implications:
+      - MPT sequencing depends on boundary strategy; hybrid/multi-enclave typically require earlier architecture and change control.
+      answer:
+        type: enum
+        options:
+        - value: single_enclave
+          description: One in-scope enclave.
+          cmmc_attainment_impact: Simpler scoping/evidence.
+          advisor_notes: Common for small contractors.
+        - value: multiple_enclaves
+          description: Multiple in-scope enclaves.
+          cmmc_attainment_impact: Can reduce scope per enclave but increases governance.
+          advisor_notes: Requires strong segmentation evidence.
+        - value: hybrid_boundary
+          description: Hybrid boundary (some shared services, some isolated).
+          cmmc_attainment_impact: High design and evidence complexity.
+          advisor_notes: Treat shared services carefully; define in/out-of-scope separation.
+        - value: unknown
+          description: Not decided yet.
+          cmmc_attainment_impact: Planning risk.
+          advisor_notes: Treat as gate when schedule is tight.
+    - id: G-08
+      text: What is the intended deployment posture for in-scope systems (cloud-only, hybrid, on-prem)?
+      applies_to_levels: *id001
+      sets_its_fields:
+      - si_baseline.scope.deployment_posture
+      required: true
+      provenance:
+        primary: client_assertion
+        validation_in_rrt: true
+      advisor_description: Captures the target hosting posture, which affects boundary, logging, identity, and inherited controls assumptions.
+      advisor_reason_its: Deployment posture constrains feasible control implementations and where evidence will be sourced.
+      advisor_cmmc_impact: Cloud-only can simplify standardization; on-prem can increase operational burden; hybrid increases evidence integration complexity.
+      advisor_pitfalls:
+      - Selecting on-prem due to perception rather than contract requirement.
+      - Hybrid without centralized identity/logging creates evidence gaps.
+      advisor_rr_implications:
+      - RR must confirm where systems actually run and where logs/config evidence are produced.
+      advisor_mpt_gate_implications:
+      - MPT must account for integration work (identity, logging, patching) across the chosen posture.
+      answer:
+        type: enum
+        options:
+        - value: cloud_only
+          description: Cloud-only deployment (no on-premises infrastructure)
+          cmmc_attainment_impact: Can simplify standardization and evidence automation.
+          advisor_notes: Leverage cloud-native security controls and centralized logging.
+        - value: hybrid
+          description: Hybrid deployment (mix of cloud and on-premises)
+          cmmc_attainment_impact: Increases evidence integration complexity.
+          advisor_notes: Requires centralized identity/logging across environments.
+        - value: on_prem
+          description: On-premises only deployment
+          cmmc_attainment_impact: May increase operational burden for patching, logging, and monitoring.
+          advisor_notes: Ensure adequate physical security and infrastructure controls.
+        - value: unknown
+          description: Unknown or to be determined
+          cmmc_attainment_impact: High planning risk.
+          advisor_notes: Treat as gate and resolve early in planning.
+    - id: S-11
+      text: Estimate the number of in-scope users and endpoints in the target state (go-live).
+      applies_to_levels: *id001
+      sets_its_fields:
+      - si_baseline.scope.in_scope_users_estimate
+      - si_baseline.scope.in_scope_endpoints_estimate
+      required: true
+      provenance:
+        primary: client_assertion
+        validation_in_rrt: true
+      advisor_description: Provides sizing for licensing, device management, monitoring, and evidence workload.
+      advisor_reason_its: Sizing is necessary for credible cost/procurement and operational feasibility planning.
+      advisor_cmmc_impact: Impacts identity/admin design, logging volume, and evidence collection scale.
+      advisor_pitfalls:
+      - Under-counting admin accounts and service accounts.
+      - Ignoring non-human identities and privileged workstations.
+      advisor_rr_implications:
+      - RR validates actual counts via inventories and directory exports.
+      advisor_mpt_gate_implications:
+      - MPT cost/proposal and tenant manifest sizing depend on these estimates.
+      answer:
+        type: structured_object
+        schema:
+          in_scope_users_estimate:
+            type: integer
+          in_scope_endpoints_estimate:
+            type: integer
+          notes:
+            type: text
+        guidance:
+          description: Provide best estimates; use ranges in notes if uncertain.
+          cmmc_attainment_impact: Sizing drives feasibility and cost assumptions.
+          advisor_notes: Include VDI instances, servers, and privileged admin workstations where applicable.
+    - id: S-12
+      text: What collaboration mode is intended for in-scope work (Teams-first, email-first, mixed)?
+      applies_to_levels: *id001
+      sets_its_fields:
+      - si_baseline.operations.collaboration_mode
+      required: true
+      provenance:
+        primary: client_assertion
+        validation_in_rrt: true
+      advisor_description: Determines primary channels used for in-scope work and where evidence will be collected.
+      advisor_reason_its: Collaboration mode drives data flow patterns and required controls (DLP, retention, access controls).
+      advisor_cmmc_impact: Teams-first often centralizes identity and audit logging; email-first increases risk of uncontrolled sharing.
+      advisor_pitfalls:
+      - Allowing email attachments for CUI without defining conditions and enforcement.
+      - Not aligning retention and eDiscovery posture with collaboration mode.
+      advisor_rr_implications:
+      - RR must validate actual usage and enforceable policies for the selected mode.
+      advisor_mpt_gate_implications:
+      - MPT will include policy and configuration tasks to enforce the chosen collaboration posture.
+      answer:
+        type: enum
+        options:
+        - value: teams_first
+          description: Teams-first (primary collaboration through Microsoft Teams or similar)
+          cmmc_attainment_impact: Centralizes identity and audit logging.
+          advisor_notes: Leverage DLP and retention policies in Teams.
+        - value: email_first
+          description: Email-first (primary collaboration via email)
+          cmmc_attainment_impact: Increases risk of uncontrolled sharing.
+          advisor_notes: Define conditions and enforcement for CUI email attachments.
+        - value: mixed
+          description: Mixed mode (both Teams and email)
+          cmmc_attainment_impact: Requires policies for both channels.
+          advisor_notes: Align retention and eDiscovery posture across channels.
+        - value: unknown
+          description: Unknown or to be determined
+          cmmc_attainment_impact: Planning risk.
+          advisor_notes: Resolve early to define channel controls.
+    - id: S-13
+      text: What is the BYOD posture for in-scope work?
+      applies_to_levels: *id001
+      sets_its_fields:
+      - si_baseline.operations.byod_posture
+      required: true
+      provenance:
+        primary: client_assertion
+        validation_in_rrt: true
+      advisor_description: Sets whether BYOD is allowed and under what containment model (e.g., VDI-only).
+      advisor_reason_its: BYOD posture is one of the largest drivers of boundary, endpoint compliance, and evidence feasibility.
+      advisor_cmmc_impact: Allowing BYOD without containment greatly increases assessment risk; VDI-only is a common containment path.
+      advisor_pitfalls:
+      - Permitting BYOD while assuming 'no CUI on device' without enforceable technical controls.
+      - Not capturing privileged/admin use restrictions on BYOD.
+      advisor_rr_implications:
+      - RR must validate enforceability (conditional access, VDI controls, device compliance).
+      advisor_mpt_gate_implications:
+      - MPT may require VDI/Cloud PC deployment or device management buildout depending on selection.
+      answer:
+        type: enum
+        options:
+        - value: not_allowed
+          description: BYOD not allowed for in-scope work
+          cmmc_attainment_impact: Simplifies endpoint compliance.
+          advisor_notes: Requires company-provided devices for all in-scope access.
+        - value: allowed_vdi_only
+          description: BYOD allowed via VDI/virtual desktop only
+          cmmc_attainment_impact: Common containment strategy.
+          advisor_notes: Ensure VDI enforces CUI restrictions and logging.
+        - value: allowed_mdm
+          description: BYOD allowed with MDM/MAM enforcement
+          cmmc_attainment_impact: Requires device compliance validation.
+          advisor_notes: Validate conditional access and compliance policies.
+        - value: unknown
+          description: Unknown or to be determined
+          cmmc_attainment_impact: High planning risk.
+          advisor_notes: Resolve early as BYOD drives boundary and endpoint strategy.
+    - id: S-16
+      text: What evidence posture target is desired (L2-self-ready, C3PAO-ready, continuous compliance)?
+      applies_to_levels: *id001
+      sets_its_fields:
+      - si_baseline.evidence.evidence_posture_target
+      required: true
+      provenance:
+        primary: client_assertion
+        validation_in_rrt: true
+      advisor_description: Sets the rigor level for artifacts, documentation, and operational proof.
+      advisor_reason_its: Evidence posture determines how controls are implemented and what logs/exports must be retained.
+      advisor_cmmc_impact: Higher posture reduces assessment risk but increases engineering and operational overhead.
+      advisor_pitfalls:
+      - Targeting certification without committing to C3PAO-ready evidence posture.
+      - Selecting continuous compliance without budget/operational support.
+      advisor_rr_implications:
+      - RR depth and artifact collection strategy should align to the evidence posture.
+      advisor_mpt_gate_implications:
+      - MPT must build evidence automation and retention mechanisms to meet the posture.
+      answer:
+        type: enum
+        options:
+        - value: l2_self_ready
+          description: L2 self-assessment ready
+          cmmc_attainment_impact: Baseline evidence rigor.
+          advisor_notes: Suitable for Level 1 or internal assessments.
+        - value: c3pao_ready
+          description: C3PAO certification ready
+          cmmc_attainment_impact: Higher evidence rigor and documentation standards.
+          advisor_notes: Required for most Level 2 certifications.
+        - value: continuous_compliance
+          description: Continuous compliance monitoring
+          cmmc_attainment_impact: Ongoing evidence automation and validation.
+          advisor_notes: Requires investment in tooling and processes.
+        - value: unknown
+          description: Unknown or to be determined
+          cmmc_attainment_impact: Planning risk.
+          advisor_notes: Align to assessment route selection.
+    - id: S-20
+      text: What tenant model is preferred for the target state (commercial, GCC, GCC High, DoD IL5/IL6, hybrid)?
+      applies_to_levels: *id001
+      sets_its_fields:
+      - si_baseline.dependencies.tenant_model_preference
+      required: true
+      provenance:
+        primary: client_assertion
+        validation_in_rrt: true
+      advisor_description: Captures the tenant/environment model preference which constrains identity, collaboration, and evidence patterns.
+      advisor_reason_its: Tenant model affects authorization posture, residency, and available compliance features.
+      advisor_cmmc_impact: Some contracts require GCC High / government-authorized environments; hybrid introduces separation evidence requirements.
+      advisor_pitfalls:
+      - Choosing commercial-only when contract requires government cloud.
+      - Assuming 'hybrid' is simple; it requires strong separation and shared responsibility clarity.
+      advisor_rr_implications:
+      - RR must validate tenant(s), licensing tiers, and where CUI actually resides.
+      advisor_mpt_gate_implications:
+      - MPT may include tenant migration/upgrade tasks and sequencing gates.
+      answer:
+        type: enum
+        options:
+        - value: commercial_only
+          description: Commercial cloud only (M365 commercial, AWS commercial, etc.)
+          cmmc_attainment_impact: May not meet contract requirements for CUI.
+          advisor_notes: Verify contract allows commercial cloud.
+        - value: gcc
+          description: GCC (Government Community Cloud)
+          cmmc_attainment_impact: Suitable for some government work.
+          advisor_notes: Check authorization level and features.
+        - value: gcc_high
+          description: GCC High (Government Community Cloud High)
+          cmmc_attainment_impact: Required for many DoD CUI contracts.
+          advisor_notes: Higher cost but meets most CUI requirements.
+        - value: dod_il5
+          description: DoD IL5 (Impact Level 5)
+          cmmc_attainment_impact: Required for specific DoD/IC workloads.
+          advisor_notes: Requires DoD authorization.
+        - value: dod_il6
+          description: DoD IL6 (Impact Level 6)
+          cmmc_attainment_impact: Highest classification level.
+          advisor_notes: Specialized authorization required.
+        - value: hybrid
+          description: Hybrid (mix of commercial and government tenants)
+          cmmc_attainment_impact: Requires strong separation evidence.
+          advisor_notes: Document separation controls and data flows.
+        - value: unknown
+          description: Unknown or to be determined
+          cmmc_attainment_impact: High planning risk.
+          advisor_notes: Verify contract requirements early.
+    - id: S-24
+      text: What is the intended POA&M policy posture (no POA&Ms, POA&M if allowed, unknown)?
+      applies_to_levels: *id001
+      sets_its_fields:
+      - si_baseline.risk_acceptance.poam_policy_intent
+      required: true
+      provenance:
+        primary: client_assertion
+        validation_in_rrt: true
+      advisor_description: Captures whether POA&Ms are acceptable in the compliance destination and under what conditions.
+      advisor_reason_its: POA&M posture determines risk tolerance and what 'done' means at go-live.
+      advisor_cmmc_impact: If POA&Ms are disallowed, the mission plan must close all gaps before claim/assessment.
+      advisor_pitfalls:
+      - Assuming POA&Ms are acceptable without contract confirmation.
+      - Allowing POA&Ms without assigning governance and timelines.
+      advisor_rr_implications:
+      - RR must classify gaps with POA&M eligibility assumptions.
+      advisor_mpt_gate_implications:
+      - MPT sequencing and gates differ materially based on POA&M intent.
+      answer:
+        type: enum
+        options:
+        - value: no_poam
+          description: No POA&Ms - all gaps must be closed before certification
+          cmmc_attainment_impact: Higher implementation burden before assessment.
+          advisor_notes: Mission plan must close all gaps.
+        - value: poam_if_allowed
+          description: POA&Ms acceptable if contractually allowed
+          cmmc_attainment_impact: Can defer some remediation with governance.
+          advisor_notes: Assign governance and timelines for each POA&M.
+        - value: unknown
+          description: Unknown or to be determined
+          cmmc_attainment_impact: Planning risk.
+          advisor_notes: Confirm with contract and customer requirements.

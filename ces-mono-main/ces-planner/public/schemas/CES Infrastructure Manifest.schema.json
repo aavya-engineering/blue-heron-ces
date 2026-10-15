@@ -1,0 +1,226 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ces.valorforge.com/schemas/infrastructure-manifest/1.0.0",
+  "title": "CES Infrastructure Manifest",
+  "description": "Infrastructure specification for CMMC L2 Azure Government deployment, derived from TCP + SI baseline + policy inputs. Consumed by Stamper's 53-entry infra registry.",
+  "type": "object",
+  "required": ["ces", "infrastructure_manifest"],
+  "additionalProperties": false,
+  "properties": {
+    "ces": {
+      "$ref": "#/$defs/ArtifactMetadata"
+    },
+    "infrastructure_manifest": {
+      "$ref": "#/$defs/InfrastructureManifestBody"
+    }
+  },
+  "$defs": {
+    "ArtifactMetadata": {
+      "type": "object",
+      "required": ["artifact", "version", "generated_on", "intent"],
+      "properties": {
+        "artifact": {
+          "type": "string",
+          "const": "infrastructure_manifest"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "generated_on": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "intent": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "InfraResourceSpec": {
+      "type": "object",
+      "required": ["resource_id", "resource_type", "name", "control_ids", "registry_entry_ids", "properties", "depends_on"],
+      "properties": {
+        "resource_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique identifier within this manifest"
+        },
+        "resource_type": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Azure resource type slug (e.g. key_vault, storage_account, virtual_network)"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Derived Azure resource name"
+        },
+        "control_ids": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[A-Z]{2}\\.L[1-3]-[0-9.]+" },
+          "description": "CMMC control IDs this resource supports"
+        },
+        "registry_entry_ids": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Stamper infra registry entry_ids that manage this resource"
+        },
+        "properties": {
+          "type": "object",
+          "description": "Resource-specific configuration properties"
+        },
+        "depends_on": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "resource_ids this resource depends on"
+        }
+      }
+    },
+    "StamperVariableMap": {
+      "type": "object",
+      "description": "Variable map consumed by Stamper at translate-time. Keys match variables_required across 53 infra registry entries.",
+      "required": [
+        "subscriptionId",
+        "resourceGroup",
+        "location",
+        "lawWorkspaceName",
+        "storageAccountName",
+        "keyVaultName",
+        "cmkKeyName",
+        "vnetName",
+        "vnetCidr",
+        "subnetPeName",
+        "subnetPeCidr",
+        "nsgPeName",
+        "automationAccountName",
+        "eoAppDisplayName"
+      ],
+      "properties": {
+        "subscriptionId": { "type": "string", "minLength": 1 },
+        "resourceGroup": { "type": "string", "minLength": 1 },
+        "location": { "type": "string", "minLength": 1 },
+        "lawWorkspaceName": { "type": "string", "minLength": 1 },
+        "storageAccountName": { "type": "string", "minLength": 1 },
+        "keyVaultName": { "type": "string", "minLength": 1 },
+        "cmkKeyName": { "type": "string", "minLength": 1 },
+        "vnetName": { "type": "string", "minLength": 1 },
+        "vnetCidr": { "type": "string", "minLength": 1 },
+        "subnetPeName": { "type": "string", "minLength": 1 },
+        "subnetPeCidr": { "type": "string", "minLength": 1 },
+        "nsgPeName": { "type": "string", "minLength": 1 },
+        "automationAccountName": { "type": "string", "minLength": 1 },
+        "eoAppDisplayName": { "type": "string", "minLength": 1 },
+        "mgmtSubnetCidr": { "type": "string", "minLength": 1 },
+        "identitySubnetCidr": { "type": "string", "minLength": 1 },
+        "peSubnetCidr": { "type": "string", "minLength": 1 },
+        "fwSubnetCidr": { "type": "string", "minLength": 1 }
+      }
+    },
+    "RegistryCoverage": {
+      "type": "object",
+      "required": ["total_infra_entries", "covered_entry_ids", "uncovered_entry_ids", "coverage_pct"],
+      "properties": {
+        "total_infra_entries": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "covered_entry_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "uncovered_entry_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "coverage_pct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "ProvenanceEntry": {
+      "type": "object",
+      "required": ["field", "value", "source", "rule"],
+      "properties": {
+        "field": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value": {},
+        "source": {
+          "type": "string",
+          "enum": ["si_baseline", "tcp", "convention", "default", "policy_odp"]
+        },
+        "rule": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "InfrastructureManifestBody": {
+      "type": "object",
+      "required": [
+        "identity",
+        "logging",
+        "security",
+        "storage",
+        "network",
+        "automation",
+        "diagnostics",
+        "stamper_variable_map",
+        "registry_coverage",
+        "provenance"
+      ],
+      "properties": {
+        "identity": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/InfraResourceSpec" },
+          "description": "Break-glass accounts, CA policies, PIM, EO service principal"
+        },
+        "logging": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/InfraResourceSpec" },
+          "description": "Resource group, Log Analytics Workspace, Entra diagnostics, Sentinel"
+        },
+        "security": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/InfraResourceSpec" },
+          "description": "Defender for Cloud plans, CMMC policy initiative"
+        },
+        "storage": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/InfraResourceSpec" },
+          "description": "Key Vault, CMK, Storage Account, WORM containers"
+        },
+        "network": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/InfraResourceSpec" },
+          "description": "VNet, PE subnet, private DNS zones, private endpoints, NSG"
+        },
+        "automation": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/InfraResourceSpec" },
+          "description": "Automation Account, RBAC role assignments"
+        },
+        "diagnostics": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/InfraResourceSpec" },
+          "description": "Diagnostic settings: KV->LAW, Storage->LAW, AA->LAW, Subscription->LAW"
+        },
+        "stamper_variable_map": {
+          "$ref": "#/$defs/StamperVariableMap"
+        },
+        "registry_coverage": {
+          "$ref": "#/$defs/RegistryCoverage"
+        },
+        "provenance": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ProvenanceEntry" },
+          "description": "Audit trail: how each value was derived"
+        }
+      }
+    }
+  }
+}

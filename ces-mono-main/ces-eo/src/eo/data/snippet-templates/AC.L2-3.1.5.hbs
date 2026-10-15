@@ -1,0 +1,35 @@
+## Control {{controlId}}: Employ Least Privilege for Security Functions
+
+**Implementation Status:** {{status}}
+
+This organization employs the principle of least privilege, including for specific security functions and privileged accounts, within the {{tenantName}} M365 GCC High tenant. Least privilege is enforced through Azure AD Privileged Identity Management (PIM) with just-in-time access, role eligibility assignments, and approval workflows that ensure users operate with minimum necessary permissions.
+
+{{#if pimConfigured}}
+Azure AD Privileged Identity Management enforces least privilege through {{roleEligibilityCount}} just-in-time role eligibilities. Administrators are assigned eligible roles rather than permanent active assignments, requiring explicit activation with time-bound elevation (maximum 8 hours per activation). Each activation requires business justification and approval from a designated approver before privileged access is granted.
+{{else}}
+Azure AD Privileged Identity Management has not been configured. Least privilege enforcement relies on static role assignments pending PIM implementation.
+{{/if}}
+
+{{#if directoryRolesConfigured}}
+Directory roles are scoped to {{directoryRolesCount}} distinct security functions, each granting only the permissions necessary for the assigned function. Role assignments follow the principle of least functionality, with administrative units further restricting scope where applicable.
+{{/if}}
+
+{{#if infraResources}}
+Supporting infrastructure:
+{{#each infraResources}}
+- {{resourceType}} "{{name}}"{{#if properties.retention_days}} (retention: {{properties.retention_days}} days){{/if}}
+{{/each}}
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Review PIM role eligibility assignments, activation logs with justifications, and approval workflow records. Verify no permanent active assignments for privileged roles.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

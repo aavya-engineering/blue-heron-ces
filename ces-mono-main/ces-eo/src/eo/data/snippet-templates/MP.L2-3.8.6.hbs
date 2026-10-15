@@ -1,0 +1,34 @@
+## Control {{controlId}}: Implement Cryptographic Mechanisms to Protect CUI on Digital Media During Transport
+
+**Implementation Status:** {{status}}
+
+This organization implements cryptographic protections for CUI on digital media during transport within the {{tenantName}} M365 GCC High tenant through BitLocker encryption, sensitivity label encryption, and TLS enforcement managed by {{variables.systemAdministrator}}.
+
+{{#if bitLockerEnforced}}
+**Endpoint Media Encryption:**
+BitLocker Drive Encryption protects CUI on {{deviceCount}} managed devices during physical transport. Full-disk encryption ensures data remains protected if devices are lost or intercepted during transit.
+{{/if}}
+
+{{#if compliancePolicyActive}}
+**Compliance-Enforced Encryption:**
+Intune compliance policy "{{policyName}}" requires encryption on all devices, ensuring CUI is cryptographically protected before any transport scenario.
+{{/if}}
+
+**Transport Encryption Standards:**
+- **Email:** Sensitivity label encryption (AES-256) protects CUI email attachments during transport; TLS 1.2+ for SMTP transport
+- **File Sharing:** SharePoint/OneDrive use HTTPS (TLS 1.2+) for all file transfers; sensitivity labels maintain encryption at rest and in transit
+- **Removable Media:** USB drives containing CUI must be encrypted with BitLocker To Go or equivalent FIPS 140-2 validated encryption before transport
+- **Physical Transport:** Devices in transit maintain BitLocker encryption; recovery keys stored securely in Entra ID
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine BitLocker deployment reports, sensitivity label encryption settings, TLS configuration, and removable media encryption policy.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

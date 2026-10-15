@@ -1,0 +1,64 @@
+controlId: "IR.L2-3.6.2"
+relatedControlIds:
+  - "IR.L2-3.6.1"
+  - "AU.L2-3.3.1"
+  - "AU.L2-3.3.2"
+  - "AU.L2-3.3.6"  # [VERIFY] mapping not yet confirmed
+  - "MP.L2-3.8.9"  # [VERIFY] mapping not yet confirmed
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: H-04
+useCaseTitle: "Timeline & Evidence Preservation"
+domain: Incident Response
+priority: P4 Standard
+trigger: 'INCIDENT: Any confirmed security incident requiring evidence preservation'
+sodTier: Tier 3 -- Privileged Admin
+entraRolesRequired:
+- Compliance Administrator
+- eDiscovery Manager (via PIM activation for privileged search scopes)
+approvalRequired: true
+services:
+- name: Microsoft Purview eDiscovery
+  purpose: '`https://compliance.microsoft.us`'
+- name: Microsoft Sentinel
+  purpose: Azure Government -- `https://portal.azure.us`
+- name: Entra ID Audit Logs
+  purpose: '`https://entra.microsoft.us`'
+- name: Azure Immutable Blob Storage
+  purpose: WORM -- Azure Government
+- name: Azure Key Vault
+  purpose: Azure Government -- for evidence manifest signing
+- name: Log Analytics Workspace
+  purpose: Azure Government
+configurationSteps:
+  portalPath: //compliance.microsoft.us > **eDiscovery** > **Premium**
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes Log.Read.All
+  graphApiEndpoint: 'GET https://graph.microsoft.us/v1.0/auditLogs/directoryAudits?$filter=targetResources/any(t:'
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-h-incident/H-04/{year}/{month}/
+  format: JSON (all exports and records), signed manifest (JSON + .sig)
+  filenamePattern: H-04_EvidenceManifest_{YYYYMMDD}_{HHmmss}_{IncidentID}.json
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://compliance.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: eDiscovery Premium is fully available in GCC High through the Purview Compliance Portal at `https://compliance.microsoft.us`.
+    The `Connect-IPPSSession` cmdlet must use the GCC High connection URI (`https://ps.compliance.protection.office365.us/powershell-liveid/`).
+    Log Analytics queries in Azure Government use the `https://api.loganalytics.us` endpoint, not the commercial `api.loganalytics.io`.
+    SharePoint Online URLs in GCC High use the `.sharepoint.us` domain. Azure Key Vault signing operations use Azure Government
+    endpoints configured via `az cloud set --name AzureUSGovernment`. All evidence
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

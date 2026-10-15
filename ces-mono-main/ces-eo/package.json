@@ -1,0 +1,97 @@
+{
+  "name": "ces-eo",
+  "version": "2.2.3",
+  "description": "Continuous compliance evidence collection and drift monitoring for CMMC L2 on M365 GCC High",
+  "main": "dist/eo/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "eo": "npx tsx src/eo/index.ts",
+    "start:eo": "node dist/eo/index.js",
+    "dev:eo": "npx tsx src/eo/index.ts",
+    "test": "jest --no-coverage",
+    "validate-snippets": "npx tsx scripts/validate-snippets.ts",
+    "operator:enroll": "npx tsx src/eo/approver-tokens/operator-passkeys-main.ts enroll",
+    "operator:passkeys": "npx tsx src/eo/approver-tokens/operator-passkeys-main.ts",
+    "test:coverage": "jest --coverage"
+  },
+  "dependencies": {
+    "@azure/identity": "^4.13.0",
+    "@microsoft/microsoft-graph-client": "^3.0.7",
+    "@microsoft/microsoft-graph-types": "^2.43.1",
+    "@simplewebauthn/server": "^14.0.3",
+    "@types/js-yaml": "^4.0.9",
+    "ajv": "^8.18.0",
+    "archiver": "^7.0.1",
+    "ces-shared": "file:../ces-shared",
+    "ces-tenant": "file:../ces-tenant",
+    "docx": "^8.5.0",
+    "dotenv": "^17.3.1",
+    "express": "^4.21.0",
+    "handlebars": "^4.7.8",
+    "js-yaml": "^3.14.2",
+    "multer": "^2.1.1",
+    "pdf-lib": "^1.17.1",
+    "uuid": "^10.0.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/archiver": "^6.0.4",
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.12",
+    "@types/multer": "^2.1.0",
+    "@types/node": "^22.0.0",
+    "@types/uuid": "^10.0.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.0"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "roots": [
+      "<rootDir>/tests",
+      "<rootDir>/src"
+    ],
+    "moduleNameMapper": {
+      "^ces-tenant$": "<rootDir>/../ces-tenant/src/index.ts",
+      "^ces-shared/config$": "<rootDir>/../ces-shared/src/config/TenantConfig.ts",
+      "^ces-shared/session$": "<rootDir>/../ces-shared/src/session/index.ts",
+      "^ces-shared/storage$": "<rootDir>/../ces-shared/src/storage/PipelineStorage.ts",
+      "^ces-shared/persistence/node$": "<rootDir>/../ces-shared/src/persistence/CesRepository.ts",
+      "^ces-shared/persistence/files$": "<rootDir>/../ces-shared/src/persistence/fileArtifacts.ts",
+      "^ces-shared/config/ces/node$": "<rootDir>/../ces-shared/src/config/cesConfig.node.ts",
+      "^ces-shared/config/ces$": "<rootDir>/../ces-shared/src/config/cesConfig.contract.ts",
+      "^ces-shared/stack$": "<rootDir>/../ces-shared/src/stack/index.ts",
+      "^ces-shared/crypto$": "<rootDir>/../ces-shared/src/crypto/canonicalHash.ts",
+      "^ces-shared/http$": "<rootDir>/../ces-shared/src/http/bearerAuth.ts",
+      "^ces-shared/http/principal$": "<rootDir>/../ces-shared/src/http/requestPrincipal.ts",
+      "^ces-shared/observability$": "<rootDir>/../ces-shared/src/observability/requestLogger.ts",
+      "^(\\.\\.?\\/.*)\\.js$": "$1"
+    },
+    "transform": {
+      "^.+\\.tsx?$": [
+        "ts-jest",
+        {
+          "tsconfig": {
+            "module": "CommonJS",
+            "moduleResolution": "Node",
+            "isolatedModules": true
+          },
+          "diagnostics": {
+            "ignoreCodes": [
+              1343,
+              151002
+            ]
+          },
+          "astTransformers": {
+            "before": [
+              "<rootDir>/tests/jest-import-meta-transformer.cjs"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

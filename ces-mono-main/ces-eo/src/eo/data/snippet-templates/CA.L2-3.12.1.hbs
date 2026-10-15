@@ -1,0 +1,45 @@
+## Control {{controlId}}: Periodically Assess Security Controls to Determine Effectiveness
+
+**Implementation Status:** {{status}}
+
+This organization periodically assesses security controls within the {{tenantName}} M365 GCC High tenant through automated assessments, manual reviews, and C3PAO engagement documented in "Security Assessment Plan v1.0" maintained by {{variables.systemAdministrator}}.
+
+{{#if secureScoresAvailable}}
+**Continuous Assessment Indicators:**
+Microsoft Secure Score provides continuous control effectiveness measurement: **{{currentScore}}** / {{maxScore}} ({{percentage}}%)
+{{#if controlScores}}
+{{#each controlScores}}
+- **{{controlName}}** — Score: {{score}} / {{maxScore}}
+{{/each}}
+{{/if}}
+{{/if}}
+
+**Assessment Program:**
+- **Annual Assessment:** Comprehensive NIST SP 800-171A assessment of all 110 CMMC Level 2 practices using examine, interview, and test methods
+- **Continuous Monitoring:** Automated control effectiveness measurement via Evidence Ops assessment toolchain
+- **Third-Party Assessment:** C3PAO assessment engagement per CMMC certification requirements
+- **Triggered Assessments:** Re-assessment upon significant system changes, security incidents, or new threat intelligence
+
+**Assessment Artifacts:**
+- Security Assessment Report (SAR) documenting control effectiveness findings
+- POA&M for deficient controls with remediation milestones
+- SPRS score calculation and submission to SPRS portal
+
+**Operational Procedure:**
+- **Action:** Annual security assessment; quarterly Secure Score review; continuous automated monitoring
+- **Frequency:** Annual comprehensive, quarterly metric review, continuous automation
+- **Responsible Party:** {{variables.systemAdministrator}}
+- **Documentation:** Security Assessment Plan v1.0, Assessment Report Template
+
+**Review Frequency:** Quarterly by ISSO
+
+**Verification Method:** Examine security assessment reports, Secure Score trends, POA&M entries, SPRS submission records, and assessment plan update history.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

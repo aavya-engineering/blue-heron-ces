@@ -1,0 +1,42 @@
+## Control {{controlId}}: Require MFA for Non-Local Maintenance Sessions and Terminate When Complete
+
+**Implementation Status:** {{status}}
+
+This organization requires multi-factor authentication for non-local maintenance sessions within the {{tenantName}} M365 GCC High tenant and terminates connections upon completion, managed by {{variables.systemAdministrator}}.
+
+{{#if mfaEnabled}}
+**Non-Local Maintenance Authentication:**
+All remote maintenance sessions require MFA using {{authMethodsCount}} configured authentication methods:
+{{#if authMethods}}
+{{#each authMethods}}
+- **{{displayName}}** ({{state}})
+{{/each}}
+{{/if}}
+
+Administrators authenticate via MFA before accessing M365 admin portals, Azure Government portal, or PowerShell remote sessions for maintenance activities.
+{{else}}
+MFA enforcement for non-local maintenance has not been confirmed.
+{{/if}}
+
+{{#if conditionalAccessActive}}
+**Session Controls:**
+{{caPoliciesTotalCount}} Conditional Access policies enforce session management for maintenance connections:
+{{#each policies}}
+- **{{displayName}}** ({{state}}){{#if sessionControls}}: Session controls enforce sign-in frequency and persistent session restrictions{{/if}}
+{{/each}}
+
+Sessions are automatically terminated after defined inactivity periods. Maintenance personnel must re-authenticate for each maintenance window.
+{{/if}}
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine Conditional Access policies for maintenance roles, MFA enforcement for admin portals, session timeout configurations, and maintenance session logs.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

@@ -1,0 +1,40 @@
+## Control {{controlId}}: Protect Wireless Access with Authentication and Encryption
+
+**Implementation Status:** {{status}}
+
+This organization protects wireless access using authentication and encryption within the {{tenantName}} M365 GCC High tenant. Wireless network protection is implemented through WPA2-Enterprise or WPA3 encryption, certificate-based 802.1X authentication, and Intune device configuration profiles that enforce cryptographic protections on all wireless connections accessing CUI resources.
+
+{{#if deviceConfigurationsActive}}
+Intune device configuration profiles enforce wireless security through {{deviceConfigurationsCount}} configuration policies. Wireless connections are protected with WPA2-Enterprise encryption using AES-256 and authenticated via certificate-based 802.1X protocols. Device configuration profiles distribute trusted root certificates and wireless network profiles that enforce encryption requirements, preventing connections to unprotected or rogue access points.
+{{else}}
+Intune device configuration profiles for wireless encryption have not been configured. Wireless protection relies on network infrastructure settings pending device-level enforcement.
+{{/if}}
+
+{{#if compliancePolicyActive}}
+Device compliance policies verify encryption requirements:
+{{#if policies}}
+{{#each policies}}
+- **{{displayName}}**: {{description}}
+{{/each}}
+{{/if}}
+{{/if}}
+
+{{#if infraResources}}
+Supporting infrastructure:
+{{#each infraResources}}
+- {{resourceType}} "{{name}}"{{#if properties.retention_days}} (retention: {{properties.retention_days}} days){{/if}}
+{{/each}}
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Review wireless network configurations for WPA2-Enterprise/WPA3 enforcement, certificate-based authentication settings, and Intune device configuration profiles for wireless security.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

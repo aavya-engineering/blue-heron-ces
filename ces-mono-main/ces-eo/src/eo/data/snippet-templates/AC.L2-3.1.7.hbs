@@ -1,0 +1,39 @@
+## Control {{controlId}}: Prevent Non-Privileged Users from Executing Privileged Functions
+
+**Implementation Status:** {{status}}
+
+This organization prevents non-privileged users from executing privileged functions within the {{tenantName}} M365 GCC High tenant. Privileged function restriction is enforced through Azure AD role-based access control, Conditional Access policies, and Privileged Identity Management (PIM) approval workflows that block unauthorized elevation of privileges.
+
+{{#if conditionalAccessActive}}
+Conditional Access policies enforce privileged function restrictions across {{caPoliciesTotalCount}} configured policies. Non-privileged users attempting to access administrative portals (Azure Portal, Microsoft 365 Admin Center, Exchange Admin Center) are blocked by policies requiring privileged role membership and compliant device authentication.
+{{else}}
+Conditional Access policies restricting privileged function execution have not been configured. Privileged function access relies on Azure AD role assignment only, pending Conditional Access enforcement.
+{{/if}}
+
+{{#if pimConfigured}}
+Privileged Identity Management requires approval workflows for all privileged role activations. Non-privileged users cannot self-elevate to administrative roles without explicit approval from a designated administrator, creating an auditable authorization chain.
+{{/if}}
+
+{{#if signInLogsAvailable}}
+Sign-in logs capture {{signInLogsCount}} authentication events for monitoring unauthorized privilege escalation attempts. Failed elevation attempts trigger security alerts reviewed by {{variables.accessControlAdministrator}}.
+{{/if}}
+
+{{#if infraResources}}
+Supporting infrastructure:
+{{#each infraResources}}
+- {{resourceType}} "{{name}}"{{#if properties.retention_days}} (retention: {{properties.retention_days}} days){{/if}}
+{{/each}}
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Review Conditional Access policies blocking non-privileged access to administrative portals, PIM activation logs, and sign-in logs for unauthorized elevation attempts.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

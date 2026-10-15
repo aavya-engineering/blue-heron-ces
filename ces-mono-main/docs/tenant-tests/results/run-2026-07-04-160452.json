@@ -1,0 +1,904 @@
+﻿{
+    "tenant":  "vfsgov",
+    "startedAt":  "2026-07-04T16:04:52.4548277Z",
+    "summary":  "FAIL=3 NOT_APPLICABLE=4 ATTEST=21 INHERITED=5 CES_PRODUCED=4",
+    "results":  [
+                    {
+                        "CaseId":  "UC-H",
+                        "CaseName":  "Boundary protection (no-firewall IaaS posture)",
+                        "Personas":  [
+                                         "P6"
+                                     ],
+                        "Practices":  [
+                                          "SC.L2-3.13.1",
+                                          "SC.L2-3.13.6",
+                                          "SI.L2-3.14.6"
+                                      ],
+                        "Test":  "NSG deny-by-default on all subnets (SC-3.13.6[a][b], SC-3.13.1[e][f][h])",
+                        "Tier":  "T1",
+                        "Controls":  [
+                                         "SC-3.13.6",
+                                         "SC-3.13.1"
+                                     ],
+                        "Objectives":  [
+                                           "SC.L2-3.13.6[a]",
+                                           "SC.L2-3.13.6[b]",
+                                           "SC.L2-3.13.1[e]",
+                                           "SC.L2-3.13.1[f]",
+                                           "SC.L2-3.13.1[h]"
+                                       ],
+                        "Verdict":  "FAIL",
+                        "Detail":  "deny-by-default gaps: vfsgov-vnet-eo/snet-pe: NSG \u0027vfsgov-nsg-pe\u0027 lacks explicit deny-all INBOUND (priority \u003e= 4000); vfsgov-vnet-eo/snet-pe: NSG \u0027vfsgov-nsg-pe\u0027 lacks explicit deny-all OUTBOUND (priority \u003e= 4000); vfsgov-vnet-eo/snet-mgmt: no NSG attached",
+                        "Evidence":  null
+                    },
+                    {
+                        "CaseId":  "UC-H",
+                        "CaseName":  "Boundary protection (no-firewall IaaS posture)",
+                        "Personas":  [
+                                         "P6"
+                                     ],
+                        "Practices":  [
+                                          "SC.L2-3.13.1",
+                                          "SC.L2-3.13.6",
+                                          "SI.L2-3.14.6"
+                                      ],
+                        "Test":  "Private Endpoints + UDR blackhole (SC-3.13.1[e][f])",
+                        "Tier":  "T1",
+                        "Controls":  [
+                                         "SC-3.13.1"
+                                     ],
+                        "Objectives":  [
+                                           "SC.L2-3.13.1[e]",
+                                           "SC.L2-3.13.1[f]"
+                                       ],
+                        "Verdict":  "FAIL",
+                        "Detail":  "private-connectivity gaps: no 0.0.0.0/0 -\u003e None blackhole route on any route table",
+                        "Evidence":  null
+                    },
+                    {
+                        "CaseId":  "UC-H",
+                        "CaseName":  "Boundary protection (no-firewall IaaS posture)",
+                        "Personas":  [
+                                         "P6"
+                                     ],
+                        "Practices":  [
+                                          "SC.L2-3.13.1",
+                                          "SC.L2-3.13.6",
+                                          "SI.L2-3.14.6"
+                                      ],
+                        "Test":  "VNet flow logs -\u003e Sentinel (SC-3.13.1[c][d][g], SI-3.14.6[a][b][c])",
+                        "Tier":  "T1",
+                        "Controls":  [
+                                         "SC-3.13.1",
+                                         "SI-3.14.6"
+                                     ],
+                        "Objectives":  [
+                                           "SC.L2-3.13.1[c]",
+                                           "SC.L2-3.13.1[d]",
+                                           "SC.L2-3.13.1[g]",
+                                           "SI.L2-3.14.6[a]",
+                                           "SI.L2-3.14.6[b]",
+                                           "SI.L2-3.14.6[c]"
+                                       ],
+                        "Verdict":  "FAIL",
+                        "Detail":  "flow-monitoring gaps: no enabled VNet flow log targets any of the 1 VNet(s) (NSG flow logs retired Jun 2025 - use VNet flow logs); no Sentinel analytics rule queries NTANetAnalytics",
+                        "Evidence":  null
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "AC-3.1.17"
+                                      ],
+                        "Test":  "Disposition: NOT_APPLICABLE",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "AC-3.1.17"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "NOT_APPLICABLE",
+                        "Detail":  "cloud-only tenant; no wireless network infrastructure in scope [SSP: SSP AC-3.1.17 - Not Applicable determination (no wireless infrastructure)]",
+                        "Evidence":  {
+                                         "reassess_when":  "on-prem or wireless network introduced",
+                                         "ssp_ref":  "SSP AC-3.1.17 - Not Applicable determination (no wireless infrastructure)"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "MA-3.7.3"
+                                      ],
+                        "Test":  "Disposition: NOT_APPLICABLE",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "MA-3.7.3"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "NOT_APPLICABLE",
+                        "Detail":  "no off-site equipment maintenance in scope (cloud-only, VDI access) [SSP: SSP MA-3.7.3 - Not Applicable determination (no off-site equipment)]",
+                        "Evidence":  {
+                                         "reassess_when":  "physical equipment or off-site maintenance introduced",
+                                         "ssp_ref":  "SSP MA-3.7.3 - Not Applicable determination (no off-site equipment)"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "MA-3.7.1"
+                                      ],
+                        "Test":  "Disposition: ATTEST",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "MA-3.7.1"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "ATTEST",
+                        "Detail":  "maintenance is Microsoft-operated for cloud services; org maintenance procedures attested [SSP: SSP MA-3.7.1 - customer attestation + Microsoft SRM]",
+                        "Evidence":  {
+                                         "reassess_when":  "admin workstations provisioned",
+                                         "ssp_ref":  "SSP MA-3.7.1 - customer attestation + Microsoft SRM"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "MA-3.7.2"
+                                      ],
+                        "Test":  "Disposition: ATTEST",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "MA-3.7.2"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "ATTEST",
+                        "Detail":  "maintenance tooling controls attested; no local maintenance for CUI systems [SSP: SSP MA-3.7.2 - customer attestation]",
+                        "Evidence":  {
+                                         "reassess_when":  "admin workstations provisioned",
+                                         "ssp_ref":  "SSP MA-3.7.2 - customer attestation"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "MA-3.7.4"
+                                      ],
+                        "Test":  "Disposition: ATTEST",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "MA-3.7.4"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "ATTEST",
+                        "Detail":  "media inspection procedural; no removable media path in VDI model [SSP: SSP MA-3.7.4 - customer attestation]",
+                        "Evidence":  {
+                                         "reassess_when":  null,
+                                         "ssp_ref":  "SSP MA-3.7.4 - customer attestation"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "MA-3.7.6"
+                                      ],
+                        "Test":  "Disposition: ATTEST",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "MA-3.7.6"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "ATTEST",
+                        "Detail":  "maintenance-personnel supervision procedural [SSP: SSP MA-3.7.6 - customer attestation]",
+                        "Evidence":  {
+                                         "reassess_when":  null,
+                                         "ssp_ref":  "SSP MA-3.7.6 - customer attestation"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "PE-3.10.1"
+                                      ],
+                        "Test":  "Disposition: ATTEST",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "PE-3.10.1"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "ATTEST",
+                        "Detail":  "physical access to CUI systems is Microsoft-operated (GCC High datacenters) + customer office policy [SSP: SSP PE-3.10.x - Microsoft SRM (datacenter) + customer physical-security attestation]",
+                        "Evidence":  {
+                                         "reassess_when":  "on-prem facility hosting CUI introduced",
+                                         "ssp_ref":  "SSP PE-3.10.x - Microsoft SRM (datacenter) + customer physical-security attestation"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "PE-3.10.2"
+                                      ],
+                        "Test":  "Disposition: ATTEST",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "PE-3.10.2"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "ATTEST",
+                        "Detail":  "physical monitoring - Microsoft SRM + customer office [SSP: SSP PE-3.10.x - Microsoft SRM + attestation]",
+                        "Evidence":  {
+                                         "reassess_when":  null,
+                                         "ssp_ref":  "SSP PE-3.10.x - Microsoft SRM + attestation"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "PE-3.10.3"
+                                      ],
+                        "Test":  "Disposition: ATTEST",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "PE-3.10.3"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "ATTEST",
+                        "Detail":  "visitor escort - customer office policy [SSP: SSP PE-3.10.x - customer attestation]",
+                        "Evidence":  {
+                                         "reassess_when":  null,
+                                         "ssp_ref":  "SSP PE-3.10.x - customer attestation"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "PE-3.10.4"
+                                      ],
+                        "Test":  "Disposition: ATTEST",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "PE-3.10.4"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "ATTEST",
+                        "Detail":  "physical access logs - Microsoft SRM (datacenter) + customer office [SSP: SSP PE-3.10.4 - Microsoft SRM + attestation]",
+                        "Evidence":  {
+                                         "reassess_when":  null,
+                                         "ssp_ref":  "SSP PE-3.10.4 - Microsoft SRM + attestation"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "PE-3.10.5"
+                                      ],
+                        "Test":  "Disposition: ATTEST",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "PE-3.10.5"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "ATTEST",
+                        "Detail":  "manage physical access devices - customer office policy [SSP: SSP PE-3.10.x - customer attestation]",
+                        "Evidence":  {
+                                         "reassess_when":  null,
+                                         "ssp_ref":  "SSP PE-3.10.x - customer attestation"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "PE-3.10.6"
+                                      ],
+                        "Test":  "Disposition: ATTEST",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "PE-3.10.6"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "ATTEST",
+                        "Detail":  "alternate work sites - VDI/Cloud-PC access policy + customer telework policy [SSP: SSP PE-3.10.6 - customer attestation (telework)]",
+                        "Evidence":  {
+                                         "reassess_when":  null,
+                                         "ssp_ref":  "SSP PE-3.10.6 - customer attestation (telework)"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "PS-3.9.1"
+                                      ],
+                        "Test":  "Disposition: ATTEST",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "PS-3.9.1"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "ATTEST",
+                        "Detail":  "personnel screening evidenced by customer HR (clearance/background) [SSP: SSP PS-3.9.1 - customer HR attestation]",
+                        "Evidence":  {
+                                         "reassess_when":  null,
+                                         "ssp_ref":  "SSP PS-3.9.1 - customer HR attestation"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "AT-3.2.1"
+                                      ],
+                        "Test":  "Disposition: ATTEST",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "AT-3.2.1"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "ATTEST",
+                        "Detail":  "awareness program documented and evidenced by customer [SSP: SSP AT-3.2.1 - customer training program attestation]",
+                        "Evidence":  {
+                                         "reassess_when":  null,
+                                         "ssp_ref":  "SSP AT-3.2.1 - customer training program attestation"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "AT-3.2.3"
+                                      ],
+                        "Test":  "Disposition: ATTEST",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "AT-3.2.3"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "ATTEST",
+                        "Detail":  "insider-threat awareness - customer program [SSP: SSP AT-3.2.3 - customer attestation]",
+                        "Evidence":  {
+                                         "reassess_when":  null,
+                                         "ssp_ref":  "SSP AT-3.2.3 - customer attestation"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "SC-3.13.2"
+                                      ],
+                        "Test":  "Disposition: INHERITED",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "SC-3.13.2"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "INHERITED",
+                        "Detail":  "security architecture/engineering inherited from Azure GCC High FedRAMP High authorization [SSP: SSP SC-3.13.2 - inherited (Azure GCC High FedRAMP, NIST SP 800-18 R1)]",
+                        "Evidence":  {
+                                         "reassess_when":  null,
+                                         "ssp_ref":  "SSP SC-3.13.2 - inherited (Azure GCC High FedRAMP, NIST SP 800-18 R1)"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "SC-3.13.4"
+                                      ],
+                        "Test":  "Disposition: INHERITED",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "SC-3.13.4"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "INHERITED",
+                        "Detail":  "shared-resource isolation inherited from Azure GCC High platform [SSP: SSP SC-3.13.4 - inherited (Azure GCC High FedRAMP)]",
+                        "Evidence":  {
+                                         "reassess_when":  null,
+                                         "ssp_ref":  "SSP SC-3.13.4 - inherited (Azure GCC High FedRAMP)"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "SC-3.13.7"
+                                      ],
+                        "Test":  "Disposition: INHERITED",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "SC-3.13.7"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "INHERITED",
+                        "Detail":  "split-tunneling blocked via VDI/Cloud-PC network egress (platform-managed) [SSP: SSP SC-3.13.7 - inherited (Windows 365 / Azure network)]",
+                        "Evidence":  {
+                                         "reassess_when":  "customer-managed VPN introduced",
+                                         "ssp_ref":  "SSP SC-3.13.7 - inherited (Windows 365 / Azure network)"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "CA-3.12.1"
+                                      ],
+                        "Test":  "Disposition: CES_PRODUCED",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "CA-3.12.1"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "CES_PRODUCED",
+                        "Detail":  "security control assessment is produced by EvidenceOps (ControlAssessor -\u003e AssessmentSnapshot, per-control met/not_met + SPRS) [SSP: SSP CA-3.12.1 - EvidenceOps AssessmentSnapshot artifact]",
+                        "Evidence":  {
+                                         "reassess_when":  "assessment methodology changes",
+                                         "ssp_ref":  "SSP CA-3.12.1 - EvidenceOps AssessmentSnapshot artifact"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "CA-3.12.2"
+                                      ],
+                        "Test":  "Disposition: CES_PRODUCED",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "CA-3.12.2"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "CES_PRODUCED",
+                        "Detail":  "plan of action \u0026 milestones is produced by EvidenceOps (PoamLifecycle objective-level auto-close ledger) [SSP: SSP CA-3.12.2 - EvidenceOps POA\u0026M ledger artifact]",
+                        "Evidence":  {
+                                         "reassess_when":  null,
+                                         "ssp_ref":  "SSP CA-3.12.2 - EvidenceOps POA\u0026M ledger artifact"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "CA-3.12.4"
+                                      ],
+                        "Test":  "Disposition: CES_PRODUCED",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "CA-3.12.4"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "CES_PRODUCED",
+                        "Detail":  "system security plan is produced by EvidenceOps (SspGenerator, mapped to all 320 objectives) [SSP: SSP CA-3.12.4 - EvidenceOps SSP artifact (golden-verified)]",
+                        "Evidence":  {
+                                         "reassess_when":  null,
+                                         "ssp_ref":  "SSP CA-3.12.4 - EvidenceOps SSP artifact (golden-verified)"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "RA-3.11.1"
+                                      ],
+                        "Test":  "Disposition: CES_PRODUCED",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "RA-3.11.1"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "CES_PRODUCED",
+                        "Detail":  "periodic risk assessment is produced/tracked by EvidenceOps (risk-assessment store + /api/risk-assessment/readiness) [SSP: SSP RA-3.11.1 - EvidenceOps risk register + annual snapshot]",
+                        "Evidence":  {
+                                         "reassess_when":  null,
+                                         "ssp_ref":  "SSP RA-3.11.1 - EvidenceOps risk register + annual snapshot"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "AC-3.1.14"
+                                      ],
+                        "Test":  "Disposition: ATTEST",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "AC-3.1.14"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "ATTEST",
+                        "Detail":  "remote access is routed through the VDI/Cloud-PC managed gateway (Windows 365/AVD is the managed access point); no direct-to-service path for CUI [SSP: SSP AC-3.1.14 - VDI/Cloud-PC managed access point (attested)]",
+                        "Evidence":  {
+                                         "reassess_when":  "a direct (non-VDI) CUI access path is introduced",
+                                         "ssp_ref":  "SSP AC-3.1.14 - VDI/Cloud-PC managed access point (attested)"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "AC-3.1.16"
+                                      ],
+                        "Test":  "Disposition: NOT_APPLICABLE",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "AC-3.1.16"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "NOT_APPLICABLE",
+                        "Detail":  "cloud-only tenant; no wireless network infrastructure to authorize (same basis as AC-3.1.17) [SSP: SSP AC-3.1.16 - Not Applicable (no wireless infrastructure)]",
+                        "Evidence":  {
+                                         "reassess_when":  "wireless network introduced",
+                                         "ssp_ref":  "SSP AC-3.1.16 - Not Applicable (no wireless infrastructure)"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "AU-3.3.4"
+                                      ],
+                        "Test":  "Disposition: ATTEST",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "AU-3.3.4"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "ATTEST",
+                        "Detail":  "audit-processing-failure alerting via Sentinel health + Log Analytics ingestion alerts to identified recipients; enforcing analytics exist (UC-E probe), recipient list attested [SSP: SSP AU-3.3.4 - Sentinel/LAW health alerting + attested recipients]",
+                        "Evidence":  {
+                                         "reassess_when":  null,
+                                         "ssp_ref":  "SSP AU-3.3.4 - Sentinel/LAW health alerting + attested recipients"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "CM-3.4.3"
+                                      ],
+                        "Test":  "Disposition: ATTEST",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "CM-3.4.3"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "ATTEST",
+                        "Detail":  "configuration change control (track/review/approve/log changes) via the change-management process + Entra/Intune directory audit logs [SSP: SSP CM-3.4.3 - change-control process + directory audit (attested)]",
+                        "Evidence":  {
+                                         "reassess_when":  null,
+                                         "ssp_ref":  "SSP CM-3.4.3 - change-control process + directory audit (attested)"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "CM-3.4.4"
+                                      ],
+                        "Test":  "Disposition: ATTEST",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "CM-3.4.4"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "ATTEST",
+                        "Detail":  "security impact analysis is performed within the change-control process prior to change approval [SSP: SSP CM-3.4.4 - security impact analysis in change control (attested)]",
+                        "Evidence":  {
+                                         "reassess_when":  null,
+                                         "ssp_ref":  "SSP CM-3.4.4 - security impact analysis in change control (attested)"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "IR-3.6.2"
+                                      ],
+                        "Test":  "Disposition: ATTEST",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "IR-3.6.2"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "ATTEST",
+                        "Detail":  "incident reporting to designated authorities (DoD 72-hour DIBNet + internal chain) per the incident-response plan [SSP: SSP IR-3.6.2 - IR plan reporting procedures (attested)]",
+                        "Evidence":  {
+                                         "reassess_when":  null,
+                                         "ssp_ref":  "SSP IR-3.6.2 - IR plan reporting procedures (attested)"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "IR-3.6.3"
+                                      ],
+                        "Test":  "Disposition: ATTEST",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "IR-3.6.3"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "ATTEST",
+                        "Detail":  "incident-response capability is tested (annual tabletop exercise) per the incident-response plan [SSP: SSP IR-3.6.3 - IR tabletop test record (attested)]",
+                        "Evidence":  {
+                                         "reassess_when":  "annual test cadence",
+                                         "ssp_ref":  "SSP IR-3.6.3 - IR tabletop test record (attested)"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "MA-3.7.5"
+                                      ],
+                        "Test":  "Disposition: ATTEST",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "MA-3.7.5"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "ATTEST",
+                        "Detail":  "nonlocal maintenance sessions require MFA and are terminated on completion; cloud maintenance is Microsoft-operated (MA family), org admin-MFA attested [SSP: SSP MA-3.7.5 - admin MFA on maintenance sessions (attested) + Microsoft SRM]",
+                        "Evidence":  {
+                                         "reassess_when":  null,
+                                         "ssp_ref":  "SSP MA-3.7.5 - admin MFA on maintenance sessions (attested) + Microsoft SRM"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "MP-3.8.5"
+                                      ],
+                        "Test":  "Disposition: NOT_APPLICABLE",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "MP-3.8.5"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "NOT_APPLICABLE",
+                        "Detail":  "no CUI media transport outside controlled areas; cloud-only VDI model has no removable/physical media path [SSP: SSP MP-3.8.5 - Not Applicable (no physical media transport)]",
+                        "Evidence":  {
+                                         "reassess_when":  "removable/physical media path introduced",
+                                         "ssp_ref":  "SSP MP-3.8.5 - Not Applicable (no physical media transport)"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "MP-3.8.8"
+                                      ],
+                        "Test":  "Disposition: ATTEST",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "MP-3.8.8"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "ATTEST",
+                        "Detail":  "portable storage with no identifiable owner is prohibited; VDI/Cloud-PC blocks removable storage (no USB passthrough), policy-attested [SSP: SSP MP-3.8.8 - VDI removable-storage block + policy (attested)]",
+                        "Evidence":  {
+                                         "reassess_when":  null,
+                                         "ssp_ref":  "SSP MP-3.8.8 - VDI removable-storage block + policy (attested)"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "MP-3.8.9"
+                                      ],
+                        "Test":  "Disposition: INHERITED",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "MP-3.8.9"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "INHERITED",
+                        "Detail":  "backup CUI confidentiality at storage locations is inherited from the Azure/M365 GCC High platform (encrypted, geo-redundant backups) [SSP: SSP MP-3.8.9 - inherited (Azure/M365 GCC High backup protection)]",
+                        "Evidence":  {
+                                         "reassess_when":  null,
+                                         "ssp_ref":  "SSP MP-3.8.9 - inherited (Azure/M365 GCC High backup protection)"
+                                     }
+                    },
+                    {
+                        "CaseId":  "SCOPE",
+                        "CaseName":  "Mission-plan applicability",
+                        "Personas":  [
+
+                                     ],
+                        "Practices":  [
+                                          "SC-3.13.10"
+                                      ],
+                        "Test":  "Disposition: INHERITED",
+                        "Tier":  "scope",
+                        "Controls":  [
+                                         "SC-3.13.10"
+                                     ],
+                        "Objectives":  [
+                                           null
+                                       ],
+                        "Verdict":  "INHERITED",
+                        "Detail":  "cryptographic key establishment and management via Azure Key Vault (FIPS 140-2 validated HSM) + platform-managed keys [SSP: SSP SC-3.13.10 - Key Vault HSM key management (inherited/platform)]",
+                        "Evidence":  {
+                                         "reassess_when":  null,
+                                         "ssp_ref":  "SSP SC-3.13.10 - Key Vault HSM key management (inherited/platform)"
+                                     }
+                    }
+                ]
+}

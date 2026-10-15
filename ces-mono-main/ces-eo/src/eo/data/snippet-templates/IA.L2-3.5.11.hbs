@@ -1,0 +1,37 @@
+## Control {{controlId}}: Obscure Feedback of Authentication Information
+
+**Implementation Status:** {{status}}
+
+This organization obscures authentication feedback within the {{tenantName}} M365 GCC High tenant through operational procedures and platform security defaults documented in "Authentication Security Policy v1.0" maintained by {{variables.accessControlAdministrator}}.
+
+Microsoft Entra ID and all M365 GCC High authentication interfaces obscure authentication information during the credential entry process:
+
+**Platform Authentication Feedback Controls:**
+- **Password Fields:** All M365 sign-in pages mask password input with dots/asterisks; no plaintext display of passwords during entry
+- **MFA Prompts:** Authentication app push notifications display verification numbers without exposing credential details
+- **Error Messages:** Authentication failure messages use generic responses ("Sign-in failed") without revealing whether the username or password was incorrect, preventing credential enumeration
+- **Smart Lockout:** Account lockout responses do not disclose lockout status to prevent targeted brute-force attacks
+
+{{#if deviceConfigurationsActive}}
+**Endpoint Feedback Controls:**
+{{deviceConfigurationsCount}} device configuration policies enforce screen lock and credential masking at the endpoint level, ensuring authentication feedback is obscured on managed devices.
+{{/if}}
+
+**Operational Procedure:**
+- **Action:** Review authentication interface configurations for proper feedback obscuring; test error message responses for information leakage
+- **Frequency:** Annually, or upon authentication infrastructure changes
+- **Responsible Party:** {{variables.accessControlAdministrator}}
+- **Documentation:** Authentication Security Policy v1.0
+
+**Review Frequency:** Annually by ISSO
+
+**Verification Method:** Examine M365 sign-in page configurations, error message responses, smart lockout settings, and endpoint screen lock policies.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** Review authentication interface testing records per procedure IA-011. {{evidenceArtifactUrl}}
+{{/if}}

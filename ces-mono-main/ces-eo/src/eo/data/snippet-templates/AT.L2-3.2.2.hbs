@@ -1,0 +1,52 @@
+## Control {{controlId}}: Ensure Personnel Are Trained to Carry Out Information Security Duties
+
+**Implementation Status:** {{status}}
+
+This organization provides role-based security training within the {{tenantName}} M365 GCC High tenant through specialized training curricula for administrators, developers, and users documented in "Role-Based Security Training Policy v1.0" maintained by {{variables.systemAdministrator}}.
+
+**Role-Specific Training Tracks:**
+
+**System Administrators:**
+- M365 GCC High security administration (Entra ID, Intune, Exchange Online, SharePoint)
+- Privileged access management and PIM activation procedures
+- Security incident handling and forensic evidence preservation
+- Configuration management and change control procedures
+- Separate privileged and standard user accounts; privileged roles activated only for the task at hand and for a limited time
+- Break-glass (emergency access) account procedures and post-use review
+
+**Security Officers (ISSO/ISSM):**
+- CMMC Level 2 assessment preparation and evidence collection
+- Risk assessment methodology (NIST SP 800-30)
+- Continuous monitoring program management
+- POA&M development and tracking
+
+**General Users:**
+- CUI identification, marking, and handling per 32 CFR Part 2002
+- Acceptable use of M365 GCC High services
+- Phishing and social engineering recognition
+- Incident reporting procedures
+
+**CUI Handlers:**
+- CUI identification, including CUI Basic vs. CUI Specified and recognizing CUI that is not yet marked
+- Applying Microsoft 365 sensitivity labels and complying with DLP policies when sharing CUI
+- Approved CUI storage locations and transmission methods (no personal cloud storage or text messaging)
+- CUI disposal and media sanitization (see MP.L2-3.8.3)
+
+**Operational Procedure:**
+- **Action:** Assign role-based training upon role assignment; track completion; update curricula annually; retrain on role change or privilege escalation
+- **Frequency:** Initial training upon role assignment; annual refresher per role
+- **Responsible Party:** {{variables.systemAdministrator}}
+- **Documentation:** Role-Based Security Training Policy v1.0, Training Completion Matrix
+
+**Review Frequency:** Annually by ISSO
+
+**Verification Method:** Examine role-based training assignments, completion records, curricula content review history, and role-specific competency assessments.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** Review role-based training records per procedure AT-002. No automated evidence collection available for this procedural control. {{evidenceArtifactUrl}}
+{{/if}}

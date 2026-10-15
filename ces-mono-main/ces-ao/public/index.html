@@ -1,0 +1,1704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CES — AdminOps</title>
+  <link rel="icon" type="image/svg+xml" href="./ces-favicon.svg">
+  <link rel="stylesheet" href="./ces-ui.css">
+  <script src="./ces-theme-toggle.js"></script>
+  <style>
+    /* =======================================
+       TOKEN ALIAS SHIM — maps local names to
+       canonical --co-* tokens from ces-ui.css.
+       Every var(--local) rule resolves here;
+       light/dark values flow from ces-ui.css.
+       ======================================= */
+    :root {
+      --bg-page:           var(--co-bg);
+      --bg-panel:          var(--co-surface);
+      --bg-elevated:       var(--co-bg-elevated);
+      --bg-console:        var(--co-bg-console);
+      --border:            var(--co-border);
+      --border-subtle:     var(--co-border);
+      --text-body:         var(--co-text);
+      --text-muted:        var(--co-text-muted);
+      --text-heading:      var(--co-text);
+      --accent-blue:       var(--co-primary);
+      --accent-blue-hover: var(--co-primary-hover);
+      --accent-blue-subtle:var(--co-primary-focus);
+      --accent-green:      var(--co-compliant);
+      --accent-green-hover:var(--co-compliant);
+      --accent-amber:      var(--co-risk);
+      --accent-red:        var(--co-violation);
+    }
+
+    /* =======================================
+       RESET & BODY
+       ======================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scrollbar-gutter: stable; }
+    body {
+      font-family: var(--co-font-sans);
+      font-size: 14px;
+      letter-spacing: 0.01em;
+      background: var(--bg-page);
+      color: var(--text-body);
+      min-height: 100vh;
+    }
+
+    /* =======================================
+       HEADER
+       ======================================= */
+    #header {
+      /* Visual styling (navy bar, white text, border) comes from the shared .ces-header class.
+         The #header id keeps only layout props that don't fight the shared header. */
+      padding: 14px 24px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    #header .version {
+      font-size: 11px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.75);
+      letter-spacing: 0.02em;
+    }
+
+    /* =======================================
+       LAYOUT GRID
+       ======================================= */
+    #main {
+      max-width: 1320px;
+      margin: 24px auto;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    #leftCol {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    #rightCol {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    /* =======================================
+       PANELS
+       ======================================= */
+    .panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 0;
+      padding: 18px 20px;
+    }
+
+    .panel h2 {
+      font-family: var(--co-font-display);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    /* =======================================
+       FAMILY SECTIONS — collapsible
+       ======================================= */
+    .family-section {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 0;
+      overflow: hidden;
+    }
+
+    .family-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .family-header:hover {
+      background: var(--bg-panel);
+    }
+
+    .family-header .chevron {
+      margin-left: auto;
+      font-size: 10px;
+      color: var(--text-muted);
+      transition: transform 0.2s;
+    }
+
+    .family-section.collapsed .chevron {
+      transform: rotate(-90deg);
+    }
+
+    .family-section.collapsed .family-body {
+      display: none;
+    }
+
+    .family-section.collapsed .family-header {
+      border-bottom: none;
+    }
+
+    .family-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--border);
+      color: var(--text-heading);
+      font-size: 11px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .family-body {
+      padding: 8px 0;
+    }
+
+    .command-item {
+      padding: 8px 16px;
+      cursor: pointer;
+      display: flex;
+      gap: 8px;
+      align-items: baseline;
+      font-size: 12px;
+      border-left: 3px solid transparent;
+      transition: background 0.15s, border-color 0.15s;
+      position: relative;
+    }
+
+    .command-item:hover {
+      background: var(--bg-elevated);
+      border-left-color: var(--accent-blue);
+    }
+
+    .command-item .cmd-id {
+      color: var(--text-muted);
+      font-family: var(--co-font-mono);
+      font-size: 11px;
+      min-width: 42px;
+    }
+
+    .command-item .cmd-title {
+      color: var(--text-body);
+      flex: 1;
+    }
+
+    .tooltip {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      margin-top: 4px;
+      max-width: 280px;
+      padding: 8px 12px;
+      background: var(--bg-elevated);
+      color: var(--text-body);
+      border: 1px solid var(--border);
+      border-radius: 0;
+      font-size: 11px;
+      line-height: 1.4;
+      word-wrap: break-word;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1000;
+      transition: opacity 0.15s;
+    }
+
+    .command-item:hover .tooltip {
+      opacity: 1;
+    }
+
+    /* =======================================
+       BLANK STATE — search bar + live results
+       ======================================= */
+    #blankState {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    #blankState.hidden {
+      display: none;
+    }
+
+    #commandSearchInput {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 0;
+      font-size: 14px;
+      font-family: var(--co-font-mono);
+      background: var(--bg-elevated);
+      color: var(--text-body);
+    }
+
+    #commandSearchInput:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 1px var(--accent-blue);
+      background: var(--bg-panel);
+    }
+
+    #searchResults {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    #searchResults .search-placeholder {
+      padding: 12px 16px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .search-result-item {
+      padding: 8px 16px;
+      cursor: pointer;
+      display: flex;
+      gap: 8px;
+      align-items: baseline;
+      font-size: 12px;
+      border-left: 3px solid transparent;
+      transition: background 0.15s, border-color 0.15s;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-bottom: none;
+    }
+
+    .search-result-item:last-child {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .search-result-item:hover {
+      background: var(--bg-elevated);
+      border-left-color: var(--accent-blue);
+    }
+
+    .search-result-item .cmd-id {
+      color: var(--text-muted);
+      font-family: var(--co-font-mono);
+      font-size: 11px;
+      min-width: 42px;
+    }
+
+    .search-result-item .cmd-title {
+      color: var(--text-body);
+      flex: 1;
+    }
+
+    /* =======================================
+       COMMAND FORM
+       ======================================= */
+    #commandForm {
+      display: none;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 0;
+      padding: 20px 24px;
+    }
+
+    #commandForm.visible {
+      display: block;
+    }
+
+    .form-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .form-header h2 {
+      font-family: var(--co-font-display);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-heading);
+      margin: 0;
+      padding: 0;
+      border: none;
+    }
+
+    .form-header .cmd-id {
+      color: var(--accent-blue-subtle);
+      font-family: var(--co-font-mono);
+      margin-right: 8px;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 20px;
+      padding: 0;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .close-btn:hover {
+      background: var(--bg-elevated);
+      color: var(--text-body);
+    }
+
+    .form-overview {
+      font-size: 13px;
+      color: var(--text-body);
+      line-height: 1.6;
+      margin-bottom: 20px;
+      padding: 12px 16px;
+      background: var(--bg-elevated);
+      border-radius: 0;
+      border-left: 3px solid var(--accent-blue);
+    }
+
+    .form-params {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      margin-top: 12px;
+      font-weight: 500;
+    }
+
+    label:first-child { margin-top: 0; }
+
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      border-radius: 0;
+      font-size: 12px;
+      font-family: var(--co-font-mono);
+      background: var(--bg-elevated);
+      color: var(--text-body);
+    }
+
+    input[type="text"]:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 1px var(--accent-blue);
+      background: var(--bg-panel);
+    }
+
+    input[type="text"]:read-only {
+      background: var(--bg-console);
+      color: var(--text-muted);
+      cursor: not-allowed;
+    }
+
+    .form-footer {
+      display: flex;
+      gap: 8px;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    /* =======================================
+       BUTTONS
+       ======================================= */
+    button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 0;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: var(--co-font-sans);
+      transition: background 0.15s, opacity 0.15s;
+    }
+
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-primary   { background: var(--accent-blue); color: #ffffff; }
+    .btn-primary:hover:not(:disabled)   { background: var(--accent-blue-hover); }
+
+    .btn-secondary { background: var(--bg-elevated); color: var(--text-body); border: 1px solid var(--border); }
+    .btn-secondary:hover:not(:disabled) { background: var(--border); }
+
+    .btn-small { padding: 3px 10px; font-size: 12px; }
+
+    /* =======================================
+       EXECUTION RESULT PANEL
+       ======================================= */
+    #resultPanel {
+      display: none;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 0;
+      padding: 20px 24px;
+      margin-bottom: 16px;
+    }
+
+    #resultPanel.visible {
+      display: block;
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .result-header h3 {
+      font-family: var(--co-font-display);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-heading);
+      margin: 0;
+    }
+
+    .status-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 0;
+      letter-spacing: 0.04em;
+    }
+
+    .status-badge.success {
+      background: var(--co-compliant-bg);
+      color: var(--accent-green-hover);
+    }
+
+    .status-badge.failed {
+      background: var(--co-violation-bg);
+      color: var(--accent-red);
+    }
+
+    .result-section {
+      margin-bottom: 16px;
+    }
+
+    .result-section h4 {
+      font-family: var(--co-font-display);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .result-output {
+      font-family: var(--co-font-mono);
+      font-size: 11px;
+      background: var(--bg-console);
+      color: var(--text-body);
+      padding: 12px;
+      border-radius: 0;
+      max-height: 400px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      line-height: 1.5;
+    }
+
+    .evidence-verdict {
+      padding: 12px 16px;
+      background: var(--bg-elevated);
+      border-radius: 0;
+      border-left: 3px solid var(--accent-blue);
+    }
+
+    .evidence-verdict .verdict-outcome {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .evidence-verdict .verdict-text {
+      font-size: 12px;
+      color: var(--text-body);
+      line-height: 1.5;
+    }
+
+    .outcome-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 0;
+      letter-spacing: 0.04em;
+    }
+
+    .outcome-badge.sat {
+      background: var(--co-compliant-bg);
+      color: var(--accent-green-hover);
+    }
+
+    .outcome-badge.not-sat {
+      background: var(--co-risk-bg);
+      color: var(--accent-amber);
+    }
+
+    /* =======================================
+       FIREWALL CONTROLS — F-11 / F-12
+       ======================================= */
+    .fw-precheck {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 12px 0;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--co-radius);
+      background: var(--bg-console);
+    }
+    .state-badge {
+      font-family: var(--co-font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      padding: 4px 10px;
+      border-radius: var(--co-radius);
+      background: var(--co-risk-bg);
+      color: var(--accent-amber);
+      border: 1px solid var(--accent-amber);
+    }
+    .state-badge.allocated { background: var(--co-compliant-bg); color: var(--co-compliant); border-color: var(--co-compliant); }
+    .state-badge.deallocated { background: var(--co-risk-bg); color: var(--accent-amber); border-color: var(--accent-amber); }
+    /* ProvisioningState (firewall health) badge */
+    .state-badge.prov-ok { background: var(--co-compliant-bg); color: var(--co-compliant); border-color: var(--co-compliant); }
+    .state-badge.prov-bad { background: var(--co-violation-bg); color: var(--co-violation); border-color: var(--co-violation); }
+    .state-badge.prov-busy { background: var(--co-risk-bg); color: var(--accent-amber); border-color: var(--accent-amber); }
+    .fw-warning {
+      width: 100%;
+      font-size: 12px;
+      color: var(--co-violation);
+      background: var(--co-violation-bg);
+      border: 1px solid var(--co-violation);
+      border-radius: var(--co-radius);
+      padding: 8px 10px;
+    }
+    .live-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--accent-amber);
+      border: 1px solid var(--accent-amber);
+      border-radius: var(--co-radius);
+      padding: 6px 10px;
+      margin-right: auto;
+      cursor: pointer;
+    }
+    .live-toggle input { accent-color: var(--accent-amber); }
+    /* FX-AO7: explicit tenant selection (no default tenant) */
+    #tenantSelect {
+      min-width: 160px;
+      font-family: var(--co-font-mono);
+      font-size: 12px;
+    }
+    #tenantSelect.needs-selection { outline: 2px solid var(--accent-amber); }
+    .status-badge.refused {
+      background: var(--co-violation-bg);
+      color: var(--accent-red);
+      outline: 1px solid var(--accent-red);
+    }
+    /* FX-AO7: blocking alerts in the result panel / approvals modal */
+    .alert-banner {
+      display: none;
+      border: 2px solid var(--accent-red);
+      background: var(--co-violation-bg);
+      color: var(--accent-red);
+      border-radius: var(--co-radius);
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.45;
+      white-space: pre-wrap;
+    }
+    .alert-banner.visible { display: block; }
+    .correlation-line {
+      font-family: var(--co-font-mono);
+      font-size: 11px;
+      color: var(--co-text-muted);
+      margin-bottom: 10px;
+      word-break: break-all;
+    }
+
+    /* =======================================
+       CONFIRMATION MODAL — F-11 / F-12
+       ======================================= */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-box {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: var(--co-radius);
+      padding: 24px;
+      max-width: 460px;
+      width: 90%;
+      box-shadow: var(--co-shadow-lg);
+    }
+    .modal-box h3 { margin: 0 0 12px; font-size: 16px; }
+    .modal-box p { font-size: 13px; line-height: 1.5; color: var(--co-text-muted); }
+    .modal-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; }
+    .btn-danger {
+      background: var(--co-violation); color: #fff; border: none; border-radius: var(--co-radius);
+      padding: 8px 18px; font-weight: 600; cursor: pointer;
+    }
+    .btn-confirm {
+      background: var(--co-compliant); color: #fff; border: none; border-radius: var(--co-radius);
+      padding: 8px 18px; font-weight: 600; cursor: pointer;
+    }
+    /* Dark-mode FILLED-button fix — same rationale as ces-ui.css's
+       [data-theme="dark"] .btn-primary/.btn-destructive block: in dark the
+       --co-violation / --co-compliant tokens are LIGHT tints meant for TEXT on a
+       dark bg, so white on them fails AA. Filled buttons take the deeper spec
+       shades instead (#b91c1c = ces-ui.css dark destructive fill, white 6.6:1;
+       #047857 = the light --co-compliant value, already aliased in this file as
+       --accent-green-hover, white 4.8:1). */
+    [data-theme="dark"] .btn-danger  { background: #b91c1c; }
+    [data-theme="dark"] .btn-confirm { background: #047857; }
+
+    /* =======================================
+       SCROLLBAR
+       ======================================= */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-console); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--co-border-strong); }
+  </style>
+</head>
+<body>
+  <div id="header" class="ces-header">
+    <div class="header-brand">
+      <img src="./ces-logo.svg" alt="CES">
+      CES
+      <span class="header-company">Blue Heron Defense &mdash; AdminOps</span>
+      <span class="version">v2.2.3</span>
+    </div>
+    <div class="header-controls">
+      <button id="approvalsBtn" data-testid="approvals-open" class="btn-secondary" title="Two-person (SoD) approvals for Tier-3 commands" onclick="openApprovals()" style="margin-right:10px;">APPROVALS <span id="approvalsCount" data-testid="approvals-count" style="display:none;"></span></button>
+      <button id="ces-theme-toggle" title="Toggle light/dark theme">&#9680;</button>
+    </div>
+  </div>
+
+  <div id="main">
+    <!-- LEFT COLUMN: Family Tree -->
+    <div id="leftCol">
+      <div class="family-section collapsed" data-domain="A">
+        <div class="family-header" onclick="toggleFamily('A')">
+          <span class="family-badge">A</span>
+          <span>Identity & Access Management</span>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="family-body" data-family="A"></div>
+      </div>
+
+      <div class="family-section collapsed" data-domain="B">
+        <div class="family-header" onclick="toggleFamily('B')">
+          <span class="family-badge">B</span>
+          <span>Device & Endpoint Management</span>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="family-body" data-family="B"></div>
+      </div>
+
+      <div class="family-section collapsed" data-domain="C">
+        <div class="family-header" onclick="toggleFamily('C')">
+          <span class="family-badge">C</span>
+          <span>Credential & Key Lifecycle</span>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="family-body" data-family="C"></div>
+      </div>
+
+      <div class="family-section collapsed" data-domain="D">
+        <div class="family-header" onclick="toggleFamily('D')">
+          <span class="family-badge">D</span>
+          <span>Data Protection & CUI Boundary</span>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="family-body" data-family="D"></div>
+      </div>
+
+      <div class="family-section collapsed" data-domain="E">
+        <div class="family-header" onclick="toggleFamily('E')">
+          <span class="family-badge">E</span>
+          <span>Audit, Logging & Monitoring</span>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="family-body" data-family="E"></div>
+      </div>
+
+      <div class="family-section collapsed" data-domain="F">
+        <div class="family-header" onclick="toggleFamily('F')">
+          <span class="family-badge">F</span>
+          <span>Security Configuration & Posture</span>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="family-body" data-family="F"></div>
+      </div>
+
+      <div class="family-section collapsed" data-domain="G">
+        <div class="family-header" onclick="toggleFamily('G')">
+          <span class="family-badge">G</span>
+          <span>Personnel Security & Training</span>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="family-body" data-family="G"></div>
+      </div>
+
+      <div class="family-section collapsed" data-domain="H">
+        <div class="family-header" onclick="toggleFamily('H')">
+          <span class="family-badge">H</span>
+          <span>Incident Response & Recovery</span>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="family-body" data-family="H"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: Blank/Search State or Command Form -->
+    <div id="rightCol">
+      <!-- Blank state: shown when no command form is open -->
+      <div id="blankState">
+        <input type="text" id="commandSearchInput" data-testid="command-search" placeholder="Search commands (id, title, domain, CMMC practice)…" autocomplete="off" />
+        <div id="searchResults" data-testid="search-results"></div>
+      </div>
+
+      <!-- Command Form: Hidden by default -->
+      <div id="commandForm">
+        <div class="form-header">
+          <h2 id="formTitle" data-testid="form-title"></h2>
+          <button class="close-btn" onclick="closeCommandForm()">×</button>
+        </div>
+        <div class="form-overview" id="formOverview"></div>
+
+        <!-- Execution Result Panel -->
+        <div id="resultPanel" data-testid="result-panel" data-state="idle">
+          <div class="result-header">
+            <h3>Execution Result</h3>
+            <span id="resultStatusBadge" data-testid="result-status" class="status-badge"></span>
+          </div>
+          <!-- FX-AO7: server refusal / blocked-execution message -->
+          <div class="alert-banner" id="refusalBanner" data-testid="refusal-banner" role="alert"></div>
+          <!-- FX-AO7 (FX-AO3 UI half): evidence row was NOT persisted -->
+          <div class="alert-banner" id="evidenceLostBanner" data-testid="evidence-lost-banner" role="alert"></div>
+          <!-- FX-AO7 (REQ-AO-GUI-NO-CORRELATION-ID): per-execution trace id -->
+          <div class="correlation-line" id="resultCorrelationId" data-testid="result-correlation-id"></div>
+          <div class="result-section">
+            <h4>Output</h4>
+            <div class="result-output" id="resultOutput" data-testid="result-output"></div>
+          </div>
+          <div class="result-section" id="evidenceSection" data-testid="evidence-section" style="display: none;">
+            <h4>Evidence</h4>
+            <div class="evidence-verdict">
+              <div class="verdict-outcome">
+                <span>Outcome:</span>
+                <span id="evidenceOutcomeBadge" data-testid="evidence-outcome" class="outcome-badge"></span>
+              </div>
+              <div class="verdict-text" id="evidenceVerdict" data-testid="evidence-verdict"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-params" id="formParams" data-testid="form-params"></div>
+
+        <!-- Firewall AllocationState pre-check (F-11 / F-12 only) -->
+        <div class="fw-precheck" id="firewallPrecheck" data-testid="fw-precheck" style="display: none;">
+          <button type="button" class="btn-secondary" id="precheckBtn" data-testid="fw-precheck-btn">CHECK CURRENT STATE</button>
+          <span class="state-badge" id="precheckBadge" data-testid="fw-precheck-badge" style="display: none;"></span>
+          <span class="state-badge prov-badge" id="precheckProvBadge" data-testid="fw-precheck-prov-badge" style="display: none;"></span>
+          <div class="fw-warning" id="precheckWarning" data-testid="fw-precheck-warning" style="display: none;"></div>
+        </div>
+
+        <div class="form-footer">
+          <label class="live-toggle" title="When OFF, runs in dry-run mode against the selected tenant.">
+            <input type="checkbox" id="liveExecToggle" data-testid="live-toggle" />
+            Live Execution (dryRun: OFF)
+          </label>
+          <!-- FX-AO7: tenant is an explicit choice from GET /api/tenants; there is no default. -->
+          <select id="tenantSelect" data-testid="tenant-select" title="Tenant to run against (required)">
+            <option value="">— select tenant —</option>
+          </select>
+          <!-- AO-20 (2026-09-27, FC-AO): whether THIS SERVER PROCESS is actually routed to
+               stacksim right now (process-level fact, independent of the selected tenant). -->
+          <span class="state-badge" id="stacksimModeBadge" data-testid="stacksim-mode-badge" style="display: none;"></span>
+          <input type="text" id="requestorUpnInput" data-testid="requestor-upn" style="display: none;" placeholder="requestor UPN (Tier 3)" title="Tier-3 commands open a two-person approval bound to this UPN" />
+          <input type="text" id="approvalIdInput" data-testid="approval-id" style="display: none;" placeholder="approvalId (approved Tier-3 run)" title="Paste an APPROVED approvalId to execute a gated Tier-3 command" />
+          <button class="btn-primary" id="executeBtn" data-testid="execute">EXECUTE</button>
+          <button class="btn-secondary" data-testid="form-cancel" onclick="closeCommandForm()">CANCEL</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Global state
+    let registry = [];
+    let tenantConfig = null;
+    // AO-03: resolved tenant-sourced param values for the currently open command,
+    // from GET /api/tenant/bindings (the server's binding table) — see loadTenantBindings.
+    let tenantBindings = {};
+
+    let tenantList = [];
+    let liveAllowed = false;
+    // AO-20: whether THIS SERVER PROCESS is routed to stacksim right now (from GET /api/tenants).
+    let stacksimModeActive = false;
+
+    // FX-AO7: single source of truth for the operator-selected tenant slug (#tenantSelect).
+    // There is NO default tenant: returns '' until the operator explicitly picks one, and
+    // every caller must refuse to contact the execute API while it is empty.
+    function getSelectedTenant() {
+      const el = document.getElementById('tenantSelect');
+      const val = el && el.value && String(el.value).trim();
+      return val || '';
+    }
+
+    const NO_TENANT_MESSAGE =
+      'No tenant selected. Choose a tenant from the tenant list before executing — ' +
+      'AdminOps never picks a default tenant.';
+
+    // FX-AO7 (REQ-AO-GUI-NO-CORRELATION-ID): one fresh id per execute request so the
+    // persisted evidence row can be traced. crypto.randomUUID is secure-context only
+    // (plain-http remote access lacks it), hence the getRandomValues/Math.random fallback.
+    function newCorrelationId() {
+      const c = (typeof crypto !== 'undefined') ? crypto : null;
+      if (c && typeof c.randomUUID === 'function') return 'ao-ui-' + c.randomUUID();
+      const bytes = new Uint8Array(16);
+      if (c && typeof c.getRandomValues === 'function') c.getRandomValues(bytes);
+      else for (let i = 0; i < 16; i++) bytes[i] = Math.floor(Math.random() * 256);
+      bytes[6] = (bytes[6] & 0x0f) | 0x40;
+      bytes[8] = (bytes[8] & 0x3f) | 0x80;
+      const h = Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+      return `ao-ui-${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
+    }
+
+    // FX-AO7: populate #tenantSelect from GET /api/tenants (sim first). Live tenants are
+    // labelled as refused when the server has not opted in to live execution.
+    // AO-20: also surfaces whether THIS SERVER PROCESS is actually routed to stacksim —
+    // a 'sim'-kind tenant is refused by the executor when it is not (see stacksimModeBadge).
+    async function loadTenants() {
+      const sel = document.getElementById('tenantSelect');
+      const badge = document.getElementById('stacksimModeBadge');
+      try {
+        const res = await fetch('/api/tenants');
+        const data = await res.json();
+        tenantList = Array.isArray(data.tenants) ? data.tenants : [];
+        liveAllowed = data.liveAllowed === true;
+        stacksimModeActive = data.stacksimModeActive === true;
+      } catch (err) {
+        console.warn('Failed to load tenant list:', err);
+        tenantList = [];
+        stacksimModeActive = false;
+      }
+      const escapeAttr = s => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+      sel.innerHTML = '<option value="">— select tenant —</option>' + tenantList.map(t => {
+        const note = t.kind === 'sim' ? 'sim' : (liveAllowed ? t.kind : `${t.kind} — refused: server is sim-only`);
+        return `<option value="${escapeAttr(t.slug)}">${escapeAttr(t.slug)} (${escapeAttr(note)})</option>`;
+      }).join('');
+      sel.value = '';
+      sel.classList.add('needs-selection');
+      sel.onchange = onTenantChanged;
+      if (badge) {
+        badge.style.display = 'inline-block';
+        badge.textContent = stacksimModeActive ? 'stacksim: ROUTED' : 'stacksim: NOT ROUTED';
+        badge.className = 'state-badge ' + (stacksimModeActive ? 'allocated' : 'deallocated');
+        badge.title = stacksimModeActive
+          ? 'This server process is routed to the stacksim simulator (STACKSIM_SERVER_URL + PSModulePath shim detected).'
+          : 'This server process is NOT routed to stacksim — any sim-kind tenant will be refused by the executor.';
+      }
+    }
+
+    // Tenant changed: drop the cached tenant config and re-fill tenant-sourced params.
+    async function onTenantChanged() {
+      const sel = document.getElementById('tenantSelect');
+      if (getSelectedTenant()) sel.classList.remove('needs-selection');
+      else sel.classList.add('needs-selection');
+      tenantConfig = null;
+      await loadTenantConfig();
+      const cmd = currentCommand;
+      if (!cmd) return;
+      await loadTenantBindings(cmd.id);
+      cmd.parameters.forEach(param => {
+        if (!param.source) return;
+        const input = document.getElementById(`param-${param.name}`);
+        if (input) input.value = tenantBindings[param.name] || '';
+      });
+    }
+
+    // Show the result panel with a blocking/refusal message (no API call was made, or the
+    // server refused). Used for the no-tenant block and for server refusals.
+    // W4-AO4: machine-readable result state for UI automation (docs/contracts/AO-UI-TEST-HOOKS.md).
+    // idle | blocked | executed | dry_run | denied | pending_approval | failed
+    function setResultState(state, extra) {
+      const panel = document.getElementById('resultPanel');
+      if (!panel || !panel.setAttribute) return;
+      panel.setAttribute('data-state', state);
+      const e = extra || {};
+      panel.setAttribute('data-outcome', e.outcome || '');
+      panel.setAttribute('data-verdict', e.verdict || '');
+      panel.setAttribute('data-approval-id', e.approvalId || '');
+      panel.setAttribute('data-correlation-id', e.correlationId || '');
+    }
+
+    function showBlocked(message, badgeText) {
+      const panel = document.getElementById('resultPanel');
+      const badge = document.getElementById('resultStatusBadge');
+      const banner = document.getElementById('refusalBanner');
+      panel.classList.add('visible');
+      badge.textContent = badgeText || 'BLOCKED';
+      badge.className = 'status-badge refused';
+      banner.textContent = message;
+      banner.classList.add('visible');
+      document.getElementById('evidenceLostBanner').classList.remove('visible');
+      document.getElementById('resultCorrelationId').textContent = '';
+      document.getElementById('resultOutput').textContent = '';
+      document.getElementById('evidenceSection').style.display = 'none';
+      setResultState('blocked');
+    }
+
+    // FX-AO7 (FX-AO3 UI half): true when the server says the evidence row was lost.
+    function isEvidenceLost(r) {
+      return !!r && (r.evidencePersisted === false || r.evidenceLost === true);
+    }
+    function evidenceLostText(r) {
+      return (r.evidenceWarning || 'EVIDENCE NOT PERSISTED — this run has NO audit evidence row.') +
+        (r.evidenceError ? `\nCause: ${r.evidenceError}` : '');
+    }
+
+    let currentCommand = null;
+
+    // On page load
+    window.addEventListener('DOMContentLoaded', async () => {
+      await loadTenants();
+      await loadRegistry();
+      renderFamilyTree();
+      document.getElementById('commandSearchInput').addEventListener('input', function() {
+        renderSearchResults(this.value);
+      });
+      renderSearchResults('');
+    });
+
+    // Fetch commands registry
+    async function loadRegistry() {
+      try {
+        const res = await fetch('/api/commands');
+        const data = await res.json();
+        // Flatten domains array into single registry
+        registry = data.domains.flatMap(d => d.commands);
+      } catch (err) {
+        console.error('Failed to load registry:', err);
+      }
+    }
+
+    // Populate left column family sections
+    function renderFamilyTree() {
+      const domains = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+      domains.forEach(domain => {
+        const commands = registry.filter(c => c.domain === domain);
+        const bodyEl = document.querySelector(`[data-family="${domain}"]`);
+        bodyEl.innerHTML = commands.map(cmd => `
+          <div class="command-item" data-testid="cmd-${cmd.id}" data-command-id="${cmd.id}" onclick="openCommandForm('${cmd.id}')">
+            <span class="cmd-id">${cmd.id}</span>
+            <span class="cmd-title">${cmd.title}</span>
+            <div class="tooltip">${cmd.overview}</div>
+          </div>
+        `).join('');
+
+        // Attach mouseenter listeners for tooltip overflow handling
+        bodyEl.querySelectorAll('.command-item').forEach(item => {
+          item.addEventListener('mouseenter', function() {
+            const tooltip = this.querySelector('.tooltip');
+            if (tooltip) {
+              positionTooltip(tooltip, this);
+            }
+          });
+        });
+      });
+    }
+
+    // Position tooltip to avoid viewport overflow
+    function positionTooltip(tooltipEl, itemEl) {
+      // Reset positioning to default (below)
+      tooltipEl.style.bottom = 'auto';
+      tooltipEl.style.top = '100%';
+
+      // Check if tooltip extends below viewport
+      setTimeout(() => {
+        const rect = tooltipEl.getBoundingClientRect();
+        if (rect.bottom > window.innerHeight) {
+          // Reposition above
+          tooltipEl.style.bottom = '100%';
+          tooltipEl.style.top = 'auto';
+          tooltipEl.style.marginTop = '0';
+          tooltipEl.style.marginBottom = '4px';
+        }
+      }, 0);
+    }
+
+    // Render live search results in the blank-state pane
+    function renderSearchResults(query) {
+      const resultsEl = document.getElementById('searchResults');
+      const trimmed = query.trim();
+
+      if (trimmed === '') {
+        resultsEl.innerHTML = `<div class="search-placeholder">Start typing to search ${registry.length} commands…</div>`;
+        return;
+      }
+
+      const q = trimmed.toLowerCase();
+      const matches = registry.filter(cmd => {
+        return cmd.id.toLowerCase().includes(q) ||
+          cmd.title.toLowerCase().includes(q) ||
+          cmd.domainName.toLowerCase().includes(q) ||
+          (cmd.cmmcPractices || []).some(p => p.toLowerCase().includes(q));
+      });
+
+      if (matches.length === 0) {
+        resultsEl.innerHTML = '<div class="search-placeholder">No matching commands.</div>';
+        return;
+      }
+
+      resultsEl.innerHTML = matches.map(cmd => `
+        <div class="search-result-item" data-testid="search-cmd-${cmd.id}" data-command-id="${cmd.id}" onclick="openCommandForm('${cmd.id}')">
+          <span class="cmd-id">${cmd.id}</span>
+          <span class="cmd-title">${cmd.title}</span>
+        </div>
+      `).join('');
+    }
+
+    // Toggle left column family section collapse/expand
+    function toggleFamily(domain) {
+      const section = document.querySelector(`.family-section[data-domain="${domain}"]`);
+      section.classList.toggle('collapsed');
+    }
+
+    // Open command form in right column
+    async function openCommandForm(commandId) {
+      const cmd = registry.find(c => c.id === commandId);
+      if (!cmd) return;
+      currentCommand = cmd;
+
+      // Hide blank state, show form
+      document.getElementById('blankState').classList.add('hidden');
+      document.getElementById('commandForm').classList.add('visible');
+
+      // Hide result panel from previous execution
+      document.getElementById('resultPanel').classList.remove('visible');
+
+      // Populate header
+      document.getElementById('formTitle').innerHTML = `<span class="cmd-id">${cmd.id}</span>${cmd.title}`;
+      document.getElementById('formTitle').setAttribute('data-command-id', cmd.id);
+      setResultState('idle');
+
+      // Populate overview
+      document.getElementById('formOverview').textContent = cmd.overview;
+
+      // Populate parameters
+      const paramsEl = document.getElementById('formParams');
+      if (cmd.parameters.length === 0) {
+        paramsEl.innerHTML = '<p data-testid="no-params" style="color: var(--text-muted); font-size: 12px;">No parameters required for this command.</p>';
+      } else {
+        // Load tenant config if not already loaded
+        if (!tenantConfig) {
+          await loadTenantConfig();
+        }
+        // AO-03: resolved bindings for THIS command's tenant-sourced params (server's
+        // binding table, not the raw tenant object — see loadTenantBindings).
+        await loadTenantBindings(cmd.id);
+
+        paramsEl.innerHTML = cmd.parameters.map(param => {
+          let inputHtml = '';
+          let value = '';
+
+          // Auto-populate from the resolved binding table if source specified
+          if (param.source) {
+            value = tenantBindings[param.name] || '';
+          }
+
+          // W4-AO4: a registry parameter without an explicit type (A-09, A-11) still gets a
+          // field — readonly when tenant-sourced, text otherwise — and a label.
+          const ptype = param.type || (param.source ? 'readonly' : 'text');
+          if (ptype === 'text' || ptype === 'readonly') {
+            const readonly = ptype === 'readonly' ? 'readonly' : '';
+            inputHtml = `<input type="text" id="param-${param.name}" data-testid="param-${param.name}" ${param.source ? `data-source="${param.source}"` : ''} ${readonly} value="${value}" placeholder="${param.placeholder || ''}" ${param.required ? 'required' : ''} />`;
+          } else if (ptype === 'select') {
+            const options = param.options.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
+            inputHtml = `<select id="param-${param.name}" data-testid="param-${param.name}" ${param.required ? 'required' : ''}>${options}</select>`;
+          }
+
+          return `
+            <label>${param.label || param.name}${param.required ? ' *' : ''}</label>
+            ${inputHtml}
+          `;
+        }).join('');
+      }
+
+      // F-11 / F-12 special handling: AllocationState pre-check + confirmation modal
+      const isFirewall = cmd.id === 'F-11' || cmd.id === 'F-12';
+      const precheckEl = document.getElementById('firewallPrecheck');
+      const precheckBadge = document.getElementById('precheckBadge');
+      const precheckWarning = document.getElementById('precheckWarning');
+      precheckBadge.style.display = 'none';
+      precheckWarning.style.display = 'none';
+      precheckEl.style.display = isFirewall ? 'flex' : 'none';
+      if (isFirewall) {
+        document.getElementById('precheckBtn').onclick = () => checkFirewallState(cmd);
+      }
+
+      // Reset Live Execution toggle to safe default (dry-run) on every open
+      // (FX-AO7: the tenant selection is NOT reset to any default — it stays the operator's
+      // explicit choice, or empty, in which case execution is blocked client-side.)
+      const liveToggle = document.getElementById('liveExecToggle');
+      const requestorUpn = document.getElementById('requestorUpnInput');
+      const approvalIdEl = document.getElementById('approvalIdInput');
+      liveToggle.checked = false;
+      requestorUpn.style.display = 'none';
+      approvalIdEl.style.display = 'none';
+      approvalIdEl.value = '';
+      const isTier3 = (cmd.sodTier || '').includes('3');
+      liveToggle.onchange = () => {
+        const on = liveToggle.checked;
+        // Tier-3: a live run needs a requestor (to open the approval) or an approvalId (to run gated)
+        requestorUpn.style.display = on && isTier3 ? 'inline-block' : 'none';
+        approvalIdEl.style.display = on && isTier3 ? 'inline-block' : 'none';
+      };
+
+      // Attach EXECUTE handler — firewall commands route through a confirmation modal
+      document.getElementById('executeBtn').onclick = async () => {
+        if (isFirewall) {
+          const confirmed = await confirmFirewallAction(cmd);
+          if (!confirmed) return;
+        }
+        await executeCommand(cmd);
+      };
+    }
+
+    // Open the confirmation modal for a firewall state change. Resolves true on CONFIRM.
+    function confirmFirewallAction(cmd) {
+      return new Promise(resolve => {
+        const modal = document.getElementById('confirmModal');
+        const title = document.getElementById('confirmModalTitle');
+        const text = document.getElementById('confirmModalText');
+        const okBtn = document.getElementById('confirmOkBtn');
+        const cancelBtn = document.getElementById('confirmCancelBtn');
+
+        if (cmd.id === 'F-11') {
+          title.textContent = 'Confirm Firewall DEALLOCATE';
+          text.textContent = 'This will DEALLOCATE the Azure Firewall. Network egress filtering will STOP until re-allocated. Confirm?';
+          okBtn.textContent = 'CONFIRM DEALLOCATE';
+          okBtn.className = 'btn-danger';
+        } else {
+          title.textContent = 'Confirm Firewall ALLOCATE';
+          text.textContent = 'This will ALLOCATE the Azure Firewall. Network egress filtering will RESUME. Confirm?';
+          okBtn.textContent = 'CONFIRM ALLOCATE';
+          okBtn.className = 'btn-confirm';
+        }
+
+        const close = (val) => {
+          modal.style.display = 'none';
+          okBtn.onclick = null;
+          cancelBtn.onclick = null;
+          resolve(val);
+        };
+        okBtn.onclick = () => close(true);
+        cancelBtn.onclick = () => close(false);
+        modal.style.display = 'flex';
+      });
+    }
+
+    // Run the read-only get_command (dryRun) and render the AllocationState badge.
+    async function checkFirewallState(cmd) {
+      const badge = document.getElementById('precheckBadge');
+      const provBadge = document.getElementById('precheckProvBadge');
+      const warning = document.getElementById('precheckWarning');
+      badge.style.display = 'inline-block';
+      badge.className = 'state-badge';
+      badge.textContent = 'CHECKING…';
+      provBadge.style.display = 'none';
+      provBadge.className = 'state-badge prov-badge';
+      warning.style.display = 'none';
+      const tenant = getSelectedTenant();
+      if (!tenant) {
+        badge.textContent = 'NO TENANT';
+        warning.style.display = 'block';
+        warning.textContent = NO_TENANT_MESSAGE;
+        return;
+      }
+      try {
+        const formData = {};
+        cmd.parameters.forEach(param => {
+          const input = document.getElementById(`param-${param.name}`);
+          if (input) formData[param.name] = input.value;
+        });
+        const res = await fetch(`/api/execute/${cmd.id}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tenant, inputs: formData, dryRun: true, correlationId: newCorrelationId() })
+        });
+        const result = await res.json();
+        if (!res.ok && (result.error || (result.result && result.result.error))) {
+          badge.textContent = 'REFUSED';
+          warning.style.display = 'block';
+          warning.textContent = `Server refused the pre-check: ${result.error || result.result.error}`;
+          return;
+        }
+
+        // Parse AllocationState + ProvisioningState out of the get_command JSON. The route
+        // answers { success, result: <ExecutionResult>, ... }; on a dry run the executor's
+        // ExecutionResult stdout is the real pre-state read (FX2-AO3: it was read one level too high).
+        const stateText = (result.result && result.result.stdout) || '';
+        let state = null;
+        let prov = null;
+        try {
+          // The executor's state read pipes the get_command through ConvertTo-Json, and the
+          // firewall get_command already ends in ConvertTo-Json, so the snapshot arrives as a
+          // JSON string holding the JSON object: unwrap one level when that happens.
+          let parsed = JSON.parse(stateText);
+          if (typeof parsed === 'string') parsed = JSON.parse(parsed);
+          state = (parsed.AllocationState || '').toLowerCase();
+          prov = (parsed.ProvisioningState || '').toLowerCase();
+        } catch (_) {
+          const m = /Allocation[^a-z]*State["':\s]+([A-Za-z]+)/i.exec(stateText);
+          if (m) state = m[1].toLowerCase();
+          const p = /Provisioning[^a-z]*State["':\s]+([A-Za-z]+)/i.exec(stateText);
+          if (p) prov = p[1].toLowerCase();
+        }
+
+        // ProvisioningState badge — closest available health signal
+        if (prov) {
+          provBadge.style.display = 'inline-block';
+          provBadge.textContent = prov.toUpperCase();
+          if (prov === 'succeeded') provBadge.classList.add('prov-ok');
+          else if (prov === 'failed') provBadge.classList.add('prov-bad');
+          else provBadge.classList.add('prov-busy'); // updating / deleting / etc.
+          if (prov === 'failed') {
+            warning.style.display = 'block';
+            warning.textContent = 'Firewall ProvisioningState is FAILED — investigate before changing allocation.';
+          }
+        }
+
+        if (state === 'allocated' || state === 'deallocated') {
+          badge.classList.add(state);
+          badge.textContent = state.toUpperCase();
+          // Warn if the current state already matches the command's target state
+          const targetIsDeallocated = cmd.id === 'F-11';
+          const alreadyInTarget = (targetIsDeallocated && state === 'deallocated') ||
+                                  (!targetIsDeallocated && state === 'allocated');
+          // Don't clobber a more-severe FAILED ProvisioningState warning.
+          if (alreadyInTarget && prov !== 'failed') {
+            warning.style.display = 'block';
+            warning.textContent = `Firewall is already ${state.toUpperCase()} — proceeding may error.`;
+          }
+        } else {
+          badge.textContent = 'STATE UNKNOWN';
+          warning.style.display = 'block';
+          warning.textContent = 'Could not determine AllocationState from the pre-check response.';
+        }
+      } catch (err) {
+        badge.textContent = 'CHECK FAILED';
+        warning.style.display = 'block';
+        warning.textContent = `Pre-check error: ${err.message}`;
+      }
+    }
+
+    // Close command form, return to blank state
+    function closeCommandForm() {
+      document.getElementById('blankState').classList.remove('hidden');
+      document.getElementById('commandForm').classList.remove('visible');
+      document.getElementById('formParams').innerHTML = '';
+      document.getElementById('commandSearchInput').value = '';
+      renderSearchResults('');
+    }
+
+    // Load tenant config
+    async function loadTenantConfig() {
+      const tenant = getSelectedTenant();
+      if (!tenant) { tenantConfig = null; return; } // FX-AO7: no tenant, no fallback
+      try {
+        const res = await fetch(`/api/tenant?tenant=${encodeURIComponent(tenant)}`);
+        if (res.ok) {
+          tenantConfig = await res.json();
+        }
+      } catch (err) {
+        console.warn('Failed to load tenant config:', err);
+      }
+    }
+
+    // AO-03 (2026-09-27, FC-AO): resolved values for the given command's tenant-sourced
+    // parameters, through the SAME binding table the server uses at execution time
+    // (GET /api/tenant/bindings -> SourceBindings.resolveSource) — NOT the raw tenant
+    // object keyed by the literal `param.source` string, which renders blank for every
+    // snake_case-bound / resolution-table source (VERIFY-ao.md AO-03).
+    async function loadTenantBindings(commandId) {
+      const tenant = getSelectedTenant();
+      if (!tenant || !commandId) { tenantBindings = {}; return; }
+      try {
+        const res = await fetch(`/api/tenant/bindings?tenant=${encodeURIComponent(tenant)}&commandId=${encodeURIComponent(commandId)}`);
+        tenantBindings = res.ok ? ((await res.json()).bindings || {}) : {};
+      } catch (err) {
+        console.warn('Failed to load tenant bindings:', err);
+        tenantBindings = {};
+      }
+    }
+
+    // Execute command
+    async function executeCommand(cmd) {
+      try {
+        // Collect form data
+        const formData = {};
+        cmd.parameters.forEach(param => {
+          const input = document.getElementById(`param-${param.name}`);
+          if (input) {
+            formData[param.name] = input.value;
+          }
+        });
+
+        // FX-AO7: the tenant is the operator's explicit selection — never a default.
+        // Without one, the execute API is not contacted at all.
+        const tenant = getSelectedTenant();
+        if (!tenant) {
+          const sel = document.getElementById('tenantSelect');
+          if (sel) sel.classList.add('needs-selection');
+          showBlocked(NO_TENANT_MESSAGE, 'NO TENANT');
+          return;
+        }
+
+        // Resolve execution mode from the Live Execution toggle (default: dry-run)
+        const liveToggle = document.getElementById('liveExecToggle');
+        const liveOn = liveToggle && liveToggle.checked;
+        const dryRun = !liveOn;
+        const requestorUPN = (document.getElementById('requestorUpnInput').value || '').trim() || undefined;
+        const approvalId = (document.getElementById('approvalIdInput').value || '').trim() || undefined;
+        // REQ-AO-GUI-NO-CORRELATION-ID: fresh trace id per click, echoed onto the evidence row.
+        const correlationId = newCorrelationId();
+
+        // POST to execute endpoint
+        const res = await fetch(`/api/execute/${cmd.id}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            tenant,
+            inputs: formData,
+            dryRun,
+            // W4-AO5 web apply guard: the Live Execution toggle is the operator's explicit
+            // intent; a live request confirms by naming the command.
+            ...(dryRun ? {} : { confirmApply: cmd.id }),
+            requestorUPN,
+            approvalId,
+            correlationId
+          })
+        });
+
+        const result = await res.json();
+        displayExecutionResult(result, cmd, correlationId);
+      } catch (err) {
+        showBlocked(`Execution error: ${err.message}`, 'ERROR');
+      }
+    }
+
+    // Display execution result in result panel
+    function displayExecutionResult(result, cmd, sentCorrelationId) {
+      const resultPanel = document.getElementById('resultPanel');
+      const statusBadge = document.getElementById('resultStatusBadge');
+      const resultOutput = document.getElementById('resultOutput');
+      const evidenceSection = document.getElementById('evidenceSection');
+      const evidenceOutcomeBadge = document.getElementById('evidenceOutcomeBadge');
+      const evidenceVerdict = document.getElementById('evidenceVerdict');
+      const refusalBanner = document.getElementById('refusalBanner');
+      const evidenceLostBanner = document.getElementById('evidenceLostBanner');
+      const correlationEl = document.getElementById('resultCorrelationId');
+
+      // Show result panel
+      resultPanel.classList.add('visible');
+      refusalBanner.classList.remove('visible');
+      refusalBanner.textContent = '';
+
+      // FX-AO7: correlationId — prefer the server's echo, fall back to what we sent.
+      const corr = result.correlationId || sentCorrelationId || '';
+      correlationEl.textContent = corr ? `correlationId: ${corr}` : '';
+
+      // FX-AO7 (FX-AO3 UI half): lost evidence is a prominent error on EVERY result shape
+      // (200 / 202 pending-approval / 4xx / 5xx) — rendered before any early return.
+      if (isEvidenceLost(result)) {
+        evidenceLostBanner.textContent = evidenceLostText(result);
+        evidenceLostBanner.classList.add('visible');
+      } else {
+        evidenceLostBanner.classList.remove('visible');
+        evidenceLostBanner.textContent = '';
+      }
+
+      // Tier-3 gate: the execute route returns 202 with a pending-approval record instead of running.
+      if (result.status === 'pending_approval') {
+        statusBadge.textContent = 'PENDING APPROVAL';
+        statusBadge.className = 'status-badge failed';
+        resultOutput.textContent =
+          `Tier-3 two-person gate: a SECOND person must approve before this can run.\n\n` +
+          `approvalId: ${result.approvalId}\n\n` +
+          `${result.message || ''}\n\n` +
+          `Open APPROVALS (header) to approve/reject, then re-run this command LIVE with the approvalId ` +
+          `(it has been pre-filled in the form).`;
+        const apEl = document.getElementById('approvalIdInput');
+        if (apEl) { apEl.value = result.approvalId || ''; apEl.style.display = 'inline-block'; }
+        evidenceSection.style.display = 'none';
+        setResultState('pending_approval', { approvalId: result.approvalId, correlationId: corr, outcome: 'blocked_pending_approval' });
+        return;
+      }
+
+      // FX-AO7: a server refusal (sim-only rail, CMMC/CUI gate, or a route-level 4xx such as
+      // an unknown tenant) is shown as REFUSED with the server's own reason, verbatim.
+      const outcome0 = result.evidence && result.evidence.outcome;
+      const serverError = (result.result && result.result.error) || result.error || '';
+      const refused = !result.success &&
+        (/^denied_/.test(outcome0 || '') || (!result.result && !!result.error));
+
+      // Set status badge
+      if (result.success) {
+        statusBadge.textContent = 'SUCCESS';
+        statusBadge.className = 'status-badge success';
+      } else if (refused) {
+        statusBadge.textContent = 'REFUSED';
+        statusBadge.className = 'status-badge refused';
+        refusalBanner.textContent =
+          (outcome0 === 'denied_sim_only' ? 'Refused by the server (sim-only rail): ' : 'Refused by the server: ') +
+          (serverError || 'no reason given');
+        refusalBanner.classList.add('visible');
+      } else {
+        statusBadge.textContent = 'FAILED';
+        statusBadge.className = 'status-badge failed';
+      }
+
+      // Set output
+      if (result.result && result.result.stdout) {
+        resultOutput.textContent = result.result.stdout;
+      } else if (serverError) {
+        resultOutput.textContent = serverError;
+      } else {
+        resultOutput.textContent = 'No output available';
+      }
+
+      // Set evidence if available
+      if (result.evidence) {
+        evidenceSection.style.display = 'block';
+
+        // Set outcome badge (W4-AO4: the badge shows the evidence OUTCOME; SAT styling follows
+        // the compliance VERDICT — previously it compared the outcome to 'SAT', which never matched).
+        const outcome = result.evidence.outcome || 'UNKNOWN';
+        const verdict = result.evidence.complianceVerdict || result.evidence.verdict || '';
+        evidenceOutcomeBadge.textContent = outcome;
+        evidenceOutcomeBadge.className = verdict === 'SAT' ? 'outcome-badge sat' : 'outcome-badge not-sat';
+
+        // Set verdict text (the field is complianceVerdict; `verdict` kept as a fallback)
+        evidenceVerdict.textContent = verdict
+          ? verdict + (result.evidence.verdictRationale ? ` — ${result.evidence.verdictRationale}` : '')
+          : 'No verdict available';
+      } else {
+        evidenceSection.style.display = 'none';
+      }
+
+      const ev = result.evidence || {};
+      const evMeta = ev.metadata || {};
+      const finalState = refused ? 'denied'
+        : !result.success ? 'failed'
+        : (evMeta.dryRun || evMeta.mode === 'dry_run') ? 'dry_run'
+        : 'executed';
+      setResultState(finalState, {
+        outcome: ev.outcome,
+        verdict: ev.complianceVerdict || ev.verdict,
+        correlationId: corr,
+      });
+    }
+  </script>
+
+  <!-- Confirmation modal (F-11 / F-12 state-change gate) -->
+  <div class="modal-overlay" id="confirmModal" data-testid="fw-confirm-modal" style="display: none;">
+    <div class="modal-box">
+      <h3 id="confirmModalTitle" data-testid="fw-confirm-title"></h3>
+      <p id="confirmModalText" data-testid="fw-confirm-text"></p>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="confirmCancelBtn" data-testid="fw-confirm-cancel">CANCEL</button>
+        <button class="btn-confirm" id="confirmOkBtn" data-testid="fw-confirm-ok">CONFIRM</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Approvals modal (Tier-3 two-person / SoD workflow) -->
+  <div class="modal-overlay" id="approvalsModal" data-testid="approvals-modal" style="display: none;">
+    <div class="modal-box" style="max-width: 860px; width: 92%;">
+      <h3 style="margin-top:0;">Tier-3 Approvals (two-person rule)</h3>
+      <p style="font-size:12px; opacity:.8;">The approver must be a DIFFERENT person than the requestor. Approving does not execute — re-run the command LIVE with the approvalId.</p>
+      <div style="margin-bottom:10px; display:flex; gap:8px; align-items:center;">
+        <select id="approvalsStatusFilter" data-testid="approvals-status-filter" onchange="loadApprovals()">
+          <option value="pending" selected>pending</option>
+          <option value="approved">approved</option>
+          <option value="rejected">rejected</option>
+          <option value="executed">executed</option>
+        </select>
+        <input type="text" id="approverUpnInput" data-testid="approver-upn" placeholder="approver UPN (display only)" style="flex:1; padding:6px;" />
+        <!-- W4-AO3: the approver is the AUTHENTICATED principal (x-ces-principal token), never the typed UPN. -->
+        <input type="password" id="approverTokenInput" data-testid="approver-token" placeholder="approver sign-in token (x-ces-principal)" style="flex:1; padding:6px;" autocomplete="off" />
+        <button class="btn-secondary" data-testid="approvals-refresh" onclick="loadApprovals()">REFRESH</button>
+      </div>
+      <!-- FX-AO7 (FX-AO3 UI half): decision whose evidence row was NOT persisted -->
+      <div class="alert-banner" id="approvalsEvidenceBanner" data-testid="approvals-evidence-banner" role="alert"></div>
+      <div id="approvalsList" data-testid="approvals-list" style="max-height: 420px; overflow-y: auto; font-size: 12.5px;"></div>
+      <div class="modal-actions">
+        <button class="btn-secondary" data-testid="approvals-close" onclick="document.getElementById('approvalsModal').style.display='none'">CLOSE</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ---- Tier-3 approvals workflow (GET /api/approvals, POST /api/approvals/:id/decision) ----
+    function openApprovals() {
+      document.getElementById('approvalsModal').style.display = 'flex';
+      loadApprovals();
+    }
+
+    async function loadApprovals() {
+      const listEl = document.getElementById('approvalsList');
+      const status = document.getElementById('approvalsStatusFilter').value;
+      listEl.innerHTML = '<em>loading…</em>';
+      try {
+        const res = await fetch(`/api/approvals?status=${encodeURIComponent(status)}`);
+        const data = await res.json();
+        const rows = (data.approvals || []);
+        const badge = document.getElementById('approvalsCount');
+        if (status === 'pending') {
+          badge.style.display = rows.length ? 'inline' : 'none';
+          badge.textContent = rows.length ? `(${rows.length})` : '';
+        }
+        if (!rows.length) { listEl.innerHTML = `<em>no ${status} approvals</em>`; return; }
+        listEl.innerHTML = rows.map(a => `
+          <div data-testid="approval-${a.approvalId}" data-approval-id="${a.approvalId}" data-command-id="${a.commandId}" data-status="${a.status}" style="border:1px solid var(--co-border); border-radius:var(--co-radius); padding:10px; margin-bottom:8px;">
+            <div style="display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap;">
+              <div>
+                <strong>${a.commandId}</strong> — ${a.commandTitle || ''}<br>
+                <span style="opacity:.75;">requestor: ${a.requestorUPN} · ${a.createdAt}</span><br>
+                <span style="opacity:.75;">inputs: <code>${JSON.stringify(a.inputs)}</code></span><br>
+                <span style="opacity:.75;">approvalId: <code>${a.approvalId}</code></span>
+                ${a.approverUPN ? `<br><span style="opacity:.75;">decided by ${a.approverUPN} at ${a.decidedAt || ''}</span>` : ''}
+                ${isEvidenceLost(a) ? `<div class="alert-banner visible approval-evidence-lost" role="alert" style="margin:8px 0 0;"></div>` : ''}
+              </div>
+              ${a.status === 'pending' ? `
+              <div style="display:flex; gap:6px; align-items:flex-start;">
+                <button class="btn-primary" data-testid="approve-${a.approvalId}" onclick="decideApproval('${a.approvalId}','approve')">APPROVE</button>
+                <button class="btn-secondary" data-testid="reject-${a.approvalId}" onclick="decideApproval('${a.approvalId}','reject')">REJECT</button>
+              </div>` : `<div><span class="status-badge ${a.status === 'approved' || a.status === 'executed' ? 'success' : 'failed'}">${a.status.toUpperCase()}</span></div>`}
+            </div>
+          </div>`).join('');
+        // Fill evidence-loss banners via textContent (server strings are not HTML).
+        const lostRows = rows.filter(isEvidenceLost);
+        listEl.querySelectorAll('.approval-evidence-lost').forEach((el, i) => {
+          if (lostRows[i]) el.textContent = evidenceLostText(lostRows[i]);
+        });
+      } catch (err) {
+        listEl.innerHTML = `<em>failed to load approvals: ${err.message}</em>`;
+      }
+    }
+
+    async function decideApproval(approvalId, decision) {
+      // W4-AO3: the server records the AUTHENTICATED principal as approver. The sign-in token is
+      // sent as x-ces-principal; without one (and without a server dev principal) the server
+      // answers 401 and nothing is recorded.
+      const tokenEl = document.getElementById('approverTokenInput');
+      const principalToken = ((tokenEl && tokenEl.value) || '').trim();
+      let reason;
+      if (decision === 'reject') { reason = prompt('Rejection reason:') || undefined; }
+      try {
+        const headers = { 'Content-Type': 'application/json' };
+        if (principalToken) headers['x-ces-principal'] = principalToken;
+        const res = await fetch(`/api/approvals/${approvalId}/decision`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ decision, reason })
+        });
+        const data = await res.json();
+        if (res.status === 401) {
+          alert('Sign-in required: approval decisions need an authenticated approver (x-ces-principal token). Nothing was recorded.');
+          return;
+        }
+        if (!data.success) { alert(`Decision failed: ${data.error}`); return; }
+        // FX-AO7 (FX-AO3 UI half): the decision was recorded but its evidence row was lost.
+        const banner = document.getElementById('approvalsEvidenceBanner');
+        if (isEvidenceLost(data)) {
+          banner.textContent = `Decision ${decision.toUpperCase()} recorded for ${approvalId}, but ` + evidenceLostText(data);
+          banner.classList.add('visible');
+        } else {
+          banner.classList.remove('visible');
+          banner.textContent = '';
+        }
+        if (decision === 'approve') {
+          alert(`APPROVED. Re-run the command LIVE with approvalId:\n${approvalId}`);
+        }
+        loadApprovals();
+      } catch (err) {
+        alert(`Decision error: ${err.message}`);
+      }
+    }
+
+    // Show the pending-approvals count on load
+    window.addEventListener('DOMContentLoaded', () => {
+      fetch('/api/approvals?status=pending').then(r => r.json()).then(d => {
+        const n = (d.approvals || []).length;
+        const badge = document.getElementById('approvalsCount');
+        if (n) { badge.style.display = 'inline'; badge.textContent = `(${n})`; }
+      }).catch(() => {});
+    });
+  </script>
+
+  <footer class="ces-footer">Blue Heron Defense &middot; CES v2.2.3 &middot; CUI</footer>
+</body>
+</html>

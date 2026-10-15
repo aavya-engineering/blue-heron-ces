@@ -1,0 +1,46 @@
+name: CI
+
+# G6 safety net: run the full CES suite (1008 tests incl. the G3 golden SSP
+# reference) on every push/PR. Offline only — no live-tenant, network, or mmdc
+# steps (those stay manual). Reproduces the root `npm test` contract exactly.
+
+on:
+  push:
+    branches: [master, g0-safety-net]
+  pull_request:
+
+# Cancel superseded runs on the same ref to save minutes.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: build + full suite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'   # matches local dev (v24.x); engines require >=18
+          cache: 'npm'
+
+      - name: Install (clean, from lockfile)
+        run: npm ci
+
+      # Supply-chain gate (G-ENG-3): fail the build on a HIGH/CRITICAL production
+      # vulnerability. This is the recurrence guard for G-ENG-2 (the multer HIGH):
+      # a future high-severity prod dep cannot ship unnoticed. `high` level lets the
+      # deferred, non-applicable uuid MODERATE through (EO uses uuid.v4 only).
+      - name: Dependency audit (prod, high+)
+        run: npm audit --omit=dev --audit-level=high
+
+      # `npm test` runs the root contract: pretest builds ces-shared + ces-stamper,
+      # then test:shared/stamper/eo/ao/fe (mixed vitest + jest). The eo suite
+      # includes the golden SSP reference test. A failing test exits non-zero and
+      # fails the job.
+      - name: Build + test (full aggregate)
+        run: npm test

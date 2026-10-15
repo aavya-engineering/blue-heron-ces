@@ -1,0 +1,44 @@
+## Control {{controlId}}: Ensure Managers, System Administrators, and Users Are Made Aware of Security Risks
+
+**Implementation Status:** {{status}}
+
+This organization ensures security awareness within the {{tenantName}} M365 GCC High tenant through formal training programs, attack simulations, and policy acknowledgments managed by {{variables.systemAdministrator}}.
+
+{{#if attackSimulationsActive}}
+**Attack Simulation Training:**
+{{attackSimulationsCount}} attack simulations conducted to validate user security awareness:
+{{#if simulations}}
+{{#each simulations}}
+- **{{displayName}}** — Technique: {{attackTechnique}} — Status: {{status}} — {{lastModifiedDateTime}}
+{{/each}}
+{{/if}}
+
+Simulations test user ability to recognize phishing, social engineering, and credential harvesting attacks. Results identify users requiring additional training.
+{{else}}
+Attack simulation training has not been conducted.
+{{/if}}
+
+**Security Awareness Program:**
+- **Initial Training:** All users complete CUI handling and security awareness training within 30 days of account provisioning
+- **Annual Refresher:** Mandatory annual training covering CUI marking, handling, incident reporting, and emerging threats
+- **Policy Acknowledgment:** Users acknowledge Acceptable Use Policy, CUI Handling Procedures, and Incident Reporting requirements
+- **Training Topics:** Phishing recognition, password security, removable media risks, social engineering, CUI marking per 32 CFR Part 2002, incident reporting procedures
+
+**Operational Procedure:**
+- **Action:** Track training completion; follow up with non-compliant users; update training content annually
+- **Frequency:** Annual training cycle with 30-day completion window
+- **Responsible Party:** {{variables.systemAdministrator}}
+- **Documentation:** Security Awareness Training Program v1.0, Training Completion Records
+
+**Review Frequency:** Annually by ISSO
+
+**Verification Method:** Examine training completion records, attack simulation results, policy acknowledgment records, and training content review history.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** Review training records per procedure AT-001. {{evidenceArtifactUrl}}
+{{/if}}

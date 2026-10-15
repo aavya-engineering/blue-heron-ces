@@ -1,0 +1,53 @@
+controlId: "SC.L2-3.13.10"
+relatedControlIds:
+  - "SC.L2-3.13.11"  # [VERIFY] mapping not yet confirmed
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: C-03
+useCaseTitle: "Key Vault Key Rotation"
+domain: Credential & Secret Management
+priority: P4 Standard
+trigger: 'SCHEDULE: Per auto-rotation policy (recommended: every 90 days); or EXPIRY: Key approaching defined expiry'
+sodTier: Tier 2 (Config Manager)
+entraRolesRequired:
+- Key Vault Crypto Officer (Azure RBAC role)
+approvalRequired: true
+services:
+- name: Azure Key Vault Premium
+  purpose: HSM-backed keys
+- name: Azure RBAC
+  purpose: Key Vault Crypto Officer role
+- name: Azure Monitor
+  purpose: key rotation event alerts
+- name: ITSM system
+  purpose: change ticket for CUI-scope keys
+configurationSteps:
+  portalPath: //portal.azure.us > Key Vaults > select vault > Keys.
+  powershellCmdlets: []
+  graphApiEndpoint: ''
+  graphApiPayloadExample: {}
+  requiredPermissions:
+  - Key Vault Crypto Officer (Azure RBAC)
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-c-credential/C-03/2026/03/
+  format: 'JSON (fields: vaultName, keyName, keyType, keySize, protectionLevel, rotationPolicyDays, expiryDays, previousKeyVersion,
+    newKeyVersion, rotationTimestamp)'
+  filenamePattern: C-03_KeyVaultKeyRotation_{YYYYMMDD}_{HHmmss}_{KeyName}.json
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: Azure Key Vault Premium tier with HSM-backed keys is fully available in Azure Government regions. The HSMs in Azure
+    Government meet FIPS 140-2 Level 2 validation. The management plane endpoint is `management.usgovcloudapi.net` (not `management.azure.com`).
+    The Key Vault data plane endpoint is `https://{vault-name}.vault.usgovcloudapi.net`. Auto-rotation policies and Event
+    Grid notifications for key expiry are available in Azure Government.
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

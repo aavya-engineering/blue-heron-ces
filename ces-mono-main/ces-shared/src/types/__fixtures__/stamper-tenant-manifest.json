@@ -1,0 +1,158 @@
+{
+  "ces": {
+    "artifact": "tenant_manifest",
+    "version": "1.0.0",
+    "generated_on": "2026-02-07T00:00:00.000Z",
+    "intent": "Synthetic test fixture — tenant manifest for PlanTranslator dual-input validation"
+  },
+  "tenant_manifest": {
+    "manifest_id": "MANIFEST-SYNTH-001",
+    "tech_stack_id": 1,
+    "tenant_identity": {
+      "tenantId": "00000000-0000-0000-0000-000000000001",
+      "domain": "vfsgov.onmicrosoft.us",
+      "tenant_name": "vfsgov",
+      "primary_domain": "vfsgov.us",
+      "resource_group": "CMMC-RG",
+      "workspace_name": "cmmc-sentinel-ws",
+      "subscription_id": "00000000-0000-0000-0000-000000000002"
+    },
+    "normative_controls": [
+      {
+        "control_id": "AC.L2-3.1.2",
+        "required_state": "PIM configured for all privileged roles with MFA and justification required",
+        "verification": [
+          {
+            "id": "CHK-AC-3.1.2-01",
+            "description": "PIM requires MFA for role activation",
+            "method": "api_query",
+            "expected": "MFA enforcement enabled for all privileged roles",
+            "on_fail": "Remediate PIM settings to require MFA"
+          }
+        ],
+        "evidence_artifacts": [
+          {
+            "artifact_id": "ART-PIM-001",
+            "artifact_type": "config_export",
+            "description": "PIM configuration export",
+            "collector": "powershell",
+            "retention_days": 365,
+            "storage_location_ref": "evidence/identity/"
+          }
+        ]
+      },
+      {
+        "control_id": "AC.L2-3.1.6",
+        "required_state": "Separate admin accounts without productivity licenses",
+        "verification": [
+          {
+            "id": "CHK-AC-3.1.6-01",
+            "description": "Admin accounts are cloud-only without M365 license",
+            "method": "api_query",
+            "expected": "All admin accounts have no M365 license assigned",
+            "on_fail": "Remove M365 licenses from admin accounts"
+          }
+        ],
+        "evidence_artifacts": []
+      },
+      {
+        "control_id": "IA.L2-3.5.3",
+        "required_state": "MFA enforced for all users via Conditional Access",
+        "verification": [
+          {
+            "id": "CHK-IA-3.5.3-01",
+            "description": "Conditional Access policy requires MFA",
+            "method": "api_query",
+            "expected": "CA policy with MFA grant control targeting all users is enabled",
+            "on_fail": "Create or enable MFA Conditional Access policy"
+          }
+        ],
+        "evidence_artifacts": []
+      }
+    ],
+    "assets": [],
+    "config_intents": [
+      {
+        "id": "CI-PIM-001",
+        "title": "PIM role activation settings",
+        "control_ids": ["AC.L2-3.1.2", "AC.L2-3.1.5"],
+        "desired_config": {
+          "mfa_required": true,
+          "justification_required": true,
+          "max_activation_hours": 8,
+          "approval_required_for_global_admin": true
+        },
+        "source_of_truth": "platform_setting",
+        "query_method": "api"
+      },
+      {
+        "id": "CI-CA-001",
+        "title": "Conditional Access MFA policy",
+        "control_ids": ["IA.L2-3.5.3"],
+        "desired_config": {
+          "state": "enabled",
+          "grant_controls": ["mfa"],
+          "target_users": "all"
+        },
+        "source_of_truth": "platform_setting",
+        "query_method": "api"
+      },
+      {
+        "id": "CI-LOCKOUT-001",
+        "title": "Smart Lockout settings",
+        "control_ids": ["AC.L2-3.1.8"],
+        "desired_config": {
+          "lockout_threshold": 10,
+          "lockout_duration_seconds": 60
+        },
+        "source_of_truth": "platform_setting",
+        "query_method": "api"
+      }
+    ],
+    "evidence_monitors": [
+      {
+        "id": "EM-PIM-001",
+        "control_ids": ["AC.L2-3.1.2"],
+        "signal": "PIM role activation events",
+        "collection_method": "api_poll",
+        "cadence": "daily",
+        "retention_days": 365,
+        "on_drift": "Alert compliance team, investigate unauthorized role activation"
+      },
+      {
+        "id": "EM-CA-001",
+        "control_ids": ["IA.L2-3.5.3"],
+        "signal": "Conditional Access policy change events",
+        "collection_method": "event_stream",
+        "cadence": "real-time",
+        "retention_days": 365,
+        "on_drift": "Alert immediately, investigate CA policy modification"
+      },
+      {
+        "id": "EM-AUDIT-001",
+        "control_ids": ["AU.L2-3.3.1"],
+        "signal": "Unified Audit Log ingestion status",
+        "collection_method": "api_poll",
+        "cadence": "daily",
+        "retention_days": 365,
+        "on_drift": "Re-enable audit log ingestion, escalate to security team"
+      }
+    ],
+    "drift_policies": [
+      {
+        "id": "DP-HIGH-001",
+        "scope": "All identity and access controls",
+        "severity": "high",
+        "detection": ["PIM settings changed", "CA policy disabled", "Admin account created outside process"],
+        "response_playbook": ["Notify compliance team within 1 hour", "Revert unauthorized change", "Document incident"]
+      },
+      {
+        "id": "DP-MED-001",
+        "scope": "Monitoring and evidence controls",
+        "severity": "medium",
+        "detection": ["Audit log ingestion stopped", "Sentinel rule disabled"],
+        "response_playbook": ["Notify security team within 24 hours", "Re-enable monitoring", "Investigate root cause"]
+      }
+    ]
+  }
+}
