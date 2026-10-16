@@ -1,0 +1,841 @@
+{
+  "generated": "2026-03-09T03:29:40.823Z",
+  "planId": "translated-PLAN-FULL-REGISTRY-001",
+  "mode": "dryrun_log",
+  "totalCommands": 119,
+  "commands": [
+    {
+      "taskId": "STEP-AT-001",
+      "label": "Security Awareness Training Evidence Collection",
+      "subId": "AT.L2-3.2.1.training-evidence",
+      "engine": "manual_gate",
+      "command": "[manual] Security Awareness Training Evidence Collection"
+    },
+    {
+      "taskId": "STEP-AT-001",
+      "label": "Insider Threat Awareness Program Evidence",
+      "subId": "AT.L2-3.2.3.insider-threat",
+      "engine": "ipps",
+      "command": "[manual] Insider Threat Awareness Program Evidence"
+    },
+    {
+      "taskId": "STEP-IR-001",
+      "label": "Enable Defender for Office 365 ATP for SharePoint, Teams, and OneDrive",
+      "subId": "IR.L2-3.6.1.atp-enable",
+      "engine": "exchange",
+      "command": "Set-AtpPolicyForO365 -EnableATPForSPOTeamsODB $true"
+    },
+    {
+      "taskId": "STEP-IR-001",
+      "label": "Sentinel Incident Tracking and Response Evidence",
+      "subId": "IR.L2-3.6.2.incident-track",
+      "engine": "az",
+      "command": "[manual] Sentinel Incident Tracking and Response Evidence"
+    },
+    {
+      "taskId": "STEP-IR-001",
+      "label": "Launch Attack Simulation for Incident Response Testing",
+      "subId": "IR.L2-3.6.3.attack-sim",
+      "engine": "mgraph",
+      "command": "[manual] Launch Attack Simulation for Incident Response Testing"
+    },
+    {
+      "taskId": "STEP-IR-001",
+      "label": "Enable File Type Filtering in Default Malware Filter Policy",
+      "subId": "IR.L2-3.6.1.malware-filter",
+      "engine": "exchange",
+      "command": "Set-MalwareFilterPolicy -Identity Default -EnableFileFilter $true"
+    },
+    {
+      "taskId": "STEP-MA-001",
+      "label": "Media Malware Check via Defender AV Evidence",
+      "subId": "MA.L2-3.7.4.media-check",
+      "engine": "mgraph",
+      "command": "[manual] Media Malware Check via Defender AV Evidence"
+    },
+    {
+      "taskId": "STEP-MA-001",
+      "label": "Supervised Maintenance by Authorized Personnel (Manual Gate)",
+      "subId": "MA.L2-3.7.6.supervised",
+      "engine": "manual_gate",
+      "command": "[manual] Supervised Maintenance by Authorized Personnel (Manual Gate)"
+    },
+    {
+      "taskId": "STEP-MA-001",
+      "label": "MFA for Remote Maintenance via Conditional Access",
+      "subId": "MA.L2-3.7.5.remote-mfa",
+      "engine": "mgraph",
+      "command": "New-MgIdentityConditionalAccessPolicy -DisplayName 'CMMC-RemoteMaintenance-MFA' -State 'enabledForReportingButNotEnforced' -Conditions @{applications=@{includeApplications=@('All')};users=@{includeRoles=@('62e90394-69f5-4237-9190-012177145e10','194ae4cb-b126-40b2-bd5b-6091b380977d')};locations=@{includeLocations=@('All');excludeLocations=@('AllTrusted')}} -GrantControls @{operator='OR';builtInControls=@('mfa')}"
+    },
+    {
+      "taskId": "STEP-MA-001",
+      "label": "Deploy Windows Update for Business Ring via Intune",
+      "subId": "MA.L2-3.7.1.update-ring",
+      "engine": "mgraph",
+      "command": "Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations' -Body (@{'@odata.type'='#microsoft.graph.windowsUpdateForBusinessConfiguration';displayName='CMMC-UpdateRing-Standard';qualityUpdatesDeferralPeriodInDays=7;featureUpdatesDeferralPeriodInDays=30;automaticUpdateMode='autoInstallAndRebootAtScheduledTime'} | ConvertTo-Json) -ContentType 'application/json'"
+    },
+    {
+      "taskId": "STEP-MP-001",
+      "label": "Media Sanitization Before Disposal (Manual Gate)",
+      "subId": "MP.L2-3.8.3.sanitize",
+      "engine": "manual_gate",
+      "command": "[manual] Media Sanitization Before Disposal (Manual Gate)"
+    },
+    {
+      "taskId": "STEP-MP-001",
+      "label": "CUI Media Access Control via Intune Removable Storage Policy",
+      "subId": "MP.L2-3.8.5.media-access",
+      "engine": "mgraph",
+      "command": "[manual] CUI Media Access Control via Intune Removable Storage Policy"
+    },
+    {
+      "taskId": "STEP-MP-001",
+      "label": "Removable Media Identification and Marking (Manual Gate)",
+      "subId": "MP.L2-3.8.7.removable-id",
+      "engine": "manual_gate",
+      "command": "[manual] Removable Media Identification and Marking (Manual Gate)"
+    },
+    {
+      "taskId": "STEP-MP-001",
+      "label": "Portable Storage Device Ownership and Accountability (Manual Gate)",
+      "subId": "MP.L2-3.8.8.storage-owner",
+      "engine": "manual_gate",
+      "command": "[manual] Portable Storage Device Ownership and Accountability (Manual Gate)"
+    },
+    {
+      "taskId": "STEP-MP-001",
+      "label": "Deploy BitLocker Drive Encryption Policy via Intune",
+      "subId": "MP.L2-3.8.6.bitlocker",
+      "engine": "mgraph",
+      "command": "Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations' -Body (@{'@odata.type'='#microsoft.graph.windows10EndpointProtectionConfiguration';displayName='CMMC-BitLocker-Policy';bitLockerEncryptDevice=$true;bitLockerSystemDrivePolicy=@{encryptionMethod='xtsAes256';startupAuthenticationRequired=$true}} | ConvertTo-Json -Depth 5) -ContentType 'application/json'"
+    },
+    {
+      "taskId": "STEP-MP-001",
+      "label": "Create CUI Sensitivity Label with Encryption",
+      "subId": "MP.L2-3.8.1.cui-label",
+      "engine": "ipps",
+      "command": "New-Label -Name 'CUI' -DisplayName 'CUI - Controlled Unclassified Information' -Tooltip 'Contains CUI' -EncryptionEnabled $true -EncryptionProtectionType Template -EncryptionEncryptOnly $false"
+    },
+    {
+      "taskId": "STEP-MP-001",
+      "label": "Publish CUI Sensitivity Label Policy to All Workloads",
+      "subId": "MP.L2-3.8.1.label-policy",
+      "engine": "ipps",
+      "command": "New-LabelPolicy -Name 'CMMC-CUI-Policy' -Labels 'CUI' -ExchangeLocation All"
+    },
+    {
+      "taskId": "STEP-MP-001",
+      "label": "Create DLP Compliance Policy to Enforce CUI Blocking",
+      "subId": "MP.L2-3.8.9.dlp-policy",
+      "engine": "ipps",
+      "command": "New-DlpCompliancePolicy -Name 'CMMC-CUI-Block' -ExchangeLocation All -SharePointLocation All -OneDriveLocation All -Mode Enable"
+    },
+    {
+      "taskId": "STEP-MP-001",
+      "label": "Create DLP Compliance Rule to Block CUI and Notify Owner",
+      "subId": "MP.L2-3.8.9.dlp-rule",
+      "engine": "ipps",
+      "command": "New-DlpComplianceRule -Name 'CMMC-CUI-Block-Rule' -Policy 'CMMC-CUI-Block' -BlockAccess $true -NotifyUser SiteAdmin"
+    },
+    {
+      "taskId": "STEP-PE-001",
+      "label": "Physical Access Authorization and Control (Manual Gate)",
+      "subId": "PE.L2-3.10.1.physical-access",
+      "engine": "manual_gate",
+      "command": "[manual] Physical Access Authorization and Control (Manual Gate)"
+    },
+    {
+      "taskId": "STEP-PE-001",
+      "label": "Physical Facility Monitoring and Visitor Escort (Manual Gate)",
+      "subId": "PE.L2-3.10.2.physical-monitor",
+      "engine": "manual_gate",
+      "command": "[manual] Physical Facility Monitoring and Visitor Escort (Manual Gate)"
+    },
+    {
+      "taskId": "STEP-PE-001",
+      "label": "Physical Access Log Audit (Manual Gate)",
+      "subId": "PE.L2-3.10.3.physical-audit",
+      "engine": "manual_gate",
+      "command": "[manual] Physical Access Log Audit (Manual Gate)"
+    },
+    {
+      "taskId": "STEP-PE-001",
+      "label": "Physical Safeguarding of CUI Systems (Manual Gate)",
+      "subId": "PE.L2-3.10.4.physical-safeguard",
+      "engine": "manual_gate",
+      "command": "[manual] Physical Safeguarding of CUI Systems (Manual Gate)"
+    },
+    {
+      "taskId": "STEP-PE-001",
+      "label": "Physical Protection of CUI Output (Manual Gate)",
+      "subId": "PE.L2-3.10.5.physical-protect",
+      "engine": "manual_gate",
+      "command": "[manual] Physical Protection of CUI Output (Manual Gate)"
+    },
+    {
+      "taskId": "STEP-PE-001",
+      "label": "Alternative Work Site Physical Controls (Manual Gate)",
+      "subId": "PE.L2-3.10.6.alternative-site",
+      "engine": "manual_gate",
+      "command": "[manual] Alternative Work Site Physical Controls (Manual Gate)"
+    },
+    {
+      "taskId": "STEP-PS-001",
+      "label": "Personnel Background Screening Process (Manual Gate)",
+      "subId": "PS.L2-3.9.1.screening",
+      "engine": "manual_gate",
+      "command": "[manual] Personnel Background Screening Process (Manual Gate)"
+    },
+    {
+      "taskId": "STEP-PS-001",
+      "label": "Personnel Termination and Transfer Account Disable Evidence",
+      "subId": "PS.L2-3.9.2.termination",
+      "engine": "mgraph",
+      "command": "[manual] Personnel Termination and Transfer Account Disable Evidence"
+    },
+    {
+      "taskId": "STEP-AC-001",
+      "label": "Create CUI Security Group",
+      "subId": "AC.L2-3.1.1.group-create",
+      "engine": "mgraph",
+      "command": "New-MgGroup -DisplayName \"CMMC-CUI-Users-DEV\" -MailEnabled:$false -MailNickname \"CMMC-CUI-Users-DEV\" -SecurityEnabled:$true"
+    },
+    {
+      "taskId": "STEP-AC-001",
+      "label": "Add User to CUI Security Group",
+      "subId": "AC.L2-3.1.1.member-add",
+      "engine": "mgraph",
+      "command": "New-MgGroupMemberByRef -GroupId {cuiGroupId} -BodyParameter @{'@odata.id'='https://graph.microsoft.us/v1.0/directoryObjects/{userId}'}"
+    },
+    {
+      "taskId": "STEP-AC-001",
+      "label": "Create Dedicated Admin Account",
+      "subId": "AC.L2-3.1.6.admin-account",
+      "engine": "mgraph",
+      "command": "New-MgUser -DisplayName \"Admin-stamper-admin\" -UserPrincipalName \"admin-stamper-admin@vfsgov.onmicrosoft.us\" -PasswordProfile @{Password='PLACEHOLDER-RotateOnFirstLogin!';ForceChangePasswordNextSignIn=$true} -AccountEnabled:$true"
+    },
+    {
+      "taskId": "STEP-AC-001",
+      "label": "RBAC Role Assignment",
+      "subId": "AC.L2-3.1.2.role-assign",
+      "engine": "mgraph",
+      "command": "New-MgRoleManagementDirectoryRoleAssignment -PrincipalId {userId} -RoleDefinitionId 62e90394-69f5-4237-9190-012177145e10 -DirectoryScopeId \"/\""
+    },
+    {
+      "taskId": "STEP-AC-001",
+      "label": "PIM Separation of Duties - Require Approval",
+      "subId": "AC.L2-3.1.4.pim-approval",
+      "engine": "mgraph",
+      "command": "Update-MgPolicyRoleManagementPolicyRule -UnifiedRoleManagementPolicyId {pimPolicyId} -UnifiedRoleManagementPolicyRuleId 'Approval_EndUser_Assignment' -BodyParameter @{'@odata.type'='#microsoft.graph.unifiedRoleManagementPolicyApprovalRule';setting=@{isApprovalRequired=$true}}"
+    },
+    {
+      "taskId": "STEP-AC-001",
+      "label": "PIM JIT Eligible Role Assignment",
+      "subId": "AC.L2-3.1.5.pim-eligible",
+      "engine": "mgraph",
+      "command": "New-MgRoleManagementDirectoryRoleEligibilityScheduleRequest -BodyParameter @{action='adminAssign';justification='CMMC L2 least privilege';roleDefinitionId='62e90394-69f5-4237-9190-012177145e10';directoryScopeId='/';principalId='{userId}';scheduleInfo=@{startDateTime=(Get-Date).ToString('o');expiration=@{type='afterDuration';duration='P1Y'}}}"
+    },
+    {
+      "taskId": "STEP-AC-001",
+      "label": "Smart Lockout Configuration Evidence",
+      "subId": "AC.L2-3.1.8.smart-lockout",
+      "engine": "mgraph",
+      "command": "[manual] Smart Lockout Configuration Evidence"
+    },
+    {
+      "taskId": "STEP-AC-001",
+      "label": "Create CUI Terms of Use Agreement",
+      "subId": "AC.L2-3.1.9.terms-of-use",
+      "engine": "mgraph",
+      "command": "New-MgAgreement -DisplayName \"CUI System Access Notice\" -IsViewingBeforeAcceptanceRequired $true -File @{FileName='CUI-Terms-of-Use.pdf';Language='en';IsDefault=$true;FileData=@{Data=[System.Convert]::FromBase64String('PLACEHOLDER_BASE64')}}"
+    },
+    {
+      "taskId": "STEP-AC-001",
+      "label": "Create Approved CUI Named Location (IP Range)",
+      "subId": "AC.L2-3.1.12.named-location",
+      "engine": "mgraph",
+      "command": "New-MgIdentityConditionalAccessNamedLocation -BodyParameter @{'@odata.type'='#microsoft.graph.ipNamedLocation';displayName='Approved-CUI-Networks';isTrusted=$true;ipRanges=@(@{'@odata.type'='#microsoft.graph.iPv4CidrRange';cidrAddress='10.0.0.0/8'})}"
+    },
+    {
+      "taskId": "STEP-AC-001",
+      "label": "Conditional Access - Session Timeout and No Persistent Browser",
+      "subId": "AC.L2-3.1.11.session-timeout",
+      "engine": "mgraph",
+      "command": "New-MgIdentityConditionalAccessPolicy -BodyParameter @{displayName='CMMC-SessionTimeout';state='enabled';conditions=@{users=@{includeGroups=@('{cuiGroupId}')};applications=@{includeApplications=@('All')};clientAppTypes=@('all')};sessionControls=@{signInFrequency=@{value=8;type='hours';isEnabled=$true};persistentBrowser=@{mode='never';isEnabled=$true}}}"
+    },
+    {
+      "taskId": "STEP-AC-001",
+      "label": "Conditional Access - Block Untrusted Network Locations",
+      "subId": "AC.L2-3.1.14.block-untrusted",
+      "engine": "mgraph",
+      "command": "New-MgIdentityConditionalAccessPolicy -BodyParameter @{displayName='CMMC-BlockUntrustedLocations';state='enabled';conditions=@{users=@{includeGroups=@('{cuiGroupId}')};applications=@{includeApplications=@('All')};locations=@{includeLocations=@('All');excludeLocations=@('{namedLocationId}')}};grantControls=@{operator='OR';builtInControls=@('block')}}"
+    },
+    {
+      "taskId": "STEP-AC-001",
+      "label": "Conditional Access - Admin MFA Phishing-Resistant",
+      "subId": "AC.L2-3.1.15.admin-mfa",
+      "engine": "mgraph",
+      "command": "New-MgIdentityConditionalAccessPolicy -BodyParameter @{displayName='CMMC-AdminMFA-PhishingResistant';state='enabled';conditions=@{users=@{includeRoles=@('62e90394-69f5-4237-9190-012177145e10','f28a1f50-f6e7-4571-818b-6a12f2af6b6c')};applications=@{includeApplications=@('All')};clientAppTypes=@('all')};grantControls=@{operator='AND';authenticationStrength=@{id='{phishingResistantStrengthId}'}}}"
+    },
+    {
+      "taskId": "STEP-AC-001",
+      "label": "Conditional Access - Mobile Device Compliance Requirement",
+      "subId": "AC.L2-3.1.18.mobile-ca",
+      "engine": "mgraph",
+      "command": "New-MgIdentityConditionalAccessPolicy -BodyParameter @{displayName='CMMC-MobileDeviceAccess';state='enabled';conditions=@{users=@{includeGroups=@('{cuiGroupId}')};applications=@{includeApplications=@('All')};platforms=@{includePlatforms=@('android','iOS')};clientAppTypes=@('all')};grantControls=@{operator='OR';builtInControls=@('approvedApplication','compliantDevice')}}"
+    },
+    {
+      "taskId": "STEP-AC-001",
+      "label": "Restrict Guest Invitations via Authorization Policy",
+      "subId": "AC.L2-3.1.20.guest-restrict",
+      "engine": "mgraph",
+      "command": "Update-MgPolicyAuthorizationPolicy -BodyParameter @{allowInvitesFrom='adminsAndGuestInviters';allowedToSignUpEmailBasedSubscriptions=$false;allowEmailVerifiedUsersToJoinOrganization=$false}"
+    },
+    {
+      "taskId": "STEP-AC-001",
+      "label": "Deploy Screen Lock / Session Timeout Intune Policy",
+      "subId": "AC.L2-3.1.10.screen-lock",
+      "engine": "mgraph",
+      "command": "Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations' -Body (@{'@odata.type'='#microsoft.graph.windows10GeneralConfiguration';displayName='CMMC-ScreenLock-Policy';passwordMinutesOfInactivityBeforeScreenTimeout=15;passwordRequired=$true;passwordMinimumLength=14} | ConvertTo-Json -Depth 5) -ContentType 'application/json'"
+    },
+    {
+      "taskId": "STEP-AC-001",
+      "label": "Deploy WPA2-Enterprise WiFi Profile via Intune",
+      "subId": "AC.L2-3.1.16.wifi-profile",
+      "engine": "mgraph",
+      "command": "Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations' -Body (@{'@odata.type'='#microsoft.graph.windowsWifiConfiguration';displayName='CMMC-WiFi-Secure';wifiSecurityType='wpa2Enterprise';networkName='CUI-Network';ssid='CUI-NETWORK-DEV'} | ConvertTo-Json) -ContentType 'application/json'"
+    },
+    {
+      "taskId": "STEP-AC-001",
+      "label": "Deploy iOS MAM App Protection Policy",
+      "subId": "AC.L2-3.1.19.ios-mam",
+      "engine": "mgraph",
+      "command": "Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceAppManagement/iosManagedAppProtections' -Body (@{'@odata.type'='#microsoft.graph.iosManagedAppProtection';displayName='CMMC-iOS-MAM';periodOfflineBeforeWipeIsEnforced='P30D';allowedDataStorageLocations=@('oneDriveForBusiness','sharePoint');dataBackupBlocked=$true;deviceComplianceRequired=$true} | ConvertTo-Json) -ContentType 'application/json'"
+    },
+    {
+      "taskId": "STEP-AC-001",
+      "label": "Block Removable Storage via Intune Device Configuration",
+      "subId": "AC.L2-3.1.21.block-storage",
+      "engine": "mgraph",
+      "command": "Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations' -Body (@{'@odata.type'='#microsoft.graph.windows10GeneralConfiguration';displayName='CMMC-BlockRemovableStorage';storageBlockRemovableStorage=$true} | ConvertTo-Json) -ContentType 'application/json'"
+    },
+    {
+      "taskId": "STEP-AC-001",
+      "label": "Create Information Barrier Segment",
+      "subId": "AC.L2-3.1.3.ib-segment",
+      "engine": "ipps",
+      "command": "New-OrganizationSegment -Name \"CUI-Segment\" -UserGroupFilter \"Department -eq 'CUI-Authorized'\""
+    },
+    {
+      "taskId": "STEP-AC-001",
+      "label": "Disable SharePoint External Sharing at Tenant Level",
+      "subId": "AC.L2-3.1.20.spo-sharing",
+      "engine": "spo",
+      "command": "Set-PnPTenant -SharingCapability Disabled"
+    },
+    {
+      "taskId": "STEP-AC-001",
+      "label": "Create Information Barrier Policy",
+      "subId": "AC.L2-3.1.3.ib-policy",
+      "engine": "ipps",
+      "command": "New-InformationBarrierPolicy -Name \"CUI-Block-External\" -AssignedSegment \"CUI-Segment\" -SegmentsBlocked \"External\""
+    },
+    {
+      "taskId": "STEP-AC-001",
+      "label": "Restrict SharePoint Site Sharing to Existing External Users Only",
+      "subId": "AC.L2-3.1.22.spo-site-sharing",
+      "engine": "spo",
+      "command": "Set-PnPTenantSite -Identity 'https://vfsgov.sharepoint.us' -SharingCapability ExistingExternalUserSharingOnly"
+    },
+    {
+      "taskId": "STEP-CM-001",
+      "label": "Configuration Change Tracking Evidence via Intune Audit Log",
+      "subId": "CM.L2-3.4.3.change-tracking",
+      "engine": "mgraph",
+      "command": "[manual] Configuration Change Tracking Evidence via Intune Audit Log"
+    },
+    {
+      "taskId": "STEP-CM-001",
+      "label": "Security Impact Analysis of Changes (Manual Process Gate)",
+      "subId": "CM.L2-3.4.4.impact-analysis",
+      "engine": "manual_gate",
+      "command": "[manual] Security Impact Analysis of Changes (Manual Process Gate)"
+    },
+    {
+      "taskId": "STEP-CM-001",
+      "label": "Access Restriction for Configuration Changes Evidence",
+      "subId": "CM.L2-3.4.5.access-restrict",
+      "engine": "mgraph",
+      "command": "[manual] Access Restriction for Configuration Changes Evidence"
+    },
+    {
+      "taskId": "STEP-CM-001",
+      "label": "WDAC Application Control Policy via Intune",
+      "subId": "CM.L2-3.4.7.wdac",
+      "engine": "mgraph",
+      "command": "Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations' -Body (@{'@odata.type'='#microsoft.graph.windows10GeneralConfiguration';displayName='CMMC-AppControl-Policy';smartScreenBlockPromptOverride=$true;smartScreenBlockPromptOverrideForFiles=$true;appsAllowTrustedAppsSideloading='notAllowed'} | ConvertTo-Json -Depth 5) -ContentType 'application/json'"
+    },
+    {
+      "taskId": "STEP-CM-001",
+      "label": "Detected Applications Inventory Evidence via Intune",
+      "subId": "CM.L2-3.4.8.detected-apps",
+      "engine": "mgraph",
+      "command": "[manual] Detected Applications Inventory Evidence via Intune"
+    },
+    {
+      "taskId": "STEP-CM-001",
+      "label": "User Software Installation Control via Intune",
+      "subId": "CM.L2-3.4.9.install-control",
+      "engine": "mgraph",
+      "command": "Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations' -Body (@{'@odata.type'='#microsoft.graph.windows10GeneralConfiguration';displayName='CMMC-InstallControl-Policy';appsAllowTrustedAppsSideloading='notAllowed';developerUnlockSetting='blocked'} | ConvertTo-Json -Depth 5) -ContentType 'application/json'"
+    },
+    {
+      "taskId": "STEP-CM-001",
+      "label": "Deploy Windows Security Baseline via Intune Template",
+      "subId": "CM.L2-3.4.1.security-baseline",
+      "engine": "mgraph",
+      "command": "Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/beta/deviceManagement/templates/00000000-0000-0000-0000-000000000099/createInstance' -Body (@{displayName='CMMC-Win11-Baseline';assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 5) -ContentType 'application/json'"
+    },
+    {
+      "taskId": "STEP-CM-001",
+      "label": "Deploy Attack Surface Reduction Rules via Intune Configuration Policy",
+      "subId": "CM.L2-3.4.2.asr-rules",
+      "engine": "mgraph",
+      "command": "Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/beta/deviceManagement/configurationPolicies' -Body (@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationPolicy';name='CMMC-ASR-Rules';platforms='windows10';technologies='mdm'} | ConvertTo-Json -Depth 10) -ContentType 'application/json'"
+    },
+    {
+      "taskId": "STEP-CM-001",
+      "label": "Enforce Least Functionality - Disable Cortana and MSIA",
+      "subId": "CM.L2-3.4.6.least-functionality",
+      "engine": "mgraph",
+      "command": "Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations' -Body (@{'@odata.type'='#microsoft.graph.windows10GeneralConfiguration';displayName='CMMC-LeastFunctionality';cortanaBlocked=$true;microsoftAccountSignInAssistantSettings='disabled'} | ConvertTo-Json) -ContentType 'application/json'"
+    },
+    {
+      "taskId": "STEP-IA-001",
+      "label": "Login Page Branding Evidence (Password Obscured by Platform)",
+      "subId": "IA.L2-3.5.11.branding",
+      "engine": "mgraph",
+      "command": "[manual] Login Page Branding Evidence (Password Obscured by Platform)"
+    },
+    {
+      "taskId": "STEP-IA-001",
+      "label": "Disable Inactive Accounts Inactive 90+ Days",
+      "subId": "IA.L2-3.5.5.disable-inactive",
+      "engine": "mgraph",
+      "command": "Get-MgUser -Filter 'accountEnabled eq true' -All -Property DisplayName,UserPrincipalName,SignInActivity | Where-Object { $_.SignInActivity.LastSignInDateTime -lt (Get-Date).AddDays(-90) } | ForEach-Object { Update-MgUser -UserId $_.Id -AccountEnabled:$false }"
+    },
+    {
+      "taskId": "STEP-IA-001",
+      "label": "User and Device Identification Evidence",
+      "subId": "IA.L2-3.5.1.user-identify",
+      "engine": "mgraph",
+      "command": "[manual] User and Device Identification Evidence"
+    },
+    {
+      "taskId": "STEP-IA-001",
+      "label": "Enable Microsoft Authenticator Authentication Method",
+      "subId": "IA.L2-3.5.3.mfa-authenticator",
+      "engine": "mgraph",
+      "command": "Invoke-MgGraphRequest -Method PATCH -Uri 'https://graph.microsoft.us/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/MicrosoftAuthenticator' -Body (@{'@odata.type'='#microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration';state='enabled'} | ConvertTo-Json -Depth 5) -ContentType 'application/json'"
+    },
+    {
+      "taskId": "STEP-IA-001",
+      "label": "Password Reuse Prevention Evidence",
+      "subId": "IA.L2-3.5.8.password-reuse",
+      "engine": "mgraph",
+      "command": "[manual] Password Reuse Prevention Evidence"
+    },
+    {
+      "taskId": "STEP-IA-001",
+      "label": "Enable FIDO2 Security Key Authentication Method",
+      "subId": "IA.L2-3.5.3.fido2-enable",
+      "engine": "mgraph",
+      "command": "Invoke-MgGraphRequest -Method PATCH -Uri 'https://graph.microsoft.us/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/Fido2' -Body (@{state='enabled'} | ConvertTo-Json) -ContentType 'application/json'"
+    },
+    {
+      "taskId": "STEP-IA-001",
+      "label": "Create Phishing-Resistant Authentication Strength Policy",
+      "subId": "IA.L2-3.5.4.auth-strength",
+      "engine": "mgraph",
+      "command": "Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/policies/authenticationStrengthPolicies' -Body (@{displayName='CMMC-PhishingResistant';description='Requires FIDO2 or WHfB';allowedCombinations=@('fido2','windowsHelloForBusiness','x509CertificateMultiFactor')} | ConvertTo-Json) -ContentType 'application/json'"
+    },
+    {
+      "taskId": "STEP-IA-001",
+      "label": "Enable Azure AD Password Protection and Banned Password List",
+      "subId": "IA.L2-3.5.7.password-protection",
+      "engine": "mgraph",
+      "command": "[manual] Enable Azure AD Password Protection and Banned Password List"
+    },
+    {
+      "taskId": "STEP-IA-001",
+      "label": "Configure Temporary Access Pass (One-Time Use, 60 Minutes)",
+      "subId": "IA.L2-3.5.9.tap-config",
+      "engine": "mgraph",
+      "command": "Invoke-MgGraphRequest -Method PATCH -Uri 'https://graph.microsoft.us/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/TemporaryAccessPass' -Body (@{state='enabled';isUsableOnce=$true;defaultLifetimeInMinutes=60} | ConvertTo-Json) -ContentType 'application/json'"
+    },
+    {
+      "taskId": "STEP-IA-001",
+      "label": "Enable Certificate-Based Authentication Method",
+      "subId": "IA.L2-3.5.10.cert-auth",
+      "engine": "mgraph",
+      "command": "Invoke-MgGraphRequest -Method PATCH -Uri 'https://graph.microsoft.us/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/x509Certificate' -Body (@{state='enabled'} | ConvertTo-Json) -ContentType 'application/json'"
+    },
+    {
+      "taskId": "STEP-SC-001",
+      "label": "FIPS 140-2 Compliance Verification (Platform Inherited)",
+      "subId": "SC.L2-3.13.11.fips",
+      "engine": "mgraph",
+      "command": "[manual] FIPS 140-2 Compliance Verification (Platform Inherited)"
+    },
+    {
+      "taskId": "STEP-SC-001",
+      "label": "Block Camera and Collaborative Devices via Intune Policy",
+      "subId": "SC.L2-3.13.12.camera-block",
+      "engine": "mgraph",
+      "command": "Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations' -Body (@{'@odata.type'='#microsoft.graph.windows10GeneralConfiguration';displayName='CMMC-CollaborativeDeviceBlock';cameraBlocked=$true} | ConvertTo-Json) -ContentType 'application/json'"
+    },
+    {
+      "taskId": "STEP-SC-001",
+      "label": "CUI Data-at-Rest Protection Evidence (Labels + BitLocker)",
+      "subId": "SC.L2-3.13.16.data-at-rest",
+      "engine": "mgraph",
+      "command": "[manual] CUI Data-at-Rest Protection Evidence (Labels + BitLocker)"
+    },
+    {
+      "taskId": "STEP-SC-001",
+      "label": "Create Network Security Group for CUI Boundary",
+      "subId": "SC.L2-3.13.1.nsg-create",
+      "engine": "az",
+      "command": "New-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Location 'usgovvirginia' -Name 'cmmc-nsg'"
+    },
+    {
+      "taskId": "STEP-SC-001",
+      "label": "Azure Advisor Security Recommendations Evidence",
+      "subId": "SC.L2-3.13.2.advisor",
+      "engine": "az",
+      "command": "[manual] Azure Advisor Security Recommendations Evidence"
+    },
+    {
+      "taskId": "STEP-SC-001",
+      "label": "Disable Teams Federation and Public Cloud External Access",
+      "subId": "SC.L2-3.13.14.teams-external",
+      "engine": "teams",
+      "command": "Set-CsExternalAccessPolicy -EnableFederationAccess $false -EnableTeamsConsumerAccess $false -EnableTeamsConsumerInbound $false"
+    },
+    {
+      "taskId": "STEP-SC-001",
+      "label": "Apply Deny-All-Inbound Rule to Network Security Group",
+      "subId": "SC.L2-3.13.1.nsg-deny",
+      "engine": "az",
+      "command": "$nsg = Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'cmmc-nsg'; Add-AzNetworkSecurityRuleConfig -NetworkSecurityGroup $nsg -Name 'DenyAllInbound' -Protocol '*' -Direction Inbound -Priority 4096 -SourceAddressPrefix '*' -SourcePortRange '*' -DestinationAddressPrefix '*' -DestinationPortRange '*' -Access Deny | Set-AzNetworkSecurityGroup"
+    },
+    {
+      "taskId": "STEP-SC-001",
+      "label": "Create Azure Firewall Policy with Threat Intel Deny Mode",
+      "subId": "SC.L2-3.13.1.firewall-policy",
+      "engine": "az",
+      "command": "New-AzFirewallPolicy -Name 'cmmc-fw-policy' -ResourceGroupName '{resourceGroup}' -Location 'usgovvirginia' -ThreatIntelMode 'Deny'"
+    },
+    {
+      "taskId": "STEP-SC-001",
+      "label": "Create CUI Virtual Network with Address Space",
+      "subId": "SC.L2-3.13.5.vnet",
+      "engine": "az",
+      "command": "New-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Location 'usgovvirginia' -Name 'cmmc-vnet' -AddressPrefix '10.0.0.0/16'"
+    },
+    {
+      "taskId": "STEP-SC-001",
+      "label": "Add Management Subnet to CUI Virtual Network",
+      "subId": "SC.L2-3.13.5.mgmt-subnet",
+      "engine": "az",
+      "command": "$vnet = Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name 'cmmc-vnet'; Add-AzVirtualNetworkSubnetConfig -Name 'management-subnet' -AddressPrefix '10.0.1.0/24' -VirtualNetwork $vnet | Set-AzVirtualNetwork"
+    },
+    {
+      "taskId": "STEP-SC-001",
+      "label": "Create Azure Key Vault with Soft Delete and Purge Protection",
+      "subId": "SC.L2-3.13.10.keyvault",
+      "engine": "az",
+      "command": "New-AzKeyVault -ResourceGroupName '{resourceGroup}' -VaultName 'cmmc-kv-dev' -Location 'usgovvirginia' -EnablePurgeProtection -Sku Standard"
+    },
+    {
+      "taskId": "STEP-SC-001",
+      "label": "Restrict Key Vault Network Access to Azure Services Only",
+      "subId": "SC.L2-3.13.10.keyvault-network",
+      "engine": "az",
+      "command": "Update-AzKeyVaultNetworkRuleSet -VaultName 'cmmc-kv-dev' -DefaultAction Deny -Bypass AzureServices"
+    },
+    {
+      "taskId": "STEP-SC-001",
+      "label": "Disable Legacy TLS Client Connections in Exchange Transport",
+      "subId": "SC.L2-3.13.8.tls-enforce",
+      "engine": "exchange",
+      "command": "Set-TransportConfig -AllowLegacyTLSClients $false"
+    },
+    {
+      "taskId": "STEP-SC-001",
+      "label": "Create Safe Attachments Policy with Dynamic Delivery",
+      "subId": "SC.L2-3.13.13.safe-attach",
+      "engine": "exchange",
+      "command": "New-SafeAttachmentPolicy -Name 'CMMC-SafeAttach' -Action DynamicDelivery -Enable $true"
+    },
+    {
+      "taskId": "STEP-SC-001",
+      "label": "Create Safe Attachments Rule for Primary Domain",
+      "subId": "SC.L2-3.13.13.safe-attach-rule",
+      "engine": "exchange",
+      "command": "New-SafeAttachmentRule -Name 'CMMC-SafeAttach-Rule' -SafeAttachmentPolicy 'CMMC-SafeAttach' -RecipientDomainIs 'vfsgov.us' -Enabled $true"
+    },
+    {
+      "taskId": "STEP-SC-001",
+      "label": "Enable DKIM Signing for Primary Domain",
+      "subId": "SC.L2-3.13.15.dkim",
+      "engine": "exchange",
+      "command": "Set-DkimSigningConfig -Identity 'vfsgov.us' -Enabled $true"
+    },
+    {
+      "taskId": "STEP-SC-001",
+      "label": "Create Anti-Phishing Policy with Mailbox Intelligence",
+      "subId": "SC.L2-3.13.15.anti-phish",
+      "engine": "exchange",
+      "command": "New-AntiPhishPolicy -Name 'CMMC-AntiPhish' -EnableMailboxIntelligence $true -EnableMailboxIntelligenceProtection $true -EnableSpoofIntelligence $true -AuthenticationFailAction Quarantine -EnableFirstContactSafetyTips $true"
+    },
+    {
+      "taskId": "STEP-SC-001",
+      "label": "Create Anti-Phishing Rule for Primary Domain",
+      "subId": "SC.L2-3.13.15.anti-phish-rule",
+      "engine": "exchange",
+      "command": "New-AntiPhishRule -Name 'CMMC-AntiPhish-Rule' -AntiPhishPolicy 'CMMC-AntiPhish' -RecipientDomainIs 'vfsgov.us' -Enabled $true"
+    },
+    {
+      "taskId": "STEP-SC-001",
+      "label": "Create Anti-Spam Inbound Content Filter Policy",
+      "subId": "SC.L2-3.13.15.anti-spam",
+      "engine": "exchange",
+      "command": "New-HostedContentFilterPolicy -Name 'CMMC-AntiSpam' -SpamAction MoveToJmf -HighConfidenceSpamAction Quarantine -BulkThreshold 6 -PhishSpamAction Quarantine"
+    },
+    {
+      "taskId": "STEP-SC-001",
+      "label": "Create Anti-Spam Inbound Filter Rule for Primary Domain",
+      "subId": "SC.L2-3.13.15.anti-spam-rule",
+      "engine": "exchange",
+      "command": "New-HostedContentFilterRule -Name 'CMMC-AntiSpam-Rule' -HostedContentFilterPolicy 'CMMC-AntiSpam' -RecipientDomainIs 'vfsgov.us'"
+    },
+    {
+      "taskId": "STEP-SC-001",
+      "label": "Create Outbound Spam Filter Policy with User Block on Threshold",
+      "subId": "SC.L2-3.13.15.outbound-spam",
+      "engine": "exchange",
+      "command": "New-HostedOutboundSpamFilterPolicy -Name 'CMMC-OutboundSpam' -ActionWhenThresholdReached BlockUser -RecipientLimitExternalPerHour 500"
+    },
+    {
+      "taskId": "STEP-SC-001",
+      "label": "Create Outbound Spam Filter Rule for Primary Domain",
+      "subId": "SC.L2-3.13.15.outbound-spam-rule",
+      "engine": "exchange",
+      "command": "New-HostedOutboundSpamFilterRule -Name 'CMMC-OutboundSpam-Rule' -HostedOutboundSpamFilterPolicy 'CMMC-OutboundSpam' -SenderDomainIs 'vfsgov.us'"
+    },
+    {
+      "taskId": "STEP-AU-001",
+      "label": "Enable Organization Customization (Pre-requisite for Audit)",
+      "subId": "AU.L2-3.3.1.org-customization",
+      "engine": "exchange",
+      "command": "Enable-OrganizationCustomization"
+    },
+    {
+      "taskId": "STEP-AU-001",
+      "label": "Authoritative Time Source Verification (Platform Inherited)",
+      "subId": "AU.L2-3.3.7.time-source",
+      "engine": "mgraph",
+      "command": "[manual] Authoritative Time Source Verification (Platform Inherited)"
+    },
+    {
+      "taskId": "STEP-AU-001",
+      "label": "Enable Unified Audit Log Ingestion",
+      "subId": "AU.L2-3.3.1.audit-enable",
+      "engine": "exchange",
+      "command": "Set-AdminAuditLogConfig -UnifiedAuditLogIngestionEnabled $true"
+    },
+    {
+      "taskId": "STEP-AU-001",
+      "label": "Create Audit Log Retention Policy (1 Year)",
+      "subId": "AU.L2-3.3.1.audit-retention",
+      "engine": "ipps",
+      "command": "New-UnifiedAuditLogRetentionPolicy -Name 'CMMC-1Year-Retention' -Description 'CMMC AU retention 1 year' -RetentionDuration TwelveMonths -Priority 1 -RecordTypes AzureActiveDirectory,ExchangeAdmin,SharePoint,OneDrive"
+    },
+    {
+      "taskId": "STEP-AU-001",
+      "label": "Audit Log Access Restriction - Compliance Admin Role Evidence",
+      "subId": "AU.L2-3.3.8.audit-protect",
+      "engine": "mgraph",
+      "command": "Get-MgRoleManagementDirectoryRoleDefinition -Filter \"displayName eq 'Compliance Administrator'\" | ForEach-Object { Get-MgRoleManagementDirectoryRoleAssignment -Filter \"roleDefinitionId eq '$($_.Id)'\" -All }"
+    },
+    {
+      "taskId": "STEP-AU-001",
+      "label": "Sign-In and Directory Audit Log Evidence",
+      "subId": "AU.L2-3.3.2.signin-logs",
+      "engine": "mgraph",
+      "command": "[manual] Sign-In and Directory Audit Log Evidence"
+    },
+    {
+      "taskId": "STEP-AU-001",
+      "label": "Create Log Analytics Workspace for Sentinel",
+      "subId": "AU.L2-3.3.3.sentinel-workspace",
+      "engine": "az",
+      "command": "New-AzOperationalInsightsWorkspace -ResourceGroupName '{resourceGroup}' -Name '{workspaceName}' -Location 'usgovvirginia' -Sku 'PerGB2018' -RetentionInDays 365"
+    },
+    {
+      "taskId": "STEP-AU-001",
+      "label": "Create Azure Monitor Action Group for CISO Alerts",
+      "subId": "AU.L2-3.3.4.alert-group",
+      "engine": "az",
+      "command": "$emailReceiver = New-AzActionGroupReceiver -Name 'CISO' -EmailReceiver -EmailAddress 'ciso@vfsgov.us'; Set-AzActionGroup -ResourceGroupName '{resourceGroup}' -Name 'CMMC-AlertGroup' -ShortName 'CMMCAlert' -Receiver $emailReceiver"
+    },
+    {
+      "taskId": "STEP-AU-001",
+      "label": "Audit Log Search Evidence (Reduce/Review Capability)",
+      "subId": "AU.L2-3.3.5.audit-search",
+      "engine": "exchange",
+      "command": "[manual] Audit Log Search Evidence (Reduce/Review Capability)"
+    },
+    {
+      "taskId": "STEP-AU-001",
+      "label": "Audit Reduction via Compliance Search",
+      "subId": "AU.L2-3.3.6.audit-reduction",
+      "engine": "ipps",
+      "command": "New-ComplianceSearch -Name 'CMMC-AuditReduction-vfsgov' -ExchangeLocation All -ContentMatchQuery 'kind:auditlog'"
+    },
+    {
+      "taskId": "STEP-AU-001",
+      "label": "Enable Microsoft Sentinel on Log Analytics Workspace",
+      "subId": "AU.L2-3.3.3.sentinel-enable",
+      "engine": "az",
+      "command": "New-AzSentinelOnboardingState -ResourceGroupName '{resourceGroup}' -WorkspaceName '{workspaceName}' -Name 'default'"
+    },
+    {
+      "taskId": "STEP-AU-001",
+      "label": "Connect Office 365 Data Connector to Sentinel",
+      "subId": "AU.L2-3.3.3.sentinel-connector",
+      "engine": "az",
+      "command": "New-AzSentinelDataConnector -ResourceGroupName '{resourceGroup}' -WorkspaceName '{workspaceName}' -Kind 'Office365' -Exchange 'Enabled' -SharePoint 'Enabled' -Teams 'Enabled'"
+    },
+    {
+      "taskId": "STEP-AU-001",
+      "label": "Create Sentinel Scheduled Analytics Rule for Failed Logons",
+      "subId": "AU.L2-3.3.3.sentinel-rule",
+      "engine": "az",
+      "command": "New-AzSentinelAlertRule -ResourceGroupName '{resourceGroup}' -WorkspaceName '{workspaceName}' -Kind Scheduled -DisplayName 'CMMC-FailedLogon-Threshold' -Enabled -Query 'SigninLogs | where ResultType != 0 | summarize count() by UserPrincipalName' -QueryFrequency (New-TimeSpan -Hours 1) -QueryPeriod (New-TimeSpan -Hours 1) -Severity Medium -TriggerOperator GreaterThan -TriggerThreshold 10"
+    },
+    {
+      "taskId": "STEP-AU-001",
+      "label": "Apply CanNotDelete Lock to Sentinel Log Analytics Workspace",
+      "subId": "AU.L2-3.3.8.workspace-lock",
+      "engine": "az",
+      "command": "Invoke-AzRestMethod -Method PUT -Path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/providers/Microsoft.Authorization/locks/DoNotDelete?api-version=2016-09-01' -Payload (@{properties=@{level='CanNotDelete';notes='CMMC AU protection'}} | ConvertTo-Json -Depth 3)"
+    },
+    {
+      "taskId": "STEP-SI-001",
+      "label": "System Flaw Identification via Defender Vulnerability Management",
+      "subId": "SI.L2-3.14.1.flaw-id",
+      "engine": "mgraph",
+      "command": "[manual] System Flaw Identification via Defender Vulnerability Management"
+    },
+    {
+      "taskId": "STEP-SI-001",
+      "label": "Antivirus Signature Currency Evidence via Intune",
+      "subId": "SI.L2-3.14.4.av-signatures",
+      "engine": "mgraph",
+      "command": "[manual] Antivirus Signature Currency Evidence via Intune"
+    },
+    {
+      "taskId": "STEP-SI-001",
+      "label": "Scheduled Malware Scan Evidence via Intune Managed Devices",
+      "subId": "SI.L2-3.14.5.scan-schedule",
+      "engine": "mgraph",
+      "command": "[manual] Scheduled Malware Scan Evidence via Intune Managed Devices"
+    },
+    {
+      "taskId": "STEP-SI-001",
+      "label": "Security Alert Monitoring Evidence via Defender",
+      "subId": "SI.L2-3.14.6.security-alerts",
+      "engine": "mgraph",
+      "command": "[manual] Security Alert Monitoring Evidence via Defender"
+    },
+    {
+      "taskId": "STEP-SI-001",
+      "label": "Enable Sentinel UEBA for Anomalous Behavior Detection",
+      "subId": "SI.L2-3.14.7.ueba",
+      "engine": "az",
+      "command": "Invoke-AzRestMethod -Method PUT -Path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/providers/Microsoft.SecurityInsights/settings/Ueba?api-version=2023-02-01' -Payload (@{kind='Ueba';properties=@{dataSources=@('AuditLogs','SigninLogs','SecurityEvent')}} | ConvertTo-Json -Depth 5)"
+    },
+    {
+      "taskId": "STEP-SI-001",
+      "label": "Create CMMC Malware Filter Policy with File Type Rejection",
+      "subId": "SI.L2-3.14.2.anti-malware",
+      "engine": "exchange",
+      "command": "New-MalwareFilterPolicy -Name 'CMMC-Malware' -EnableFileFilter $true -FileTypeAction Reject -EnableInternalSenderAdminNotifications $true -InternalSenderAdminAddress 'security@vfsgov.us'"
+    },
+    {
+      "taskId": "STEP-SI-001",
+      "label": "Create Malware Filter Rule for Primary Domain",
+      "subId": "SI.L2-3.14.2.malware-rule",
+      "engine": "exchange",
+      "command": "New-MalwareFilterRule -Name 'CMMC-Malware-Rule' -MalwareFilterPolicy 'CMMC-Malware' -RecipientDomainIs 'vfsgov.us'"
+    },
+    {
+      "taskId": "STEP-SI-001",
+      "label": "Create Safe Links Policy with URL Scanning",
+      "subId": "SI.L2-3.14.3.safe-links",
+      "engine": "exchange",
+      "command": "New-SafeLinksPolicy -Name 'CMMC-SafeLinks' -EnableSafeLinksForEmail $true -ScanUrls $true -EnableForInternalSenders $true -DeliverMessageAfterScan $true"
+    },
+    {
+      "taskId": "STEP-SI-001",
+      "label": "Create Safe Links Rule for Primary Domain",
+      "subId": "SI.L2-3.14.3.safe-links-rule",
+      "engine": "exchange",
+      "command": "New-SafeLinksRule -Name 'CMMC-SafeLinks-Rule' -SafeLinksPolicy 'CMMC-SafeLinks' -RecipientDomainIs 'vfsgov.us' -Enabled $true"
+    },
+    {
+      "taskId": "STEP-RA-001",
+      "label": "Vulnerability Remediation via Windows Update for Business Rings",
+      "subId": "RA.L2-3.11.3.vuln-remediation",
+      "engine": "mgraph",
+      "command": "Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations' -Body (@{'@odata.type'='#microsoft.graph.windowsUpdateForBusinessConfiguration';displayName='CMMC-SecurityUpdateRing';qualityUpdatesDeferralPeriodInDays=0;featureUpdatesDeferralPeriodInDays=14;automaticUpdateMode='autoInstallAndRebootAtScheduledTime';businessReadyUpdatesOnly='all'} | ConvertTo-Json -Depth 5) -ContentType 'application/json'"
+    },
+    {
+      "taskId": "STEP-RA-001",
+      "label": "Microsoft Secure Score Risk Assessment Evidence",
+      "subId": "RA.L2-3.11.1.secure-score",
+      "engine": "mgraph",
+      "command": "[manual] Microsoft Secure Score Risk Assessment Evidence"
+    },
+    {
+      "taskId": "STEP-RA-001",
+      "label": "Vulnerability Scan Results Evidence via Defender",
+      "subId": "RA.L2-3.11.2.vuln-scan",
+      "engine": "mgraph",
+      "command": "[manual] Vulnerability Scan Results Evidence via Defender"
+    },
+    {
+      "taskId": "STEP-CA-001",
+      "label": "Compliance Assessment Evidence via Compliance Manager",
+      "subId": "CA.L2-3.12.1.compliance-assess",
+      "engine": "mgraph",
+      "command": "[manual] Compliance Assessment Evidence via Compliance Manager"
+    },
+    {
+      "taskId": "STEP-CA-001",
+      "label": "POA&M Improvement Actions Evidence via Compliance Manager",
+      "subId": "CA.L2-3.12.2.poam",
+      "engine": "mgraph",
+      "command": "[manual] POA&M Improvement Actions Evidence via Compliance Manager"
+    },
+    {
+      "taskId": "STEP-CA-001",
+      "label": "System Security Plan Documentation (Manual Gate)",
+      "subId": "CA.L2-3.12.4.ssp",
+      "engine": "manual_gate",
+      "command": "[manual] System Security Plan Documentation (Manual Gate)"
+    }
+  ]
+}

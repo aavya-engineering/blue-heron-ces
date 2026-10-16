@@ -38,6 +38,7 @@ const SIM_AVAILABLE =
   process.platform === 'win32' &&
   fs.existsSync(path.join(PSMODULES, 'Microsoft.Graph.Authentication')) &&
   fs.existsSync(path.join(SIM_ROOT, 'bin', 'stacksim.mjs')) &&
+  fs.existsSync(path.join(SIM_ROOT, 'dist', 'index.js')) &&
   fs.existsSync(STAMPER_REGISTRY);
 
 const SIM_TENANT_JSON = {

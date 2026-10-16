@@ -1,0 +1,164 @@
+services:
+  # ── 1. PostgreSQL Database ──────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: muster-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-muster_db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgrespassword}
+    ports:
+      # Host port 5434 by default to avoid conflicts with host PostgreSQL
+      - "${POSTGRES_PORT:-5434}:5432"
+    volumes:
+      - muster_postgres_data:/var/lib/postgresql/data
+      - ./ces-muster-main/docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U muster_app -d muster_db || pg_isready -U postgres -d muster_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - ces_network
+
+  # ── 2. Tenant Auth Daemon (:4690) ───────────────────────────────────────────
+  ces-tenant:
+    container_name: ces-tenant
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.tenant
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      CES_TENANT_HOST: "0.0.0.0"
+      PORT: 4690
+    ports:
+      - "${TENANT_PORT:-4690}:4690"
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://127.0.0.1:4690/status', (r) => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))\""]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - ces_network
+
+  # ── 3. Mock Microsoft GCC High Cloud Simulator (:4390) ─────────────────────
+  ces-stacksim:
+    container_name: ces-stacksim
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.stacksim
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      STACKSIM_HOST: "0.0.0.0"
+      PORT: 4390
+    ports:
+      - "${STACKSIM_PORT:-4390}:4390"
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://127.0.0.1:4390/', (r) => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))\""]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - ces_network
+
+  # ── 4. Muster Backend API (:4000) ───────────────────────────────────────────
+  muster-api:
+    container_name: muster-api
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ces-tenant:
+        condition: service_started
+      ces-stacksim:
+        condition: service_started
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgresql://${DB_USER:-muster_app}:${DB_PASSWORD:-password}@postgres:5432/${POSTGRES_DB:-muster_db}
+      JWT_SECRET: ${JWT_SECRET:-bhd-ces-muster-local-dev-jwt-secret-key-32chars}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-8h}
+      MUSTER_CORS_ORIGINS: ${MUSTER_CORS_ORIGINS:-http://localhost:5173,http://localhost:80,http://localhost:8080,https://127.0.0.1.sslip.io,http://127.0.0.1.sslip.io,*.sslip.io}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      CLAUDE_MODEL: ${CLAUDE_MODEL:-}
+      RECIPES_DIR: /app/ces-muster-main/recipes
+      RECIPES_SELF_SERVE: ${RECIPES_SELF_SERVE:-}
+      CES_PIPELINE_ROOT: ${CES_PIPELINE_ROOT:-/app/pipeline}
+    ports:
+      - "${API_PORT:-4000}:4000"
+    volumes:
+      - ces_pipeline_data:/app/pipeline
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://127.0.0.1:4000/auth/me', (r) => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))\""]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    networks:
+      - ces_network
+
+  # ── 5. Muster Web Portal + SSL Nginx Proxy (:443, :5173, :8080, :80) ────────
+  muster-ui:
+    container_name: muster-ui
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.ui
+    restart: unless-stopped
+    depends_on:
+      - muster-api
+    environment:
+      SSLIP_DOMAIN: ${SSLIP_DOMAIN:-127.0.0.1.sslip.io}
+      HOST_IP: ${HOST_IP:-}
+    ports:
+      # HTTPS with SSL (sslip.io)
+      - "${HTTPS_PORT:-443}:443"
+      # Standard HTTP / Dev ports
+      - "${UI_PORT:-5173}:80"
+      - "${HTTP_PORT:-8080}:80"
+    volumes:
+      - muster_ssl_certs:/etc/nginx/ssl
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - ces_network
+
+  # ── 6. Stamper Remediation GUI (:5002) (Profile: full / stamper) ────────────
+  ces-stamper:
+    container_name: ces-stamper
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.stamper
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 5002
+    ports:
+      - "${STAMPER_PORT:-5002}:5002"
+    profiles:
+      - full
+      - stamper
+    networks:
+      - ces_network
+
+volumes:
+  muster_postgres_data:
+    name: muster_postgres_data
+  ces_pipeline_data:
+    name: ces_pipeline_data
+  muster_ssl_certs:
+    name: muster_ssl_certs
+
+networks:
+  ces_network:
+    name: ces_network
+    driver: bridge

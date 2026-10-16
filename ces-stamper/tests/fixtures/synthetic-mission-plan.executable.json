@@ -1,0 +1,1254 @@
+{
+  "plan_id": "translated-synthetic-gcch-l2-001",
+  "target_level": "L2",
+  "tech_stack_id": 1,
+  "execution_graph": [
+    {
+      "id": "STEP-L0-001",
+      "type": "policy",
+      "priority": "p0",
+      "depends_on": [],
+      "action": {
+        "engine": "manual_gate",
+        "command": "Draft System Security Plan documenting all 110 L2 controls | Include system boundary description and data flow diagrams",
+        "args": {
+          "_layer": 0,
+          "_layer_name": "Foundation",
+          "_step_title": "System Security Plan (SSP) Foundation",
+          "_task_type": "policy",
+          "_verification_steps": [
+            "SSP document exists with all required sections",
+            "Reviewed and signed by ISSO"
+          ],
+          "_sub_commands": [
+            {
+              "id": "CA.L2-3.12.4.ssp",
+              "label": "System Security Plan Documentation (Manual Gate)",
+              "set_command": "",
+              "get_command": "",
+              "engine": "manual_gate",
+              "sequence_hint": 0,
+              "idempotency": "evidence-only",
+              "variables_required": [],
+              "variables_runtime": [],
+              "captures": [],
+              "on_failure": "abort_step",
+              "evidence_commands": []
+            }
+          ],
+          "_evidence_commands": [],
+          "_variables_required": [],
+          "_variables_runtime": [],
+          "_captures": []
+        }
+      },
+      "inputs": [
+        "Draft System Security Plan documenting all 110 L2 controls",
+        "Include system boundary description and data flow diagrams"
+      ],
+      "outputs": [
+        "SSP document completed",
+        "SSP reviewed by compliance lead"
+      ],
+      "controls": [
+        "CA.L2-3.12.4"
+      ],
+      "idempotency": "safe",
+      "rollback": {
+        "strategy": "manual",
+        "notes": "Policy documents require manual rollback review"
+      },
+      "evidence_emit": [
+        {
+          "artifact_id": "ART-SSP-001",
+          "artifact_type": "ssp",
+          "description": "System Security Plan v1.0",
+          "collector": "manual",
+          "retention_days": 1095,
+          "storage_location_ref": "evidence/ssp/"
+        }
+      ]
+    },
+    {
+      "id": "STEP-L0-002",
+      "type": "policy",
+      "priority": "p1",
+      "depends_on": [],
+      "action": {
+        "engine": "manual_gate",
+        "command": "Draft personnel screening policy covering background checks | Define screening requirements for CUI access",
+        "args": {
+          "_layer": 0,
+          "_layer_name": "Foundation",
+          "_step_title": "Personnel Screening Policy",
+          "_task_type": "policy",
+          "_verification_steps": [
+            "Policy document exists",
+            "Approved by HR and security lead"
+          ],
+          "_sub_commands": [
+            {
+              "id": "PS.L2-3.9.1.screening",
+              "label": "Personnel Background Screening Process (Manual Gate)",
+              "set_command": "",
+              "get_command": "",
+              "engine": "manual_gate",
+              "sequence_hint": 0,
+              "idempotency": "evidence-only",
+              "variables_required": [],
+              "variables_runtime": [],
+              "captures": [],
+              "on_failure": "abort_step",
+              "evidence_commands": []
+            }
+          ],
+          "_evidence_commands": [],
+          "_variables_required": [],
+          "_variables_runtime": [],
+          "_captures": []
+        }
+      },
+      "inputs": [
+        "Draft personnel screening policy covering background checks",
+        "Define screening requirements for CUI access"
+      ],
+      "outputs": [
+        "Policy drafted",
+        "Policy approved"
+      ],
+      "controls": [
+        "PS.L2-3.9.1"
+      ],
+      "idempotency": "safe",
+      "rollback": {
+        "strategy": "manual",
+        "notes": "Policy documents require manual rollback review"
+      },
+      "evidence_emit": [
+        {
+          "artifact_id": "ART-PS-001",
+          "artifact_type": "policy",
+          "description": "Personnel Screening Policy",
+          "collector": "manual",
+          "retention_days": 1095,
+          "storage_location_ref": "evidence/policies/"
+        }
+      ]
+    },
+    {
+      "id": "STEP-L0-003",
+      "type": "training",
+      "priority": "p1",
+      "depends_on": [],
+      "action": {
+        "engine": "manual_gate",
+        "command": "Establish security awareness training program | Define role-based training tracks (admin, user, developer)",
+        "args": {
+          "_layer": 0,
+          "_layer_name": "Foundation",
+          "_step_title": "Security Awareness Training Program",
+          "_task_type": "training",
+          "_verification_steps": [
+            "Training program documented",
+            "Training materials created",
+            "Initial training scheduled"
+          ],
+          "_sub_commands": [
+            {
+              "id": "AT.L2-3.2.1.training-evidence",
+              "label": "Security Awareness Training Evidence Collection",
+              "set_command": "",
+              "get_command": "",
+              "engine": "manual_gate",
+              "sequence_hint": 0,
+              "idempotency": "evidence-only",
+              "variables_required": [],
+              "variables_runtime": [],
+              "captures": [],
+              "on_failure": "abort_step",
+              "evidence_commands": []
+            }
+          ],
+          "_evidence_commands": [],
+          "_variables_required": [],
+          "_variables_runtime": [],
+          "_captures": []
+        }
+      },
+      "inputs": [
+        "Establish security awareness training program",
+        "Define role-based training tracks (admin, user, developer)"
+      ],
+      "outputs": [
+        "Training program established",
+        "Materials created"
+      ],
+      "controls": [
+        "AT.L2-3.2.1",
+        "AT.L2-3.2.2"
+      ],
+      "idempotency": "best_effort",
+      "rollback": {
+        "strategy": "none"
+      },
+      "evidence_emit": [
+        {
+          "artifact_id": "ART-TRAIN-001",
+          "artifact_type": "training_record",
+          "description": "Training program documentation",
+          "collector": "manual",
+          "retention_days": 1095,
+          "storage_location_ref": "evidence/training/"
+        }
+      ]
+    },
+    {
+      "id": "STEP-L1-001",
+      "type": "configuration",
+      "priority": "p0",
+      "depends_on": [
+        "STEP-L0-003"
+      ],
+      "action": {
+        "engine": "mgraph",
+        "command": "New-MgUser -DisplayName \"Admin-{adminUserName}\" -UserPrincipalName \"admin-{adminUserName}@{tenantName}\" -PasswordProfile @{Password='{initialPassword}';ForceChangePasswordNextSignIn=$true} -AccountEnabled:$true",
+        "args": {
+          "_layer": 1,
+          "_layer_name": "Identity Objects",
+          "_step_title": "Create Dedicated Admin Accounts",
+          "_task_type": "configuration",
+          "_portal_path": "entra.microsoft.com > Users > New User",
+          "_verification_steps": [
+            "Verify admin accounts exist without M365 license",
+            "Confirm admin accounts blocked from productivity apps"
+          ],
+          "_sub_commands": [
+            {
+              "id": "AC.L2-3.1.6.admin-account",
+              "label": "Create Dedicated Admin Account",
+              "set_command": "New-MgUser -DisplayName \"Admin-{adminUserName}\" -UserPrincipalName \"admin-{adminUserName}@{tenantName}\" -PasswordProfile @{Password='{initialPassword}';ForceChangePasswordNextSignIn=$true} -AccountEnabled:$true",
+              "get_command": "Get-MgUser -Filter \"startswith(displayName,'Admin-')\"",
+              "engine": "mgraph",
+              "sequence_hint": 2,
+              "idempotency": "get-then-set",
+              "variables_required": [
+                "adminUserName",
+                "tenantName",
+                "initialPassword"
+              ],
+              "variables_runtime": [],
+              "captures": [
+                {
+                  "variable": "adminUserId",
+                  "from": "json_field",
+                  "json_path": "$.Id"
+                }
+              ],
+              "on_failure": "abort_step",
+              "evidence_commands": []
+            }
+          ],
+          "_get_command": "Get-MgUser -Filter \"startswith(displayName,'Admin-')\"",
+          "_evidence_commands": [
+            "Get-MgUser -Filter \"startsWith(userPrincipalName,'admin_')\" | Select DisplayName,UserPrincipalName,AccountEnabled | Export-Csv admin_accounts.csv"
+          ],
+          "_variables_required": [
+            "adminUserName",
+            "tenantName",
+            "initialPassword"
+          ],
+          "_variables_runtime": [],
+          "_captures": [
+            {
+              "variable": "adminUserId",
+              "from": "json_field",
+              "json_path": "$.Id"
+            }
+          ]
+        }
+      },
+      "inputs": [
+        "Create separate cloud-only admin accounts (admin_user@domain)",
+        "Block admin accounts from email and Teams"
+      ],
+      "outputs": [
+        "Admin accounts created",
+        "Admin accounts verified as cloud-only"
+      ],
+      "controls": [
+        "AC.L2-3.1.6"
+      ],
+      "idempotency": "safe",
+      "rollback": {
+        "strategy": "reverse_task",
+        "notes": "Revert configuration for: Create Dedicated Admin Accounts"
+      },
+      "evidence_emit": [
+        {
+          "artifact_id": "ART-ADMIN-001",
+          "artifact_type": "config_export",
+          "description": "Admin account listing export",
+          "collector": "powershell",
+          "retention_days": 365,
+          "storage_location_ref": "evidence/identity/"
+        }
+      ]
+    },
+    {
+      "id": "STEP-L1-002",
+      "type": "configuration",
+      "priority": "p0",
+      "depends_on": [
+        "STEP-L0-003"
+      ],
+      "action": {
+        "engine": "mgraph",
+        "command": "New-MgRoleManagementDirectoryRoleAssignment -PrincipalId {userId} -RoleDefinitionId {roleDefId} -DirectoryScopeId \"/\"",
+        "args": {
+          "_layer": 1,
+          "_layer_name": "Identity Objects",
+          "_step_title": "Create Security Groups for RBAC",
+          "_task_type": "configuration",
+          "_verification_steps": [
+            "Groups exist with correct membership type",
+            "Groups are role-assignable"
+          ],
+          "_sub_commands": [
+            {
+              "id": "AC.L2-3.1.2.role-assign",
+              "label": "RBAC Role Assignment",
+              "set_command": "New-MgRoleManagementDirectoryRoleAssignment -PrincipalId {userId} -RoleDefinitionId {roleDefId} -DirectoryScopeId \"/\"",
+              "get_command": "Get-MgRoleManagementDirectoryRoleAssignment -All",
+              "engine": "mgraph",
+              "sequence_hint": 0,
+              "idempotency": "get-then-set",
+              "variables_required": [
+                "roleDefId"
+              ],
+              "variables_runtime": [
+                "userId"
+              ],
+              "captures": [],
+              "on_failure": "abort_step",
+              "evidence_commands": []
+            }
+          ],
+          "_get_command": "Get-MgRoleManagementDirectoryRoleAssignment -All",
+          "_evidence_commands": [
+            "Get-MgGroup -Filter \"securityEnabled eq true\" | Select DisplayName,Id,IsAssignableToRole | Export-Csv security_groups.csv"
+          ],
+          "_variables_required": [
+            "roleDefId"
+          ],
+          "_variables_runtime": [
+            "userId"
+          ],
+          "_captures": []
+        }
+      },
+      "inputs": [
+        "Create role-assignable security groups for each admin tier",
+        "Create groups for Conditional Access targeting"
+      ],
+      "outputs": [
+        "Security groups created",
+        "Membership verified"
+      ],
+      "controls": [
+        "AC.L2-3.1.2"
+      ],
+      "idempotency": "safe",
+      "rollback": {
+        "strategy": "reverse_task",
+        "notes": "Revert configuration for: Create Security Groups for RBAC"
+      },
+      "evidence_emit": [
+        {
+          "artifact_id": "ART-GROUPS-001",
+          "artifact_type": "config_export",
+          "description": "Security group inventory",
+          "collector": "powershell",
+          "retention_days": 365,
+          "storage_location_ref": "evidence/identity/"
+        }
+      ]
+    },
+    {
+      "id": "STEP-L8-001",
+      "type": "evidence_collection",
+      "priority": "p2",
+      "depends_on": [
+        "STEP-L0-003"
+      ],
+      "action": {
+        "engine": "mgraph",
+        "command": "New-MgUser -DisplayName \"Admin-{adminUserName}\" -UserPrincipalName \"admin-{adminUserName}@{tenantName}\" -PasswordProfile @{Password='{initialPassword}';ForceChangePasswordNextSignIn=$true} -AccountEnabled:$true",
+        "args": {
+          "_layer": 1,
+          "_layer_name": "Identity Objects",
+          "_step_title": "Collect Identity Evidence Package",
+          "_task_type": "evidence_collection",
+          "_verification_steps": [
+            "All exports completed successfully",
+            "Files contain expected data",
+            "Hashes recorded"
+          ],
+          "_sub_commands": [
+            {
+              "id": "AC.L2-3.1.6.admin-account",
+              "label": "Create Dedicated Admin Account",
+              "set_command": "New-MgUser -DisplayName \"Admin-{adminUserName}\" -UserPrincipalName \"admin-{adminUserName}@{tenantName}\" -PasswordProfile @{Password='{initialPassword}';ForceChangePasswordNextSignIn=$true} -AccountEnabled:$true",
+              "get_command": "Get-MgUser -Filter \"startswith(displayName,'Admin-')\"",
+              "engine": "mgraph",
+              "sequence_hint": 2,
+              "idempotency": "get-then-set",
+              "variables_required": [
+                "adminUserName",
+                "tenantName",
+                "initialPassword"
+              ],
+              "variables_runtime": [],
+              "captures": [
+                {
+                  "variable": "adminUserId",
+                  "from": "json_field",
+                  "json_path": "$.Id"
+                }
+              ],
+              "on_failure": "abort_step",
+              "evidence_commands": []
+            },
+            {
+              "id": "AC.L2-3.1.2.role-assign",
+              "label": "RBAC Role Assignment",
+              "set_command": "New-MgRoleManagementDirectoryRoleAssignment -PrincipalId {userId} -RoleDefinitionId {roleDefId} -DirectoryScopeId \"/\"",
+              "get_command": "Get-MgRoleManagementDirectoryRoleAssignment -All",
+              "engine": "mgraph",
+              "sequence_hint": 0,
+              "idempotency": "get-then-set",
+              "variables_required": [
+                "roleDefId"
+              ],
+              "variables_runtime": [
+                "userId"
+              ],
+              "captures": [],
+              "on_failure": "abort_step",
+              "evidence_commands": []
+            },
+            {
+              "id": "IA.L2-3.5.3.mfa-authenticator",
+              "label": "Enable Microsoft Authenticator Authentication Method",
+              "set_command": "Invoke-MgGraphRequest -Method PATCH -Uri 'https://graph.microsoft.us/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/MicrosoftAuthenticator' -Body (@{'@odata.type'='#microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration';state='enabled'} | ConvertTo-Json -Depth 5) -ContentType 'application/json'",
+              "get_command": "Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/MicrosoftAuthenticator'",
+              "engine": "mgraph",
+              "sequence_hint": 0,
+              "idempotency": "get-then-set",
+              "variables_required": [],
+              "variables_runtime": [],
+              "captures": [],
+              "on_failure": "abort_step",
+              "evidence_commands": []
+            },
+            {
+              "id": "IA.L2-3.5.3.fido2-enable",
+              "label": "Enable FIDO2 Security Key Authentication Method",
+              "set_command": "Invoke-MgGraphRequest -Method PATCH -Uri 'https://graph.microsoft.us/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/Fido2' -Body (@{state='enabled'} | ConvertTo-Json) -ContentType 'application/json'",
+              "get_command": "Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/Fido2'",
+              "engine": "mgraph",
+              "sequence_hint": 1,
+              "idempotency": "get-then-set",
+              "variables_required": [],
+              "variables_runtime": [],
+              "captures": [],
+              "on_failure": "abort_step",
+              "evidence_commands": []
+            }
+          ],
+          "_get_command": "Get-MgUser -Filter \"startswith(displayName,'Admin-')\"",
+          "_evidence_commands": [
+            "Get-MgUser -Filter \"startsWith(userPrincipalName,'admin_')\" | Export-Csv admin_accounts_evidence.csv",
+            "Get-MgIdentityConditionalAccessPolicy | ConvertTo-Json -Depth 5 > ca_policies_evidence.json"
+          ],
+          "_variables_required": [
+            "adminUserName",
+            "tenantName",
+            "initialPassword",
+            "roleDefId"
+          ],
+          "_variables_runtime": [
+            "userId"
+          ],
+          "_captures": [
+            {
+              "variable": "adminUserId",
+              "from": "json_field",
+              "json_path": "$.Id"
+            }
+          ]
+        }
+      },
+      "inputs": [
+        "Export PIM configuration and role assignment logs",
+        "Export Conditional Access policy state",
+        "Export admin account inventory"
+      ],
+      "outputs": [
+        "All identity evidence exported",
+        "Evidence indexed"
+      ],
+      "controls": [
+        "AC.L2-3.1.2",
+        "AC.L2-3.1.6",
+        "IA.L2-3.5.3"
+      ],
+      "idempotency": "safe",
+      "rollback": {
+        "strategy": "none"
+      },
+      "evidence_emit": [
+        {
+          "artifact_id": "ART-EVID-IAM-001",
+          "artifact_type": "config_export",
+          "description": "Identity evidence package",
+          "collector": "powershell",
+          "retention_days": 1095,
+          "storage_location_ref": "evidence/packages/"
+        }
+      ]
+    },
+    {
+      "id": "STEP-L2-001",
+      "type": "configuration",
+      "priority": "p0",
+      "depends_on": [
+        "STEP-L1-001",
+        "STEP-L1-002",
+        "STEP-L8-001"
+      ],
+      "action": {
+        "engine": "mgraph",
+        "command": "New-MgRoleManagementDirectoryRoleAssignment -PrincipalId {userId} -RoleDefinitionId {roleDefId} -DirectoryScopeId \"/\"",
+        "args": {
+          "_layer": 2,
+          "_layer_name": "Role Assignments",
+          "_step_title": "Configure PIM Role Assignments",
+          "_task_type": "configuration",
+          "_verification_steps": [
+            "Test PIM activation requires MFA",
+            "Verify 8-hour max duration"
+          ],
+          "_sub_commands": [
+            {
+              "id": "AC.L2-3.1.2.role-assign",
+              "label": "RBAC Role Assignment",
+              "set_command": "New-MgRoleManagementDirectoryRoleAssignment -PrincipalId {userId} -RoleDefinitionId {roleDefId} -DirectoryScopeId \"/\"",
+              "get_command": "Get-MgRoleManagementDirectoryRoleAssignment -All",
+              "engine": "mgraph",
+              "sequence_hint": 0,
+              "idempotency": "get-then-set",
+              "variables_required": [
+                "roleDefId"
+              ],
+              "variables_runtime": [
+                "userId"
+              ],
+              "captures": [],
+              "on_failure": "abort_step",
+              "evidence_commands": []
+            },
+            {
+              "id": "AC.L2-3.1.5.pim-eligible",
+              "label": "PIM JIT Eligible Role Assignment",
+              "set_command": "New-MgRoleManagementDirectoryRoleEligibilityScheduleRequest -BodyParameter @{action='adminAssign';justification='CMMC L2 least privilege';roleDefinitionId='{roleDefId}';directoryScopeId='/';principalId='{userId}';scheduleInfo=@{startDateTime=(Get-Date).ToString('o');expiration=@{type='afterDuration';duration='P1Y'}}}",
+              "get_command": "Get-MgRoleManagementDirectoryRoleEligibilitySchedule -All",
+              "engine": "mgraph",
+              "sequence_hint": 1,
+              "idempotency": "get-then-set",
+              "variables_required": [
+                "roleDefId"
+              ],
+              "variables_runtime": [
+                "userId"
+              ],
+              "captures": [],
+              "on_failure": "abort_step",
+              "evidence_commands": []
+            }
+          ],
+          "_get_command": "Get-MgRoleManagementDirectoryRoleAssignment -All",
+          "_evidence_commands": [
+            "Get-MgPolicyRoleManagementPolicyAssignment | Select RoleDefinitionId,PolicyId | Export-Csv pim_settings.csv"
+          ],
+          "_variables_required": [
+            "roleDefId",
+            "roleDefId"
+          ],
+          "_variables_runtime": [
+            "userId",
+            "userId"
+          ],
+          "_captures": []
+        }
+      },
+      "inputs": [
+        "Configure PIM requiring justification and MFA for role activation",
+        "Set maximum activation duration to 8 hours"
+      ],
+      "outputs": [
+        "PIM configured for all privileged roles",
+        "Activation tested successfully"
+      ],
+      "controls": [
+        "AC.L2-3.1.2",
+        "AC.L2-3.1.5"
+      ],
+      "idempotency": "safe",
+      "rollback": {
+        "strategy": "reverse_task",
+        "notes": "Revert configuration for: Configure PIM Role Assignments"
+      },
+      "evidence_emit": [
+        {
+          "artifact_id": "ART-PIM-001",
+          "artifact_type": "config_export",
+          "description": "PIM configuration export",
+          "collector": "powershell",
+          "retention_days": 365,
+          "storage_location_ref": "evidence/identity/"
+        }
+      ]
+    },
+    {
+      "id": "STEP-L3-001",
+      "type": "configuration",
+      "priority": "p0",
+      "depends_on": [
+        "STEP-L8-001",
+        "STEP-L2-001"
+      ],
+      "action": {
+        "engine": "mgraph",
+        "command": "Invoke-MgGraphRequest -Method PATCH -Uri 'https://graph.microsoft.us/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/MicrosoftAuthenticator' -Body (@{'@odata.type'='#microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration';state='enabled'} | ConvertTo-Json -Depth 5) -ContentType 'application/json'",
+        "args": {
+          "_layer": 3,
+          "_layer_name": "Identity Policies",
+          "_step_title": "Deploy Conditional Access Baseline",
+          "_task_type": "configuration",
+          "_verification_steps": [
+            "Test MFA prompt on sign-in",
+            "Verify legacy auth blocked",
+            "Verify lockout triggers after 10 failures"
+          ],
+          "_sub_commands": [
+            {
+              "id": "IA.L2-3.5.3.mfa-authenticator",
+              "label": "Enable Microsoft Authenticator Authentication Method",
+              "set_command": "Invoke-MgGraphRequest -Method PATCH -Uri 'https://graph.microsoft.us/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/MicrosoftAuthenticator' -Body (@{'@odata.type'='#microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration';state='enabled'} | ConvertTo-Json -Depth 5) -ContentType 'application/json'",
+              "get_command": "Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/MicrosoftAuthenticator'",
+              "engine": "mgraph",
+              "sequence_hint": 0,
+              "idempotency": "get-then-set",
+              "variables_required": [],
+              "variables_runtime": [],
+              "captures": [],
+              "on_failure": "abort_step",
+              "evidence_commands": []
+            },
+            {
+              "id": "AC.L2-3.1.8.smart-lockout",
+              "label": "Smart Lockout Configuration Evidence",
+              "set_command": "",
+              "get_command": "Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/policies/authenticationMethodsPolicy'",
+              "engine": "mgraph",
+              "sequence_hint": 0,
+              "idempotency": "evidence-only",
+              "variables_required": [],
+              "variables_runtime": [],
+              "captures": [],
+              "on_failure": "warn_continue",
+              "evidence_commands": [
+                "Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/policies/authenticationMethodsPolicy'"
+              ]
+            },
+            {
+              "id": "IA.L2-3.5.3.fido2-enable",
+              "label": "Enable FIDO2 Security Key Authentication Method",
+              "set_command": "Invoke-MgGraphRequest -Method PATCH -Uri 'https://graph.microsoft.us/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/Fido2' -Body (@{state='enabled'} | ConvertTo-Json) -ContentType 'application/json'",
+              "get_command": "Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/Fido2'",
+              "engine": "mgraph",
+              "sequence_hint": 1,
+              "idempotency": "get-then-set",
+              "variables_required": [],
+              "variables_runtime": [],
+              "captures": [],
+              "on_failure": "abort_step",
+              "evidence_commands": []
+            }
+          ],
+          "_get_command": "Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/MicrosoftAuthenticator'",
+          "_evidence_commands": [
+            "Get-MgIdentityConditionalAccessPolicy | Select DisplayName,State | Export-Csv ca_policies.csv",
+            "Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/policies/authenticationMethodsPolicy'"
+          ],
+          "_variables_required": [],
+          "_variables_runtime": [],
+          "_captures": []
+        }
+      },
+      "inputs": [
+        "Create CA policy requiring MFA for all users",
+        "Create CA policy blocking legacy authentication",
+        "Configure Smart Lockout (10 attempts, 60s duration)"
+      ],
+      "outputs": [
+        "MFA CA policy active",
+        "Legacy auth block active",
+        "Smart Lockout configured"
+      ],
+      "controls": [
+        "IA.L2-3.5.3",
+        "AC.L2-3.1.8"
+      ],
+      "idempotency": "safe",
+      "rollback": {
+        "strategy": "reverse_task",
+        "notes": "Revert configuration for: Deploy Conditional Access Baseline"
+      },
+      "evidence_emit": [
+        {
+          "artifact_id": "ART-CA-001",
+          "artifact_type": "config_export",
+          "description": "Conditional Access policy export",
+          "collector": "powershell",
+          "retention_days": 365,
+          "storage_location_ref": "evidence/identity/"
+        }
+      ]
+    },
+    {
+      "id": "STEP-L4-001",
+      "type": "configuration",
+      "priority": "p1",
+      "depends_on": [
+        "STEP-L3-001"
+      ],
+      "action": {
+        "engine": "mgraph",
+        "command": "New-MgIdentityConditionalAccessPolicy -BodyParameter @{displayName='CMMC-MobileDeviceAccess';state='enabled';conditions=@{users=@{includeGroups=@('{cuiGroupId}')};applications=@{includeApplications=@('All')};platforms=@{includePlatforms=@('android','iOS')};clientAppTypes=@('all')};grantControls=@{operator='OR';builtInControls=@('approvedApplication','compliantDevice')}}",
+        "args": {
+          "_layer": 4,
+          "_layer_name": "Device Policies",
+          "_step_title": "Deploy Intune Compliance Policies",
+          "_task_type": "configuration",
+          "_verification_steps": [
+            "Verify compliance policies assigned to all devices",
+            "Test non-compliant device is blocked"
+          ],
+          "_sub_commands": [
+            {
+              "id": "AC.L2-3.1.18.mobile-ca",
+              "label": "Conditional Access - Mobile Device Compliance Requirement",
+              "set_command": "New-MgIdentityConditionalAccessPolicy -BodyParameter @{displayName='CMMC-MobileDeviceAccess';state='enabled';conditions=@{users=@{includeGroups=@('{cuiGroupId}')};applications=@{includeApplications=@('All')};platforms=@{includePlatforms=@('android','iOS')};clientAppTypes=@('all')};grantControls=@{operator='OR';builtInControls=@('approvedApplication','compliantDevice')}}",
+              "get_command": "Get-MgIdentityConditionalAccessPolicy -Filter \"displayName eq 'CMMC-MobileDeviceAccess'\"",
+              "engine": "mgraph",
+              "sequence_hint": 4,
+              "idempotency": "get-then-set",
+              "variables_required": [],
+              "variables_runtime": [
+                "cuiGroupId"
+              ],
+              "captures": [],
+              "on_failure": "abort_step",
+              "evidence_commands": []
+            },
+            {
+              "id": "CM.L2-3.4.2.asr-rules",
+              "label": "Deploy Attack Surface Reduction Rules via Intune Configuration Policy",
+              "set_command": "Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/beta/deviceManagement/configurationPolicies' -Body (@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationPolicy';name='CMMC-ASR-Rules';platforms='windows10';technologies='mdm'} | ConvertTo-Json -Depth 10) -ContentType 'application/json'",
+              "get_command": "Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/beta/deviceManagement/configurationPolicies' | Select-Object -ExpandProperty value | Where-Object name -like 'CMMC*'",
+              "engine": "mgraph",
+              "sequence_hint": 4,
+              "idempotency": "get-then-set",
+              "variables_required": [],
+              "variables_runtime": [],
+              "captures": [],
+              "on_failure": "abort_step",
+              "evidence_commands": []
+            }
+          ],
+          "_get_command": "Get-MgIdentityConditionalAccessPolicy -Filter \"displayName eq 'CMMC-MobileDeviceAccess'\"",
+          "_evidence_commands": [
+            "Get-MgDeviceManagementDeviceCompliancePolicy | Select DisplayName,LastModifiedDateTime | Export-Csv compliance_status.csv"
+          ],
+          "_variables_required": [],
+          "_variables_runtime": [
+            "cuiGroupId"
+          ],
+          "_captures": []
+        }
+      },
+      "inputs": [
+        "Deploy Intune configuration profiles aligned with CIS benchmarks",
+        "Configure device compliance policies requiring encryption and OS version"
+      ],
+      "outputs": [
+        "Compliance policies deployed",
+        "Test device evaluated"
+      ],
+      "controls": [
+        "CM.L2-3.4.2",
+        "AC.L2-3.1.18"
+      ],
+      "idempotency": "safe",
+      "rollback": {
+        "strategy": "reverse_task",
+        "notes": "Revert configuration for: Deploy Intune Compliance Policies"
+      },
+      "evidence_emit": [
+        {
+          "artifact_id": "ART-INTUNE-001",
+          "artifact_type": "config_export",
+          "description": "Intune compliance policy export",
+          "collector": "powershell",
+          "retention_days": 365,
+          "storage_location_ref": "evidence/devices/"
+        }
+      ]
+    },
+    {
+      "id": "STEP-L5-001",
+      "type": "configuration",
+      "priority": "p1",
+      "depends_on": [
+        "STEP-L3-001",
+        "STEP-L4-001"
+      ],
+      "action": {
+        "engine": "spo",
+        "command": "Set-PnPTenantSite -Identity 'https://{tenantName}.sharepoint.us' -SharingCapability ExistingExternalUserSharingOnly",
+        "args": {
+          "_layer": 5,
+          "_layer_name": "Data Protection",
+          "_step_title": "Configure Sensitivity Labels for CUI",
+          "_task_type": "configuration",
+          "_verification_steps": [
+            "Labels appear in Office apps",
+            "Auto-labeling triggers on CUI keywords",
+            "DLP blocks external CUI sharing"
+          ],
+          "_sub_commands": [
+            {
+              "id": "AC.L2-3.1.22.spo-site-sharing",
+              "label": "Restrict SharePoint Site Sharing to Existing External Users Only",
+              "set_command": "Set-PnPTenantSite -Identity 'https://{tenantName}.sharepoint.us' -SharingCapability ExistingExternalUserSharingOnly",
+              "get_command": "Get-PnPTenantSite -Url 'https://{tenantName}.sharepoint.us' | Select-Object Url,SharingCapability",
+              "engine": "spo",
+              "sequence_hint": 1,
+              "idempotency": "get-then-set",
+              "variables_required": [
+                "tenantName"
+              ],
+              "variables_runtime": [],
+              "captures": [],
+              "on_failure": "abort_step",
+              "evidence_commands": []
+            },
+            {
+              "id": "MP.L2-3.8.1.cui-label",
+              "label": "Create CUI Sensitivity Label with Encryption",
+              "set_command": "New-Label -Name 'CUI' -DisplayName 'CUI - Controlled Unclassified Information' -Tooltip 'Contains CUI' -EncryptionEnabled $true -EncryptionProtectionType Template -EncryptionEncryptOnly $false",
+              "get_command": "Get-Label -Identity 'CUI'",
+              "engine": "ipps",
+              "sequence_hint": 2,
+              "idempotency": "get-then-set",
+              "variables_required": [],
+              "variables_runtime": [],
+              "captures": [],
+              "on_failure": "abort_step",
+              "evidence_commands": []
+            }
+          ],
+          "_get_command": "Get-PnPTenantSite -Url 'https://{tenantName}.sharepoint.us' | Select-Object Url,SharingCapability",
+          "_evidence_commands": [
+            "Get-DlpCompliancePolicy | Select Name,Mode,Enabled | Export-Csv dlp_policies.csv"
+          ],
+          "_variables_required": [
+            "tenantName"
+          ],
+          "_variables_runtime": [],
+          "_captures": []
+        }
+      },
+      "inputs": [
+        "Create sensitivity labels for CUI classification",
+        "Configure auto-labeling policies",
+        "Create DLP rule blocking CUI external sharing"
+      ],
+      "outputs": [
+        "Sensitivity labels published",
+        "DLP policy active",
+        "Auto-labeling tested"
+      ],
+      "controls": [
+        "MP.L2-3.8.4",
+        "AC.L2-3.1.22"
+      ],
+      "idempotency": "safe",
+      "rollback": {
+        "strategy": "reverse_task",
+        "notes": "Revert configuration for: Configure Sensitivity Labels for CUI"
+      },
+      "evidence_emit": [
+        {
+          "artifact_id": "ART-LABELS-001",
+          "artifact_type": "config_export",
+          "description": "Sensitivity label configuration",
+          "collector": "powershell",
+          "retention_days": 365,
+          "storage_location_ref": "evidence/data-protection/"
+        }
+      ]
+    },
+    {
+      "id": "STEP-L6-001",
+      "type": "configuration",
+      "priority": "p1",
+      "depends_on": [
+        "STEP-L0-003"
+      ],
+      "action": {
+        "engine": "az",
+        "command": "$nsg = Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'cmmc-nsg'; Add-AzNetworkSecurityRuleConfig -NetworkSecurityGroup $nsg -Name 'DenyAllInbound' -Protocol '*' -Direction Inbound -Priority 4096 -SourceAddressPrefix '*' -SourcePortRange '*' -DestinationAddressPrefix '*' -DestinationPortRange '*' -Access Deny | Set-AzNetworkSecurityGroup",
+        "args": {
+          "_layer": 6,
+          "_layer_name": "Infrastructure",
+          "_step_title": "Deploy Azure Network Segmentation",
+          "_task_type": "configuration",
+          "_verification_steps": [
+            "VNet exists with correct address space",
+            "NSGs have default-deny rules",
+            "Only documented traffic is allowed"
+          ],
+          "_sub_commands": [
+            {
+              "id": "SC.L2-3.13.1.nsg-deny",
+              "label": "Apply Deny-All-Inbound Rule to Network Security Group",
+              "set_command": "$nsg = Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'cmmc-nsg'; Add-AzNetworkSecurityRuleConfig -NetworkSecurityGroup $nsg -Name 'DenyAllInbound' -Protocol '*' -Direction Inbound -Priority 4096 -SourceAddressPrefix '*' -SourcePortRange '*' -DestinationAddressPrefix '*' -DestinationPortRange '*' -Access Deny | Set-AzNetworkSecurityGroup",
+              "get_command": "Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'cmmc-nsg' | Select-Object -ExpandProperty SecurityRules",
+              "engine": "az",
+              "sequence_hint": 1,
+              "idempotency": "get-then-set",
+              "variables_required": [
+                "resourceGroup"
+              ],
+              "variables_runtime": [],
+              "captures": [],
+              "on_failure": "abort_step",
+              "evidence_commands": []
+            },
+            {
+              "id": "SC.L2-3.13.5.vnet",
+              "label": "Create CUI Virtual Network with Address Space",
+              "set_command": "New-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Location 'usgovvirginia' -Name 'cmmc-vnet' -AddressPrefix '10.0.0.0/16'",
+              "get_command": "Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name 'cmmc-vnet'",
+              "engine": "az",
+              "sequence_hint": 3,
+              "idempotency": "get-then-set",
+              "variables_required": [
+                "resourceGroup"
+              ],
+              "variables_runtime": [],
+              "captures": [],
+              "on_failure": "abort_step",
+              "evidence_commands": []
+            },
+            {
+              "id": "SC.L2-3.13.5.mgmt-subnet",
+              "label": "Add Management Subnet to CUI Virtual Network",
+              "set_command": "$vnet = Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name 'cmmc-vnet'; Add-AzVirtualNetworkSubnetConfig -Name 'management-subnet' -AddressPrefix '10.0.1.0/24' -VirtualNetwork $vnet | Set-AzVirtualNetwork",
+              "get_command": "Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name 'cmmc-vnet' | Select-Object -ExpandProperty Subnets",
+              "engine": "az",
+              "sequence_hint": 4,
+              "idempotency": "get-then-set",
+              "variables_required": [
+                "resourceGroup"
+              ],
+              "variables_runtime": [],
+              "captures": [],
+              "on_failure": "abort_step",
+              "evidence_commands": []
+            }
+          ],
+          "_get_command": "Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'cmmc-nsg' | Select-Object -ExpandProperty SecurityRules",
+          "_evidence_commands": [
+            "Get-AzNetworkSecurityGroup | Select Name,@{N='RuleCount';E={$_.SecurityRules.Count}} | Export-Csv nsg_summary.csv"
+          ],
+          "_variables_required": [
+            "resourceGroup",
+            "resourceGroup",
+            "resourceGroup"
+          ],
+          "_variables_runtime": [],
+          "_captures": []
+        }
+      },
+      "inputs": [
+        "Create dedicated VNet for CUI workloads",
+        "Deploy NSGs with default deny-all",
+        "Add explicit allow rules per documented requirements"
+      ],
+      "outputs": [
+        "VNet deployed",
+        "NSGs applied",
+        "Traffic tested"
+      ],
+      "controls": [
+        "SC.L2-3.13.5",
+        "SC.L2-3.13.6"
+      ],
+      "idempotency": "safe",
+      "rollback": {
+        "strategy": "reverse_task",
+        "notes": "Revert configuration for: Deploy Azure Network Segmentation"
+      },
+      "evidence_emit": [
+        {
+          "artifact_id": "ART-NET-001",
+          "artifact_type": "config_export",
+          "description": "Network topology and NSG rules",
+          "collector": "cli",
+          "retention_days": 365,
+          "storage_location_ref": "evidence/infrastructure/"
+        }
+      ]
+    },
+    {
+      "id": "STEP-L7-001",
+      "type": "monitoring",
+      "priority": "p1",
+      "depends_on": [
+        "STEP-L3-001",
+        "STEP-L6-001"
+      ],
+      "action": {
+        "engine": "exchange",
+        "command": "Enable-OrganizationCustomization",
+        "args": {
+          "_layer": 7,
+          "_layer_name": "Monitoring",
+          "_step_title": "Deploy Sentinel Analytics Rules",
+          "_task_type": "monitoring",
+          "_verification_steps": [
+            "Audit log ingestion active",
+            "Sentinel workspace receiving logs",
+            "Analytics rules firing on test events"
+          ],
+          "_sub_commands": [
+            {
+              "id": "AU.L2-3.3.1.org-customization",
+              "label": "Enable Organization Customization (Pre-requisite for Audit)",
+              "set_command": "Enable-OrganizationCustomization",
+              "get_command": "Get-OrganizationConfig | Select-Object IsDehydrated",
+              "engine": "exchange",
+              "sequence_hint": 0,
+              "idempotency": "get-then-set",
+              "variables_required": [],
+              "variables_runtime": [],
+              "captures": [],
+              "on_failure": "warn_continue",
+              "evidence_commands": []
+            },
+            {
+              "id": "AU.L2-3.3.1.audit-enable",
+              "label": "Enable Unified Audit Log Ingestion",
+              "set_command": "Set-AdminAuditLogConfig -UnifiedAuditLogIngestionEnabled $true",
+              "get_command": "Get-AdminAuditLogConfig | Select-Object UnifiedAuditLogIngestionEnabled",
+              "engine": "exchange",
+              "sequence_hint": 1,
+              "idempotency": "get-then-set",
+              "variables_required": [],
+              "variables_runtime": [],
+              "captures": [],
+              "on_failure": "abort_step",
+              "evidence_commands": []
+            },
+            {
+              "id": "AU.L2-3.3.1.audit-retention",
+              "label": "Create Audit Log Retention Policy (1 Year)",
+              "set_command": "New-UnifiedAuditLogRetentionPolicy -Name 'CMMC-1Year-Retention' -Description 'CMMC AU retention 1 year' -RetentionDuration TwelveMonths -Priority 1 -RecordTypes AzureActiveDirectory,ExchangeAdmin,SharePoint,OneDrive",
+              "get_command": "Get-UnifiedAuditLogRetentionPolicy | Select-Object Name,RetentionDuration",
+              "engine": "ipps",
+              "sequence_hint": 2,
+              "idempotency": "get-then-set",
+              "variables_required": [],
+              "variables_runtime": [],
+              "captures": [],
+              "on_failure": "abort_step",
+              "evidence_commands": []
+            },
+            {
+              "id": "SI.L2-3.14.6.security-alerts",
+              "label": "Security Alert Monitoring Evidence via Defender",
+              "set_command": "",
+              "get_command": "",
+              "engine": "mgraph",
+              "sequence_hint": 0,
+              "idempotency": "evidence-only",
+              "variables_required": [],
+              "variables_runtime": [],
+              "captures": [],
+              "on_failure": "abort_step",
+              "evidence_commands": [
+                "Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/security/alerts_v2' | Select-Object -ExpandProperty value | Select-Object id,title,severity,status,createdDateTime"
+              ]
+            }
+          ],
+          "_get_command": "Get-OrganizationConfig | Select-Object IsDehydrated",
+          "_evidence_commands": [
+            "Get-AzSentinelAlertRule -WorkspaceName {ws} -ResourceGroupName {rg} | Measure-Object | Select Count",
+            "Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/security/alerts_v2' | Select-Object -ExpandProperty value | Select-Object id,title,severity,status,createdDateTime"
+          ],
+          "_variables_required": [],
+          "_variables_runtime": [],
+          "_captures": []
+        }
+      },
+      "inputs": [
+        "Enable Unified Audit Log",
+        "Deploy Sentinel workspace with data connectors",
+        "Configure analytics rules for sign-in anomalies and privilege escalation"
+      ],
+      "outputs": [
+        "Sentinel deployed",
+        "Data connectors active",
+        "Analytics rules enabled"
+      ],
+      "controls": [
+        "AU.L2-3.3.1",
+        "SI.L2-3.14.6"
+      ],
+      "idempotency": "safe",
+      "rollback": {
+        "strategy": "reverse_task",
+        "notes": "Disable monitoring rule"
+      },
+      "evidence_emit": [
+        {
+          "artifact_id": "ART-SIEM-001",
+          "artifact_type": "config_export",
+          "description": "Sentinel analytics rules export",
+          "collector": "powershell",
+          "retention_days": 365,
+          "storage_location_ref": "evidence/monitoring/"
+        }
+      ]
+    }
+  ],
+  "variables": {
+    "config_intent.CI-PIM-001": {
+      "mfa_required": true,
+      "justification_required": true,
+      "max_activation_hours": 8,
+      "approval_required_for_global_admin": true
+    },
+    "mfa_required": true,
+    "justification_required": true,
+    "max_activation_hours": 8,
+    "approval_required_for_global_admin": true,
+    "config_intent.CI-CA-001": {
+      "state": "enabled",
+      "grant_controls": [
+        "mfa"
+      ],
+      "target_users": "all"
+    },
+    "state": "enabled",
+    "grant_controls": [
+      "mfa"
+    ],
+    "target_users": "all",
+    "config_intent.CI-LOCKOUT-001": {
+      "lockout_threshold": 10,
+      "lockout_duration_seconds": 60
+    },
+    "lockout_threshold": 10,
+    "lockout_duration_seconds": 60,
+    "tenantId": "00000000-0000-0000-0000-000000000001",
+    "domain": "vfsgov.onmicrosoft.us",
+    "tenant_name": "vfsgov",
+    "primary_domain": "vfsgov.us",
+    "resource_group": "CMMC-RG",
+    "workspace_name": "cmmc-sentinel-ws",
+    "subscription_id": "00000000-0000-0000-0000-000000000002",
+    "manifest_id": "MANIFEST-SYNTH-001",
+    "tech_stack_id": 1,
+    "_source": "translated-from-manual-mission-plan",
+    "_plan_mode": "harden_existing",
+    "_translated_at": "2026-03-09T03:26:58.216Z",
+    "_drift_policies": [
+      {
+        "id": "DP-HIGH-001",
+        "scope": "All identity and access controls",
+        "severity": "high",
+        "detection": [
+          "PIM settings changed",
+          "CA policy disabled",
+          "Admin account created outside process"
+        ],
+        "response_playbook": [
+          "Notify compliance team within 1 hour",
+          "Revert unauthorized change",
+          "Document incident"
+        ]
+      },
+      {
+        "id": "DP-MED-001",
+        "scope": "Monitoring and evidence controls",
+        "severity": "medium",
+        "detection": [
+          "Audit log ingestion stopped",
+          "Sentinel rule disabled"
+        ],
+        "response_playbook": [
+          "Notify security team within 24 hours",
+          "Re-enable monitoring",
+          "Investigate root cause"
+        ]
+      }
+    ]
+  },
+  "prechecks": [
+    {
+      "id": "pre-graph-connectivity",
+      "description": "Verify Microsoft Graph API (GCC High) connectivity",
+      "method": "api_query",
+      "target": "/v1.0/organization",
+      "expected": "accessible",
+      "on_fail": "Cannot reach graph.microsoft.us — check tenant credentials and network"
+    }
+  ],
+  "postchecks": [
+    {
+      "id": "post-CHK-AC-3.1.2-01",
+      "description": "[Postcheck] AC.L2-3.1.2: PIM requires MFA for role activation",
+      "method": "api_query",
+      "expected": "MFA enforcement enabled for all privileged roles",
+      "on_fail": "Remediate PIM settings to require MFA"
+    },
+    {
+      "id": "post-CHK-AC-3.1.6-01",
+      "description": "[Postcheck] AC.L2-3.1.6: Admin accounts are cloud-only without M365 license",
+      "method": "api_query",
+      "expected": "All admin accounts have no M365 license assigned",
+      "on_fail": "Remove M365 licenses from admin accounts"
+    },
+    {
+      "id": "post-CHK-IA-3.5.3-01",
+      "description": "[Postcheck] IA.L2-3.5.3: Conditional Access policy requires MFA",
+      "method": "api_query",
+      "expected": "CA policy with MFA grant control targeting all users is enabled",
+      "on_fail": "Create or enable MFA Conditional Access policy"
+    }
+  ]
+}

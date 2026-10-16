@@ -28,6 +28,14 @@ export function getApiBase(): string {
     const stored = localStorage.getItem('muster-api-url');
     if (stored) return stored;
   }
+  if (typeof window !== 'undefined' && window.location) {
+    const isHttps = window.location.protocol === 'https:';
+    const isSslip = window.location.hostname.endsWith('sslip.io');
+    const isProductionPort = window.location.port === '80' || window.location.port === '443' || window.location.port === '8080' || !window.location.port;
+    if (isHttps || isSslip || isProductionPort) {
+      return `${window.location.origin}/api`;
+    }
+  }
   return 'http://localhost:4000/api';
 }
 

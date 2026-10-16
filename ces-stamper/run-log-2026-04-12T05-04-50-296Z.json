@@ -1,0 +1,1195 @@
+{
+  "executionMetadata": {
+    "planId": "unknown",
+    "tenant": "vfsgov-xtra",
+    "timestamp": "2026-04-12T05:04:50.214Z",
+    "operator": "unknown",
+    "sha256Hash": "ff5274eaefa556be7156ba7180d2b84ecd3c56d5289f5e79d34fd6bd5921df2a"
+  },
+  "resources": [
+    {
+      "category": "discovered",
+      "type": "Label",
+      "path": "MP.L2-3.8.1.cui-label",
+      "step": "step_task_MP.L2-3.8.1_mnshcf75_7k5kp39",
+      "timestamp": "2026-04-12T04:52:35.636Z",
+      "cmdlet": "Get-Label -Identity 'CUI'"
+    },
+    {
+      "category": "discovered",
+      "type": "Label",
+      "path": "MP.L2-3.8.1.cui-label",
+      "step": "step_task_MP.L2-3.8.1_mnshcf75_7k5kp39",
+      "timestamp": "2026-04-12T04:52:35.646Z",
+      "cmdlet": "Get-Label -Identity 'CUI'"
+    },
+    {
+      "category": "discovered",
+      "type": "LabelPolicy",
+      "path": "MP.L2-3.8.1.label-policy",
+      "step": "step_task_MP.L2-3.8.1_mnshcf75_7k5kp39",
+      "timestamp": "2026-04-12T04:52:36.510Z",
+      "cmdlet": "Get-LabelPolicy -Identity 'CMMC-CUI-Policy'"
+    },
+    {
+      "category": "discovered",
+      "type": "LabelPolicy",
+      "path": "MP.L2-3.8.1.label-policy",
+      "step": "step_task_MP.L2-3.8.1_mnshcf75_7k5kp39",
+      "timestamp": "2026-04-12T04:52:36.511Z",
+      "cmdlet": "Get-LabelPolicy -Identity 'CMMC-CUI-Policy'"
+    },
+    {
+      "category": "discovered",
+      "type": "MgUser",
+      "path": "AC.L2-3.1.1.operator-discover",
+      "step": "step_task_AC.L1-3.1.2_mnshcf6z_unetiag",
+      "timestamp": "2026-04-12T04:52:37.150Z",
+      "cmdlet": "Get-MgUser -Filter \"userPrincipalName eq 'operator@vfsgov.us'\" | ConvertTo-Json"
+    },
+    {
+      "category": "discovered",
+      "type": "$roleId",
+      "path": "AC.L2-3.1.4.pim-policy-get",
+      "step": "step_task_AC.L2-3.1.4_mnshcf6z_p11uwpl",
+      "timestamp": "2026-04-12T04:52:40.952Z",
+      "cmdlet": "$roleId = (Get-MgRoleManagementDirectoryRoleDefinition -Filter \"displayName eq 'Compliance Administrator'\").Id; $assignment = Get-MgPolicyRoleManagementPolicyAssignment -Filter \"scopeId eq '/' and scopeType eq 'DirectoryRole' and roleDefinitionId eq '$roleId'\" | Select-Object -First 1; Get-MgPolicyRoleManagementPolicy -UnifiedRoleManagementPolicyId $assignment.PolicyId | Select-Object Id,DisplayName | ConvertTo-Json -Depth 10"
+    },
+    {
+      "category": "discovered",
+      "type": "MgRoleManagementDirectoryRoleDefinition",
+      "path": "AC.L2-3.1.4.pim-approval",
+      "step": "step_task_AC.L2-3.1.4_mnshcf6z_p11uwpl",
+      "timestamp": "2026-04-12T04:52:44.644Z",
+      "cmdlet": "$roleId=(Get-MgRoleManagementDirectoryRoleDefinition -Filter \"displayName eq 'Compliance Administrator'\").Id; $pimPolicyId=(Get-MgPolicyRoleManagementPolicyAssignment -Filter \"scopeId eq '/' and scopeType eq 'DirectoryRole' and roleDefinitionId eq '$roleId'\" | Select-Object -First 1).PolicyId; Get-MgPolicyRoleManagementPolicyRule -UnifiedRoleManagementPolicyId $pimPolicyId -Filter \"id eq 'Approval_EndUser_Assignment'\" | ConvertTo-Json -Depth 10"
+    },
+    {
+      "category": "discovered",
+      "type": "MgUser",
+      "path": "AC.L2-3.1.1.operator-discover",
+      "step": "step_task_AC.L2-3.1.7_mnshcf6z_q27kkhe",
+      "timestamp": "2026-04-12T04:52:49.896Z",
+      "cmdlet": "Get-MgUser -Filter \"userPrincipalName eq 'operator@vfsgov.us'\" | ConvertTo-Json"
+    },
+    {
+      "category": "created",
+      "type": "MgRoleManagementDirectoryRoleEligibilityScheduleRequest",
+      "path": "AC.L2-3.1.5.pim-eligible",
+      "step": "step_task_AC.L2-3.1.7_mnshcf6z_q27kkhe",
+      "timestamp": "2026-04-12T04:52:51.806Z",
+      "cmdlet": "New-MgRoleManagementDirectoryRoleEligibilityScheduleRequest -BodyParameter @{action='adminAssign';justification='CMMC L2 least privilege';roleDefinitionId='62e90394-69f5-4237-9190-012177145e10';directoryScopeId='/';principalId='1e2eb07a-5b78-48b9-912f-789e73dbd4fb';scheduleInfo=@{startDateTime=(Get-Date).ToString('o');expiration=@{type='afterDuration';duration='P1Y'}}}"
+    },
+    {
+      "category": "discovered",
+      "type": "MgGraphRequest",
+      "path": "IA.L2-3.5.9.tap-config",
+      "step": "step_task_IA.L2-3.5.9_mnshcf71_rdqv32m",
+      "timestamp": "2026-04-12T04:53:02.218Z",
+      "cmdlet": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/TemporaryAccessPass').isUsableOnce"
+    },
+    {
+      "category": "discovered",
+      "type": "MgIdentityConditionalAccessPolicy",
+      "path": "AC.L2-3.1.15.admin-mfa",
+      "step": "step_task_AC.L2-3.1.15_mnshcf71_lm6dnqu",
+      "timestamp": "2026-04-12T04:53:04.711Z",
+      "cmdlet": "Get-MgIdentityConditionalAccessPolicy -Filter \"displayName eq 'CMMC-AdminMFA-PhishingResistant'\""
+    },
+    {
+      "category": "discovered",
+      "type": "MgIdentityConditionalAccessPolicy",
+      "path": "AC.L2-3.1.15.admin-mfa",
+      "step": "step_task_AC.L2-3.1.15_mnshcf71_lm6dnqu",
+      "timestamp": "2026-04-12T04:53:04.711Z",
+      "cmdlet": "Get-MgIdentityConditionalAccessPolicy -Filter \"displayName eq 'CMMC-AdminMFA-PhishingResistant'\""
+    },
+    {
+      "category": "created",
+      "type": "MgIdentityConditionalAccessPolicy",
+      "path": "MA.L2-3.7.5.remote-mfa",
+      "step": "step_task_MA.L2-3.7.5_mnshcf77_ue6l63c",
+      "timestamp": "2026-04-12T04:53:07.045Z",
+      "cmdlet": "New-MgIdentityConditionalAccessPolicy -DisplayName 'CMMC-RemoteMaintenance-MFA' -State 'enabledForReportingButNotEnforced' -Conditions @{applications=@{includeApplications=@('All')};users=@{includeRoles=@('62e90394-69f5-4237-9190-012177145e10','194ae4cb-b126-40b2-bd5b-6091b380977d');excludeUsers=@('10c831ac-959b-4819-9d8f-8db645367550')};locations=@{includeLocations=@('All');excludeLocations=@('AllTrusted')}} -GrantControls @{operator='OR';builtInControls=@('mfa')}"
+    },
+    {
+      "category": "discovered",
+      "type": "MgIdentityConditionalAccessPolicy",
+      "path": "AC.L2-3.1.11.session-timeout",
+      "step": "step_task_AC.L2-3.1.11_mnshcf70_cowxkmd",
+      "timestamp": "2026-04-12T04:53:07.809Z",
+      "cmdlet": "Get-MgIdentityConditionalAccessPolicy -Filter \"displayName eq 'CMMC-SessionTimeout'\""
+    },
+    {
+      "category": "discovered",
+      "type": "MgIdentityConditionalAccessPolicy",
+      "path": "AC.L2-3.1.11.session-timeout",
+      "step": "step_task_AC.L2-3.1.11_mnshcf70_cowxkmd",
+      "timestamp": "2026-04-12T04:53:07.809Z",
+      "cmdlet": "Get-MgIdentityConditionalAccessPolicy -Filter \"displayName eq 'CMMC-SessionTimeout'\""
+    },
+    {
+      "category": "discovered",
+      "type": "MgGraphRequest",
+      "path": "AC.L2-3.1.10.screen-lock",
+      "step": "step_task_SC.L2-3.13.9_mnshcf72_59rhu0w",
+      "timestamp": "2026-04-12T04:53:09.392Z",
+      "cmdlet": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object displayName -like 'CMMC-ScreenLock*'"
+    },
+    {
+      "category": "discovered",
+      "type": "MgGraphRequest",
+      "path": "AC.L2-3.1.10.screen-lock",
+      "step": "step_task_SC.L2-3.13.9_mnshcf72_59rhu0w",
+      "timestamp": "2026-04-12T04:53:09.392Z",
+      "cmdlet": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object displayName -like 'CMMC-ScreenLock*'"
+    },
+    {
+      "category": "discovered",
+      "type": "MgGraphRequest",
+      "path": "AC.L2-3.1.21.block-storage",
+      "step": "step_task_AC.L2-3.1.21_mnshcf73_geld438",
+      "timestamp": "2026-04-12T04:53:10.882Z",
+      "cmdlet": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object displayName -eq 'CMMC-BlockRemovableStorage'"
+    },
+    {
+      "category": "discovered",
+      "type": "MgGraphRequest",
+      "path": "AC.L2-3.1.21.block-storage",
+      "step": "step_task_AC.L2-3.1.21_mnshcf73_geld438",
+      "timestamp": "2026-04-12T04:53:10.883Z",
+      "cmdlet": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object displayName -eq 'CMMC-BlockRemovableStorage'"
+    },
+    {
+      "category": "discovered",
+      "type": "$locks",
+      "path": "AZ-FOUND-004",
+      "step": "step_task_CM.L2-3.4.2_mnshcf73_fppsj22",
+      "timestamp": "2026-04-12T04:53:14.453Z",
+      "cmdlet": "$locks = Get-AzResourceLock -ResourceGroupName rg-eo-prod -ErrorAction SilentlyContinue; $match = $locks | Where-Object { $_.Properties.Level -eq 'CanNotDelete' }; if ($match) { $match | ConvertTo-Json -Depth 5 } else { $null }"
+    },
+    {
+      "category": "discovered",
+      "type": "$locks",
+      "path": "AZ-FOUND-004",
+      "step": "step_task_CM.L2-3.4.2_mnshcf73_fppsj22",
+      "timestamp": "2026-04-12T04:53:14.468Z",
+      "cmdlet": "$locks = Get-AzResourceLock -ResourceGroupName rg-eo-prod -ErrorAction SilentlyContinue; $match = $locks | Where-Object { $_.Properties.Level -eq 'CanNotDelete' }; if ($match) { $match | ConvertTo-Json -Depth 5 } else { $null }"
+    },
+    {
+      "category": "discovered",
+      "type": "Label",
+      "path": "MP.L2-3.8.1.cui-label",
+      "step": "step_task_MP.L2-3.8.2_mnshcf75_vvre11l",
+      "timestamp": "2026-04-12T04:53:33.173Z",
+      "cmdlet": "Get-Label -Identity 'CUI'"
+    },
+    {
+      "category": "discovered",
+      "type": "Label",
+      "path": "MP.L2-3.8.1.cui-label",
+      "step": "step_task_MP.L2-3.8.2_mnshcf75_vvre11l",
+      "timestamp": "2026-04-12T04:53:33.174Z",
+      "cmdlet": "Get-Label -Identity 'CUI'"
+    },
+    {
+      "category": "discovered",
+      "type": "SafeAttachmentPolicy",
+      "path": "SC.L2-3.13.13.safe-attach",
+      "step": "step_task_SC.L2-3.13.13_mnshcf72_ct349u0",
+      "timestamp": "2026-04-12T04:53:33.510Z",
+      "cmdlet": "Get-SafeAttachmentPolicy -Identity 'CMMC-SafeAttach'"
+    },
+    {
+      "category": "discovered",
+      "type": "SafeAttachmentPolicy",
+      "path": "SC.L2-3.13.13.safe-attach",
+      "step": "step_task_SC.L2-3.13.13_mnshcf72_ct349u0",
+      "timestamp": "2026-04-12T04:53:33.511Z",
+      "cmdlet": "Get-SafeAttachmentPolicy -Identity 'CMMC-SafeAttach'"
+    },
+    {
+      "category": "discovered",
+      "type": "SafeAttachmentRule",
+      "path": "SC.L2-3.13.13.safe-attach-rule",
+      "step": "step_task_SC.L2-3.13.13_mnshcf72_ct349u0",
+      "timestamp": "2026-04-12T04:53:33.692Z",
+      "cmdlet": "Get-SafeAttachmentRule -Identity 'CMMC-SafeAttach-Rule'"
+    },
+    {
+      "category": "discovered",
+      "type": "SafeAttachmentRule",
+      "path": "SC.L2-3.13.13.safe-attach-rule",
+      "step": "step_task_SC.L2-3.13.13_mnshcf72_ct349u0",
+      "timestamp": "2026-04-12T04:53:33.693Z",
+      "cmdlet": "Get-SafeAttachmentRule -Identity 'CMMC-SafeAttach-Rule'"
+    },
+    {
+      "category": "discovered",
+      "type": "az",
+      "path": "AZ-SEN-001",
+      "step": "step_task_SI.L1-3.14.1_mnshcf74_6kxsaue",
+      "timestamp": "2026-04-12T04:54:05.862Z",
+      "cmdlet": "az rest --method GET --url 'https://management.usgovcloudapi.net/subscriptions/668a730f-12a1-4c80-9734-89c621e98115/resourceGroups/rg-eo-prod/providers/Microsoft.OperationalInsights/workspaces/vfsgov-law-prod/providers/Microsoft.SecurityInsights/onboardingStates/default?api-version=2023-11-01'"
+    },
+    {
+      "category": "discovered",
+      "type": "$connector",
+      "path": "AZ-SEN-002",
+      "step": "step_task_SI.L1-3.14.1_mnshcf74_6kxsaue",
+      "timestamp": "2026-04-12T04:54:10.721Z",
+      "cmdlet": "$connector = Get-AzSentinelDataConnector -ResourceGroupName rg-eo-prod -WorkspaceName vfsgov-law-prod | Where-Object Kind -eq 'AzureActivity'; if ($connector -and $connector.SubscriptionId -eq '668a730f-12a1-4c80-9734-89c621e98115') { $connector } else { $null }"
+    },
+    {
+      "category": "discovered",
+      "type": "$connector",
+      "path": "AZ-SEN-002",
+      "step": "step_task_SI.L1-3.14.1_mnshcf74_6kxsaue",
+      "timestamp": "2026-04-12T04:54:10.722Z",
+      "cmdlet": "$connector = Get-AzSentinelDataConnector -ResourceGroupName rg-eo-prod -WorkspaceName vfsgov-law-prod | Where-Object Kind -eq 'AzureActivity'; if ($connector -and $connector.SubscriptionId -eq '668a730f-12a1-4c80-9734-89c621e98115') { $connector } else { $null }"
+    },
+    {
+      "category": "created",
+      "type": "AzSentinelDataConnector",
+      "path": "AZ-SEN-003",
+      "step": "step_task_SI.L1-3.14.1_mnshcf74_6kxsaue",
+      "timestamp": "2026-04-12T04:54:11.588Z",
+      "cmdlet": "New-AzSentinelDataConnector -ResourceGroupName rg-eo-prod -WorkspaceName vfsgov-law-prod -Kind 'MicrosoftDefenderAdvancedThreatProtection'"
+    },
+    {
+      "category": "created",
+      "type": "AzSentinelDataConnector",
+      "path": "AZ-SEN-004",
+      "step": "step_task_SI.L1-3.14.1_mnshcf74_6kxsaue",
+      "timestamp": "2026-04-12T04:54:12.879Z",
+      "cmdlet": "New-AzSentinelDataConnector -ResourceGroupName rg-eo-prod -WorkspaceName vfsgov-law-prod -Kind 'AzureKeyVault'"
+    },
+    {
+      "category": "discovered",
+      "type": "AzAccount",
+      "path": "AZ-SEN-005",
+      "step": "step_task_SI.L1-3.14.1_mnshcf74_6kxsaue",
+      "timestamp": "2026-04-12T04:54:15.507Z",
+      "cmdlet": "Connect-AzAccount -ServicePrincipal -TenantId 'bbe08772-8fde-4e55-961a-8a43779e7d58' -ApplicationId '830b3c2a-4cb3-415a-a88d-ad7b203bdeb4' -CertificateThumbprint 'B57CDA27D62C12AF417E6280D32F7B7395A09F11' -Environment AzureUSGovernment | Out-Null; Get-AzSentinelAlertRule -ResourceGroupName 'rg-eo-prod' -WorkspaceName 'vfsgov-law-prod' -ErrorAction SilentlyContinue | Where-Object {$_.DisplayName -eq 'CMMC L2 - Privileged Identity Changes'}"
+    },
+    {
+      "category": "discovered",
+      "type": "AzSentinelAlertRule",
+      "path": "AZ-SEN-006",
+      "step": "step_task_SI.L1-3.14.1_mnshcf74_6kxsaue",
+      "timestamp": "2026-04-12T04:54:47.704Z",
+      "cmdlet": "Get-AzSentinelAlertRule -ResourceGroupName rg-eo-prod -WorkspaceName vfsgov-law-prod -ErrorAction SilentlyContinue | Where-Object DisplayName -eq 'CMMC L2 - Malware Detection'"
+    },
+    {
+      "category": "discovered",
+      "type": "AzSentinelAlertRule",
+      "path": "AZ-SEN-007",
+      "step": "step_task_SI.L1-3.14.1_mnshcf74_6kxsaue",
+      "timestamp": "2026-04-12T04:55:19.042Z",
+      "cmdlet": "Get-AzSentinelAlertRule -ResourceGroupName rg-eo-prod -WorkspaceName vfsgov-law-prod -ErrorAction SilentlyContinue | Where-Object DisplayName -eq 'CMMC L2 - Excessive Failed Logins'"
+    },
+    {
+      "category": "discovered",
+      "type": "AzSentinelAlertRule",
+      "path": "AZ-SEN-008",
+      "step": "step_task_SI.L1-3.14.1_mnshcf74_6kxsaue",
+      "timestamp": "2026-04-12T04:55:50.516Z",
+      "cmdlet": "Get-AzSentinelAlertRule -ResourceGroupName rg-eo-prod -WorkspaceName vfsgov-law-prod -ErrorAction SilentlyContinue | Where-Object DisplayName -eq 'CMMC L2 - Unauthorized Resource Deletion'"
+    },
+    {
+      "category": "discovered",
+      "type": "MalwareFilterPolicy",
+      "path": "SI.L2-3.14.2.anti-malware",
+      "step": "step_task_SI.L1-3.14.2_mnshcf74_0kls7c6",
+      "timestamp": "2026-04-12T04:56:23.690Z",
+      "cmdlet": "Get-MalwareFilterPolicy -Identity 'CMMC-Malware'"
+    },
+    {
+      "category": "discovered",
+      "type": "MalwareFilterPolicy",
+      "path": "SI.L2-3.14.2.anti-malware",
+      "step": "step_task_SI.L1-3.14.2_mnshcf74_0kls7c6",
+      "timestamp": "2026-04-12T04:56:23.691Z",
+      "cmdlet": "Get-MalwareFilterPolicy -Identity 'CMMC-Malware'"
+    },
+    {
+      "category": "discovered",
+      "type": "MalwareFilterRule",
+      "path": "SI.L2-3.14.2.malware-rule",
+      "step": "step_task_SI.L1-3.14.2_mnshcf74_0kls7c6",
+      "timestamp": "2026-04-12T04:56:23.907Z",
+      "cmdlet": "Get-MalwareFilterRule -Identity 'CMMC-Malware-Rule'"
+    },
+    {
+      "category": "discovered",
+      "type": "MalwareFilterRule",
+      "path": "SI.L2-3.14.2.malware-rule",
+      "step": "step_task_SI.L1-3.14.2_mnshcf74_0kls7c6",
+      "timestamp": "2026-04-12T04:56:23.908Z",
+      "cmdlet": "Get-MalwareFilterRule -Identity 'CMMC-Malware-Rule'"
+    },
+    {
+      "category": "discovered",
+      "type": "Label",
+      "path": "MP.L2-3.8.1.cui-label",
+      "step": "step_task_MP.L2-3.8.4_mnshcf76_xr1pofz",
+      "timestamp": "2026-04-12T04:56:33.871Z",
+      "cmdlet": "Get-Label -Identity 'CUI'"
+    },
+    {
+      "category": "discovered",
+      "type": "Label",
+      "path": "MP.L2-3.8.1.cui-label",
+      "step": "step_task_MP.L2-3.8.4_mnshcf76_xr1pofz",
+      "timestamp": "2026-04-12T04:56:33.872Z",
+      "cmdlet": "Get-Label -Identity 'CUI'"
+    },
+    {
+      "category": "discovered",
+      "type": "AntiPhishPolicy",
+      "path": "SC.L2-3.13.15.anti-phish",
+      "step": "step_task_SC.L2-3.13.15_mnshcf72_piev6li",
+      "timestamp": "2026-04-12T04:56:37.742Z",
+      "cmdlet": "Get-AntiPhishPolicy -Identity 'CMMC-AntiPhish'"
+    },
+    {
+      "category": "discovered",
+      "type": "AntiPhishRule",
+      "path": "SC.L2-3.13.15.anti-phish-rule",
+      "step": "step_task_SC.L2-3.13.15_mnshcf72_piev6li",
+      "timestamp": "2026-04-12T04:56:38.927Z",
+      "cmdlet": "Get-AntiPhishRule -Identity 'CMMC-AntiPhish-Rule'"
+    },
+    {
+      "category": "discovered",
+      "type": "HostedContentFilterPolicy",
+      "path": "SC.L2-3.13.15.anti-spam",
+      "step": "step_task_SC.L2-3.13.15_mnshcf72_piev6li",
+      "timestamp": "2026-04-12T04:56:39.830Z",
+      "cmdlet": "Get-HostedContentFilterPolicy -Identity 'CMMC-AntiSpam'"
+    },
+    {
+      "category": "discovered",
+      "type": "HostedContentFilterRule",
+      "path": "SC.L2-3.13.15.anti-spam-rule",
+      "step": "step_task_SC.L2-3.13.15_mnshcf72_piev6li",
+      "timestamp": "2026-04-12T04:56:41.561Z",
+      "cmdlet": "Get-HostedContentFilterRule -Identity 'CMMC-AntiSpam-Rule'"
+    },
+    {
+      "category": "discovered",
+      "type": "HostedOutboundSpamFilterPolicy",
+      "path": "SC.L2-3.13.15.outbound-spam",
+      "step": "step_task_SC.L2-3.13.15_mnshcf72_piev6li",
+      "timestamp": "2026-04-12T04:56:42.754Z",
+      "cmdlet": "Get-HostedOutboundSpamFilterPolicy -Identity 'CMMC-OutboundSpam'"
+    },
+    {
+      "category": "discovered",
+      "type": "HostedOutboundSpamFilterRule",
+      "path": "SC.L2-3.13.15.outbound-spam-rule",
+      "step": "step_task_SC.L2-3.13.15_mnshcf72_piev6li",
+      "timestamp": "2026-04-12T04:56:44.420Z",
+      "cmdlet": "Get-HostedOutboundSpamFilterRule -Identity 'CMMC-OutboundSpam-Rule'"
+    },
+    {
+      "category": "discovered",
+      "type": "DlpCompliancePolicy",
+      "path": "MP.L2-3.8.9.dlp-policy",
+      "step": "step_task_MP.L2-3.8.9_mnshcf76_qor636p",
+      "timestamp": "2026-04-12T04:56:46.617Z",
+      "cmdlet": "Get-DlpCompliancePolicy -Identity 'CMMC-CUI-Block'"
+    },
+    {
+      "category": "discovered",
+      "type": "DlpCompliancePolicy",
+      "path": "MP.L2-3.8.9.dlp-policy",
+      "step": "step_task_MP.L2-3.8.9_mnshcf76_qor636p",
+      "timestamp": "2026-04-12T04:56:46.618Z",
+      "cmdlet": "Get-DlpCompliancePolicy -Identity 'CMMC-CUI-Block'"
+    },
+    {
+      "category": "discovered",
+      "type": "AzContext",
+      "path": "AZ-CTX-001",
+      "step": "step_task_SC.L1-3.13.1_mnshcf71_vsexo7v",
+      "timestamp": "2026-04-12T04:57:32.871Z",
+      "cmdlet": "Get-AzContext | Select-Object -ExpandProperty Subscription | Where-Object { $_.Id -eq '668a730f-12a1-4c80-9734-89c621e98115' }"
+    },
+    {
+      "category": "discovered",
+      "type": "AzResourceGroup",
+      "path": "AZ-FOUND-001",
+      "step": "step_task_SC.L1-3.13.1_mnshcf71_vsexo7v",
+      "timestamp": "2026-04-12T04:57:34.249Z",
+      "cmdlet": "Get-AzResourceGroup -Name rg-eo-prod"
+    },
+    {
+      "category": "discovered",
+      "type": "AzResourceGroup",
+      "path": "AZ-FOUND-001",
+      "step": "step_task_SC.L1-3.13.1_mnshcf71_vsexo7v",
+      "timestamp": "2026-04-12T04:57:34.250Z",
+      "cmdlet": "Get-AzResourceGroup -Name rg-eo-prod"
+    },
+    {
+      "category": "discovered",
+      "type": "AzPolicyAssignment",
+      "path": "AZ-FOUND-002",
+      "step": "step_task_SC.L1-3.13.1_mnshcf71_vsexo7v",
+      "timestamp": "2026-04-12T04:57:34.898Z",
+      "cmdlet": "Get-AzPolicyAssignment -Name 'CMMC-L2-Initiative' -Scope '/subscriptions/668a730f-12a1-4c80-9734-89c621e98115' -ErrorAction SilentlyContinue | Select-Object Name, DisplayName, EnforcementMode | ConvertTo-Json"
+    },
+    {
+      "category": "discovered",
+      "type": "AzKeyVault",
+      "path": "AZ-KV-001",
+      "step": "step_task_SC.L1-3.13.1_mnshcf71_vsexo7v",
+      "timestamp": "2026-04-12T04:57:49.840Z",
+      "cmdlet": "Get-AzKeyVault -ResourceGroupName rg-eo-prod -VaultName vfsgov-kv-prod | ConvertTo-Json -Depth 10"
+    },
+    {
+      "category": "discovered",
+      "type": "AzKeyVault",
+      "path": "AZ-KV-001",
+      "step": "step_task_SC.L1-3.13.1_mnshcf71_vsexo7v",
+      "timestamp": "2026-04-12T04:57:49.842Z",
+      "cmdlet": "Get-AzKeyVault -ResourceGroupName rg-eo-prod -VaultName vfsgov-kv-prod | ConvertTo-Json -Depth 10"
+    },
+    {
+      "category": "discovered",
+      "type": "AzAutomationAccount",
+      "path": "AZ-AUTO-001",
+      "step": "step_task_SC.L1-3.13.1_mnshcf71_vsexo7v",
+      "timestamp": "2026-04-12T04:57:50.750Z",
+      "cmdlet": "Get-AzAutomationAccount -ResourceGroupName rg-eo-prod -Name vfsgov-automation-eo"
+    },
+    {
+      "category": "discovered",
+      "type": "AzAutomationAccount",
+      "path": "AZ-AUTO-001",
+      "step": "step_task_SC.L1-3.13.1_mnshcf71_vsexo7v",
+      "timestamp": "2026-04-12T04:57:50.751Z",
+      "cmdlet": "Get-AzAutomationAccount -ResourceGroupName rg-eo-prod -Name vfsgov-automation-eo"
+    },
+    {
+      "category": "discovered",
+      "type": "$acct",
+      "path": "AZ-AUTO-002",
+      "step": "step_task_SC.L1-3.13.1_mnshcf71_vsexo7v",
+      "timestamp": "2026-04-12T04:57:51.151Z",
+      "cmdlet": "$acct = Get-AzAutomationAccount -ResourceGroupName rg-eo-prod -Name vfsgov-automation-eo; if ($acct.SubscriptionId -eq '668a730f-12a1-4c80-9734-89c621e98115' -and $acct.Identity.Type -eq 'SystemAssigned') { $acct.Identity | ConvertTo-Json -Depth 10 } else { $null }"
+    },
+    {
+      "category": "discovered",
+      "type": "$assignments",
+      "path": "AZ-AUTO-003",
+      "step": "step_task_SC.L1-3.13.1_mnshcf71_vsexo7v",
+      "timestamp": "2026-04-12T04:57:54.237Z",
+      "cmdlet": "$assignments = Get-AzRoleAssignment -ObjectId 1503913b-d878-49c6-92a7-2ced799822f4; @{ hasSubScope = ($assignments | Where-Object { $_.Scope -eq '/subscriptions/668a730f-12a1-4c80-9734-89c621e98115' -and $_.RoleDefinitionName -eq 'Security Reader' }) -ne $null; hasLawScope = ($assignments | Where-Object { $_.Scope -like '*/workspaces/vfsgov-law-prod' -and $_.RoleDefinitionName -eq 'Log Analytics Reader' }) -ne $null; hasStorageScope = ($assignments | Where-Object { $_.Scope -like '*/storageAccounts/vfsgoevops01' -and $_.RoleDefinitionName -eq 'Storage Blob Data Contributor' }) -ne $null; hasKvScope = ($assignments | Where-Object { $_.Scope -like '*/vaults/vfsgov-kv-prod' -and $_.RoleDefinitionName -eq 'Key Vault Crypto User' }) -ne $null } | ConvertTo-Json -Compress"
+    },
+    {
+      "category": "discovered",
+      "type": "$assignments",
+      "path": "AZ-AUTO-003",
+      "step": "step_task_SC.L1-3.13.1_mnshcf71_vsexo7v",
+      "timestamp": "2026-04-12T04:57:54.238Z",
+      "cmdlet": "$assignments = Get-AzRoleAssignment -ObjectId 1503913b-d878-49c6-92a7-2ced799822f4; @{ hasSubScope = ($assignments | Where-Object { $_.Scope -eq '/subscriptions/668a730f-12a1-4c80-9734-89c621e98115' -and $_.RoleDefinitionName -eq 'Security Reader' }) -ne $null; hasLawScope = ($assignments | Where-Object { $_.Scope -like '*/workspaces/vfsgov-law-prod' -and $_.RoleDefinitionName -eq 'Log Analytics Reader' }) -ne $null; hasStorageScope = ($assignments | Where-Object { $_.Scope -like '*/storageAccounts/vfsgoevops01' -and $_.RoleDefinitionName -eq 'Storage Blob Data Contributor' }) -ne $null; hasKvScope = ($assignments | Where-Object { $_.Scope -like '*/vaults/vfsgov-kv-prod' -and $_.RoleDefinitionName -eq 'Key Vault Crypto User' }) -ne $null } | ConvertTo-Json -Compress"
+    },
+    {
+      "category": "discovered",
+      "type": "MgServicePrincipal",
+      "path": "AZ-ID-003",
+      "step": "step_task_SC.L1-3.13.1_mnshcf71_vsexo7v",
+      "timestamp": "2026-04-12T04:57:54.865Z",
+      "cmdlet": "Get-MgServicePrincipal -Filter \"appId eq '830b3c2a-4cb3-415a-a88d-ad7b203bdeb4'\" | Select-Object Id,DisplayName,AppId | ConvertTo-Json -Depth 10"
+    },
+    {
+      "category": "discovered",
+      "type": "AzPrivateDnsZone",
+      "path": "AZ-DNS-001",
+      "step": "step_task_SC.L1-3.13.1_mnshcf71_vsexo7v",
+      "timestamp": "2026-04-12T04:57:55.816Z",
+      "cmdlet": "Get-AzPrivateDnsZone -ResourceGroupName rg-eo-prod -Name 'privatelink.vaultcore.usgovcloudapi.net'"
+    },
+    {
+      "category": "discovered",
+      "type": "AzPrivateDnsZone",
+      "path": "AZ-DNS-001",
+      "step": "step_task_SC.L1-3.13.1_mnshcf71_vsexo7v",
+      "timestamp": "2026-04-12T04:57:55.817Z",
+      "cmdlet": "Get-AzPrivateDnsZone -ResourceGroupName rg-eo-prod -Name 'privatelink.vaultcore.usgovcloudapi.net'"
+    },
+    {
+      "category": "discovered",
+      "type": "AzPrivateDnsZone",
+      "path": "AZ-DNS-002",
+      "step": "step_task_SC.L1-3.13.1_mnshcf71_vsexo7v",
+      "timestamp": "2026-04-12T04:57:56.258Z",
+      "cmdlet": "Get-AzPrivateDnsZone -ResourceGroupName rg-eo-prod -Name 'privatelink.blob.core.usgovcloudapi.net'"
+    },
+    {
+      "category": "discovered",
+      "type": "AzPrivateDnsZone",
+      "path": "AZ-DNS-002",
+      "step": "step_task_SC.L1-3.13.1_mnshcf71_vsexo7v",
+      "timestamp": "2026-04-12T04:57:56.259Z",
+      "cmdlet": "Get-AzPrivateDnsZone -ResourceGroupName rg-eo-prod -Name 'privatelink.blob.core.usgovcloudapi.net'"
+    },
+    {
+      "category": "discovered",
+      "type": "AzStorageAccount",
+      "path": "AZ-LOG-002a",
+      "step": "step_task_SC.L2-3.13.10_mnshcf73_gy9ajiq",
+      "timestamp": "2026-04-12T04:57:58.587Z",
+      "cmdlet": "Get-AzStorageAccount -ResourceGroupName rg-eo-prod -Name vfsgoevops01 | Select-Object -ExpandProperty Identity | ConvertTo-Json -Depth 10"
+    },
+    {
+      "category": "discovered",
+      "type": "AzRoleAssignment",
+      "path": "AZ-LOG-002b",
+      "step": "step_task_SC.L2-3.13.10_mnshcf73_gy9ajiq",
+      "timestamp": "2026-04-12T04:58:01.863Z",
+      "cmdlet": "Get-AzRoleAssignment -ObjectId ca2ed215-708c-44cf-b61c-96ba5ae7034d -Scope /subscriptions/668a730f-12a1-4c80-9734-89c621e98115/resourceGroups/rg-eo-prod/providers/Microsoft.KeyVault/vaults/vfsgov-kv-prod | Where-Object RoleDefinitionName -eq 'Key Vault Crypto Service Encryption User'"
+    },
+    {
+      "category": "discovered",
+      "type": "AzRoleAssignment",
+      "path": "AZ-LOG-002b",
+      "step": "step_task_SC.L2-3.13.10_mnshcf73_gy9ajiq",
+      "timestamp": "2026-04-12T04:58:01.864Z",
+      "cmdlet": "Get-AzRoleAssignment -ObjectId ca2ed215-708c-44cf-b61c-96ba5ae7034d -Scope /subscriptions/668a730f-12a1-4c80-9734-89c621e98115/resourceGroups/rg-eo-prod/providers/Microsoft.KeyVault/vaults/vfsgov-kv-prod | Where-Object RoleDefinitionName -eq 'Key Vault Crypto Service Encryption User'"
+    },
+    {
+      "category": "discovered",
+      "type": "AzStorageAccount",
+      "path": "AZ-LOG-002c",
+      "step": "step_task_SC.L2-3.13.10_mnshcf73_gy9ajiq",
+      "timestamp": "2026-04-12T04:58:02.262Z",
+      "cmdlet": "Get-AzStorageAccount -ResourceGroupName rg-eo-prod -Name vfsgoevops01 | Select-Object -ExpandProperty Encryption | Where-Object { $_.KeySource -eq 'Microsoft.Keyvault' } | ConvertTo-Json -Depth 5"
+    },
+    {
+      "category": "discovered",
+      "type": "AzKeyVault",
+      "path": "AZ-KV-001",
+      "step": "step_task_SC.L2-3.13.10_mnshcf73_gy9ajiq",
+      "timestamp": "2026-04-12T04:58:04.715Z",
+      "cmdlet": "Get-AzKeyVault -ResourceGroupName rg-eo-prod -VaultName vfsgov-kv-prod | ConvertTo-Json -Depth 10"
+    },
+    {
+      "category": "discovered",
+      "type": "AzKeyVault",
+      "path": "AZ-KV-001",
+      "step": "step_task_SC.L2-3.13.10_mnshcf73_gy9ajiq",
+      "timestamp": "2026-04-12T04:58:04.716Z",
+      "cmdlet": "Get-AzKeyVault -ResourceGroupName rg-eo-prod -VaultName vfsgov-kv-prod | ConvertTo-Json -Depth 10"
+    },
+    {
+      "category": "discovered",
+      "type": "AzRoleAssignment",
+      "path": "AZ-KV-002",
+      "step": "step_task_SC.L2-3.13.10_mnshcf73_gy9ajiq",
+      "timestamp": "2026-04-12T04:58:06.972Z",
+      "cmdlet": "Get-AzRoleAssignment -Scope (Get-AzKeyVault -ResourceGroupName rg-eo-prod -VaultName vfsgov-kv-prod).ResourceId | Where-Object ObjectId -eq 6baa1e3f-f5b3-4c02-b40d-2105b18ea676"
+    },
+    {
+      "category": "discovered",
+      "type": "AzKeyVaultKey",
+      "path": "AZ-KV-003",
+      "step": "step_task_SC.L2-3.13.10_mnshcf73_gy9ajiq",
+      "timestamp": "2026-04-12T04:58:15.693Z",
+      "cmdlet": "Get-AzKeyVaultKey -VaultName vfsgov-kv-prod -Name eo-storage-cmk -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Select-Object Name,Version,Enabled,Id,@{N='KeyType';E={$_.Key.Kty}},@{N='KeySize';E={$_.KeySize}},@{N='KeyOps';E={$_.Key.KeyOps}} | ConvertTo-Json -Depth 5"
+    },
+    {
+      "category": "discovered",
+      "type": "$vault",
+      "path": "AZ-KV-004",
+      "step": "step_task_SC.L2-3.13.10_mnshcf73_gy9ajiq",
+      "timestamp": "2026-04-12T04:58:17.734Z",
+      "cmdlet": "$vault = Get-AzKeyVault -VaultName vfsgov-kv-prod -ErrorAction SilentlyContinue -WarningAction SilentlyContinue; if ($vault -and $vault.NetworkAcls -and $vault.NetworkAcls.DefaultAction.ToString() -eq 'Deny') { $vault.NetworkAcls | Select-Object @{N='DefaultAction';E={$_.DefaultAction.ToString()}},@{N='Bypass';E={$_.Bypass.ToString()}},IpAddressRanges,VirtualNetworkResourceIds | ConvertTo-Json -Depth 5 } else { $null }"
+    },
+    {
+      "category": "discovered",
+      "type": "MgGraphRequest",
+      "path": "SC.L2-3.13.12.camera-block",
+      "step": "step_task_SC.L2-3.13.12_mnshcf72_yiiqwgv",
+      "timestamp": "2026-04-12T04:58:21.390Z",
+      "cmdlet": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object displayName -eq 'CMMC-CollaborativeDeviceBlock'"
+    },
+    {
+      "category": "discovered",
+      "type": "MgGraphRequest",
+      "path": "SC.L2-3.13.12.camera-block",
+      "step": "step_task_SC.L2-3.13.12_mnshcf72_yiiqwgv",
+      "timestamp": "2026-04-12T04:58:21.391Z",
+      "cmdlet": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object displayName -eq 'CMMC-CollaborativeDeviceBlock'"
+    },
+    {
+      "category": "created",
+      "type": "MgRoleManagementDirectoryRoleEligibilityScheduleRequest",
+      "path": "AC.L2-3.1.5.pim-eligible",
+      "step": "step_task_SC.L2-3.13.3_mnshcf72_f52yc8y",
+      "timestamp": "2026-04-12T04:58:25.373Z",
+      "cmdlet": "New-MgRoleManagementDirectoryRoleEligibilityScheduleRequest -BodyParameter @{action='adminAssign';justification='CMMC L2 least privilege';roleDefinitionId='62e90394-69f5-4237-9190-012177145e10';directoryScopeId='/';principalId='1e2eb07a-5b78-48b9-912f-789e73dbd4fb';scheduleInfo=@{startDateTime=(Get-Date).ToString('o');expiration=@{type='afterDuration';duration='P1Y'}}}"
+    },
+    {
+      "category": "discovered",
+      "type": "AzPrivateDnsZone",
+      "path": "AZ-DNS-001",
+      "step": "step_task_SC.L2-3.13.6_mnshcf72_r7knakn",
+      "timestamp": "2026-04-12T04:58:29.578Z",
+      "cmdlet": "Get-AzPrivateDnsZone -ResourceGroupName rg-eo-prod -Name 'privatelink.vaultcore.usgovcloudapi.net'"
+    },
+    {
+      "category": "discovered",
+      "type": "AzPrivateDnsZone",
+      "path": "AZ-DNS-001",
+      "step": "step_task_SC.L2-3.13.6_mnshcf72_r7knakn",
+      "timestamp": "2026-04-12T04:58:29.579Z",
+      "cmdlet": "Get-AzPrivateDnsZone -ResourceGroupName rg-eo-prod -Name 'privatelink.vaultcore.usgovcloudapi.net'"
+    },
+    {
+      "category": "discovered",
+      "type": "AzPrivateDnsZone",
+      "path": "AZ-DNS-002",
+      "step": "step_task_SC.L2-3.13.6_mnshcf72_r7knakn",
+      "timestamp": "2026-04-12T04:58:29.922Z",
+      "cmdlet": "Get-AzPrivateDnsZone -ResourceGroupName rg-eo-prod -Name 'privatelink.blob.core.usgovcloudapi.net'"
+    },
+    {
+      "category": "discovered",
+      "type": "AzPrivateDnsZone",
+      "path": "AZ-DNS-002",
+      "step": "step_task_SC.L2-3.13.6_mnshcf72_r7knakn",
+      "timestamp": "2026-04-12T04:58:29.923Z",
+      "cmdlet": "Get-AzPrivateDnsZone -ResourceGroupName rg-eo-prod -Name 'privatelink.blob.core.usgovcloudapi.net'"
+    },
+    {
+      "category": "discovered",
+      "type": "MgIdentityConditionalAccessPolicy",
+      "path": "AC.L2-3.1.14.block-untrusted",
+      "step": "step_task_SC.L2-3.13.7_mnshcf72_3alsv93",
+      "timestamp": "2026-04-12T04:58:30.596Z",
+      "cmdlet": "Get-MgIdentityConditionalAccessPolicy -Filter \"displayName eq 'CMMC-BlockUntrustedLocations'\""
+    },
+    {
+      "category": "discovered",
+      "type": "MgIdentityConditionalAccessPolicy",
+      "path": "AC.L2-3.1.14.block-untrusted",
+      "step": "step_task_SC.L2-3.13.7_mnshcf72_3alsv93",
+      "timestamp": "2026-04-12T04:58:30.596Z",
+      "cmdlet": "Get-MgIdentityConditionalAccessPolicy -Filter \"displayName eq 'CMMC-BlockUntrustedLocations'\""
+    },
+    {
+      "category": "discovered",
+      "type": "MgUser",
+      "path": "AC.L2-3.1.1.operator-discover",
+      "step": "step_task_AC.L1-3.1.1_mnshcf6x_v1fzwfl",
+      "timestamp": "2026-04-12T04:58:30.736Z",
+      "cmdlet": "Get-MgUser -Filter \"userPrincipalName eq 'operator@vfsgov.us'\" | ConvertTo-Json"
+    },
+    {
+      "category": "discovered",
+      "type": "MgGroup",
+      "path": "AC.L2-3.1.1.group-create",
+      "step": "step_task_AC.L1-3.1.1_mnshcf6x_v1fzwfl",
+      "timestamp": "2026-04-12T04:58:31.197Z",
+      "cmdlet": "Get-MgGroup -Filter \"displayName eq 'cui-users-sg'\" | ConvertTo-Json"
+    },
+    {
+      "category": "discovered",
+      "type": "MgGroup",
+      "path": "AC.L2-3.1.1.group-create",
+      "step": "step_task_AC.L1-3.1.1_mnshcf6x_v1fzwfl",
+      "timestamp": "2026-04-12T04:58:31.199Z",
+      "cmdlet": "Get-MgGroup -Filter \"displayName eq 'cui-users-sg'\" | ConvertTo-Json"
+    },
+    {
+      "category": "discovered",
+      "type": "MgGroupMember",
+      "path": "AC.L2-3.1.1.member-add",
+      "step": "step_task_AC.L1-3.1.1_mnshcf6x_v1fzwfl",
+      "timestamp": "2026-04-12T04:58:31.422Z",
+      "cmdlet": "Get-MgGroupMember -GroupId d04c4a7a-3afa-4b35-b618-25fed25d5c85 | Where-Object { $_.Id -eq '1e2eb07a-5b78-48b9-912f-789e73dbd4fb' }"
+    },
+    {
+      "category": "discovered",
+      "type": "MgGroupMember",
+      "path": "AC.L2-3.1.1.member-add",
+      "step": "step_task_AC.L1-3.1.1_mnshcf6x_v1fzwfl",
+      "timestamp": "2026-04-12T04:58:31.423Z",
+      "cmdlet": "Get-MgGroupMember -GroupId d04c4a7a-3afa-4b35-b618-25fed25d5c85 | Where-Object { $_.Id -eq '1e2eb07a-5b78-48b9-912f-789e73dbd4fb' }"
+    },
+    {
+      "category": "discovered",
+      "type": "AzRoleAssignment",
+      "path": "AZ-KV-002",
+      "step": "step_task_AC.L1-3.1.1_mnshcf6x_v1fzwfl",
+      "timestamp": "2026-04-12T04:58:35.311Z",
+      "cmdlet": "Get-AzRoleAssignment -Scope (Get-AzKeyVault -ResourceGroupName rg-eo-prod -VaultName vfsgov-kv-prod).ResourceId | Where-Object ObjectId -eq 6baa1e3f-f5b3-4c02-b40d-2105b18ea676"
+    },
+    {
+      "category": "discovered",
+      "type": "$assignments",
+      "path": "AZ-AUTO-003",
+      "step": "step_task_AC.L1-3.1.1_mnshcf6x_v1fzwfl",
+      "timestamp": "2026-04-12T04:58:43.389Z",
+      "cmdlet": "$assignments = Get-AzRoleAssignment -ObjectId 1503913b-d878-49c6-92a7-2ced799822f4; @{ hasSubScope = ($assignments | Where-Object { $_.Scope -eq '/subscriptions/668a730f-12a1-4c80-9734-89c621e98115' -and $_.RoleDefinitionName -eq 'Security Reader' }) -ne $null; hasLawScope = ($assignments | Where-Object { $_.Scope -like '*/workspaces/vfsgov-law-prod' -and $_.RoleDefinitionName -eq 'Log Analytics Reader' }) -ne $null; hasStorageScope = ($assignments | Where-Object { $_.Scope -like '*/storageAccounts/vfsgoevops01' -and $_.RoleDefinitionName -eq 'Storage Blob Data Contributor' }) -ne $null; hasKvScope = ($assignments | Where-Object { $_.Scope -like '*/vaults/vfsgov-kv-prod' -and $_.RoleDefinitionName -eq 'Key Vault Crypto User' }) -ne $null } | ConvertTo-Json -Compress"
+    },
+    {
+      "category": "discovered",
+      "type": "$assignments",
+      "path": "AZ-AUTO-003",
+      "step": "step_task_AC.L1-3.1.1_mnshcf6x_v1fzwfl",
+      "timestamp": "2026-04-12T04:58:43.390Z",
+      "cmdlet": "$assignments = Get-AzRoleAssignment -ObjectId 1503913b-d878-49c6-92a7-2ced799822f4; @{ hasSubScope = ($assignments | Where-Object { $_.Scope -eq '/subscriptions/668a730f-12a1-4c80-9734-89c621e98115' -and $_.RoleDefinitionName -eq 'Security Reader' }) -ne $null; hasLawScope = ($assignments | Where-Object { $_.Scope -like '*/workspaces/vfsgov-law-prod' -and $_.RoleDefinitionName -eq 'Log Analytics Reader' }) -ne $null; hasStorageScope = ($assignments | Where-Object { $_.Scope -like '*/storageAccounts/vfsgoevops01' -and $_.RoleDefinitionName -eq 'Storage Blob Data Contributor' }) -ne $null; hasKvScope = ($assignments | Where-Object { $_.Scope -like '*/vaults/vfsgov-kv-prod' -and $_.RoleDefinitionName -eq 'Key Vault Crypto User' }) -ne $null } | ConvertTo-Json -Compress"
+    },
+    {
+      "category": "discovered",
+      "type": "MgUser",
+      "path": "AZ-ID-001",
+      "step": "step_task_AC.L1-3.1.1_mnshcf6x_v1fzwfl",
+      "timestamp": "2026-04-12T04:58:43.688Z",
+      "cmdlet": "Get-MgUser -Filter \"userPrincipalName eq 'breakglass@vfsgov.us'\" | Select-Object Id,DisplayName,UserPrincipalName,AccountEnabled | ConvertTo-Json -Depth 10"
+    },
+    {
+      "category": "discovered",
+      "type": "MgUser",
+      "path": "AZ-ID-002",
+      "step": "step_task_AC.L1-3.1.1_mnshcf6x_v1fzwfl",
+      "timestamp": "2026-04-12T04:58:44.018Z",
+      "cmdlet": "Get-MgUser -Filter \"userPrincipalName eq 'operator@vfsgov.us'\" | Select-Object Id,DisplayName,UserPrincipalName,AccountEnabled | ConvertTo-Json -Depth 10"
+    },
+    {
+      "category": "discovered",
+      "type": "MgServicePrincipal",
+      "path": "AZ-ID-003",
+      "step": "step_task_AC.L1-3.1.1_mnshcf6x_v1fzwfl",
+      "timestamp": "2026-04-12T04:58:44.313Z",
+      "cmdlet": "Get-MgServicePrincipal -Filter \"appId eq '830b3c2a-4cb3-415a-a88d-ad7b203bdeb4'\" | Select-Object Id,DisplayName,AppId | ConvertTo-Json -Depth 10"
+    },
+    {
+      "category": "created",
+      "type": "MgRoleManagementDirectoryRoleEligibilityScheduleRequest",
+      "path": "AC.L2-3.1.5.pim-eligible",
+      "step": "step_task_AC.L2-3.1.5_mnshcf6z_wleknp0",
+      "timestamp": "2026-04-12T04:59:24.582Z",
+      "cmdlet": "New-MgRoleManagementDirectoryRoleEligibilityScheduleRequest -BodyParameter @{action='adminAssign';justification='CMMC L2 least privilege';roleDefinitionId='62e90394-69f5-4237-9190-012177145e10';directoryScopeId='/';principalId='1e2eb07a-5b78-48b9-912f-789e73dbd4fb';scheduleInfo=@{startDateTime=(Get-Date).ToString('o');expiration=@{type='afterDuration';duration='P1Y'}}}"
+    },
+    {
+      "category": "discovered",
+      "type": "MgUser",
+      "path": "AZ-ID-002",
+      "step": "step_task_AC.L2-3.1.5_mnshcf6z_wleknp0",
+      "timestamp": "2026-04-12T04:59:25.896Z",
+      "cmdlet": "Get-MgUser -Filter \"userPrincipalName eq 'operator@vfsgov.us'\" | Select-Object Id,DisplayName,UserPrincipalName,AccountEnabled | ConvertTo-Json -Depth 10"
+    },
+    {
+      "category": "discovered",
+      "type": "MgAgreement",
+      "path": "AC.L2-3.1.9.terms-of-use",
+      "step": "step_task_AC.L2-3.1.9_mnshcf70_xk6ldzv",
+      "timestamp": "2026-04-12T04:59:27.346Z",
+      "cmdlet": "Get-MgAgreement -Filter \"displayName eq 'CUI System Access Notice'\""
+    },
+    {
+      "category": "discovered",
+      "type": "MgAgreement",
+      "path": "AC.L2-3.1.9.terms-of-use",
+      "step": "step_task_AC.L2-3.1.9_mnshcf70_xk6ldzv",
+      "timestamp": "2026-04-12T04:59:27.347Z",
+      "cmdlet": "Get-MgAgreement -Filter \"displayName eq 'CUI System Access Notice'\""
+    },
+    {
+      "category": "discovered",
+      "type": "AzOperationalInsightsWorkspace",
+      "path": "AZ-LOG-001",
+      "step": "step_task_AU.L2-3.3.1_mnshcf73_wlniw31",
+      "timestamp": "2026-04-12T04:59:45.362Z",
+      "cmdlet": "Get-AzOperationalInsightsWorkspace -ResourceGroupName rg-eo-prod -Name vfsgov-law-prod | ConvertTo-Json -Depth 10"
+    },
+    {
+      "category": "discovered",
+      "type": "AzOperationalInsightsWorkspace",
+      "path": "AZ-LOG-001",
+      "step": "step_task_AU.L2-3.3.1_mnshcf73_wlniw31",
+      "timestamp": "2026-04-12T04:59:45.363Z",
+      "cmdlet": "Get-AzOperationalInsightsWorkspace -ResourceGroupName rg-eo-prod -Name vfsgov-law-prod | ConvertTo-Json -Depth 10"
+    },
+    {
+      "category": "discovered",
+      "type": "AzStorageAccount",
+      "path": "AZ-LOG-002",
+      "step": "step_task_AU.L2-3.3.1_mnshcf73_wlniw31",
+      "timestamp": "2026-04-12T04:59:45.761Z",
+      "cmdlet": "Get-AzStorageAccount -ResourceGroupName rg-eo-prod -Name vfsgoevops01 | Select-Object -Property * -ExcludeProperty Context | ConvertTo-Json -Depth 3"
+    },
+    {
+      "category": "discovered",
+      "type": "AzStorageAccount",
+      "path": "AZ-LOG-002",
+      "step": "step_task_AU.L2-3.3.1_mnshcf73_wlniw31",
+      "timestamp": "2026-04-12T04:59:45.762Z",
+      "cmdlet": "Get-AzStorageAccount -ResourceGroupName rg-eo-prod -Name vfsgoevops01 | Select-Object -Property * -ExcludeProperty Context | ConvertTo-Json -Depth 3"
+    },
+    {
+      "category": "discovered",
+      "type": "AzStorageAccount",
+      "path": "AZ-LOG-002a",
+      "step": "step_task_AU.L2-3.3.1_mnshcf73_wlniw31",
+      "timestamp": "2026-04-12T04:59:46.164Z",
+      "cmdlet": "Get-AzStorageAccount -ResourceGroupName rg-eo-prod -Name vfsgoevops01 | Select-Object -ExpandProperty Identity | ConvertTo-Json -Depth 10"
+    },
+    {
+      "category": "discovered",
+      "type": "AzRoleAssignment",
+      "path": "AZ-LOG-002b",
+      "step": "step_task_AU.L2-3.3.1_mnshcf73_wlniw31",
+      "timestamp": "2026-04-12T04:59:49.516Z",
+      "cmdlet": "Get-AzRoleAssignment -ObjectId ca2ed215-708c-44cf-b61c-96ba5ae7034d -Scope /subscriptions/668a730f-12a1-4c80-9734-89c621e98115/resourceGroups/rg-eo-prod/providers/Microsoft.KeyVault/vaults/vfsgov-kv-prod | Where-Object RoleDefinitionName -eq 'Key Vault Crypto Service Encryption User'"
+    },
+    {
+      "category": "discovered",
+      "type": "AzRoleAssignment",
+      "path": "AZ-LOG-002b",
+      "step": "step_task_AU.L2-3.3.1_mnshcf73_wlniw31",
+      "timestamp": "2026-04-12T04:59:49.517Z",
+      "cmdlet": "Get-AzRoleAssignment -ObjectId ca2ed215-708c-44cf-b61c-96ba5ae7034d -Scope /subscriptions/668a730f-12a1-4c80-9734-89c621e98115/resourceGroups/rg-eo-prod/providers/Microsoft.KeyVault/vaults/vfsgov-kv-prod | Where-Object RoleDefinitionName -eq 'Key Vault Crypto Service Encryption User'"
+    },
+    {
+      "category": "discovered",
+      "type": "AzStorageAccount",
+      "path": "AZ-LOG-002c",
+      "step": "step_task_AU.L2-3.3.1_mnshcf73_wlniw31",
+      "timestamp": "2026-04-12T04:59:49.920Z",
+      "cmdlet": "Get-AzStorageAccount -ResourceGroupName rg-eo-prod -Name vfsgoevops01 | Select-Object -ExpandProperty Encryption | Where-Object { $_.KeySource -eq 'Microsoft.Keyvault' } | ConvertTo-Json -Depth 5"
+    },
+    {
+      "category": "discovered",
+      "type": "AzRmStorageContainerImmutabilityPolicy",
+      "path": "AZ-LOG-003",
+      "step": "step_task_AU.L2-3.3.1_mnshcf73_wlniw31",
+      "timestamp": "2026-04-12T04:59:52.142Z",
+      "cmdlet": "Get-AzRmStorageContainerImmutabilityPolicy -ResourceGroupName rg-eo-prod -StorageAccountName vfsgoevops01 -ContainerName 'logs' | ConvertTo-Json -Depth 5"
+    },
+    {
+      "category": "discovered",
+      "type": "AzAutomationAccount",
+      "path": "AZ-AUTO-001",
+      "step": "step_task_AU.L2-3.3.1_mnshcf73_wlniw31",
+      "timestamp": "2026-04-12T04:59:54.736Z",
+      "cmdlet": "Get-AzAutomationAccount -ResourceGroupName rg-eo-prod -Name vfsgov-automation-eo"
+    },
+    {
+      "category": "discovered",
+      "type": "AzAutomationAccount",
+      "path": "AZ-AUTO-001",
+      "step": "step_task_AU.L2-3.3.1_mnshcf73_wlniw31",
+      "timestamp": "2026-04-12T04:59:54.737Z",
+      "cmdlet": "Get-AzAutomationAccount -ResourceGroupName rg-eo-prod -Name vfsgov-automation-eo"
+    },
+    {
+      "category": "discovered",
+      "type": "$acct",
+      "path": "AZ-AUTO-002",
+      "step": "step_task_AU.L2-3.3.1_mnshcf73_wlniw31",
+      "timestamp": "2026-04-12T04:59:55.396Z",
+      "cmdlet": "$acct = Get-AzAutomationAccount -ResourceGroupName rg-eo-prod -Name vfsgov-automation-eo; if ($acct.SubscriptionId -eq '668a730f-12a1-4c80-9734-89c621e98115' -and $acct.Identity.Type -eq 'SystemAssigned') { $acct.Identity | ConvertTo-Json -Depth 10 } else { $null }"
+    },
+    {
+      "category": "discovered",
+      "type": "$assignments",
+      "path": "AZ-AUTO-003",
+      "step": "step_task_AU.L2-3.3.1_mnshcf73_wlniw31",
+      "timestamp": "2026-04-12T04:59:57.937Z",
+      "cmdlet": "$assignments = Get-AzRoleAssignment -ObjectId 1503913b-d878-49c6-92a7-2ced799822f4; @{ hasSubScope = ($assignments | Where-Object { $_.Scope -eq '/subscriptions/668a730f-12a1-4c80-9734-89c621e98115' -and $_.RoleDefinitionName -eq 'Security Reader' }) -ne $null; hasLawScope = ($assignments | Where-Object { $_.Scope -like '*/workspaces/vfsgov-law-prod' -and $_.RoleDefinitionName -eq 'Log Analytics Reader' }) -ne $null; hasStorageScope = ($assignments | Where-Object { $_.Scope -like '*/storageAccounts/vfsgoevops01' -and $_.RoleDefinitionName -eq 'Storage Blob Data Contributor' }) -ne $null; hasKvScope = ($assignments | Where-Object { $_.Scope -like '*/vaults/vfsgov-kv-prod' -and $_.RoleDefinitionName -eq 'Key Vault Crypto User' }) -ne $null } | ConvertTo-Json -Compress"
+    },
+    {
+      "category": "discovered",
+      "type": "$assignments",
+      "path": "AZ-AUTO-003",
+      "step": "step_task_AU.L2-3.3.1_mnshcf73_wlniw31",
+      "timestamp": "2026-04-12T04:59:57.938Z",
+      "cmdlet": "$assignments = Get-AzRoleAssignment -ObjectId 1503913b-d878-49c6-92a7-2ced799822f4; @{ hasSubScope = ($assignments | Where-Object { $_.Scope -eq '/subscriptions/668a730f-12a1-4c80-9734-89c621e98115' -and $_.RoleDefinitionName -eq 'Security Reader' }) -ne $null; hasLawScope = ($assignments | Where-Object { $_.Scope -like '*/workspaces/vfsgov-law-prod' -and $_.RoleDefinitionName -eq 'Log Analytics Reader' }) -ne $null; hasStorageScope = ($assignments | Where-Object { $_.Scope -like '*/storageAccounts/vfsgoevops01' -and $_.RoleDefinitionName -eq 'Storage Blob Data Contributor' }) -ne $null; hasKvScope = ($assignments | Where-Object { $_.Scope -like '*/vaults/vfsgov-kv-prod' -and $_.RoleDefinitionName -eq 'Key Vault Crypto User' }) -ne $null } | ConvertTo-Json -Compress"
+    },
+    {
+      "category": "discovered",
+      "type": "az",
+      "path": "AZ-SEN-001",
+      "step": "step_task_AU.L2-3.3.1_mnshcf73_wlniw31",
+      "timestamp": "2026-04-12T04:59:59.452Z",
+      "cmdlet": "az rest --method GET --url 'https://management.usgovcloudapi.net/subscriptions/668a730f-12a1-4c80-9734-89c621e98115/resourceGroups/rg-eo-prod/providers/Microsoft.OperationalInsights/workspaces/vfsgov-law-prod/providers/Microsoft.SecurityInsights/onboardingStates/default?api-version=2023-11-01'"
+    },
+    {
+      "category": "created",
+      "type": "AzSentinelDataConnector",
+      "path": "AZ-SEN-002",
+      "step": "step_task_AU.L2-3.3.1_mnshcf73_wlniw31",
+      "timestamp": "2026-04-12T05:00:03.183Z",
+      "cmdlet": "New-AzSentinelDataConnector -ResourceGroupName rg-eo-prod -WorkspaceName vfsgov-law-prod -Kind 'AzureActivity' -SubscriptionId 668a730f-12a1-4c80-9734-89c621e98115"
+    },
+    {
+      "category": "created",
+      "type": "AzSentinelDataConnector",
+      "path": "AZ-SEN-003",
+      "step": "step_task_AU.L2-3.3.1_mnshcf73_wlniw31",
+      "timestamp": "2026-04-12T05:00:04.724Z",
+      "cmdlet": "New-AzSentinelDataConnector -ResourceGroupName rg-eo-prod -WorkspaceName vfsgov-law-prod -Kind 'MicrosoftDefenderAdvancedThreatProtection'"
+    },
+    {
+      "category": "created",
+      "type": "AzSentinelDataConnector",
+      "path": "AZ-SEN-004",
+      "step": "step_task_AU.L2-3.3.1_mnshcf73_wlniw31",
+      "timestamp": "2026-04-12T05:00:05.946Z",
+      "cmdlet": "New-AzSentinelDataConnector -ResourceGroupName rg-eo-prod -WorkspaceName vfsgov-law-prod -Kind 'AzureKeyVault'"
+    },
+    {
+      "category": "discovered",
+      "type": "AzSentinelAlertRule",
+      "path": "AZ-SEN-008",
+      "step": "step_task_AU.L2-3.3.1_mnshcf73_wlniw31",
+      "timestamp": "2026-04-12T05:00:06.990Z",
+      "cmdlet": "Get-AzSentinelAlertRule -ResourceGroupName rg-eo-prod -WorkspaceName vfsgov-law-prod -ErrorAction SilentlyContinue | Where-Object DisplayName -eq 'CMMC L2 - Unauthorized Resource Deletion'"
+    },
+    {
+      "category": "discovered",
+      "type": "$diag",
+      "path": "AZ-DIAG-001",
+      "step": "step_task_AU.L2-3.3.1_mnshcf73_wlniw31",
+      "timestamp": "2026-04-12T05:00:38.670Z",
+      "cmdlet": "$diag = Get-AzSubscriptionDiagnosticSetting -Name 'activitylog-to-law' -WarningAction SilentlyContinue; if ($diag.WorkspaceId -like '*/workspaces/vfsgov-law-prod') { $diag } else { $null }"
+    },
+    {
+      "category": "discovered",
+      "type": "$diag",
+      "path": "AZ-DIAG-002",
+      "step": "step_task_AU.L2-3.3.1_mnshcf73_wlniw31",
+      "timestamp": "2026-04-12T05:00:41.711Z",
+      "cmdlet": "$diag = Get-AzDiagnosticSetting -ResourceId (Get-AzKeyVault -ResourceGroupName rg-eo-prod -VaultName vfsgov-kv-prod).ResourceId -Name 'kv-to-law' -WarningAction SilentlyContinue; if ($diag.WorkspaceId -like '*/workspaces/vfsgov-law-prod') { $diag } else { $null }"
+    },
+    {
+      "category": "discovered",
+      "type": "$diag",
+      "path": "AZ-DIAG-006",
+      "step": "step_task_AU.L2-3.3.1_mnshcf73_wlniw31",
+      "timestamp": "2026-04-12T05:00:49.660Z",
+      "cmdlet": "$diag = Get-AzSubscriptionDiagnosticSetting -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Where-Object { $_.Name -eq 'activitylog-to-law' }; if ($diag -and $diag.WorkspaceId -like '*/workspaces/vfsgov-law-prod') { $diag | Select-Object Name,WorkspaceId,@{N='LogCategories';E={($_.Log | Where-Object Enabled) | Select-Object -ExpandProperty Category}} | ConvertTo-Json -Depth 5 } else { $null }"
+    },
+    {
+      "category": "discovered",
+      "type": "$locks",
+      "path": "AZ-FOUND-004",
+      "step": "step_task_AU.L2-3.3.1_mnshcf73_wlniw31",
+      "timestamp": "2026-04-12T05:00:51.675Z",
+      "cmdlet": "$locks = Get-AzResourceLock -ResourceGroupName rg-eo-prod -ErrorAction SilentlyContinue; $match = $locks | Where-Object { $_.Properties.Level -eq 'CanNotDelete' }; if ($match) { $match | ConvertTo-Json -Depth 5 } else { $null }"
+    },
+    {
+      "category": "discovered",
+      "type": "$locks",
+      "path": "AZ-FOUND-004",
+      "step": "step_task_AU.L2-3.3.1_mnshcf73_wlniw31",
+      "timestamp": "2026-04-12T05:00:51.676Z",
+      "cmdlet": "$locks = Get-AzResourceLock -ResourceGroupName rg-eo-prod -ErrorAction SilentlyContinue; $match = $locks | Where-Object { $_.Properties.Level -eq 'CanNotDelete' }; if ($match) { $match | ConvertTo-Json -Depth 5 } else { $null }"
+    },
+    {
+      "category": "discovered",
+      "type": "AzOperationalInsightsWorkspace",
+      "path": "AZ-LOG-001",
+      "step": "step_task_AU.L2-3.3.2_mnshcf74_b07j6yi",
+      "timestamp": "2026-04-12T05:01:10.940Z",
+      "cmdlet": "Get-AzOperationalInsightsWorkspace -ResourceGroupName rg-eo-prod -Name vfsgov-law-prod | ConvertTo-Json -Depth 10"
+    },
+    {
+      "category": "discovered",
+      "type": "AzOperationalInsightsWorkspace",
+      "path": "AZ-LOG-001",
+      "step": "step_task_AU.L2-3.3.2_mnshcf74_b07j6yi",
+      "timestamp": "2026-04-12T05:01:10.941Z",
+      "cmdlet": "Get-AzOperationalInsightsWorkspace -ResourceGroupName rg-eo-prod -Name vfsgov-law-prod | ConvertTo-Json -Depth 10"
+    },
+    {
+      "category": "discovered",
+      "type": "AzStorageAccount",
+      "path": "AZ-LOG-002",
+      "step": "step_task_AU.L2-3.3.2_mnshcf74_b07j6yi",
+      "timestamp": "2026-04-12T05:01:11.345Z",
+      "cmdlet": "Get-AzStorageAccount -ResourceGroupName rg-eo-prod -Name vfsgoevops01 | Select-Object -Property * -ExcludeProperty Context | ConvertTo-Json -Depth 3"
+    },
+    {
+      "category": "discovered",
+      "type": "AzStorageAccount",
+      "path": "AZ-LOG-002",
+      "step": "step_task_AU.L2-3.3.2_mnshcf74_b07j6yi",
+      "timestamp": "2026-04-12T05:01:11.346Z",
+      "cmdlet": "Get-AzStorageAccount -ResourceGroupName rg-eo-prod -Name vfsgoevops01 | Select-Object -Property * -ExcludeProperty Context | ConvertTo-Json -Depth 3"
+    },
+    {
+      "category": "discovered",
+      "type": "AzSentinelAlertRule",
+      "path": "AZ-SEN-007",
+      "step": "step_task_AU.L2-3.3.2_mnshcf74_b07j6yi",
+      "timestamp": "2026-04-12T05:01:11.671Z",
+      "cmdlet": "Get-AzSentinelAlertRule -ResourceGroupName rg-eo-prod -WorkspaceName vfsgov-law-prod -ErrorAction SilentlyContinue | Where-Object DisplayName -eq 'CMMC L2 - Excessive Failed Logins'"
+    },
+    {
+      "category": "discovered",
+      "type": "$diag",
+      "path": "AZ-DIAG-001",
+      "step": "step_task_AU.L2-3.3.2_mnshcf74_b07j6yi",
+      "timestamp": "2026-04-12T05:01:43.022Z",
+      "cmdlet": "$diag = Get-AzSubscriptionDiagnosticSetting -Name 'activitylog-to-law' -WarningAction SilentlyContinue; if ($diag.WorkspaceId -like '*/workspaces/vfsgov-law-prod') { $diag } else { $null }"
+    },
+    {
+      "category": "discovered",
+      "type": "$diag",
+      "path": "AZ-DIAG-002",
+      "step": "step_task_AU.L2-3.3.2_mnshcf74_b07j6yi",
+      "timestamp": "2026-04-12T05:01:45.416Z",
+      "cmdlet": "$diag = Get-AzDiagnosticSetting -ResourceId (Get-AzKeyVault -ResourceGroupName rg-eo-prod -VaultName vfsgov-kv-prod).ResourceId -Name 'kv-to-law' -WarningAction SilentlyContinue; if ($diag.WorkspaceId -like '*/workspaces/vfsgov-law-prod') { $diag } else { $null }"
+    },
+    {
+      "category": "discovered",
+      "type": "$diag",
+      "path": "AZ-DIAG-006",
+      "step": "step_task_AU.L2-3.3.2_mnshcf74_b07j6yi",
+      "timestamp": "2026-04-12T05:01:52.649Z",
+      "cmdlet": "$diag = Get-AzSubscriptionDiagnosticSetting -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Where-Object { $_.Name -eq 'activitylog-to-law' }; if ($diag -and $diag.WorkspaceId -like '*/workspaces/vfsgov-law-prod') { $diag | Select-Object Name,WorkspaceId,@{N='LogCategories';E={($_.Log | Where-Object Enabled) | Select-Object -ExpandProperty Category}} | ConvertTo-Json -Depth 5 } else { $null }"
+    },
+    {
+      "category": "created",
+      "type": "AzSentinelDataConnector",
+      "path": "AU.L2-3.3.3.sentinel-connector",
+      "step": "step_task_AU.L2-3.3.3_mnshcf74_uli5khb",
+      "timestamp": "2026-04-12T05:02:01.309Z",
+      "cmdlet": "New-AzSentinelDataConnector -ResourceGroupName rg-eo-prod -WorkspaceName vfsgov-law-prod -Kind 'Office365' -Exchange 'Enabled' -SharePoint 'Enabled' -Teams 'Enabled'"
+    },
+    {
+      "category": "discovered",
+      "type": "AzOperationalInsightsWorkspace",
+      "path": "AZ-LOG-001",
+      "step": "step_task_AU.L2-3.3.3_mnshcf74_uli5khb",
+      "timestamp": "2026-04-12T05:02:14.212Z",
+      "cmdlet": "Get-AzOperationalInsightsWorkspace -ResourceGroupName rg-eo-prod -Name vfsgov-law-prod | ConvertTo-Json -Depth 10"
+    },
+    {
+      "category": "discovered",
+      "type": "AzOperationalInsightsWorkspace",
+      "path": "AZ-LOG-001",
+      "step": "step_task_AU.L2-3.3.3_mnshcf74_uli5khb",
+      "timestamp": "2026-04-12T05:02:14.213Z",
+      "cmdlet": "Get-AzOperationalInsightsWorkspace -ResourceGroupName rg-eo-prod -Name vfsgov-law-prod | ConvertTo-Json -Depth 10"
+    },
+    {
+      "category": "discovered",
+      "type": "az",
+      "path": "AZ-SEN-001",
+      "step": "step_task_AU.L2-3.3.3_mnshcf74_uli5khb",
+      "timestamp": "2026-04-12T05:02:15.765Z",
+      "cmdlet": "az rest --method GET --url 'https://management.usgovcloudapi.net/subscriptions/668a730f-12a1-4c80-9734-89c621e98115/resourceGroups/rg-eo-prod/providers/Microsoft.OperationalInsights/workspaces/vfsgov-law-prod/providers/Microsoft.SecurityInsights/onboardingStates/default?api-version=2023-11-01'"
+    },
+    {
+      "category": "discovered",
+      "type": "AzSentinelAlertRule",
+      "path": "AZ-SEN-007",
+      "step": "step_task_AU.L2-3.3.3_mnshcf74_uli5khb",
+      "timestamp": "2026-04-12T05:02:19.139Z",
+      "cmdlet": "Get-AzSentinelAlertRule -ResourceGroupName rg-eo-prod -WorkspaceName vfsgov-law-prod -ErrorAction SilentlyContinue | Where-Object DisplayName -eq 'CMMC L2 - Excessive Failed Logins'"
+    },
+    {
+      "category": "discovered",
+      "type": "AzActionGroup",
+      "path": "AZ-MON-001",
+      "step": "step_task_AU.L2-3.3.4_mnshcf74_vpd544y",
+      "timestamp": "2026-04-12T05:02:50.709Z",
+      "cmdlet": "Get-AzActionGroup -ResourceGroupName rg-eo-prod -Name 'CMMC-AlertGroup'"
+    },
+    {
+      "category": "discovered",
+      "type": "AzRestMethod",
+      "path": "AZ-LOG-004",
+      "step": "step_task_AU.L2-3.3.8_mnshcf74_keljsux",
+      "timestamp": "2026-04-12T05:03:05.217Z",
+      "cmdlet": "Invoke-AzRestMethod -Method GET -Path '/subscriptions/668a730f-12a1-4c80-9734-89c621e98115/resourceGroups/rg-eo-prod/providers/Microsoft.OperationalInsights/workspaces/vfsgov-law-prod/providers/Microsoft.Authorization/locks?api-version=2016-09-01'"
+    },
+    {
+      "category": "discovered",
+      "type": "AzPolicyAssignment",
+      "path": "AZ-FOUND-002",
+      "step": "step_task_CM.L2-3.4.1_mnshcf73_3fu7tro",
+      "timestamp": "2026-04-12T05:03:09.829Z",
+      "cmdlet": "Get-AzPolicyAssignment -Name 'CMMC-L2-Initiative' -Scope '/subscriptions/668a730f-12a1-4c80-9734-89c621e98115' -ErrorAction SilentlyContinue | Select-Object Name, DisplayName, EnforcementMode | ConvertTo-Json"
+    },
+    {
+      "category": "discovered",
+      "type": "MgGraphRequest",
+      "path": "IA.L2-3.5.3.mfa-authenticator",
+      "step": "step_task_IA.L2-3.5.3_mnshcf70_1662cv8",
+      "timestamp": "2026-04-12T05:03:23.566Z",
+      "cmdlet": "Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/MicrosoftAuthenticator' | ConvertTo-Json -Depth 10"
+    },
+    {
+      "category": "discovered",
+      "type": "MgGraphRequest",
+      "path": "IA.L2-3.5.3.fido2-enable",
+      "step": "step_task_IA.L2-3.5.3_mnshcf70_1662cv8",
+      "timestamp": "2026-04-12T05:03:24.782Z",
+      "cmdlet": "Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/Fido2' | ConvertTo-Json -Depth 10"
+    },
+    {
+      "category": "discovered",
+      "type": "SafeLinksPolicy",
+      "path": "SI.L2-3.14.3.safe-links",
+      "step": "step_task_SI.L2-3.14.3_mnshcf75_tx8voz7",
+      "timestamp": "2026-04-12T05:03:28.732Z",
+      "cmdlet": "Get-SafeLinksPolicy -Identity 'CMMC-SafeLinks'"
+    },
+    {
+      "category": "discovered",
+      "type": "SafeLinksPolicy",
+      "path": "SI.L2-3.14.3.safe-links",
+      "step": "step_task_SI.L2-3.14.3_mnshcf75_tx8voz7",
+      "timestamp": "2026-04-12T05:03:28.733Z",
+      "cmdlet": "Get-SafeLinksPolicy -Identity 'CMMC-SafeLinks'"
+    },
+    {
+      "category": "discovered",
+      "type": "SafeLinksRule",
+      "path": "SI.L2-3.14.3.safe-links-rule",
+      "step": "step_task_SI.L2-3.14.3_mnshcf75_tx8voz7",
+      "timestamp": "2026-04-12T05:03:28.911Z",
+      "cmdlet": "Get-SafeLinksRule -Identity 'CMMC-SafeLinks-Rule'"
+    },
+    {
+      "category": "discovered",
+      "type": "SafeLinksRule",
+      "path": "SI.L2-3.14.3.safe-links-rule",
+      "step": "step_task_SI.L2-3.14.3_mnshcf75_tx8voz7",
+      "timestamp": "2026-04-12T05:03:28.912Z",
+      "cmdlet": "Get-SafeLinksRule -Identity 'CMMC-SafeLinks-Rule'"
+    },
+    {
+      "category": "discovered",
+      "type": "AzAccount",
+      "path": "AZ-SEN-005",
+      "step": "step_task_SI.L2-3.14.6_mnshcf74_hkbg5nn",
+      "timestamp": "2026-04-12T05:03:43.792Z",
+      "cmdlet": "Connect-AzAccount -ServicePrincipal -TenantId 'bbe08772-8fde-4e55-961a-8a43779e7d58' -ApplicationId '830b3c2a-4cb3-415a-a88d-ad7b203bdeb4' -CertificateThumbprint 'B57CDA27D62C12AF417E6280D32F7B7395A09F11' -Environment AzureUSGovernment | Out-Null; Get-AzSentinelAlertRule -ResourceGroupName 'rg-eo-prod' -WorkspaceName 'vfsgov-law-prod' -ErrorAction SilentlyContinue | Where-Object {$_.DisplayName -eq 'CMMC L2 - Privileged Identity Changes'}"
+    },
+    {
+      "category": "discovered",
+      "type": "AzSentinelAlertRule",
+      "path": "AZ-SEN-006",
+      "step": "step_task_SI.L2-3.14.6_mnshcf74_hkbg5nn",
+      "timestamp": "2026-04-12T05:04:15.733Z",
+      "cmdlet": "Get-AzSentinelAlertRule -ResourceGroupName rg-eo-prod -WorkspaceName vfsgov-law-prod -ErrorAction SilentlyContinue | Where-Object DisplayName -eq 'CMMC L2 - Malware Detection'"
+    },
+    {
+      "category": "discovered",
+      "type": "AzRestMethod",
+      "path": "AZ-SEN-010",
+      "step": "step_task_SI.L2-3.14.7_mnshcf74_xzippex",
+      "timestamp": "2026-04-12T05:04:47.524Z",
+      "cmdlet": "Invoke-AzRestMethod -Method GET -Path '/subscriptions/668a730f-12a1-4c80-9734-89c621e98115/resourceGroups/rg-eo-prod/providers/Microsoft.OperationalInsights/workspaces/vfsgov-law-prod/providers/Microsoft.SecurityInsights/settings/Ueba?api-version=2023-02-01'"
+    }
+  ]
+}

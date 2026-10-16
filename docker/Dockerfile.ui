@@ -1,0 +1,26 @@
+# syntax=docker/dockerfile:1
+FROM node:20-bookworm-slim AS builder
+
+WORKDIR /app
+COPY ces-muster-main/package*.json ./
+RUN npm ci
+
+COPY ces-muster-main/ ./
+RUN npm run build
+
+FROM nginx:1.27-alpine AS runner
+
+RUN apk add --no-cache openssl
+
+COPY --from=builder /app/dist /usr/share/nginx/html
+COPY docker/nginx.conf /etc/nginx/nginx.conf
+COPY docker/nginx-entrypoint.sh /docker-entrypoint-ssl.sh
+RUN chmod +x /docker-entrypoint-ssl.sh
+
+EXPOSE 80 443
+
+HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=3 \
+  CMD wget -qO- http://127.0.0.1/health || exit 1
+
+ENTRYPOINT ["/docker-entrypoint-ssl.sh"]
+CMD ["nginx", "-g", "daemon off;"]

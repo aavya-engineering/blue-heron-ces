@@ -1,0 +1,420 @@
+/*
+  SPDX-FileCopyrightText: Blue Heron Defense LLC and its licensors. All rights reserved.
+  SPDX-License-Identifier: LicenseRef-BHD-Proprietary
+  CONFIDENTIAL - TRADE SECRET. Unpublished work. Provided solely to perform work for Blue Heron Defense LLC at its direction.
+  Any other use, copying, disclosure, or reuse, in whole or in part, is prohibited.
+  Changes made to this file for Blue Heron Defense LLC are made on its behalf; it claims all rights in them.
+  Submitting a change to this repository means you accept TERMS.md.
+  Removing or altering this notice is prohibited (17 U.S.C. 1202). Ref: BHD-CES-MONO-2026A
+  See LICENSE and TERMS.md.
+*/
+
+/*
+ * CES UI — "Instrument" Design Language (v2, security-themed)
+ * CANONICAL SOURCE: ces-shared/ui/ces-ui.css (this file). Every module's
+ * public/ces-ui.css is a generated copy — never edit those; they are overwritten.
+ * Edit here; run `npm run sync-ui-assets` from the mono root to push copies to
+ * ces-stamper, ces-ao, ces-eo and ces-muster public/ (ces-planner: brand assets only).
+ *
+ * Identity: these are instruments for handling regulated (CUI) information, and the
+ * design borrows from that world's real artifacts — the CUI designation banner
+ * (32 CFR 2002 marking conventions; DoD screen-banner purple), engineering
+ * title-block typography (condensed caps + mono designators), and a cold
+ * "ops floor" dark mode. One accent spent deliberately: the designation rail.
+ *
+ * Tokens mirror ces-planner/tailwind.config.js + ces-planner/src/index.css.
+ * Dark overrides use [data-theme="dark"] — same token NAMES, different VALUES.
+ */
+
+/* ── Google Fonts ──────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Barlow+Condensed:wght@500;600;700&display=swap');
+
+/* ── Light token set (:root) ──────────────────────────────────────────────── */
+:root {
+  /* Primary — Heron Ink: deep desaturated navy (brand gravitas, not template blue) */
+  --co-primary:        #1b2a4a;
+  --co-primary-hover:  #24365c;
+  --co-primary-focus:  #4a6fa5;  /* was #5b7db1 (4.19:1) — darkened to 5.11:1 on #ffffff, consistent with new border weight */
+  --co-primary-subtle: #edf1f7;
+  --co-header-icon:    #f5b74a;  /* brand gold — 7.96:1 on light header fill #1b2a4a, 10.20:1 on dark header fill #0d1526 (UI-glyph floor 3:1) */
+
+  /* Designation — regulation CUI-banner purple (DoD screen-marking convention).
+     Constant across themes: a marking color is policy, not preference.
+     White on #502b85 = 9.7:1 (AAA). */
+  --co-designation:      #502b85;
+  --co-designation-text: #ffffff;
+
+  /* Slate surface / border / text ramp */
+  --co-bg:             #f4f6f9;  /* was #f8fafc — darkened slightly so --co-bg-elevated keeps a visible step */
+  --co-surface:        #ffffff;
+  --co-bg-elevated:    #eef1f5;  /* was #f1f5f9 — light elevated surface (G-UI-3 light-mode equivalent) */
+  --co-bg-console:     #eef1f5;  /* was #f1f5f9 */
+  --co-border:         #c3ccd6;  /* was #e2e8f0 (1.23:1) — bumped for visibility only, no AA floor (decorative divider) */
+  --co-border-strong:  #7c8ba1;  /* was #cbd5e1 (1.48:1 FAIL) — 3.46:1 on #ffffff / 3.20:1 on #f4f6f9 (UI-component floor 3:1, PASS) */
+  --co-text:           #0f172a;  /* slate-900 — unchanged, 16.49:1 on #f4f6f9 / 17.85:1 on #ffffff (AA) */
+  --co-text-secondary: #334155;  /* new role — 9.56:1 on #f4f6f9 / 10.35:1 on #ffffff (AA) */
+  --co-text-muted:     #55647a;  /* was #475569 (7.24:1) — 5.56:1 on #f4f6f9 / 6.02:1 on #ffffff (AA, kept headroom above 4.5:1 floor) */
+
+  /* Compliance semantics — text tokens darkened to >=4.5:1 on their tint bgs (AA fix) */
+  --co-compliant:      #047857;  /* was #059669 — 4.54:1 on #dcfce7 (AA) */
+  --co-compliant-bg:   #dcfce7;
+  --co-risk:           #b45309;  /* was #d97706 — 4.52:1 on #fef3c7 (AA) */
+  --co-risk-bg:        #fef3c7;
+  --co-violation:      #b91c1c;  /* was #dc2626 — 4.50:1 on #fee2e2 (AA) */
+  --co-violation-bg:   #fee2e2;
+  --co-review:         #1d4ed8;  /* was #2563eb — 4.53:1 on #dbeafe (AA) */
+  --co-review-bg:      #dbeafe;
+
+  /* Typography — IBM Plex (engineered-instrument voice) + Barlow Condensed display
+     (title-block caps). --co-font-serif kept as a compat alias for the display face. */
+  --co-font-sans:    'IBM Plex Sans', system-ui, sans-serif;
+  --co-font-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --co-font-serif:   'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --co-font-mono:    'IBM Plex Mono', ui-monospace, monospace;
+
+  /* Shape — sharp corners throughout (instrument spec) */
+  --co-radius: 0px;
+
+  /* Shadows — flat-with-borders model; shadows for overlays only */
+  --co-shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --co-shadow-md: 0 2px 6px rgba(0,0,0,0.06);
+  --co-shadow-lg: 0 4px 16px rgba(0,0,0,0.10);
+}
+
+/* ── Dark token set ([data-theme="dark"]) ─────────────────────────────────── */
+/*
+ * Same token NAMES as :root — only VALUES change.
+ * Text #f8fafc on bg #0f172a: contrast ratio 17.06:1 (WCAG AAA).
+ * Text-muted #94a3b8 on bg #0f172a: contrast ratio 6.96:1 (WCAG AA).
+ */
+[data-theme="dark"] {
+  /* Ops-floor dark: blue-black, colder than slate — text #f2f6fc on #0b1220 = 18.2:1 (AAA) */
+  --co-bg:             #0b1220;
+  --co-surface:        #121c2e;
+  --co-bg-elevated:    #1c2a44;
+  --co-bg-console:     #101a2c;
+  --co-border:         #24344e;
+  --co-border-strong:  #3a4e6e;
+  --co-text:           #f2f6fc;
+  --co-text-muted:     #96a6bd;  /* 7.1:1 on #0b1220 (AA+) */
+  --co-primary:        #7ea0d6;  /* steel-blue text/link — 6.4:1 on #0b1220 (AA) */
+  --co-primary-hover:  #99b5e3;
+  --co-primary-focus:  #b7ccee;
+  --co-primary-subtle: #1a2c4a;
+  --co-header-icon:    #f5b74a;  /* additive — same brand-gold value as light :root; header fill stays dark-navy in both themes */
+  /* --co-designation intentionally NOT overridden: the marking color is constant. */
+
+  /* Semantic colors adjusted for dark (text readable on dark bg, WCAG AA) */
+  --co-compliant:      #34d399;  /* green-400 — 9.29:1 on #0f172a  (WCAG AAA) */
+  --co-compliant-bg:   #064e3b;
+  --co-risk:           #fbbf24;  /* yellow-400 — 10.69:1 on #0f172a (WCAG AAA) */
+  --co-risk-bg:        #78350f;
+  --co-violation:      #fca5a5;  /* red-300   — 5.28:1 on own tint bg #7f1d1d (bumped from #f87171, 3.62:1 FAIL on own bg — round 2 forced fix) */
+  --co-violation-bg:   #7f1d1d;
+  --co-review:         #60a5fa;  /* blue-400  — 7.02:1 on #0f172a  (WCAG AA)  */
+  --co-review-bg:      #172554;
+}
+
+/* ── Base reset ───────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--co-font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--co-text);
+  background-color: var(--co-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Header ───────────────────────────────────────────────────────────────── */
+.ces-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 20px;
+  height: 48px;
+  background-color: var(--co-primary);   /* Heron Ink — dark navy, white text 13.5:1 */
+  border-bottom: 1px solid var(--co-designation);  /* thin CUI-purple keel line under the header */
+  color: #ffffff;
+}
+/*
+ * Dark mode: --co-primary is a LIGHT steel-blue tuned for text/links on dark bg, so as a
+ * header FILL it fails white-text contrast. The header therefore keeps a deep-ink fill in
+ * dark mode (white text 15.8:1 on #0d1526), consistent with the light-mode ink header.
+ */
+[data-theme="dark"] .ces-header {
+  background-color: #0d1526;
+  border-bottom-color: var(--co-designation);
+}
+
+.ces-header .header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--co-font-sans);
+  font-weight: 700;
+  font-size: 16px;
+  color: #ffffff;
+  white-space: nowrap;        /* keep the brand lockup on one line */
+  min-width: 0;
+}
+
+/* Logo mark sits as a compact icon in the header (inherits white via currentColor). */
+.ces-header .header-brand img,
+.ces-header img.header-logo {
+  height: 22px;
+  width: auto;
+  display: block;
+  flex: 0 0 auto;
+}
+
+.ces-header .header-company {
+  font-size: 12px;
+  font-weight: 400;
+  opacity: 0.85;
+}
+
+.ces-header .header-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Footer ───────────────────────────────────────────────────────────────── */
+.ces-footer {
+  padding: 6px 20px;
+  font-size: 11px;
+  color: var(--co-text-muted);
+  background-color: var(--co-bg-elevated);
+  border-top: 1px solid var(--co-border);
+  text-align: center;
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  font-family: var(--co-font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  border: none;
+  border-radius: var(--co-radius);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.btn:disabled,
+.btn[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background-color: var(--co-primary);
+  color: #ffffff;
+}
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--co-primary-hover);
+}
+.btn-primary:focus-visible {
+  outline: 2px solid var(--co-primary-focus);
+  outline-offset: 2px;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--co-primary);
+  border: 1.5px solid var(--co-primary);
+}
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--co-primary-subtle);
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: var(--co-text-muted);
+}
+.btn-ghost:hover:not(:disabled) {
+  background-color: var(--co-bg-elevated);
+  color: var(--co-text);
+}
+
+.btn-destructive {
+  background-color: var(--co-violation);
+  color: #ffffff;
+}
+.btn-destructive:hover:not(:disabled) {
+  background-color: #991b1b;  /* red-800 — darker than the --co-violation base (#b91c1c) so hover is visible */
+}
+
+/*
+ * Dark-mode FILLED-button overrides (WCAG AA fix).
+ * In dark mode the --co-primary / --co-violation tokens are LIGHT tints tuned for use as
+ * TEXT on a dark background; used as a button FILL under white text they fall below 4.5:1
+ * (white on #3b82f6 = 3.68:1; white on #f87171 = 2.5:1). Filled buttons therefore use a
+ * deeper shade as the background so white text stays AA-compliant. Token text/link/accent
+ * usages keep the lighter tints (correct for text on dark bg).
+ */
+[data-theme="dark"] .btn-primary {
+  background-color: #2a4370;  /* ink-600 — white text 8.0:1 (AAA) */
+  color: #ffffff;
+}
+[data-theme="dark"] .btn-primary:hover:not(:disabled) {
+  background-color: #33518a;  /* ink-500 */
+}
+[data-theme="dark"] .btn-destructive {
+  background-color: #b91c1c;  /* red-700 — white text 6.6:1 (AA) */
+  color: #ffffff;
+}
+[data-theme="dark"] .btn-destructive:hover:not(:disabled) {
+  background-color: #dc2626;  /* red-600 */
+}
+
+/* ── Badges ───────────────────────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  font-family: var(--co-font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: var(--co-radius);
+  white-space: nowrap;
+}
+
+.badge-compliant {
+  background-color: var(--co-compliant-bg);
+  color: var(--co-compliant);
+}
+
+.badge-risk {
+  background-color: var(--co-risk-bg);
+  color: var(--co-risk);
+}
+
+.badge-violation {
+  background-color: var(--co-violation-bg);
+  color: var(--co-violation);
+}
+
+.badge-review {
+  background-color: var(--co-review-bg);
+  color: var(--co-review);
+}
+
+/* ── Panel ────────────────────────────────────────────────────────────────── */
+.panel {
+  background-color: var(--co-surface);
+  border: 1.5px solid var(--co-border);
+  border-radius: var(--co-radius);
+}
+
+/* ── Console ──────────────────────────────────────────────────────────────── */
+.console {
+  background-color: var(--co-bg-console);
+  font-family: var(--co-font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--co-text);
+  border: 1px solid var(--co-border);
+  border-radius: var(--co-radius);
+  padding: 12px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* ── Designation rail (signature) ─────────────────────────────────────────── */
+/*
+ * The one deliberate accent of the system: a full-width designation banner in
+ * regulation CUI purple, exactly where a DoD screen banner sits. CSS-only —
+ * every page that loads this stylesheet is marked, with zero markup changes.
+ * It prints (a marking that vanishes on paper isn't a marking) and it does not
+ * change with theme.
+ */
+body::before {
+  content: 'CUI';
+  display: block;
+  height: 20px;
+  line-height: 20px;
+  background-color: var(--co-designation);
+  color: var(--co-designation-text);
+  font-family: var(--co-font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.45em;
+  text-indent: 0.45em;   /* re-center: letter-spacing adds a trailing gap */
+  text-align: center;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+/* ── Title block (engineering-drawing vernacular) ─────────────────────────── */
+/* A panel/section heading with a designation tick: condensed caps title on the
+   left, optional mono designator (control id, module code) on the right. */
+.ces-titleblock {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0 6px 10px;
+  border-left: 3px solid var(--co-designation);
+}
+.ces-titleblock .tb-title {
+  font-family: var(--co-font-display);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--co-text);
+}
+.ces-titleblock .tb-designator {
+  font-family: var(--co-font-mono);
+  font-size: 11px;
+  color: var(--co-text-muted);
+  white-space: nowrap;
+}
+
+/* Eyebrow — mono micro-label above content groups */
+.eyebrow {
+  font-family: var(--co-font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--co-text-muted);
+}
+
+/* ── Theme toggle button ──────────────────────────────────────────────────── */
+#ces-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background-color: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.30);
+  border-radius: var(--co-radius);
+  color: var(--co-header-icon);
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.15s;
+}
+#ces-theme-toggle:hover {
+  background-color: rgba(255,255,255,0.25);
+}

@@ -1,0 +1,40 @@
+services:
+  # Primary Database dependency for muster-api
+  # Runs PostgreSQL 16 with dedicated least-privilege role (NOBYPASSRLS for tenant isolation)
+  postgres:
+    image: postgres:16-alpine
+    container_name: muster-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: muster_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+    ports:
+      # Exposed on host port 5434 by default to avoid conflict with existing local PostgreSQL instances on 5432
+      - "${POSTGRES_PORT:-5434}:5432"
+    volumes:
+      - muster_postgres_data:/var/lib/postgresql/data
+      - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U muster_app -d muster_db || pg_isready -U postgres -d muster_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Mock tenant simulator service (simulates Microsoft GCC High APIs for discovery testing)
+  stacksim:
+    image: node:20-alpine
+    container_name: muster-stacksim
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - ../ces-stacksim-main:/app
+    ports:
+      - "4390:4390"
+    command: sh -c "npm install && npm run build && node bin/stacksim.mjs serve m365_azure --slug aoops-g5 --port 4390"
+    profiles:
+      - stacksim
+      - full
+
+volumes:
+  muster_postgres_data:

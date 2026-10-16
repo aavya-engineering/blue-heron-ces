@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registry Editor</title>
+  <link rel="icon" type="image/svg+xml" href="./ces-favicon.svg">
+  <link rel="stylesheet" href="./ces-ui.css">
+  <script src="./ces-theme-toggle.js"></script>
+  <style>
+    /* =======================================
+       TOKEN ALIAS SHIM — maps Blueprint-Dark
+       local names to CES canonical --co-* vars.
+       ces-ui.css :root provides light defaults;
+       [data-theme="dark"] provides dark overrides.
+       ======================================= */
+    :root {
+      --bg-page:           var(--co-bg);
+      --bg-panel:          var(--co-surface);
+      --bg-elevated:       var(--co-bg-elevated);
+      --bg-console:        var(--co-bg-console);
+      --border:            var(--co-border);
+      --border-subtle:     var(--co-border);
+      --text-body:         var(--co-text);
+      --text-muted:        var(--co-text-muted);
+      --text-heading:      var(--co-text);
+      --accent-blue:       var(--co-primary);
+      --accent-blue-hover: var(--co-primary-hover);
+      --accent-blue-subtle:var(--co-primary-focus);
+      --accent-green:      var(--co-compliant);
+      --accent-green-hover:var(--co-compliant);
+      --accent-amber:      var(--co-risk);
+      --accent-red:        var(--co-violation);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--co-font-sans);
+      font-size: 14px;
+      letter-spacing: 0.01em;
+      background: var(--bg-page);
+      color: var(--text-body);
+      min-height: 100vh;
+    }
+
+    /* ---- Sticky Top Bar ---- */
+    .top-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .top-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+    }
+
+    .top-bar-row + .top-bar-row {
+      padding-top: 0;
+      padding-bottom: 10px;
+    }
+
+    .top-bar-divider {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    .top-bar-spacer {
+      flex: 1;
+    }
+
+    /* ---- Row 1: Toggle, Search, Nav, Save ---- */
+    .registry-toggle {
+      display: flex;
+      gap: 4px;
+    }
+
+    .search-input {
+      width: 180px;
+      padding: 5px 8px;
+      font-size: 11px;
+      font-family: var(--co-font-mono);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--co-radius);
+      color: var(--text-body);
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 1px var(--accent-blue);
+    }
+
+    .search-clear {
+      padding: 4px 6px;
+      font-size: 12px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      margin-left: -4px;
+    }
+
+    .search-clear:hover { color: var(--text-body); }
+
+    .search-count {
+      font-size: 10px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .entry-counter {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    /* ---- Row 2: Resolve, Copy, Var Status ---- */
+    .var-status {
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .var-status.all-resolved { color: var(--accent-green); }
+    .var-status.has-missing { color: var(--accent-amber); }
+
+    /* ---- Resolve output ---- */
+    .resolve-output {
+      display: none;
+      margin: 0;
+      padding: 10px 12px;
+      background: var(--bg-console);
+      border-bottom: 1px solid var(--border);
+      font-family: var(--co-font-mono);
+      font-size: 11px;
+      color: var(--text-body);
+      max-height: 200px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    /* ---- Buttons ---- */
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      color: var(--text-body);
+      border-radius: var(--co-radius);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .btn-sm:hover:not(:disabled) {
+      background: var(--bg-panel);
+      border-color: var(--accent-blue);
+      color: var(--accent-blue-subtle);
+    }
+
+    .btn-sm:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-sm.active {
+      background: var(--accent-blue);
+      border-color: var(--accent-blue);
+      color: #fff;
+    }
+
+    .btn-primary {
+      background: var(--accent-blue);
+      border-color: var(--accent-blue);
+      color: #fff;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--accent-blue-hover);
+      border-color: var(--accent-blue-hover);
+      color: #fff;
+    }
+
+    .btn-sm.toggle-btn {
+      padding: 5px 10px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+    }
+
+    .btn-sm.toggle-btn.active {
+      color: #fff;
+    }
+
+    /* ---- Scrollable form area ---- */
+    .form-area {
+      padding: 12px 16px 16px 16px;
+    }
+
+    .registry-section {
+      margin-top: 12px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: var(--co-radius);
+      padding: 0 12px 12px 12px;
+    }
+
+    .registry-section:first-child {
+      margin-top: 0;
+    }
+
+    .registry-section-header {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      padding: 12px 0 8px;
+      border-bottom: 1px solid var(--border-subtle);
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .registry-section-header:hover {
+      color: var(--text-body);
+    }
+
+    .registry-section-chevron {
+      font-size: 9px;
+      transition: transform 0.2s;
+    }
+
+    .registry-section.collapsed .registry-section-chevron {
+      transform: rotate(-90deg);
+    }
+
+    .registry-section.collapsed .registry-section-body {
+      display: none;
+    }
+
+    .registry-section-body {
+      padding: 8px 0;
+    }
+
+    .registry-field {
+      margin-top: 10px;
+    }
+
+    .registry-field:first-child {
+      margin-top: 0;
+    }
+
+    .registry-field label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .registry-field input[type="text"],
+    .registry-field input[type="number"],
+    .registry-field textarea,
+    .registry-field select {
+      width: 100%;
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--co-radius);
+      font-size: 12px;
+      font-family: var(--co-font-mono);
+      background: var(--bg-elevated);
+      color: var(--text-body);
+      resize: vertical;
+    }
+
+    .registry-field input[type="text"]:focus,
+    .registry-field input[type="number"]:focus,
+    .registry-field textarea:focus,
+    .registry-field select:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 1px var(--accent-blue);
+      background: var(--bg-page);
+    }
+
+    .registry-field input[type="text"]:read-only {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .registry-field input[type="checkbox"] {
+      width: auto;
+      margin-right: 6px;
+    }
+
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 12px 18px;
+      border-radius: var(--co-radius);
+      font-size: 13px;
+      font-weight: 500;
+      z-index: 10000;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toast.success {
+      background: var(--accent-green);
+      color: #fff;
+    }
+
+    .toast.error {
+      background: var(--accent-red);
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Top Bar -->
+  <div class="top-bar">
+    <!-- Brand row: CES wordmark + Blue Heron Defense + theme toggle -->
+    <div class="top-bar-row" style="border-bottom:1px solid var(--border);padding-bottom:6px;">
+      <span style="font-weight:700;font-size:14px;color:var(--text-heading);letter-spacing:0.04em;">CES</span>
+      <span style="font-size:11px;color:var(--text-muted);font-weight:400;">Blue Heron Defense</span>
+      <span style="font-size:11px;color:var(--text-muted);">&#183;</span>
+      <span style="font-size:11px;color:var(--text-muted);">Registry Editor</span>
+      <span class="top-bar-spacer"></span>
+      <button id="ces-theme-toggle" title="Toggle light/dark theme" style="padding:2px 6px;font-size:12px;background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-body);cursor:pointer;border-radius:var(--co-radius);">&#9680;</button>
+    </div>
+    <!-- Row 1: Toggle | Search | Nav | Save -->
+    <div class="top-bar-row">
+      <div class="registry-toggle">
+        <button class="btn-sm toggle-btn active" id="regToggleM365" onclick="switchRegistryType('m365')">M365</button>
+        <button class="btn-sm toggle-btn" id="regToggleInfra" onclick="switchRegistryType('infra')">Infra</button>
+      </div>
+      <div class="top-bar-divider"></div>
+      <input type="text" class="search-input" id="searchInput" placeholder="Search entry_id..." oninput="filterEntries()" />
+      <button class="search-clear" onclick="clearSearch()" title="Clear search">&times;</button>
+      <span class="search-count" id="searchResultsCount"></span>
+      <div class="top-bar-divider"></div>
+      <span id="registryEntryCounter" class="entry-counter">Entry 0 of 0</span>
+      <button class="btn-sm" id="regPrevBtn" onclick="navigateRegistry(-1)" title="Previous entry">&#9664;</button>
+      <button class="btn-sm" id="regNextBtn" onclick="navigateRegistry(1)" title="Next entry">&#9654;</button>
+      <span class="top-bar-spacer"></span>
+      <button class="btn-sm btn-primary" onclick="saveRegistryEntry()">Save</button>
+    </div>
+    <!-- Row 2: Resolve GET | Resolve SET | Copy | Var Status -->
+    <div class="top-bar-row">
+      <button class="btn-sm btn-primary" onclick="resolveRegistryCmd('get')">Resolve GET</button>
+      <button class="btn-sm btn-primary" onclick="resolveRegistryCmd('set')">Resolve SET</button>
+      <button class="btn-sm" onclick="copyResolvedCmd()">Copy</button>
+      <div class="top-bar-divider"></div>
+      <span class="var-status" id="varStatusIndicator" style="display:none;">
+        <span id="varStatusIcon"></span>
+        <span id="varStatusText"></span>
+      </span>
+    </div>
+  </div>
+
+  <!-- Resolve output (below top bar, collapsible) -->
+  <pre id="registryResolveBox" class="resolve-output"></pre>
+
+  <!-- Scrollable form -->
+  <div class="form-area" id="registryFormContainer"></div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---- Global State ----
+    var currentTenant = '';
+    var currentRegistryType = 'm365';
+    var registryEntries = [];
+    var filteredEntries = [];
+    var registryCurrentIndex = 0;
+    var searchTerm = '';
+
+    // ---- Initialization ----
+    (function init() {
+      var params = new URLSearchParams(window.location.search);
+      currentTenant = params.get('tenant') || '';
+      var type = params.get('type') || 'm365';
+
+      if (type === 'infra') {
+        switchRegistryType('infra');
+      } else {
+        switchRegistryType('m365');
+      }
+    })();
+
+    // ---- Registry Type Switching ----
+    function switchRegistryType(type) {
+      currentRegistryType = type;
+      registryCurrentIndex = 0;
+      searchTerm = '';
+      document.getElementById('searchInput').value = '';
+
+      var m365Btn = document.getElementById('regToggleM365');
+      var infraBtn = document.getElementById('regToggleInfra');
+      if (type === 'm365') {
+        m365Btn.classList.add('active');
+        infraBtn.classList.remove('active');
+      } else {
+        m365Btn.classList.remove('active');
+        infraBtn.classList.add('active');
+      }
+
+      fetch('/api/registry/' + type)
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          registryEntries = data.entries || [];
+          filteredEntries = registryEntries.slice();
+          registryCurrentIndex = 0;
+          updateSearchResultsCount();
+          updateRegistryNavigation();
+          renderRegistryForm();
+        })
+        .catch(function(err) {
+          showToast('Failed to load registry: ' + err.message, 'error');
+        });
+    }
+
+    // ---- Search & Filtering ----
+    function filterEntries() {
+      searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+
+      if (searchTerm === '') {
+        filteredEntries = registryEntries.slice();
+      } else {
+        filteredEntries = registryEntries.filter(function(entry) {
+          return entry.entry_id.toLowerCase().indexOf(searchTerm) !== -1;
+        });
+      }
+
+      registryCurrentIndex = 0;
+      updateSearchResultsCount();
+      updateRegistryNavigation();
+      renderRegistryForm();
+    }
+
+    function clearSearch() {
+      document.getElementById('searchInput').value = '';
+      filterEntries();
+    }
+
+    function updateSearchResultsCount() {
+      var countEl = document.getElementById('searchResultsCount');
+      if (searchTerm) {
+        countEl.textContent = filteredEntries.length + ' of ' + registryEntries.length;
+      } else {
+        countEl.textContent = '';
+      }
+    }
+
+    // ---- Navigation ----
+    function navigateRegistry(delta) {
+      var newIndex = registryCurrentIndex + delta;
+      if (newIndex < 0 || newIndex >= filteredEntries.length) return;
+      registryCurrentIndex = newIndex;
+      updateRegistryNavigation();
+      renderRegistryForm();
+    }
+
+    function updateRegistryNavigation() {
+      var counter = document.getElementById('registryEntryCounter');
+      var prevBtn = document.getElementById('regPrevBtn');
+      var nextBtn = document.getElementById('regNextBtn');
+
+      counter.textContent = 'Entry ' + (registryCurrentIndex + 1) + ' of ' + filteredEntries.length;
+      prevBtn.disabled = registryCurrentIndex === 0;
+      nextBtn.disabled = registryCurrentIndex === filteredEntries.length - 1;
+    }
+
+    // ---- Form Rendering ----
+    function renderRegistryForm() {
+      var container = document.getElementById('registryFormContainer');
+      if (filteredEntries.length === 0) {
+        container.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:12px;">No entries found.</p>';
+        document.getElementById('varStatusIndicator').style.display = 'none';
+        return;
+      }
+
+      var entry = filteredEntries[registryCurrentIndex];
+      var html = '';
+
+      // Core section
+      html += '<div class="registry-section" id="regSecCore">';
+      html += '<div class="registry-section-header" onclick="toggleRegistrySection(\'regSecCore\')">';
+      html += '<span class="registry-section-chevron">&#9660;</span> Core';
+      html += '</div>';
+      html += '<div class="registry-section-body">';
+      html += '<div class="registry-field"><label>entry_id</label><input type="text" id="reg_entry_id" value="' + escHtml(entry.entry_id) + '" readonly /></div>';
+      html += '<div class="registry-field"><label>control_ids</label><textarea id="reg_control_ids" rows="2">' + escHtml((entry.control_ids || []).join(', ')) + '</textarea></div>';
+      html += '<div class="registry-field"><label>label</label><input type="text" id="reg_label" value="' + escHtml(entry.label || '') + '" /></div>';
+      html += '</div></div>';
+
+      // Execution section
+      html += '<div class="registry-section" id="regSecExec">';
+      html += '<div class="registry-section-header" onclick="toggleRegistrySection(\'regSecExec\')">';
+      html += '<span class="registry-section-chevron">&#9660;</span> Execution';
+      html += '</div>';
+      html += '<div class="registry-section-body">';
+      html += '<div class="registry-field"><label>engine</label>';
+      html += '<select id="reg_engine">';
+      var engines = ['mgraph','exchange','ipps','az','spo','teams','cli'];
+      for (var i = 0; i < engines.length; i++) {
+        var eng = engines[i];
+        var sel = entry.engine === eng ? ' selected' : '';
+        html += '<option value="' + eng + '"' + sel + '>' + eng + '</option>';
+      }
+      html += '</select></div>';
+      html += '<div class="registry-field"><label>get_command</label><textarea id="reg_get_command" rows="3">' + escHtml(entry.get_command || '') + '</textarea></div>';
+      html += '<div class="registry-field"><label>set_command</label><textarea id="reg_set_command" rows="3">' + escHtml(entry.set_command || '') + '</textarea></div>';
+      html += '<div class="registry-field"><label>idempotency</label>';
+      html += '<select id="reg_idempotency">';
+      var idems = ['get-then-set','unsafe_requires_gate','skip'];
+      for (var j = 0; j < idems.length; j++) {
+        var idem = idems[j];
+        var sel2 = entry.idempotency === idem ? ' selected' : '';
+        html += '<option value="' + idem + '"' + sel2 + '>' + idem + '</option>';
+      }
+      html += '</select></div>';
+      html += '</div></div>';
+
+      // Variables section
+      html += '<div class="registry-section collapsed" id="regSecVars">';
+      html += '<div class="registry-section-header" onclick="toggleRegistrySection(\'regSecVars\')">';
+      html += '<span class="registry-section-chevron">&#9660;</span> Variables';
+      html += '</div>';
+      html += '<div class="registry-section-body">';
+      html += '<div class="registry-field"><label>variables_required</label><textarea id="reg_variables_required" rows="2">' + escHtml((entry.variables_required || []).join(', ')) + '</textarea></div>';
+      html += '<div class="registry-field"><label>variables_runtime</label><textarea id="reg_variables_runtime" rows="2">' + escHtml((entry.variables_runtime || []).join(', ')) + '</textarea></div>';
+      html += '<div class="registry-field"><label>captures (JSON)</label><textarea id="reg_captures" rows="3">' + escHtml(JSON.stringify(entry.captures || [], null, 2)) + '</textarea></div>';
+      html += '</div></div>';
+
+      // Dependencies section
+      html += '<div class="registry-section collapsed" id="regSecDeps">';
+      html += '<div class="registry-section-header" onclick="toggleRegistrySection(\'regSecDeps\')">';
+      html += '<span class="registry-section-chevron">&#9660;</span> Dependencies';
+      html += '</div>';
+      html += '<div class="registry-section-body">';
+      html += '<div class="registry-field"><label>layer_hint</label><input type="number" id="reg_layer_hint" value="' + (entry.layer_hint || 0) + '" /></div>';
+      html += '<div class="registry-field"><label>sequence_hint</label><input type="number" id="reg_sequence_hint" value="' + (entry.sequence_hint || 0) + '" /></div>';
+      html += '</div></div>';
+
+      // Flags section
+      html += '<div class="registry-section collapsed" id="regSecFlags">';
+      html += '<div class="registry-section-header" onclick="toggleRegistrySection(\'regSecFlags\')">';
+      html += '<span class="registry-section-chevron">&#9660;</span> Flags';
+      html += '</div>';
+      html += '<div class="registry-section-body">';
+      html += '<div class="registry-field"><label><input type="checkbox" id="reg_manual_only"' + (entry.manual_only ? ' checked' : '') + ' /> manual_only</label></div>';
+      html += '<div class="registry-field"><label>on_failure</label>';
+      html += '<select id="reg_on_failure">';
+      var failures = ['abort_step','warn_continue','retry_once'];
+      for (var k = 0; k < failures.length; k++) {
+        var fail = failures[k];
+        var sel3 = entry.on_failure === fail ? ' selected' : '';
+        html += '<option value="' + fail + '"' + sel3 + '>' + fail + '</option>';
+      }
+      html += '</select></div>';
+      html += '</div></div>';
+
+      // Evidence section
+      html += '<div class="registry-section collapsed" id="regSecEvid">';
+      html += '<div class="registry-section-header" onclick="toggleRegistrySection(\'regSecEvid\')">';
+      html += '<span class="registry-section-chevron">&#9660;</span> Evidence';
+      html += '</div>';
+      html += '<div class="registry-section-body">';
+      html += '<div class="registry-field"><label>evidence_commands (one per line)</label><textarea id="reg_evidence_commands" rows="3">' + escHtml((entry.evidence_commands || []).join('\n')) + '</textarea></div>';
+      html += '<div class="registry-field"><label>verification (JSON)</label><textarea id="reg_verification" rows="3">' + escHtml(JSON.stringify(entry.verification || {}, null, 2)) + '</textarea></div>';
+      html += '</div></div>';
+
+      // Notes section
+      html += '<div class="registry-section collapsed" id="regSecNotes">';
+      html += '<div class="registry-section-header" onclick="toggleRegistrySection(\'regSecNotes\')">';
+      html += '<span class="registry-section-chevron">&#9660;</span> Notes';
+      html += '</div>';
+      html += '<div class="registry-section-body">';
+      html += '<div class="registry-field"><label>notes</label><textarea id="reg_notes" rows="3">' + escHtml(entry.notes || '') + '</textarea></div>';
+      html += '</div></div>';
+
+      container.innerHTML = html;
+
+      // Check variable resolution status
+      checkVariableResolution(entry);
+
+      // Hide resolve box on entry change
+      document.getElementById('registryResolveBox').style.display = 'none';
+    }
+
+    function toggleRegistrySection(sectionId) {
+      var section = document.getElementById(sectionId);
+      if (!section) return;
+      section.classList.toggle('collapsed');
+    }
+
+    // ---- Variable Resolution Check ----
+    function checkVariableResolution(entry) {
+      if (!currentTenant || currentTenant === 'dev') {
+        document.getElementById('varStatusIndicator').style.display = 'none';
+        return;
+      }
+
+      var getCmd = entry.get_command || '';
+      var setCmd = entry.set_command || '';
+      var combinedCmd = getCmd + '\n' + setCmd;
+
+      if (!combinedCmd.trim()) {
+        document.getElementById('varStatusIndicator').style.display = 'none';
+        return;
+      }
+
+      fetch('/api/registry/resolve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ command: combinedCmd, tenant: currentTenant })
+      })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          var indicator = document.getElementById('varStatusIndicator');
+          var icon = document.getElementById('varStatusIcon');
+          var text = document.getElementById('varStatusText');
+
+          indicator.style.display = '';
+
+          if (data.unresolved && data.unresolved.length > 0) {
+            indicator.className = 'var-status has-missing';
+            icon.textContent = '\u26A0';
+            text.textContent = 'Missing: ' + data.unresolved.join(', ');
+          } else {
+            indicator.className = 'var-status all-resolved';
+            icon.textContent = '\u2713';
+            text.textContent = 'All vars OK';
+          }
+        })
+        .catch(function(err) {
+          document.getElementById('varStatusIndicator').style.display = 'none';
+        });
+    }
+
+    // ---- Command Resolution ----
+    function resolveRegistryCmd(which) {
+      if (!currentTenant || currentTenant === 'dev') {
+        showToast('Select a tenant first', 'error');
+        return;
+      }
+
+      var cmdField = which === 'get' ? 'reg_get_command' : 'reg_set_command';
+      var cmd = document.getElementById(cmdField).value.trim();
+      if (!cmd) {
+        showToast('No ' + which.toUpperCase() + ' command to resolve', 'error');
+        return;
+      }
+
+      fetch('/api/registry/resolve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ command: cmd, tenant: currentTenant })
+      })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          var box = document.getElementById('registryResolveBox');
+          box.style.display = 'block';
+
+          var output = '# ' + which.toUpperCase() + ' Command (Resolved)\n\n';
+          output += data.resolved;
+
+          if (data.unresolved && data.unresolved.length > 0) {
+            output += '\n\n# Unresolved Variables:\n';
+            for (var i = 0; i < data.unresolved.length; i++) {
+              output += '- {' + data.unresolved[i] + '}\n';
+            }
+          }
+
+          box.textContent = output;
+        })
+        .catch(function(err) {
+          showToast('Resolve failed: ' + err.message, 'error');
+        });
+    }
+
+    function copyResolvedCmd() {
+      var box = document.getElementById('registryResolveBox');
+      var text = box.textContent;
+      if (!text) {
+        showToast('Nothing to copy', 'error');
+        return;
+      }
+
+      navigator.clipboard.writeText(text).then(function() {
+        showToast('Copied to clipboard', 'success');
+      }).catch(function() {
+        showToast('Copy failed', 'error');
+      });
+    }
+
+    // ---- Save Entry ----
+    function saveRegistryEntry() {
+      var entry = collectRegistryFormData();
+      if (!entry) return;
+
+      fetch('/api/registry/' + currentRegistryType + '/' + entry.entry_id, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(entry)
+      })
+        .then(function(res) {
+          if (!res.ok) {
+            return res.json().then(function(err) {
+              throw new Error(err.error || 'Save failed');
+            });
+          }
+          return res.json();
+        })
+        .then(function(data) {
+          showToast('Entry saved successfully', 'success');
+
+          // Update local cache
+          var actualIndex = registryEntries.findIndex(function(e) { return e.entry_id === entry.entry_id; });
+          if (actualIndex !== -1) {
+            registryEntries[actualIndex] = data.entry;
+          }
+          filteredEntries[registryCurrentIndex] = data.entry;
+
+          // Notify parent window
+          if (window.opener) {
+            window.opener.postMessage({ type: 'registry-saved', registryType: currentRegistryType }, '*');
+          }
+        })
+        .catch(function(err) {
+          showToast('Save failed: ' + err.message, 'error');
+        });
+    }
+
+    function collectRegistryFormData() {
+      if (filteredEntries.length === 0) return null;
+
+      var entry = {};
+
+      // Core
+      entry.entry_id = document.getElementById('reg_entry_id').value.trim();
+      var controlIdsText = document.getElementById('reg_control_ids').value.trim();
+      entry.control_ids = controlIdsText ? controlIdsText.split(',').map(function(s) { return s.trim(); }).filter(function(s) { return s; }) : [];
+      entry.label = document.getElementById('reg_label').value.trim();
+
+      // Execution
+      entry.engine = document.getElementById('reg_engine').value;
+      entry.get_command = document.getElementById('reg_get_command').value.trim() || undefined;
+      entry.set_command = document.getElementById('reg_set_command').value.trim() || undefined;
+      entry.idempotency = document.getElementById('reg_idempotency').value;
+
+      // Variables
+      var varsReqText = document.getElementById('reg_variables_required').value.trim();
+      entry.variables_required = varsReqText ? varsReqText.split(',').map(function(s) { return s.trim(); }).filter(function(s) { return s; }) : undefined;
+      var varsRtText = document.getElementById('reg_variables_runtime').value.trim();
+      entry.variables_runtime = varsRtText ? varsRtText.split(',').map(function(s) { return s.trim(); }).filter(function(s) { return s; }) : undefined;
+
+      var capturesText = document.getElementById('reg_captures').value.trim();
+      if (capturesText) {
+        try {
+          entry.captures = JSON.parse(capturesText);
+        } catch (e) {
+          showToast('Invalid JSON in captures field', 'error');
+          return null;
+        }
+      } else {
+        entry.captures = undefined;
+      }
+
+      // Dependencies
+      var layerVal = parseInt(document.getElementById('reg_layer_hint').value, 10);
+      entry.layer_hint = isNaN(layerVal) ? undefined : layerVal;
+      var seqVal = parseInt(document.getElementById('reg_sequence_hint').value, 10);
+      entry.sequence_hint = isNaN(seqVal) ? undefined : seqVal;
+
+      // Flags
+      entry.manual_only = document.getElementById('reg_manual_only').checked || undefined;
+      entry.on_failure = document.getElementById('reg_on_failure').value || undefined;
+
+      // Evidence
+      var evidText = document.getElementById('reg_evidence_commands').value.trim();
+      entry.evidence_commands = evidText ? evidText.split('\n').map(function(s) { return s.trim(); }).filter(function(s) { return s; }) : undefined;
+
+      var verifText = document.getElementById('reg_verification').value.trim();
+      if (verifText) {
+        try {
+          entry.verification = JSON.parse(verifText);
+        } catch (e) {
+          showToast('Invalid JSON in verification field', 'error');
+          return null;
+        }
+      } else {
+        entry.verification = undefined;
+      }
+
+      // Notes
+      entry.notes = document.getElementById('reg_notes').value.trim() || undefined;
+
+      return entry;
+    }
+
+    // ---- Utilities ----
+    function escHtml(s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function showToast(message, type) {
+      var toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast ' + type;
+
+      setTimeout(function() {
+        toast.classList.add('show');
+      }, 10);
+
+      setTimeout(function() {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

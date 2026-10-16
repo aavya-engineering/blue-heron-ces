@@ -1,0 +1,30 @@
+# syntax=docker/dockerfile:1
+FROM node:20-bookworm-slim AS builder
+
+WORKDIR /app
+COPY ces-stacksim-main/package*.json ./
+RUN npm ci
+
+COPY ces-stacksim-main/ ./
+RUN npm run build
+
+FROM node:20-bookworm-slim AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+ENV STACKSIM_HOST=0.0.0.0
+ENV PORT=4390
+
+COPY ces-stacksim-main/package*.json ./
+RUN npm ci --omit=dev || npm ci
+
+COPY --from=builder /app/dist ./dist
+COPY ces-stacksim-main/bin ./bin
+COPY ces-stacksim-main/profiles ./profiles
+COPY ces-stacksim-main/scripts ./scripts
+
+EXPOSE 4390
+
+HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://127.0.0.1:4390/', (r) => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))"
+
+CMD ["node", "bin/stacksim.mjs", "serve", "m365_azure", "--slug", "aoops-g5", "--port", "4390", "--host", "0.0.0.0"]

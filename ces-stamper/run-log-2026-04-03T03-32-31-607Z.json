@@ -1,0 +1,83 @@
+{
+  "executionMetadata": {
+    "planId": "unknown",
+    "tenant": "vfsgov-xtra",
+    "timestamp": "2026-04-03T03:32:31.552Z",
+    "operator": "unknown",
+    "sha256Hash": "df2cc503a7641c180860b068a918e4c76713579ee3e7ba89e893422ae17af45f"
+  },
+  "resources": [
+    {
+      "category": "discovered",
+      "type": "MgUser",
+      "path": "AC.L2-3.1.1.operator-discover",
+      "step": "step_task_AC.L1-3.1.2_mngm0qvu_2z694ca",
+      "timestamp": "2026-04-03T03:23:02.867Z",
+      "cmdlet": "Get-MgUser -Filter \"userPrincipalName eq 'operator@vfsgov.us'\""
+    },
+    {
+      "category": "discovered",
+      "type": "$roleId",
+      "path": "AC.L2-3.1.4.pim-policy-get",
+      "step": "step_task_AC.L2-3.1.4_mngm0qvu_marlw3f",
+      "timestamp": "2026-04-03T03:23:34.197Z",
+      "cmdlet": "$roleId = (Get-MgRoleManagementDirectoryRoleDefinition -Filter \"displayName eq 'Compliance Administrator'\").Id; $assignment = Get-MgPolicyRoleManagementPolicyAssignment -Filter \"scopeId eq '/' and scopeType eq 'DirectoryRole' and roleDefinitionId eq '$roleId'\" | Select-Object -First 1; Get-MgPolicyRoleManagementPolicy -UnifiedRoleManagementPolicyId $assignment.PolicyId | Select-Object Id,DisplayName | ConvertTo-Json -Depth 10"
+    },
+    {
+      "category": "discovered",
+      "type": "MgGraphRequest",
+      "path": "CM.L2-3.4.2.asr-rules",
+      "step": "step_task_CM.L2-3.4.2_mngm0qvy_ugm2gg0",
+      "timestamp": "2026-04-03T03:25:32.695Z",
+      "cmdlet": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/beta/deviceManagement/configurationPolicies').value | Where-Object name -like 'CMMC-ASR*'"
+    },
+    {
+      "category": "discovered",
+      "type": "MgGraphRequest",
+      "path": "CM.L2-3.4.7.wdac",
+      "step": "step_task_CM.L2-3.4.7_mngm0qvy_dpp94ne",
+      "timestamp": "2026-04-03T03:26:13.182Z",
+      "cmdlet": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object displayName -like 'CMMC-AppControl*' | Select-Object displayName,createdDateTime"
+    },
+    {
+      "category": "discovered",
+      "type": "MgGraphRequest",
+      "path": "CM.L2-3.4.7.wdac",
+      "step": "step_task_CM.L2-3.4.7_mngm0qvy_dpp94ne",
+      "timestamp": "2026-04-03T03:26:13.184Z",
+      "cmdlet": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object displayName -like 'CMMC-AppControl*' | Select-Object displayName,createdDateTime"
+    },
+    {
+      "category": "discovered",
+      "type": "MgGraphRequest",
+      "path": "CM.L2-3.4.9.install-control",
+      "step": "step_task_CM.L2-3.4.9_mngm0qvy_m6e67ny",
+      "timestamp": "2026-04-03T03:26:15.828Z",
+      "cmdlet": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object displayName -like 'CMMC-InstallControl*' | Select-Object displayName,createdDateTime"
+    },
+    {
+      "category": "discovered",
+      "type": "MgGraphRequest",
+      "path": "CM.L2-3.4.9.install-control",
+      "step": "step_task_CM.L2-3.4.9_mngm0qvy_m6e67ny",
+      "timestamp": "2026-04-03T03:26:15.829Z",
+      "cmdlet": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object displayName -like 'CMMC-InstallControl*' | Select-Object displayName,createdDateTime"
+    },
+    {
+      "category": "discovered",
+      "type": "AzSentinelAlertRule",
+      "path": "AZ-SEN-005",
+      "step": "step_task_SI.L1-3.14.1_mngm0qvz_lhqxpee",
+      "timestamp": "2026-04-03T03:26:45.401Z",
+      "cmdlet": "Get-AzSentinelAlertRule -ResourceGroupName rg-eo-prod -WorkspaceName vfsgov-law-prod | Where-Object DisplayName -eq 'CMMC L2 — Privileged Identity Changes'"
+    },
+    {
+      "category": "discovered",
+      "type": "AzContext",
+      "path": "AZ-CTX-001",
+      "step": "step_task_SC.L1-3.13.1_mngm0qvw_su95jfs",
+      "timestamp": "2026-04-03T03:28:39.518Z",
+      "cmdlet": "Get-AzContext | Select-Object -ExpandProperty Subscription | Where-Object { $_.Id -eq '668a730f-12a1-4c80-9734-89c621e98115' }"
+    }
+  ]
+}

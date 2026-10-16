@@ -1,0 +1,27 @@
+# syntax=docker/dockerfile:1
+FROM node:20-bookworm-slim AS builder
+
+WORKDIR /app
+COPY ces-tenant-main/package*.json ./
+RUN npm ci
+
+COPY ces-tenant-main/ ./
+RUN npm run build
+
+FROM node:20-bookworm-slim AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+ENV CES_TENANT_HOST=0.0.0.0
+ENV PORT=4690
+
+COPY ces-tenant-main/package*.json ./
+RUN npm ci --omit=dev || npm ci
+
+COPY --from=builder /app/dist ./dist
+
+EXPOSE 4690
+
+HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://127.0.0.1:4690/status', (r) => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"
+
+CMD ["node", "dist/service/cli.js", "serve", "--host", "0.0.0.0", "--port", "4690"]

@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Variables</title>
+  <link rel="icon" type="image/svg+xml" href="./ces-favicon.svg">
+  <link rel="stylesheet" href="./ces-ui.css">
+  <script src="./ces-theme-toggle.js"></script>
+  <style>
+    /* =======================================
+       TOKEN ALIAS SHIM — maps Blueprint-Dark
+       local names to CES canonical --co-* vars.
+       ces-ui.css :root provides light defaults;
+       [data-theme="dark"] provides dark overrides.
+       ======================================= */
+    :root {
+      --bg-page:           var(--co-bg);
+      --bg-panel:          var(--co-surface);
+      --bg-elevated:       var(--co-bg-elevated);
+      --bg-console:        var(--co-bg-console);
+      --border:            var(--co-border);
+      --border-subtle:     var(--co-border);
+      --text-body:         var(--co-text);
+      --text-muted:        var(--co-text-muted);
+      --text-heading:      var(--co-text);
+      --accent-blue:       var(--co-primary);
+      --accent-blue-hover: var(--co-primary-hover);
+      --accent-blue-subtle:var(--co-primary-focus);
+      --accent-green:      var(--co-compliant);
+      --accent-green-hover:var(--co-compliant);
+      --accent-amber:      var(--co-risk);
+      --accent-red:        var(--co-violation);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--co-font-sans);
+      font-size: 14px;
+      letter-spacing: 0.01em;
+      background: var(--bg-page);
+      color: var(--text-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      background: var(--bg-panel);
+      color: var(--text-heading);
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header .tenant-label {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+
+    .header .path-hint {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-left: auto;
+      font-family: var(--co-font-mono);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 300px;
+    }
+
+    /* ---- Tab Navigation ---- */
+    .tab-nav {
+      display: flex;
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .tab-btn:hover { color: var(--text-body); }
+    .tab-btn.active {
+      color: var(--accent-blue-subtle);
+      border-bottom-color: var(--accent-blue);
+    }
+
+    /* ---- Scrollable forms ---- */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .form-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 16px;
+    }
+
+    .form-scroll::-webkit-scrollbar { width: 6px; }
+    .form-scroll::-webkit-scrollbar-track { background: var(--bg-page); }
+    .form-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: var(--co-radius); }
+
+    /* ---- Config sections ---- */
+    .config-section { margin-bottom: 2px; }
+
+    .var-category-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 0;
+      cursor: pointer;
+      user-select: none;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-heading);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .var-category-header:hover { color: var(--accent-blue-subtle); }
+
+    .var-category-toggle {
+      font-size: 10px;
+      color: var(--text-muted);
+      transition: transform 0.2s;
+    }
+
+    .var-category-count {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-left: auto;
+    }
+
+    .var-category-body.collapsed { display: none; }
+
+    /* ---- Config fields ---- */
+    .config-field {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 3px 0 3px 20px;
+    }
+
+    .config-field:hover { background: rgba(30,64,175,0.04); border-radius: var(--co-radius); }
+
+    .config-field label {
+      margin: 0;
+      font-size: 11px;
+      font-family: var(--co-font-mono);
+      color: var(--text-body);
+      min-width: 160px;
+      flex-shrink: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .config-field input[type="text"],
+    .config-field input[type="password"] {
+      flex: 1;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-family: var(--co-font-mono);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--co-radius);
+      color: var(--text-body);
+      min-width: 0;
+    }
+
+    .config-field input:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 1px var(--accent-blue);
+    }
+
+    .config-field select {
+      flex: 1;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-family: var(--co-font-mono);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--co-radius);
+      color: var(--text-body);
+      min-width: 0;
+    }
+
+    .config-field select:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+    }
+
+    .config-field .var-eye {
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      width: 18px;
+      text-align: center;
+    }
+
+    .config-field .var-eye:hover { color: var(--text-body); }
+
+    .config-field.resource-id input { color: var(--text-muted); }
+
+    /* ---- TOU upload ---- */
+    .tou-upload-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 0 4px 20px;
+    }
+
+    .tou-upload-row label {
+      font-size: 11px;
+      font-family: var(--co-font-mono);
+      color: var(--text-body);
+      min-width: 160px;
+      flex-shrink: 0;
+      margin: 0;
+    }
+
+    .tou-file-name {
+      font-size: 12px;
+      color: var(--text-body);
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .tou-browse-btn {
+      font-size: 11px;
+      padding: 2px 8px;
+      background: var(--bg-elevated);
+      color: var(--text-body);
+      border: 1px solid var(--border);
+      border-radius: var(--co-radius);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .tou-browse-btn:hover { background: var(--bg-panel); border-color: var(--accent-blue); }
+
+    .tou-clear-btn {
+      font-size: 11px;
+      padding: 2px 6px;
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--co-radius);
+      cursor: pointer;
+      flex-shrink: 0;
+      display: none;
+    }
+
+    .tou-clear-btn:hover { color: var(--accent-red); border-color: var(--accent-red); }
+
+    /* ---- Plan Variables ---- */
+    .var-cat-badge {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: var(--co-radius);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      flex-shrink: 0;
+    }
+
+    .var-cat-badge.si  { background: var(--co-violation-bg); color: var(--co-violation); border: 1px solid var(--co-violation); }
+    .var-cat-badge.cui { background: var(--co-risk-bg); color: var(--co-risk); border: 1px solid var(--co-risk); }
+    .var-cat-badge.tcp { background: var(--co-review-bg); color: var(--co-review); border: 1px solid var(--co-review); }
+
+    .var-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 0 4px 20px;
+    }
+
+    .var-row:hover { background: rgba(30,64,175,0.04); border-radius: var(--co-radius); }
+
+    .var-row label {
+      margin: 0;
+      font-size: 11px;
+      font-family: var(--co-font-mono);
+      color: var(--text-body);
+      min-width: 220px;
+      flex-shrink: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .var-row input[type="text"],
+    .var-row input[type="password"] {
+      flex: 1;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-family: var(--co-font-mono);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--co-radius);
+      color: var(--text-body);
+      min-width: 0;
+    }
+
+    .var-row input:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 1px var(--accent-blue);
+    }
+
+    .var-row.var-missing input {
+      border-color: var(--accent-amber);
+      background: var(--co-risk-bg);
+    }
+
+    .var-row.var-missing label { color: var(--accent-amber); }
+
+    .var-missing-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--co-risk-bg);
+      color: var(--co-risk);
+      font-size: 10px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-left: 4px;
+      cursor: help;
+    }
+
+    .var-row .var-eye {
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      width: 18px;
+      text-align: center;
+    }
+
+    .var-row .var-eye:hover { color: var(--text-body); }
+
+    .var-check-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: var(--co-radius);
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 13px;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      flex-shrink: 0;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .var-check-btn:hover { color: var(--accent-blue); border-color: var(--accent-blue); }
+    .var-check-btn:disabled { opacity: 0.4; cursor: default; }
+    .var-check-btn.resolved { color: var(--accent-green); border-color: var(--accent-green); }
+    .var-check-btn.failed { color: var(--accent-red); border-color: var(--accent-red); }
+
+    /* ---- Button bar ---- */
+    .btn-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--bg-panel);
+    }
+
+    .btn-sm {
+      padding: 6px 14px;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      color: var(--text-body);
+      border-radius: var(--co-radius);
+      cursor: pointer;
+    }
+
+    .btn-sm:hover:not(:disabled) {
+      background: var(--bg-panel);
+      border-color: var(--accent-blue);
+      color: var(--accent-blue-subtle);
+    }
+
+    .btn-sm:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--accent-blue);
+      border-color: var(--accent-blue);
+      color: #fff;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--accent-blue-hover);
+      border-color: var(--accent-blue-hover);
+      color: #fff;
+    }
+
+    .dirty-hint {
+      font-size: 11px;
+      color: var(--accent-amber);
+      display: none;
+    }
+
+    /* ---- Search ---- */
+    .search-bar {
+      padding: 8px 16px;
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .search-bar input {
+      width: 100%;
+      padding: 6px 10px 6px 28px;
+      font-size: 12px;
+      font-family: var(--co-font-sans);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--co-radius);
+      color: var(--text-body);
+      outline: none;
+    }
+
+    .search-bar input:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 1px var(--accent-blue);
+    }
+
+    .search-bar input::placeholder { color: var(--text-muted); }
+
+    .search-bar-wrap {
+      position: relative;
+    }
+
+    .search-bar-wrap::before {
+      content: '\1F50D';
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-no-results {
+      text-align: center;
+      padding: 20px 16px;
+      color: var(--text-muted);
+      font-size: 12px;
+      display: none;
+    }
+
+    .config-field.search-hidden,
+    .var-row.search-hidden,
+    .tou-upload-row.search-hidden,
+    .config-section.search-hidden { display: none !important; }
+
+    /* ---- Empty state ---- */
+    .empty-state {
+      text-align: center;
+      padding: 40px 16px;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 12px 18px;
+      border-radius: var(--co-radius);
+      font-size: 13px;
+      font-weight: 500;
+      z-index: 10000;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.success { background: var(--accent-green); color: #fff; }
+    .toast.error { background: var(--accent-red); color: #fff; }
+
+    /* ---- Tooltips ---- */
+    .tooltip-target {
+      position: relative;
+      overflow: visible !important;
+    }
+
+    .tooltip-target::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 0;
+      max-width: 320px;
+      white-space: normal;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      font-size: 11px;
+      line-height: 1.4;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      z-index: 9999;
+      margin-bottom: 4px;
+      border-radius: var(--co-radius);
+      box-shadow: var(--co-shadow-md);
+    }
+
+    .tooltip-target:hover::after {
+      opacity: 1;
+      transition-delay: 0.2s;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    Variables
+    <span class="tenant-label">Tenant:</span>
+    <span id="tenantName" style="font-family:var(--co-font-mono);font-size:11px;color:var(--text-body);"></span>
+    <span class="path-hint" id="pathHint"></span>
+    <button id="ces-theme-toggle" title="Toggle light/dark theme" style="margin-left:8px;padding:2px 6px;font-size:12px;background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-body);cursor:pointer;border-radius:var(--co-radius);">&#9680;</button>
+  </div>
+
+  <div class="tab-nav">
+    <button class="tab-btn active" data-tab="config" onclick="switchTab('config')">Config</button>
+    <button class="tab-btn" data-tab="variables" onclick="switchTab('variables')">Variables</button>
+  </div>
+
+  <div class="search-bar" id="searchBar">
+    <div class="search-bar-wrap">
+      <input type="text" id="searchInput" placeholder="Filter by name or value..." oninput="filterItems()" />
+    </div>
+  </div>
+
+  <div id="emptyState" class="empty-state" style="display:none;">
+    <p>No tenant selected.</p>
+  </div>
+
+  <!-- Config Tab -->
+  <div class="tab-content active" id="configTab">
+    <div class="form-scroll" id="configFormScroll">
+      <!-- Client -->
+      <div class="config-section">
+        <div class="var-category-header" onclick="toggleSection('cfgClient')">
+          <span class="var-category-toggle" id="cfgClientToggle">&#9660;</span>
+          Client
+          <span class="var-category-count" id="cfgClientCount"></span>
+        </div>
+        <div class="var-category-body" id="cfgClientBody">
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Unique tenant identifier (alphanumeric + hyphens/underscores). Used in file paths and URLs.">slug</label><input type="text" data-path="client.slug" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Human-readable organization name. Displayed in reports and UI headers.">name</label><input type="text" data-path="client.name" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Unique engagement tracking number. Links this tenant to contract/project records.">engagement_id</label><input type="text" data-path="client.engagement_id" /></div>
+        </div>
+      </div>
+      <!-- Tenant -->
+      <div class="config-section">
+        <div class="var-category-header" onclick="toggleSection('cfgTenant')">
+          <span class="var-category-toggle" id="cfgTenantToggle">&#9660;</span>
+          Tenant
+          <span class="var-category-count" id="cfgTenantCount"></span>
+        </div>
+        <div class="var-category-body" id="cfgTenantBody">
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Azure AD/Entra tenant GUID. Identifies the M365 tenant for authentication.">tenant_id</label><input type="text" data-path="tenant.tenant_id" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Primary tenant domain (e.g., example.onmicrosoft.us). Used for M365 API connections.">domain</label><input type="text" data-path="tenant.domain" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Cloud environment type (gcchigh/gcc/commercial). Determines API endpoints and compliance requirements.">environment</label>
+            <select data-path="tenant.environment">
+              <option value="">--</option>
+              <option value="gcchigh">gcchigh</option>
+              <option value="gcc">gcc</option>
+              <option value="commercial">commercial</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <!-- Auth -->
+      <div class="config-section">
+        <div class="var-category-header" onclick="toggleSection('cfgAuth')">
+          <span class="var-category-toggle" id="cfgAuthToggle">&#9660;</span>
+          Auth
+          <span class="var-category-count" id="cfgAuthCount"></span>
+        </div>
+        <div class="var-category-body" id="cfgAuthBody">
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Enterprise application client ID. Used for certificate-based authentication to M365/Azure.">app_id</label><input type="text" data-path="auth.app_id" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Certificate thumbprint (40-char hex). Identifies the authentication certificate in local store.">cert_thumbprint</label><input type="password" data-path="auth.cert_thumbprint" /><span class="var-eye" onclick="toggleEye(this)">&#128065;</span></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Filesystem path to PFX/CER certificate. Used for PowerShell session establishment.">cert_path</label><input type="text" data-path="auth.cert_path" /></div>
+        </div>
+      </div>
+      <!-- Endpoints -->
+      <div class="config-section">
+        <div class="var-category-header" onclick="toggleSection('cfgEndpoints')">
+          <span class="var-category-toggle" id="cfgEndpointsToggle">&#9660;</span>
+          Endpoints
+          <span class="var-category-count" id="cfgEndpointsCount"></span>
+        </div>
+        <div class="var-category-body collapsed" id="cfgEndpointsBody">
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Microsoft Graph API endpoint URL. Environment-specific (commercial vs GCC High).">graph</label><input type="text" data-path="endpoints.graph" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Azure AD login endpoint URL. Used for token acquisition.">login</label><input type="text" data-path="endpoints.login" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Security & Compliance Center endpoint. Used for DLP, retention, audit log access.">compliance_uri</label><input type="text" data-path="endpoints.compliance_uri" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Exchange Online environment name (O365USGovGCCHigh/O365Default). Used by ExchangeOnlineManagement module.">exchange_env</label><input type="text" data-path="endpoints.exchange_env" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Azure authentication endpoint URL. Used for Azure PowerShell and CLI connections.">azure_auth</label><input type="text" data-path="endpoints.azure_auth" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Azure Resource Manager endpoint URL. Used for Azure resource management.">arm</label><input type="text" data-path="endpoints.arm" /></div>
+        </div>
+      </div>
+      <!-- Subscription -->
+      <div class="config-section">
+        <div class="var-category-header" onclick="toggleSection('cfgSubscription')">
+          <span class="var-category-toggle" id="cfgSubscriptionToggle">&#9660;</span>
+          Subscription
+          <span class="var-category-count" id="cfgSubscriptionCount"></span>
+        </div>
+        <div class="var-category-body" id="cfgSubscriptionBody">
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Azure subscription GUID. Identifies the Azure subscription for infrastructure deployment.">subscription_id</label><input type="text" data-path="subscription.subscription_id" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Azure resource group name. Container for all CMMC-related Azure resources.">resource_group</label><input type="text" data-path="subscription.resource_group" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Azure region code (usgovvirginia/usgovarizona). Physical location for resource deployment.">location</label><input type="text" data-path="subscription.location" /></div>
+        </div>
+      </div>
+      <!-- Resources -->
+      <div class="config-section">
+        <div class="var-category-header" onclick="toggleSection('cfgResources')">
+          <span class="var-category-toggle" id="cfgResourcesTogg">&#9660;</span>
+          Resources
+          <span class="var-category-count" id="cfgResourcesCount"></span>
+        </div>
+        <div class="var-category-body collapsed" id="cfgResourcesBody">
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Log Analytics Workspace name. Central logging repository for security events and audit logs.">law_name</label><input type="text" data-path="resources.law_name" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Log Analytics Workspace GUID. Unique identifier for KQL queries and agent configuration.">law_workspace_id</label><input type="text" data-path="resources.law_workspace_id" /></div>
+          <div class="config-field resource-id"><label class="tooltip-target" data-tooltip="Log Analytics full Azure resource ID. Used for diagnostic settings and RBAC assignments.">law_resource_id</label><input type="text" data-path="resources.law_resource_id" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Key Vault name. Stores secrets, keys, and certificates for encryption and authentication.">kv_name</label><input type="text" data-path="resources.kv_name" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Key Vault URI (https://name.vault.usgovcloudapi.net). Endpoint for secret retrieval and key operations.">kv_uri</label><input type="text" data-path="resources.kv_uri" /></div>
+          <div class="config-field resource-id"><label class="tooltip-target" data-tooltip="Key Vault full Azure resource ID. Used for access policies and diagnostic settings.">kv_resource_id</label><input type="text" data-path="resources.kv_resource_id" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Storage Account name. Stores evidence artifacts, logs, and compliance documentation.">storage_account_name</label><input type="text" data-path="resources.storage_account_name" /></div>
+          <div class="config-field resource-id"><label class="tooltip-target" data-tooltip="Storage Account full Azure resource ID. Used for RBAC and CMK encryption configuration.">storage_resource_id</label><input type="text" data-path="resources.storage_resource_id" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Storage Account Managed Identity principal ID. Used for Key Vault access without secrets.">storage_mi_principal_id</label><input type="text" data-path="resources.storage_mi_principal_id" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Automation Account name. Hosts runbooks for automated compliance checks and remediation.">automation_account_name</label><input type="text" data-path="resources.automation_account_name" /></div>
+          <div class="config-field resource-id"><label class="tooltip-target" data-tooltip="Automation Account full Azure resource ID. Used for RBAC and diagnostic settings.">automation_resource_id</label><input type="text" data-path="resources.automation_resource_id" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Automation Account Managed Identity principal ID. Used for authenticated runbook execution.">automation_mi_principal_id</label><input type="text" data-path="resources.automation_mi_principal_id" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Virtual Network name. Network isolation boundary for secure enclaves.">vnet_name</label><input type="text" data-path="resources.vnet_name" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Network Security Group name. Firewall rules for inbound/outbound traffic control.">nsg_name</label><input type="text" data-path="resources.nsg_name" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Exchange Online service principal object ID. Used for mailbox encryption with customer-managed keys.">eo_sp_object_id</label><input type="text" data-path="resources.eo_sp_object_id" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Customer-Managed Key name in Key Vault. Used for encryption of M365 data at rest.">cmk_key_name</label><input type="text" data-path="resources.cmk_key_name" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="CMK version GUID. Specific key version for encryption operations (supports key rotation).">cmk_key_version</label><input type="text" data-path="resources.cmk_key_version" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Security group name for CUI access. Membership determines access to Controlled Unclassified Information.">cui_group_name</label><input type="text" data-path="resources.cui_group_name" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Break-glass admin UPN (user@domain.us). Emergency access account excluded from MFA/Conditional Access.">breakglass_upn</label><input type="text" data-path="resources.breakglass_upn" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Operator admin UPN. Primary administrative account for daily operations and compliance execution.">operator_upn</label><input type="text" data-path="resources.operator_upn" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Local admin username for Azure VMs. Used for initial VM provisioning and recovery.">admin_username</label><input type="text" data-path="resources.admin_username" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Primary vanity domain (example.gov). Custom domain for user email addresses and SharePoint sites.">primary_domain</label><input type="text" data-path="resources.primary_domain" placeholder="example.onmicrosoft.us" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Virtual machine name. Jump box or secure enclave VM for administrative access.">vm_name</label><input type="text" data-path="resources.vm_name" placeholder="az-vm-enclave-01" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="CISO email address. Receives security alerts, audit reports, and compliance notifications.">ciso_email</label><input type="text" data-path="resources.ciso_email" placeholder="ciso@example.gov" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Security team email. Distribution list for security incidents and vulnerability alerts.">security_email</label><input type="text" data-path="resources.security_email" placeholder="security@example.gov" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Compliance Administrator role definition ID. Custom RBAC role for compliance operations.">compliance_role_id</label><input type="text" data-path="resources.compliance_role_id" placeholder="00000000-0000-0000-0000-000000000000" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Custom role definition GUID. Application-specific RBAC role for least-privilege access.">role_def_id</label><input type="text" data-path="resources.role_def_id" placeholder="00000000-0000-0000-0000-000000000000" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Secure WiFi network name. Enclave wireless network for CUI access.">wifi_ssid</label><input type="text" data-path="resources.wifi_ssid" placeholder="EnclaveSecureWiFi" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Approved IP CIDR range (10.0.0.0/24). Whitelist for Conditional Access and firewall rules.">approved_ip_range</label><input type="text" data-path="resources.approved_ip_range" placeholder="10.0.0.0/24" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Initial VM password. Temporary password for first-time VM login (must be changed).">initial_password</label><input type="password" data-path="resources.initial_password" placeholder="Initial VM password" /></div>
+          <!-- Terms of Use PDF upload -->
+          <input type="hidden" id="touFileName" data-path="resources.tou_file_name" />
+          <input type="hidden" id="touFileBase64" data-path="resources.tou_file_base64" />
+          <div class="tou-upload-row">
+            <label class="tooltip-target" data-tooltip="Terms of Use PDF file. User acceptance agreement displayed at login (3MB max).">terms_of_use</label>
+            <span class="tou-file-name" id="touFileLabel">No file selected</span>
+            <button type="button" class="tou-browse-btn" id="touBrowseBtn">Browse</button>
+            <button type="button" class="tou-browse-btn" id="touLoadSampleBtn" title="Load sample CUI TOU from project">Sample</button>
+            <input type="file" id="touFileInput" accept=".pdf" style="display:none" />
+            <button type="button" class="tou-clear-btn" id="touClearBtn">&times;</button>
+          </div>
+        </div>
+      </div>
+      <!-- Onboarding -->
+      <div class="config-section">
+        <div class="var-category-header" onclick="toggleSection('cfgOnboarding')">
+          <span class="var-category-toggle" id="cfgOnboardingToggle">&#9660;</span>
+          Onboarding
+          <span class="var-category-count" id="cfgOnboardingCount"></span>
+        </div>
+        <div class="var-category-body collapsed" id="cfgOnboardingBody">
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Tenant bootstrap timestamp (ISO 8601). Records when tenant config was first created.">bootstrapped_at</label><input type="text" data-path="onboarding.bootstrapped_at" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Bootstrap operator name/email. Audit trail for tenant provisioning.">bootstrapped_by</label><input type="text" data-path="onboarding.bootstrapped_by" /></div>
+          <div class="config-field"><label class="tooltip-target" data-tooltip="Certificate expiration date (ISO 8601). Tracks authentication certificate lifecycle for renewal planning.">cert_expires</label><input type="text" data-path="onboarding.cert_expires" /></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="search-no-results" id="configNoResults">No matches</div>
+    <div class="btn-bar" id="configBtnBar">
+      <button class="btn-sm" onclick="loadTenantFromFile()">Load</button>
+      <span class="dirty-hint" id="configDirtyHint">Unsaved changes</span>
+      <button class="btn-sm btn-primary" id="configSaveBtn" onclick="saveConfig()" disabled style="margin-left:auto;">Save</button>
+      <button class="btn-sm" onclick="saveConfigAs()">Save As</button>
+    </div>
+  </div>
+
+  <!-- Variables Tab -->
+  <div class="tab-content" id="variablesTab">
+    <div class="form-scroll" id="variablesFormScroll"></div>
+    <div class="search-no-results" id="variablesNoResults">No matches</div>
+    <div class="btn-bar" id="variablesBtnBar">
+      <button class="btn-sm btn-primary" id="resolveAllBtn" onclick="resolveAllVariables()">Resolve All</button>
+      <span class="dirty-hint" id="variablesDirtyHint">Unsaved changes</span>
+      <button class="btn-sm btn-primary" id="variablesSaveBtn" onclick="saveVariables()" disabled style="margin-left:auto;">Save</button>
+      <button class="btn-sm" onclick="cancelVariables()">Cancel</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---- State ----
+    var currentTenant = '';
+    var configOriginal = {};
+    var variablesOriginal = {};
+    var resolvableVarsSet = new Set();
+
+    // ---- Init ----
+    (function init() {
+      var params = new URLSearchParams(window.location.search);
+      currentTenant = params.get('tenant') || '';
+
+      if (!currentTenant || currentTenant === 'dev') {
+        document.getElementById('emptyState').style.display = '';
+        return;
+      }
+
+      document.getElementById('tenantName').textContent = currentTenant;
+      loadResolvableVariables();
+      loadTenantConfig(currentTenant);
+      loadTenantVariables(currentTenant);
+
+      // Dirty detection on input (both tabs)
+      document.getElementById('configFormScroll').addEventListener('input', function() {
+        updateDirtyState('config');
+        updateConfigSectionCounts();
+      });
+      document.getElementById('variablesFormScroll').addEventListener('input', function() {
+        updateDirtyState('variables');
+      });
+
+      initTouUpload();
+    })();
+
+    // ---- Tab Switching ----
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-btn').forEach(function(btn) {
+        btn.classList.toggle('active', btn.getAttribute('data-tab') === tabName);
+      });
+      document.querySelectorAll('.tab-content').forEach(function(content) {
+        content.classList.toggle('active', content.id === tabName + 'Tab');
+      });
+      // Re-apply search filter to new tab
+      filterItems();
+    }
+
+    // ---- Config Tab ----
+    async function loadTenantConfig(slug) {
+      var pathHint = document.getElementById('pathHint');
+      configOriginal = {};
+      updateDirtyState('config');
+
+      try {
+        var resp = await fetch('/api/tenants/' + encodeURIComponent(slug));
+        var data = await resp.json();
+        if (!data.ok) {
+          showToast('Failed to load config: ' + (data.error || 'Unknown'), 'error');
+          return;
+        }
+        configOriginal = data.config || {};
+        populateConfigForm(configOriginal);
+        if (pathHint) { pathHint.textContent = data.path || ''; pathHint.title = data.path || ''; }
+        updateDirtyState('config');
+        document.title = 'Variables — ' + slug;
+      } catch (e) {
+        showToast('Failed to load config: ' + e.message, 'error');
+      }
+    }
+
+    function populateConfigForm(config) {
+      var inputs = document.querySelectorAll('#configFormScroll [data-path]');
+      for (var i = 0; i < inputs.length; i++) {
+        var el = inputs[i];
+        var path = el.getAttribute('data-path');
+        var parts = path.split('.');
+        var val = config;
+        for (var j = 0; j < parts.length; j++) {
+          val = val ? val[parts[j]] : undefined;
+        }
+        el.value = val || '';
+      }
+      updateConfigSectionCounts();
+      // Refresh ToU display
+      var touName = document.getElementById('touFileName');
+      var touLabel = document.getElementById('touFileLabel');
+      var touClear = document.getElementById('touClearBtn');
+      if (touName && touLabel && touClear) {
+        if (touName.value) {
+          touLabel.textContent = touName.value;
+          touClear.style.display = '';
+        } else {
+          touLabel.textContent = 'No file selected';
+          touClear.style.display = 'none';
+        }
+      }
+    }
+
+    function serializeConfigForm() {
+      var cfg = {};
+      var inputs = document.querySelectorAll('#configFormScroll [data-path]');
+      for (var i = 0; i < inputs.length; i++) {
+        var el = inputs[i];
+        var path = el.getAttribute('data-path');
+        var parts = path.split('.');
+        var val = el.value;
+        if (!val && val !== '0') continue;
+        var obj = cfg;
+        for (var j = 0; j < parts.length - 1; j++) {
+          if (!obj[parts[j]]) obj[parts[j]] = {};
+          obj = obj[parts[j]];
+        }
+        obj[parts[parts.length - 1]] = val;
+      }
+      // Preserve last_session (translate_paths etc.) from original config
+      if (configOriginal.last_session) {
+        cfg.last_session = configOriginal.last_session;
+      }
+      return cfg;
+    }
+
+    function updateConfigSectionCounts() {
+      var sections = {
+        cfgClient: 'client', cfgTenant: 'tenant', cfgAuth: 'auth',
+        cfgEndpoints: 'endpoints', cfgSubscription: 'subscription',
+        cfgResources: 'resources', cfgOnboarding: 'onboarding'
+      };
+      for (var prefix in sections) {
+        var body = document.getElementById(prefix + 'Body');
+        if (!body) continue;
+        var inputs = body.querySelectorAll('[data-path]');
+        var filled = 0;
+        for (var i = 0; i < inputs.length; i++) {
+          if (inputs[i].value && inputs[i].value.trim()) filled++;
+        }
+        var countEl = document.getElementById(prefix + 'Count');
+        if (countEl) countEl.textContent = filled + '/' + inputs.length;
+      }
+    }
+
+    async function saveConfig() {
+      if (!currentTenant) return;
+
+      var cfg = serializeConfigForm();
+      var json = JSON.stringify(cfg, null, 2);
+
+      try {
+        var resp = await fetch('/api/tenants/' + encodeURIComponent(currentTenant), {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ json: json })
+        });
+        var data = await resp.json();
+        if (!data.ok) {
+          showToast('Save failed: ' + (data.error || 'Unknown'), 'error');
+          return;
+        }
+        configOriginal = cfg;
+        updateDirtyState('config');
+        showToast('Config saved', 'success');
+
+        // Notify parent
+        if (window.opener) {
+          window.opener.postMessage({ type: 'config-saved', tenant: currentTenant }, '*');
+        }
+      } catch (e) {
+        showToast('Save failed: ' + e.message, 'error');
+      }
+    }
+
+    async function saveConfigAs() {
+      var newSlug = prompt('Enter new tenant slug (letters, numbers, hyphens, underscores):');
+      if (!newSlug) return;
+      newSlug = newSlug.trim();
+      if (!/^[a-zA-Z0-9_-]+$/.test(newSlug)) {
+        showToast('Invalid slug', 'error');
+        return;
+      }
+
+      var cfg = serializeConfigForm();
+      if (!cfg.client) cfg.client = {};
+      cfg.client.slug = newSlug;
+      var json = JSON.stringify(cfg, null, 2);
+
+      try {
+        var resp = await fetch('/api/tenants', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ json: json })
+        });
+        var data = await resp.json();
+        if (!data.ok) {
+          showToast('Save As failed: ' + (data.error || 'Unknown'), 'error');
+          return;
+        }
+        showToast('Saved as: ' + newSlug, 'success');
+
+        if (window.opener) {
+          window.opener.postMessage({ type: 'config-saved', tenant: newSlug }, '*');
+        }
+      } catch (e) {
+        showToast('Save As failed: ' + e.message, 'error');
+      }
+    }
+
+    function loadTenantFromFile() {
+      fetch('/api/tenants-browse')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (!data.ok || !data.files || data.files.length === 0) {
+            showToast('No tenant files found', 'error');
+            return;
+          }
+          var names = data.files.map(function(f) { return f.name; });
+          var choice = prompt('Available configs:\n' + names.join('\n') + '\n\nEnter filename to load:');
+          if (!choice) return;
+          var match = data.files.find(function(f) { return f.name === choice || f.name === choice + '.json'; });
+          if (!match) {
+            showToast('File not found: ' + choice, 'error');
+            return;
+          }
+          loadTenantFromPath(match.path);
+        })
+        .catch(function(err) {
+          showToast('Failed to browse: ' + err.message, 'error');
+        });
+    }
+
+    async function loadTenantFromPath(filePath) {
+      try {
+        var resp = await fetch('/api/browse-file?path=' + encodeURIComponent(filePath));
+        var data = await resp.json();
+        if (!data.ok) {
+          showToast('Failed to load: ' + (data.error || 'Unknown'), 'error');
+          return;
+        }
+        var cfg = JSON.parse(data.content);
+        configOriginal = cfg;
+        populateConfigForm(cfg);
+
+        var pathHint = document.getElementById('pathHint');
+        if (pathHint) { pathHint.textContent = filePath; pathHint.title = filePath; }
+
+        updateDirtyState('config');
+        showToast('Loaded from ' + filePath.split(/[/\\]/).pop(), 'success');
+      } catch (e) {
+        showToast('Failed to load: ' + e.message, 'error');
+      }
+    }
+
+    // ---- Resolvable Variables List ----
+    async function loadResolvableVariables() {
+      try {
+        var resp = await fetch('/api/resolvable-variables');
+        var data = await resp.json();
+        if (data.ok && data.variables) {
+          resolvableVarsSet = new Set(data.variables);
+        }
+      } catch (e) {
+        console.error('Failed to load resolvable variables:', e);
+      }
+    }
+
+    // ---- Variables Tab ----
+    async function loadTenantVariables(slug) {
+      variablesOriginal = {};
+      updateDirtyState('variables');
+
+      try {
+        var resp = await fetch('/api/tenants/' + encodeURIComponent(slug) + '/variables');
+        var data = await resp.json();
+        if (!data.ok) {
+          // Empty variables file is OK
+          variablesOriginal = {};
+          renderVariablesForm({});
+          return;
+        }
+        variablesOriginal = data.variables || {};
+        renderVariablesForm(variablesOriginal);
+        updateDirtyState('variables');
+      } catch (e) {
+        variablesOriginal = {};
+        renderVariablesForm({});
+      }
+    }
+
+    function renderVariablesForm(vars) {
+      var container = document.getElementById('variablesFormScroll');
+
+      // Classify variables
+      var groups = { cui: [], tcp: [], si: [] };
+      for (var key in vars) {
+        if (key.startsWith('_') || key.startsWith('config_intent.')) continue;
+        var cat = classifyVariable(key);
+        groups[cat].push({ name: key, value: vars[key] });
+      }
+
+      var catLabels = {
+        cui: 'Controlled Unclassified Information',
+        tcp: 'Tenant Configuration Parameters',
+        si: 'Sensitive Information'
+      };
+
+      var html = '';
+      var catOrder = ['cui', 'tcp', 'si'];
+      for (var ci = 0; ci < catOrder.length; ci++) {
+        var cat = catOrder[ci];
+        var items = groups[cat];
+        if (items.length === 0) continue;
+
+        html += '<div class="config-section">';
+        html += '<div class="var-category-header" onclick="toggleSection(\'var' + cat.toUpperCase() + '\')">';
+        html += '<span class="var-category-toggle" id="var' + cat.toUpperCase() + 'Toggle">&#9660;</span>';
+        html += '<span class="var-cat-badge ' + cat + '">' + cat.toUpperCase() + '</span>';
+        html += '<span>' + escHtml(catLabels[cat]) + '</span>';
+        html += '<span class="var-category-count">' + items.length + ' vars</span>';
+        html += '</div>';
+        html += '<div class="var-category-body" id="var' + cat.toUpperCase() + 'Body">';
+
+        for (var j = 0; j < items.length; j++) {
+          var v = items[j];
+          var inputType = cat === 'si' ? 'password' : 'text';
+          var valStr = v.value === null || v.value === undefined ? '' : String(v.value);
+          var eyeBtn = cat === 'si' ? '<span class="var-eye" onclick="toggleVarEye(this)" title="Show/hide">&#128065;</span>' : '';
+          var resolvable = resolvableVarsSet.has(v.name);
+          var resolveBtn = resolvable ? '<button class="var-check-btn" onclick="resolveVariable(\'' + escHtml(v.name) + '\')" title="Auto-resolve from tenant">&#128269;</button>' : '';
+          var isEmpty = valStr === '';
+          var rowClass = isEmpty ? 'var-row var-missing' : 'var-row';
+          var tooltip = getVariableTooltip(v.name, cat);
+
+          html += '<div class="' + rowClass + '">';
+          html += '<label class="tooltip-target" data-tooltip="' + escHtml(tooltip) + '" title="' + escHtml(v.name) + '">' + escHtml(v.name) + '</label>';
+          var badge = '';
+          if (isEmpty && !resolvable) {
+            badge = '<span class="var-missing-badge" title="Required by registry entries">!</span>';
+          }
+          html += badge;
+          html += '<input type="' + inputType + '" value="' + escHtml(valStr) + '" data-var="' + escHtml(v.name) + '" ' + (resolvable ? 'data-resolvable="true"' : '') + ' />';
+          html += eyeBtn;
+          html += resolveBtn;
+          html += '</div>';
+        }
+
+        html += '</div>';
+        html += '</div>';
+      }
+
+      if (html === '') {
+        html = '<div class="empty-state"><p>No plan variables yet. Variables are created after running Translate.</p></div>';
+      }
+
+      container.innerHTML = html;
+    }
+
+    function serializeVariablesForm() {
+      var vars = {};
+      var inputs = document.querySelectorAll('#variablesFormScroll input[data-var]');
+      for (var i = 0; i < inputs.length; i++) {
+        var name = inputs[i].getAttribute('data-var');
+        var val = inputs[i].value;
+        // Preserve type for booleans and numbers
+        if (val === 'true') val = true;
+        else if (val === 'false') val = false;
+        else if (val !== '' && !isNaN(Number(val)) && val.trim() === val) val = Number(val);
+        vars[name] = val;
+      }
+      return vars;
+    }
+
+    async function saveVariables() {
+      if (!currentTenant) return;
+
+      var vars = serializeVariablesForm();
+
+      try {
+        var resp = await fetch('/api/tenants/' + encodeURIComponent(currentTenant) + '/variables', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ variables: vars })
+        });
+        var data = await resp.json();
+        if (!data.ok) {
+          showToast('Save failed: ' + (data.error || 'Unknown'), 'error');
+          return;
+        }
+        variablesOriginal = vars;
+        updateDirtyState('variables');
+        showToast('Variables saved', 'success');
+
+        if (window.opener) {
+          window.opener.postMessage({ type: 'variables-saved' }, '*');
+        }
+      } catch (e) {
+        showToast('Save failed: ' + e.message, 'error');
+      }
+    }
+
+    function cancelVariables() {
+      renderVariablesForm(variablesOriginal);
+      updateDirtyState('variables');
+    }
+
+    function classifyVariable(varName) {
+      var SI_VARS = /password|secret|key|token|thumbprint|cert_path/i;
+      var CUI_VARS = /email|upn|name|domain|tenant|app_id|subscription|resource|location|group|ip|ssid/i;
+      if (SI_VARS.test(varName)) return 'si';
+      if (CUI_VARS.test(varName)) return 'cui';
+      return 'tcp';
+    }
+
+    function getVariableTooltip(varName, category) {
+      var tooltips = {
+        'tenantId': 'Azure AD tenant GUID',
+        'appId': 'Enterprise application client ID',
+        'domain': 'Tenant primary domain',
+        'subscriptionId': 'Azure subscription GUID',
+        'resourceGroup': 'Azure resource group name',
+        'location': 'Azure region',
+        'environment': 'Cloud environment type',
+        'lawName': 'Log Analytics Workspace name',
+        'lawWorkspaceName': 'Log Analytics Workspace name',
+        'lawWorkspaceId': 'Log Analytics Workspace GUID',
+        'lawResourceId': 'Log Analytics full Azure resource ID',
+        'kvName': 'Key Vault name',
+        'keyVaultName': 'Key Vault name',
+        'kvUri': 'Key Vault URI',
+        'kvResourceId': 'Key Vault full Azure resource ID',
+        'storageAccountName': 'Storage Account name',
+        'storageResourceId': 'Storage Account full Azure resource ID',
+        'storageMiPrincipalId': 'Storage Account Managed Identity principal ID',
+        'automationAccountName': 'Automation Account name',
+        'automationResourceId': 'Automation Account full Azure resource ID',
+        'automationMiPrincipalId': 'Automation Account Managed Identity principal ID',
+        'vnetName': 'Virtual Network name',
+        'nsgName': 'Network Security Group name',
+        'eoSpObjectId': 'Exchange Online service principal object ID',
+        'cmkKeyName': 'Customer-Managed Key name in Key Vault',
+        'cmkKeyVersion': 'CMK version GUID',
+        'cuiGroupName': 'Security group name for CUI access',
+        'breakglassUpn': 'Break-glass admin UPN',
+        'breakGlassUPN': 'Break-glass admin UPN',
+        'operatorUpn': 'Operator admin UPN',
+        'adminUsername': 'Local admin username for Azure VMs',
+        'primaryDomain': 'Primary vanity domain',
+        'vmName': 'Virtual machine name',
+        'cisoEmail': 'CISO email address',
+        'securityEmail': 'Security team email',
+        'complianceRoleId': 'Compliance Administrator role definition ID',
+        'roleDefId': 'Custom role definition GUID',
+        'wifiSsid': 'Secure WiFi network name',
+        'approvedIpRange': 'Approved IP CIDR range',
+        'initialPassword': 'Initial VM password',
+        'certThumbprint': 'Certificate thumbprint',
+        'certPath': 'Certificate file path',
+        'touFileBase64': 'Terms of Use PDF base64 encoded',
+        'clientName': 'Human-readable organization name',
+        'tenantName': 'SharePoint tenant name prefix'
+      };
+
+      if (tooltips[varName]) {
+        return tooltips[varName];
+      }
+
+      // Category-level fallback
+      if (category === 'si') {
+        return 'Secrets, credentials, and cryptographic material requiring encryption at rest.';
+      } else if (category === 'cui') {
+        return 'Controlled Unclassified Information requiring access control and audit trails.';
+      } else {
+        return 'Non-sensitive technical settings and configuration values.';
+      }
+    }
+
+    // ---- Variable Resolution ----
+    async function resolveAllVariables() {
+      if (!currentTenant) {
+        showToast('No tenant selected', 'error');
+        return;
+      }
+
+      // Collect empty variables
+      var inputs = document.querySelectorAll('#variablesFormScroll input[data-var]');
+      var emptyVars = [];
+      for (var i = 0; i < inputs.length; i++) {
+        var varName = inputs[i].getAttribute('data-var');
+        var val = inputs[i].value;
+        if ((val === '' || val === null || val === undefined) && resolvableVarsSet.has(varName)) {
+          emptyVars.push(varName);
+        }
+      }
+
+      if (emptyVars.length === 0) {
+        showToast('No empty resolvable variables to resolve', 'error');
+        return;
+      }
+
+      try {
+        var resp = await fetch('/api/resolve-all-variables', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ variables: emptyVars, tenant: currentTenant })
+        });
+        var data = await resp.json();
+        if (!data.ok) {
+          showToast('Batch resolve failed: ' + (data.error || 'Unknown'), 'error');
+          return;
+        }
+
+        // Update input fields with resolved values
+        var resolvedCount = 0;
+        for (var varName in data.resolved) {
+          var input = document.querySelector('#variablesFormScroll input[data-var="' + varName + '"]');
+          if (input) {
+            input.value = data.resolved[varName];
+            resolvedCount++;
+          }
+        }
+
+        // Mark dirty state
+        if (resolvedCount > 0) {
+          updateDirtyState('variables');
+        }
+
+        // Build summary message
+        var msg = 'Resolved ' + resolvedCount + ' variable' + (resolvedCount !== 1 ? 's' : '');
+        var ambigCount = Object.keys(data.ambiguous || {}).length;
+        var notFoundCount = (data.notFound || []).length;
+
+        if (ambigCount > 0) {
+          msg += '. ' + ambigCount + ' ambiguous (see details)';
+          var ambigDetails = [];
+          for (var v in data.ambiguous) {
+            ambigDetails.push(v + ': [' + data.ambiguous[v].join(', ') + ']');
+          }
+          console.log('Ambiguous variables:', ambigDetails.join('\n'));
+          alert('Ambiguous variables:\n' + ambigDetails.join('\n'));
+        }
+
+        if (notFoundCount > 0) {
+          msg += '. ' + notFoundCount + ' not found';
+        }
+
+        showToast(msg, 'success');
+
+        // Reload config tab to show newly discovered resources
+        loadTenantConfig(currentTenant);
+      } catch (e) {
+        showToast('Batch resolve failed: ' + e.message, 'error');
+      }
+    }
+
+    async function resolveVariable(varName) {
+      if (!currentTenant) {
+        showToast('No tenant selected', 'error');
+        return;
+      }
+
+      try {
+        var resp = await fetch('/api/resolve-variable', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ variable: varName, tenant: currentTenant })
+        });
+        var data = await resp.json();
+
+        if (!data.ok) {
+          if (data.ambiguous && data.candidates) {
+            alert('Multiple ' + varName + ' found:\n' + data.candidates.join(', ') + '\n\nCopy and paste the desired value.');
+            return;
+          }
+          showToast('Resolve failed: ' + (data.error || 'Unknown'), 'error');
+          return;
+        }
+
+        // Update input field
+        if (data.resolved && data.resolved[varName]) {
+          var input = document.querySelector('#variablesFormScroll input[data-var="' + varName + '"]');
+          if (input) {
+            input.value = data.resolved[varName];
+            updateDirtyState('variables');
+            showToast('Resolved ' + varName, 'success');
+
+            // Reload config tab
+            loadTenantConfig(currentTenant);
+          }
+        }
+      } catch (e) {
+        showToast('Resolve failed: ' + e.message, 'error');
+      }
+    }
+
+    function toggleVarEye(eyeEl) {
+      var input = eyeEl.previousElementSibling;
+      if (!input) return;
+      if (input.type === 'password') {
+        input.type = 'text';
+        eyeEl.style.color = 'var(--accent-blue)';
+      } else {
+        input.type = 'password';
+        eyeEl.style.color = '';
+      }
+    }
+
+    // ---- Dirty state ----
+    function isDirty(tab) {
+      if (tab === 'config') {
+        return JSON.stringify(serializeConfigForm()) !== JSON.stringify(configOriginal);
+      } else if (tab === 'variables') {
+        return JSON.stringify(serializeVariablesForm()) !== JSON.stringify(variablesOriginal);
+      }
+      return false;
+    }
+
+    function updateDirtyState(tab) {
+      var dirty = isDirty(tab);
+      if (tab === 'config') {
+        var hint = document.getElementById('configDirtyHint');
+        var btn = document.getElementById('configSaveBtn');
+        if (hint) hint.style.display = dirty ? '' : 'none';
+        if (btn) btn.disabled = !dirty;
+      } else if (tab === 'variables') {
+        var hint = document.getElementById('variablesDirtyHint');
+        var btn = document.getElementById('variablesSaveBtn');
+        if (hint) hint.style.display = dirty ? '' : 'none';
+        if (btn) btn.disabled = !dirty;
+      }
+    }
+
+    // ---- Section toggle ----
+    function toggleSection(prefix) {
+      var body = document.getElementById(prefix + 'Body');
+      var toggle = document.getElementById(prefix + 'Toggle');
+      if (!body) return;
+      var collapsed = body.classList.toggle('collapsed');
+      if (toggle) toggle.innerHTML = collapsed ? '&#9654;' : '&#9660;';
+    }
+
+    // ---- Eye toggle (config fields) ----
+    function toggleEye(el) {
+      var input = el.previousElementSibling;
+      if (!input) return;
+      if (input.type === 'password') {
+        input.type = 'text';
+        el.style.color = 'var(--accent-blue)';
+      } else {
+        input.type = 'password';
+        el.style.color = '';
+      }
+    }
+
+    // ---- TOU Upload ----
+    function initTouUpload() {
+      var fileInput = document.getElementById('touFileInput');
+      var browseBtn = document.getElementById('touBrowseBtn');
+      var clearBtn  = document.getElementById('touClearBtn');
+      var nameInput = document.getElementById('touFileName');
+      var b64Input  = document.getElementById('touFileBase64');
+      var label     = document.getElementById('touFileLabel');
+      if (!fileInput || !browseBtn) return;
+
+      browseBtn.addEventListener('click', function() { fileInput.click(); });
+
+      var sampleBtn = document.getElementById('touLoadSampleBtn');
+      if (sampleBtn) {
+        sampleBtn.addEventListener('click', function() {
+          fetch('/api/file-to-base64', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filePath: 'CUI-System-Access-Notice.pdf' })
+          })
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            if (!data.ok) { showToast('Failed to load sample TOU: ' + data.error, 'error'); return; }
+            nameInput.value = data.fileName;
+            b64Input.value = data.base64;
+            label.textContent = data.fileName;
+            clearBtn.style.display = '';
+            updateDirtyState('config');
+            updateConfigSectionCounts();
+          })
+          .catch(function(err) { showToast('Error loading sample TOU: ' + err.message, 'error'); });
+        });
+      }
+
+      fileInput.addEventListener('change', function() {
+        var file = fileInput.files && fileInput.files[0];
+        if (!file) return;
+        if (file.type !== 'application/pdf') {
+          showToast('Only PDF files accepted', 'error');
+          fileInput.value = '';
+          return;
+        }
+        if (file.size > 3 * 1024 * 1024) {
+          showToast('PDF must be under 3 MB', 'error');
+          fileInput.value = '';
+          return;
+        }
+        var reader = new FileReader();
+        reader.onload = function() {
+          var base64 = reader.result.split(',')[1] || '';
+          nameInput.value = file.name;
+          b64Input.value = base64;
+          label.textContent = file.name;
+          clearBtn.style.display = '';
+          updateDirtyState('config');
+          updateConfigSectionCounts();
+        };
+        reader.readAsDataURL(file);
+      });
+
+      clearBtn.addEventListener('click', function() {
+        nameInput.value = '';
+        b64Input.value = '';
+        fileInput.value = '';
+        label.textContent = 'No file selected';
+        clearBtn.style.display = 'none';
+        updateDirtyState('config');
+        updateConfigSectionCounts();
+      });
+    }
+
+    // ---- Search / Filter ----
+    function filterItems() {
+      var query = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+      var activeTab = document.querySelector('.tab-btn.active');
+      var tabName = activeTab ? activeTab.getAttribute('data-tab') : 'config';
+
+      if (tabName === 'config') {
+        filterConfigTab(query);
+      } else {
+        filterVariablesTab(query);
+      }
+    }
+
+    function filterConfigTab(query) {
+      var container = document.getElementById('configFormScroll');
+      var sections = container.querySelectorAll('.config-section');
+      var totalVisible = 0;
+
+      for (var s = 0; s < sections.length; s++) {
+        var section = sections[s];
+        var rows = section.querySelectorAll('.config-field, .tou-upload-row');
+        var sectionVisible = 0;
+
+        for (var r = 0; r < rows.length; r++) {
+          var row = rows[r];
+          if (!query) {
+            row.classList.remove('search-hidden');
+            sectionVisible++;
+            continue;
+          }
+          var label = row.querySelector('label');
+          var input = row.querySelector('input, select');
+          var labelText = label ? label.textContent.toLowerCase() : '';
+          var inputVal = input ? (input.value || '').toLowerCase() : '';
+          var match = labelText.indexOf(query) !== -1 || inputVal.indexOf(query) !== -1;
+          row.classList.toggle('search-hidden', !match);
+          if (match) sectionVisible++;
+        }
+
+        section.classList.toggle('search-hidden', sectionVisible === 0);
+        totalVisible += sectionVisible;
+
+        // Auto-expand sections with matches when searching
+        if (query && sectionVisible > 0) {
+          var body = section.querySelector('.var-category-body');
+          var toggle = section.querySelector('.var-category-toggle');
+          if (body && body.classList.contains('collapsed')) {
+            body.classList.remove('collapsed');
+            if (toggle) toggle.innerHTML = '&#9660;';
+          }
+        }
+      }
+
+      var noResults = document.getElementById('configNoResults');
+      if (noResults) noResults.style.display = (query && totalVisible === 0) ? '' : 'none';
+    }
+
+    function filterVariablesTab(query) {
+      var container = document.getElementById('variablesFormScroll');
+      var sections = container.querySelectorAll('.config-section');
+      var totalVisible = 0;
+
+      for (var s = 0; s < sections.length; s++) {
+        var section = sections[s];
+        var rows = section.querySelectorAll('.var-row');
+        var sectionVisible = 0;
+
+        for (var r = 0; r < rows.length; r++) {
+          var row = rows[r];
+          if (!query) {
+            row.classList.remove('search-hidden');
+            sectionVisible++;
+            continue;
+          }
+          var label = row.querySelector('label');
+          var input = row.querySelector('input');
+          var labelText = label ? label.textContent.toLowerCase() : '';
+          var inputVal = input ? (input.value || '').toLowerCase() : '';
+          var match = labelText.indexOf(query) !== -1 || inputVal.indexOf(query) !== -1;
+          row.classList.toggle('search-hidden', !match);
+          if (match) sectionVisible++;
+        }
+
+        section.classList.toggle('search-hidden', sectionVisible === 0);
+        totalVisible += sectionVisible;
+
+        // Auto-expand sections with matches when searching
+        if (query && sectionVisible > 0) {
+          var body = section.querySelector('.var-category-body');
+          var toggle = section.querySelector('.var-category-toggle');
+          if (body && body.classList.contains('collapsed')) {
+            body.classList.remove('collapsed');
+            if (toggle) toggle.innerHTML = '&#9660;';
+          }
+        }
+      }
+
+      // Also check the empty-state div
+      var emptyState = container.querySelector('.empty-state');
+      if (emptyState) {
+        emptyState.classList.toggle('search-hidden', !!query);
+      }
+
+      var noResults = document.getElementById('variablesNoResults');
+      if (noResults) noResults.style.display = (query && totalVisible === 0) ? '' : 'none';
+    }
+
+    // ---- Utilities ----
+    function escHtml(s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function showToast(message, type) {
+      var toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast ' + type;
+      setTimeout(function() { toast.classList.add('show'); }, 10);
+      setTimeout(function() { toast.classList.remove('show'); }, 3000);
+    }
+  </script>
+</body>
+</html>

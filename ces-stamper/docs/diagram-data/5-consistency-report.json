@@ -1,0 +1,59 @@
+{
+  "_changelog": [
+    {
+      "date": "2026-04-19",
+      "changes": [
+        "Regenerated after remediation of Blocking Issues 1 (partial), 2 (partial), 3 (expanded)",
+        "Blocking Issue 4 (Cloud PC/VDI) removed from blocking_issues array (out of scope per implementation plan)",
+        "Updated total_gaps count reflecting resolved and newly expanded gaps",
+        "Updated cross_walk_summary to reflect Key Vault recategorization (5 CUI assets in both ABD and Inventory)",
+        "Documented manual cross-walk analysis process (no automated tooling)"
+      ],
+      "sources": ["Updated datasets 1-4", "fabrica-remediation-spec.md", "GAP_ANALYSIS.md"],
+      "notes": "Cross-walk analysis performed as manual visual comparison per Gap Analysis findings"
+    },
+    {
+      "date": "2026-04-19",
+      "changes": [
+        "Resolved Blocking Issue 3 (user count: 2-25 pre-production)",
+        "Resolved CAGE code gap (17FZ7)",
+        "Resolved retention gap (7-year norm applied to all CUI workloads)",
+        "blocking_issues now empty, total_gaps 22 -> 19"
+      ],
+      "sources": ["Operator input"]
+    }
+  ],
+  "asset_name_collisions": [],
+  "abd_not_in_inventory": [],
+  "inventory_not_in_abd": [
+    "vfsgov-automation-eo — listed in inventory as security-protection but not depicted as an SPA in ABD. Add to ABD security_protection_assets or remove from inventory.",
+    "EvidenceOps-Automation (SP) — service principal in inventory, not separately depicted in ABD. Acceptable if grouped under 'Azure Automation' SPA in the diagram.",
+    "breakglass@vfsgov.us — emergency access account in inventory, not depicted in ABD. Acceptable for diagram simplicity, but document in SSP.",
+    "CMMC L2 Policy Initiative — in inventory as security-protection, not in ABD SPA list. Add to ABD or group under 'Azure Policy (CMMC)'."
+  ],
+  "vlan_devices_not_in_inventory": [
+    "vfsgov-pe-kv — private endpoint listed as key device in subnet snet-pe. It is a sub-resource of AZ-KV-001 (vfsgov-kv-prod) which IS in inventory. Acceptable.",
+    "vfsgov-pe-blob — private endpoint listed as key device in subnet snet-pe. It is a sub-resource of AZ-SA-001 (vfsgovevops01) which IS in inventory. Acceptable."
+  ],
+  "dfd_endpoints_not_in_network": [
+    "M365 GCC High services (SPO, Exchange, Teams, OneDrive) — DFD references these as data stores and ingress/egress endpoints, but they are SaaS services outside the Azure VNet. Network topology covers only the Azure Gov VNet. This is architecturally correct — M365 services connect over Microsoft backbone, not through the VNet."
+  ],
+  "esps_missing_srm": [
+    "Microsoft Corporation — SRM/CRM not confirmed on file. The Microsoft GCC High CRM should be obtained from Service Trust Portal (https://servicetrust.microsoft.com/) and referenced in the SSP."
+  ],
+  "fips_assertions_without_cert": [],
+  "out_of_scope_with_cui_path": [],
+  "total_gaps": 8,
+  "blocking_issues": [],
+  "cross_walk_summary": {
+    "abd_cui_assets": 5,
+    "inventory_cui_assets": 5,
+    "note": "ABD has 5 CUI assets (Key Vault moved to security_protection_assets). Inventory has 5 CUI assets. Cross-walk alignment achieved.",
+    "abd_spas": 11,
+    "inventory_security_protection": 14,
+    "note_spas": "Inventory has more granular entries (VNet, NSG, SP, break-glass account counted separately). ABD groups some of these. Acceptable for diagram legibility.",
+    "abd_esps": 4,
+    "inventory_esps": 1,
+    "note_esps": "ABD lists 4 Microsoft service lines separately. Inventory consolidates to 1 ESP (Microsoft Corporation). Both representations valid — ABD is service-level, Inventory is entity-level. FedRAMP package IDs appended to ABD where available."
+  }
+}

@@ -44,3 +44,59 @@ jobs:
       # fails the job.
       - name: Build + test (full aggregate)
         run: npm test
+
+  muster-api:
+    name: muster-api tests
+    # P2-03 fix: muster-api had 54 vitest files with no CI coverage. Recipe hash
+    # drift (P1-01) and registry path issues (P1-03) were not caught automatically.
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (workspace root)
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: |
+            ces-muster-main/muster-api/package-lock.json
+            ces-muster-main/package-lock.json
+
+      # ces-stamper registry is expected at ../ces-stamper relative to workspace root
+      # by muster-api tests (live.areas, live.gate, live.teams, live.azTranslate).
+      - name: Create ces-stamper symlink (registry path tests)
+        run: ln -s $GITHUB_WORKSPACE/ces-mono-main/ces-stamper $GITHUB_WORKSPACE/ces-stamper
+
+      # ces-muster expected at ces-mono-main/ces-muster by stamper fixture tests
+      - name: Create ces-muster symlink (stamper fixture tests)
+        run: |
+          cd ces-muster-main
+          git init --initial-branch=main
+          git add src/features/plan/__fixtures__/
+          git -c user.email=ci@ces.local -c user.name=CI commit -m fixture-baseline
+          cd ..
+          ln -s $GITHUB_WORKSPACE/ces-muster-main $GITHUB_WORKSPACE/ces-mono-main/ces-muster
+
+      - name: Install ces-shared deps + build
+        working-directory: ces-mono-main/ces-shared
+        run: npm ci && npm run build
+
+      - name: Install ces-tenant deps + build
+        working-directory: ces-tenant-main
+        run: npm ci && npm run build || true
+
+      - name: Install muster-api deps
+        working-directory: ces-muster-main/muster-api
+        run: npm ci
+
+      - name: Dependency audit (prod, high+)
+        working-directory: ces-muster-main/muster-api
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Test muster-api
+        working-directory: ces-muster-main/muster-api
+        run: npm test
+        env:
+          JWT_SECRET: ci-test-secret-not-for-production
+          # No DATABASE_URL — RLS and delivery tests use in-memory mocks via vitest

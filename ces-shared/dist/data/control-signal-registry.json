@@ -1,0 +1,656 @@
+{
+  "AC.L1-3.1.1": {
+    "signals": [
+      { "type": "graph", "endpoint": "/identity/conditionalAccess/policies", "required": true }
+    ],
+    "evaluator": "caEnforcementEvaluator"
+  },
+  "AC.L1-3.1.2": {
+    "signals": [
+      { "type": "graph", "endpoint": "/directoryRoles", "required": true }
+    ],
+    "evaluator": "rbacEvidenceEvaluator"
+  },
+  "AC.L1-3.1.20": {
+    "signals": [
+      { "type": "graph", "endpoint": "/policies/crossTenantAccessPolicy/default", "required": true }
+    ],
+    "evaluator": "crossTenantEvaluator"
+  },
+  "AC.L1-3.1.22": {
+    "signals": [
+      { "type": "graph", "endpoint": "/admin/sharepoint/settings", "required": true }
+    ],
+    "evaluator": "publicSharingEvaluator"
+  },
+  "AC.L2-3.1.3": {
+    "signals": [
+      { "type": "graph", "endpoint": "/informationProtection/policy/labels", "required": true }
+    ],
+    "evaluator": "informationBarrierEvaluator"
+  },
+  "AC.L2-3.1.4": {
+    "signals": [
+      { "type": "graph", "endpoint": "/policies/roleManagementPolicies", "required": true, "variables": ["pimPolicyId"] }
+    ],
+    "evaluator": "pimApprovalEvaluator"
+  },
+  "AC.L2-3.1.5": {
+    "signals": [
+      { "type": "graph", "endpoint": "/roleManagement/directory/roleAssignments", "required": true },
+      { "type": "graph", "endpoint": "/identity/conditionalAccess/policies" }
+    ],
+    "evaluator": "leastPrivilegeEvaluator"
+  },
+  "AC.L2-3.1.6": {
+    "signals": [
+      { "type": "graph", "endpoint": "/users", "required": true, "filter": "startswith(displayName,'Admin-')", "variables": ["adminUserName"] }
+    ],
+    "evaluator": "dedicatedAdminEvaluator"
+  },
+  "AC.L2-3.1.7": {
+    "signals": [
+      { "type": "graph", "endpoint": "/roleManagement/directory/roleEligibilityScheduleRequests", "required": true }
+    ],
+    "evaluator": "privilegedFunctionEvaluator"
+  },
+  "AC.L2-3.1.8": {
+    "signals": [
+      { "type": "graph", "endpoint": "/policies/authenticationMethodsPolicy", "required": true }
+    ],
+    "evaluator": "smartLockoutEvaluator"
+  },
+  "AC.L2-3.1.9": {
+    "signals": [
+      { "type": "graph", "endpoint": "/agreements", "required": true, "variables": ["touFileName"] }
+    ],
+    "evaluator": "termsOfUseEvaluator"
+  },
+  "AC.L2-3.1.10": {
+    "signals": [
+      { "type": "graph", "endpoint": "/identity/conditionalAccess/policies", "required": true }
+    ],
+    "evaluator": "sessionLockEvaluator"
+  },
+  "AC.L2-3.1.11": {
+    "signals": [
+      { "type": "graph", "endpoint": "/identity/conditionalAccess/policies", "required": true, "variables": ["cuiGroupId"] }
+    ],
+    "evaluator": "sessionTimeoutEvaluator"
+  },
+  "AC.L2-3.1.12": {
+    "signals": [
+      { "type": "graph", "endpoint": "/identity/conditionalAccess/namedLocations", "required": true, "variables": ["approvedIpRange"] }
+    ],
+    "evaluator": "namedLocationEvaluator"
+  },
+  "AC.L2-3.1.13": {
+    "signals": [
+      { "type": "graph", "endpoint": "/admin/exchangeOnline/transportConfig", "required": true }
+    ],
+    "evaluator": "tlsEnforcementEvaluator"
+  },
+  "AC.L2-3.1.14": {
+    "signals": [
+      { "type": "graph", "endpoint": "/identity/conditionalAccess/policies", "required": true, "variables": ["cuiGroupId", "namedLocationId"] }
+    ],
+    "evaluator": "blockUntrustedEvaluator"
+  },
+  "AC.L2-3.1.15": {
+    "signals": [
+      { "type": "graph", "endpoint": "/identity/conditionalAccess/policies", "required": true, "variables": ["phishingResistantStrengthId"] }
+    ],
+    "evaluator": "adminMfaEvaluator"
+  },
+  "AC.L2-3.1.16": {
+    "signals": [
+      { "type": "graph", "endpoint": "/deviceManagement/deviceConfigurations", "required": true, "variables": ["wifiSsid"] }
+    ],
+    "evaluator": "wifiProfileEvaluator"
+  },
+  "AC.L2-3.1.17": {
+    "signals": [
+      { "type": "graph", "endpoint": "/deviceManagement/deviceConfigurations", "required": true }
+    ],
+    "evaluator": "wirelessProtectionEvaluator"
+  },
+  "AC.L2-3.1.18": {
+    "signals": [
+      { "type": "graph", "endpoint": "/identity/conditionalAccess/policies", "required": true, "variables": ["cuiGroupId"] }
+    ],
+    "evaluator": "mobileDeviceAccessEvaluator"
+  },
+  "AC.L2-3.1.19": {
+    "signals": [
+      { "type": "graph", "endpoint": "/deviceAppManagement/iosManagedAppProtectionPolicies", "required": true }
+    ],
+    "evaluator": "appProtectionEvaluator"
+  },
+  "AC.L2-3.1.21": {
+    "signals": [
+      { "type": "graph", "endpoint": "/deviceManagement/deviceConfigurations", "required": true }
+    ],
+    "evaluator": "removableStorageEvaluator"
+  },
+  "AT.L2-3.2.1": {
+    "signals": [
+      { "type": "graph", "endpoint": "/reports/security/getAttackSimulationTrainingUserCoverage", "required": true },
+      { "type": "graph", "endpoint": "/users", "required": true }
+    ],
+    "evaluator": "awarenessTrainingCoverageEvaluator"
+  },
+  "AT.L2-3.2.2": {
+    "signals": [
+      { "type": "manual" }
+    ],
+    "evaluator": "manualGateEvaluator"
+  },
+  "AT.L2-3.2.3": {
+    "signals": [
+      { "type": "graph", "endpoint": "/reports/security/getAttackSimulationTrainingUserCoverage", "required": true },
+      { "type": "graph", "endpoint": "/users", "required": true }
+    ],
+    "evaluator": "insiderThreatTrainingEvaluator"
+  },
+  "AU.L2-3.3.1": {
+    "signals": [
+      { "type": "graph", "endpoint": "/security/auditLog/queries", "required": true }
+    ],
+    "evaluator": "auditEventsEvaluator"
+  },
+  "AU.L2-3.3.2": {
+    "signals": [
+      { "type": "graph", "endpoint": "/auditLogs/signIns", "required": true },
+      { "type": "graph", "endpoint": "/auditLogs/directoryAudits" }
+    ],
+    "evaluator": "auditReviewEvaluator"
+  },
+  "AU.L2-3.3.3": {
+    "signals": [
+      { "type": "graph", "endpoint": "/security/alerts_v2", "required": true, "variables": ["resourceGroup", "workspaceName"] }
+    ],
+    "evaluator": "sentinelWorkspaceEvaluator"
+  },
+  "AU.L2-3.3.4": {
+    "signals": [
+      { "type": "graph", "endpoint": "/security/alerts_v2", "required": true, "variables": ["cisoEmail", "resourceGroup"] }
+    ],
+    "evaluator": "alertGroupEvaluator"
+  },
+  "AU.L2-3.3.5": {
+    "signals": [
+      { "type": "graph", "endpoint": "/security/incidents", "required": true }
+    ],
+    "evaluator": "incidentCorrelationEvaluator"
+  },
+  "AU.L2-3.3.6": {
+    "signals": [
+      { "type": "graph", "endpoint": "/security/auditLog/queries", "required": true, "variables": ["tenantName"] }
+    ],
+    "evaluator": "auditReductionEvaluator"
+  },
+  "AU.L2-3.3.7": {
+    "signals": [
+      { "type": "graph", "endpoint": "/organization", "required": true }
+    ],
+    "evaluator": "timeSourceEvaluator"
+  },
+  "AU.L2-3.3.8": {
+    "signals": [
+      { "type": "manual" }
+    ],
+    "evaluator": "manualGateEvaluator"
+  },
+  "AU.L2-3.3.9": {
+    "signals": [
+      { "type": "manual" }
+    ],
+    "evaluator": "manualGateEvaluator"
+  },
+  "CM.L2-3.4.1": {
+    "signals": [
+      { "type": "graph", "endpoint": "/deviceManagement/deviceConfigurations", "required": true, "variables": ["baselineTemplateId", "cuiGroupId"] }
+    ],
+    "evaluator": "securityBaselineEvaluator"
+  },
+  "CM.L2-3.4.2": {
+    "signals": [
+      { "type": "graph", "endpoint": "/deviceManagement/deviceConfigurations", "required": true }
+    ],
+    "evaluator": "asrRulesEvaluator"
+  },
+  "CM.L2-3.4.3": {
+    "signals": [
+      { "type": "graph", "endpoint": "/auditLogs/directoryAudits", "required": true }
+    ],
+    "evaluator": "changeTrackingEvaluator"
+  },
+  "CM.L2-3.4.5": {
+    "signals": [
+      { "type": "graph", "endpoint": "/roleManagement/directory/roleAssignments", "required": true }
+    ],
+    "evaluator": "configAccessRestrictEvaluator"
+  },
+  "CM.L2-3.4.6": {
+    "signals": [
+      { "type": "graph", "endpoint": "/deviceManagement/deviceConfigurations", "required": true }
+    ],
+    "evaluator": "leastFunctionalityEvaluator"
+  },
+  "CM.L2-3.4.7": {
+    "signals": [
+      { "type": "graph", "endpoint": "/deviceManagement/deviceConfigurations", "required": true }
+    ],
+    "evaluator": "applicationControlEvaluator"
+  },
+  "CM.L2-3.4.8": {
+    "signals": [
+      { "type": "graph", "endpoint": "/deviceManagement/detectedApps", "required": true }
+    ],
+    "evaluator": "detectedAppsEvaluator"
+  },
+  "CM.L2-3.4.9": {
+    "signals": [
+      { "type": "graph", "endpoint": "/deviceManagement/deviceConfigurations", "required": true }
+    ],
+    "evaluator": "installControlEvaluator"
+  },
+  "IA.L1-3.5.1": {
+    "signals": [
+      { "type": "graph", "endpoint": "/users", "required": true },
+      { "type": "graph", "endpoint": "/devices" }
+    ],
+    "evaluator": "userDeviceIdentifyEvaluator"
+  },
+  "IA.L1-3.5.2": {
+    "signals": [
+      { "type": "graph", "endpoint": "/policies/authenticationMethodsPolicy", "required": true }
+    ],
+    "evaluator": "authTransactionEvaluator"
+  },
+  "IA.L2-3.5.3": {
+    "signals": [
+      { "type": "graph", "endpoint": "/policies/authenticationMethodsPolicy", "required": true }
+    ],
+    "evaluator": "mfaMethodsEvaluator"
+  },
+  "IA.L2-3.5.4": {
+    "signals": [
+      { "type": "graph", "endpoint": "/policies/authenticationStrengthPolicies", "required": true }
+    ],
+    "evaluator": "authStrengthEvaluator"
+  },
+  "IA.L2-3.5.5": {
+    "signals": [
+      { "type": "graph", "endpoint": "/users", "required": true, "filter": "accountEnabled eq true" }
+    ],
+    "evaluator": "inactiveAccountsEvaluator"
+  },
+  "IA.L2-3.5.6": {
+    "signals": [
+      { "type": "graph", "endpoint": "/users", "required": true, "filter": "accountEnabled eq true" }
+    ],
+    "evaluator": "accountDisableEvaluator"
+  },
+  "IA.L2-3.5.7": {
+    "signals": [
+      { "type": "graph", "endpoint": "/policies/authenticationMethodsPolicy", "required": true }
+    ],
+    "evaluator": "passwordComplexityEvaluator"
+  },
+  "IA.L2-3.5.8": {
+    "signals": [
+      { "type": "graph", "endpoint": "/policies/authenticationMethodsPolicy", "required": true }
+    ],
+    "evaluator": "passwordReuseEvaluator"
+  },
+  "IA.L2-3.5.9": {
+    "signals": [
+      { "type": "graph", "endpoint": "/policies/authenticationMethodsPolicy", "required": true }
+    ],
+    "evaluator": "temporaryPasswordEvaluator"
+  },
+  "IA.L2-3.5.10": {
+    "signals": [
+      { "type": "graph", "endpoint": "/policies/authenticationMethodsPolicy", "required": true }
+    ],
+    "evaluator": "certBasedAuthEvaluator"
+  },
+  "IA.L2-3.5.11": {
+    "signals": [
+      { "type": "graph", "endpoint": "/identity/conditionalAccess/policies", "required": true }
+    ],
+    "evaluator": "sessionTerminationEvaluator"
+  },
+  "IR.L2-3.6.1": {
+    "signals": [
+      { "type": "graph", "endpoint": "/security/alerts_v2", "required": true }
+    ],
+    "evaluator": "incidentResponseEvaluator"
+  },
+  "IR.L2-3.6.2": {
+    "signals": [
+      { "type": "manual" }
+    ],
+    "evaluator": "manualGateEvaluator"
+  },
+  "IR.L2-3.6.3": {
+    "signals": [
+      { "type": "manual" }
+    ],
+    "evaluator": "manualGateEvaluator"
+  },
+  "MA.L2-3.7.1": {
+    "signals": [
+      { "type": "manual" }
+    ],
+    "evaluator": "manualGateEvaluator"
+  },
+  "MA.L2-3.7.2": {
+    "signals": [
+      { "type": "manual" }
+    ],
+    "evaluator": "manualGateEvaluator"
+  },
+  "MA.L2-3.7.4": {
+    "signals": [
+      { "type": "graph", "endpoint": "/deviceManagement/deviceConfigurations", "required": true }
+    ],
+    "evaluator": "mediaCheckEvaluator"
+  },
+  "MA.L2-3.7.5": {
+    "signals": [
+      { "type": "graph", "endpoint": "/identity/conditionalAccess/policies", "required": true }
+    ],
+    "evaluator": "remoteMfaEvaluator"
+  },
+  "MP.L2-3.8.1": {
+    "signals": [
+      { "type": "graph", "endpoint": "/informationProtection/policy/labels", "required": true }
+    ],
+    "evaluator": "sensitivityLabelEvaluator"
+  },
+  "MP.L2-3.8.2": {
+    "signals": [
+      { "type": "graph", "endpoint": "/informationProtection/policy/labels", "required": true }
+    ],
+    "evaluator": "mediaMarkingEvaluator"
+  },
+  "MP.L1-3.8.3": {
+    "signals": [
+      { "type": "manual" }
+    ],
+    "evaluator": "manualGateEvaluator"
+  },
+  "MP.L2-3.8.4": {
+    "signals": [
+      { "type": "manual" }
+    ],
+    "evaluator": "manualGateEvaluator"
+  },
+  "MP.L2-3.8.5": {
+    "signals": [
+      { "type": "graph", "endpoint": "/deviceManagement/deviceConfigurations", "required": true }
+    ],
+    "evaluator": "mediaAccessEvaluator"
+  },
+  "MP.L2-3.8.6": {
+    "signals": [
+      { "type": "graph", "endpoint": "/deviceManagement/deviceConfigurations", "required": true }
+    ],
+    "evaluator": "bitLockerPolicyEvaluator"
+  },
+  "MP.L2-3.8.7": {
+    "signals": [
+      { "type": "graph", "endpoint": "/deviceManagement/deviceConfigurations", "required": true }
+    ],
+    "evaluator": "removableMediaEvaluator"
+  },
+  "MP.L2-3.8.8": {
+    "signals": [
+      { "type": "graph", "endpoint": "/deviceManagement/deviceConfigurations", "required": true }
+    ],
+    "evaluator": "unownedStorageEvaluator"
+  },
+  "MP.L2-3.8.9": {
+    "signals": [
+      { "type": "manual" }
+    ],
+    "evaluator": "manualGateEvaluator"
+  },
+  "PE.L1-3.10.1": {
+    "signals": [
+      { "type": "manual" }
+    ],
+    "evaluator": "manualGateEvaluator"
+  },
+  "PE.L1-3.10.3": {
+    "signals": [
+      { "type": "manual" }
+    ],
+    "evaluator": "manualGateEvaluator"
+  },
+  "PE.L1-3.10.4": {
+    "signals": [
+      { "type": "manual" }
+    ],
+    "evaluator": "manualGateEvaluator"
+  },
+  "PE.L1-3.10.5": {
+    "signals": [
+      { "type": "manual" }
+    ],
+    "evaluator": "manualGateEvaluator"
+  },
+  "PE.L2-3.10.2": {
+    "signals": [
+      { "type": "manual" }
+    ],
+    "evaluator": "manualGateEvaluator"
+  },
+  "PE.L2-3.10.6": {
+    "signals": [
+      { "type": "manual" }
+    ],
+    "evaluator": "manualGateEvaluator"
+  },
+  "PS.L2-3.9.1": {
+    "signals": [
+      { "type": "manual" }
+    ],
+    "evaluator": "manualGateEvaluator"
+  },
+  "PS.L2-3.9.2": {
+    "signals": [
+      { "type": "graph", "endpoint": "/identityGovernance/lifecycleWorkflows/workflows", "required": true },
+      { "type": "graph", "endpoint": "/users", "required": true },
+      { "type": "graph", "endpoint": "/roleManagement/directory/roleAssignments", "required": true }
+    ],
+    "evaluator": "personnelActionAccessEvaluator"
+  },
+  "RA.L2-3.11.1": {
+    "signals": [
+      { "type": "manual" }
+    ],
+    "evaluator": "manualGateEvaluator"
+  },
+  "RA.L2-3.11.2": {
+    "signals": [
+      { "type": "graph", "endpoint": "/security/runHuntingQuery", "required": true },
+      { "type": "graph", "endpoint": "/deviceManagement/managedDevices" }
+    ],
+    "evaluator": "vulnScanRecencyEvaluator"
+  },
+  "RA.L2-3.11.3": {
+    "signals": [
+      { "type": "graph", "endpoint": "/deviceManagement/windowsUpdateForBusinessUpdateRings", "required": true }
+    ],
+    "evaluator": "vulnRemediationEvaluator"
+  },
+  "CA.L2-3.12.1": {
+    "signals": [
+      { "type": "manual" }
+    ],
+    "evaluator": "manualGateEvaluator"
+  },
+  "CA.L2-3.12.2": {
+    "signals": [
+      { "type": "manual" }
+    ],
+    "evaluator": "manualGateEvaluator"
+  },
+  "CA.L2-3.12.3": {
+    "signals": [
+      { "type": "manual" }
+    ],
+    "evaluator": "manualGateEvaluator"
+  },
+  "CA.L2-3.12.4": {
+    "signals": [
+      { "type": "manual" }
+    ],
+    "evaluator": "manualGateEvaluator"
+  },
+  "SC.L1-3.13.1": {
+    "signals": [
+      { "type": "graph", "endpoint": "/identity/conditionalAccess/policies", "required": true }
+    ],
+    "evaluator": "boundaryProtectionL1Evaluator"
+  },
+  "SC.L1-3.13.5": {
+    "signals": [
+      { "type": "graph", "endpoint": "/identity/conditionalAccess/policies", "required": true }
+    ],
+    "evaluator": "publicNetworkL1Evaluator"
+  },
+  "SC.L2-3.13.2": {
+    "signals": [
+      { "type": "graph", "endpoint": "/security/secureScores", "required": true }
+    ],
+    "evaluator": "architecturalDesignEvaluator"
+  },
+  "SC.L2-3.13.3": {
+    "signals": [
+      { "type": "graph", "endpoint": "/roleManagement/directory/roleAssignments", "required": true }
+    ],
+    "evaluator": "securityFunctionIsolationEvaluator"
+  },
+  "SC.L2-3.13.4": {
+    "signals": [
+      { "type": "graph", "endpoint": "/deviceManagement/deviceConfigurations", "required": true }
+    ],
+    "evaluator": "sharedResourceControlEvaluator"
+  },
+  "SC.L2-3.13.6": {
+    "signals": [
+      { "type": "graph", "endpoint": "/identity/conditionalAccess/policies", "required": true }
+    ],
+    "evaluator": "networkDenyByDefaultEvaluator"
+  },
+  "SC.L2-3.13.7": {
+    "signals": [
+      { "type": "graph", "endpoint": "/deviceManagement/deviceConfigurations", "required": true }
+    ],
+    "evaluator": "splitTunnelingEvaluator"
+  },
+  "SC.L2-3.13.8": {
+    "signals": [
+      { "type": "graph", "endpoint": "/deviceManagement/deviceCompliancePolicies", "required": true }
+    ],
+    "evaluator": "fipsCryptoEvaluator"
+  },
+  "SC.L2-3.13.9": {
+    "signals": [
+      { "type": "graph", "endpoint": "/deviceManagement/deviceConfigurations", "required": true }
+    ],
+    "evaluator": "sessionTerminationNetworkEvaluator"
+  },
+  "SC.L2-3.13.10": {
+    "signals": [
+      { "type": "graph", "endpoint": "/security/secureScores", "required": true, "variables": ["resourceGroup", "keyVaultName"] }
+    ],
+    "evaluator": "cryptoKeyManagementEvaluator"
+  },
+  "SC.L2-3.13.11": {
+    "signals": [
+      { "type": "graph", "endpoint": "/deviceManagement/managedDevices", "required": true },
+      { "type": "graph", "endpoint": "/deviceManagement/deviceCompliancePolicies" }
+    ],
+    "evaluator": "bitLockerEvaluator"
+  },
+  "SC.L2-3.13.12": {
+    "signals": [
+      { "type": "graph", "endpoint": "/deviceManagement/deviceConfigurations", "required": true }
+    ],
+    "evaluator": "collaborativeDeviceEvaluator"
+  },
+  "SC.L2-3.13.13": {
+    "signals": [
+      { "type": "graph", "endpoint": "/security/attackSimulation/simulations", "required": true }
+    ],
+    "evaluator": "safeAttachmentsEvaluator"
+  },
+  "SC.L2-3.13.14": {
+    "signals": [
+      { "type": "graph", "endpoint": "/communications/presences", "required": true }
+    ],
+    "evaluator": "voipEvaluator"
+  },
+  "SC.L2-3.13.15": {
+    "signals": [
+      { "type": "graph", "endpoint": "/security/alerts_v2", "required": true }
+    ],
+    "evaluator": "emailProtectionEvaluator"
+  },
+  "SC.L2-3.13.16": {
+    "signals": [
+      { "type": "graph", "endpoint": "/deviceManagement/deviceCompliancePolicies", "required": true },
+      { "type": "graph", "endpoint": "/deviceManagement/detectedApps" }
+    ],
+    "evaluator": "mobileCodeEvaluator"
+  },
+  "SI.L1-3.14.1": {
+    "signals": [
+      { "type": "graph", "endpoint": "/deviceManagement/deviceCompliancePolicies", "required": true }
+    ],
+    "evaluator": "flawRemediationL1Evaluator"
+  },
+  "SI.L1-3.14.2": {
+    "signals": [
+      { "type": "graph", "endpoint": "/deviceManagement/deviceConfigurations", "required": true }
+    ],
+    "evaluator": "malwareProtectionL1Evaluator"
+  },
+  "SI.L1-3.14.4": {
+    "signals": [
+      { "type": "graph", "endpoint": "/deviceManagement/deviceConfigurations", "required": true }
+    ],
+    "evaluator": "avUpdateEvaluator"
+  },
+  "SI.L1-3.14.5": {
+    "signals": [
+      { "type": "graph", "endpoint": "/deviceManagement/deviceConfigurations", "required": true }
+    ],
+    "evaluator": "scanScheduleEvaluator"
+  },
+  "SI.L2-3.14.3": {
+    "signals": [
+      { "type": "graph", "endpoint": "/security/alerts_v2", "required": true }
+    ],
+    "evaluator": "safeLinksEvaluator"
+  },
+  "SI.L2-3.14.6": {
+    "signals": [
+      { "type": "graph", "endpoint": "/security/alerts_v2", "required": true },
+      { "type": "graph", "endpoint": "/security/secureScores" },
+      { "type": "graph", "endpoint": "/identityProtection/riskDetections" }
+    ],
+    "evaluator": "monitoringEvaluator"
+  },
+  "SI.L2-3.14.7": {
+    "signals": [
+      { "type": "graph", "endpoint": "/security/alerts_v2", "required": true }
+    ],
+    "evaluator": "alertsEvaluator"
+  }
+}

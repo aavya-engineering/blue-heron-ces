@@ -1,0 +1,29 @@
+# syntax=docker/dockerfile:1
+FROM node:20-bookworm-slim
+
+WORKDIR /app
+
+# Copy mono workspace packages
+COPY ces-mono-main/package*.json ./
+COPY ces-mono-main/ces-shared/package*.json ./ces-shared/
+COPY ces-mono-main/ces-stamper/package*.json ./ces-stamper/
+COPY ces-tenant-main/package*.json ./ces-tenant/
+
+# Install dependencies
+RUN npm ci
+
+# Copy source trees
+COPY ces-mono-main/scripts ./scripts/
+COPY ces-mono-main/ces-shared ./ces-shared/
+COPY ces-mono-main/ces-stamper ./ces-stamper/
+COPY ces-tenant-main ./ces-tenant/
+
+# Build required packages
+RUN npm run build:shared && npm run build:stamper
+
+ENV NODE_ENV=production
+ENV PORT=5002
+
+EXPOSE 5002
+
+CMD ["npm", "run", "gui", "-w", "ces-stamper", "--", "--port", "5002"]

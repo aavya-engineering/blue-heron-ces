@@ -1,0 +1,274 @@
+{
+  "_changelog": [
+    {
+      "date": "2026-04-19",
+      "changes": [
+        "Populated FedRAMP evidence with package IDs and marketplace URLs where available",
+        "Verified Key Vault categorization as security-protection (cross-walk alignment with ABD)",
+        "Added FIPS cert references to storage and key vault justification fields where certs available",
+        "Expanded SRM/CRM gap with Service Trust Portal download instructions and credential fallback",
+        "Added M365 license tier and Entra edition to OS fields where versions confirmed",
+        "Expanded gaps with unavailability fallbacks for Admin Center access"
+      ],
+      "sources": ["FedRAMP Marketplace", "NIST CMVP", "fabrica-remediation-spec.md", "GAP_ANALYSIS.md"]
+    }
+  ],
+  "assets": [
+    {
+      "id": "SPO-GCCH-001",
+      "name": "SharePoint Online (GCC High)",
+      "type": "saas-tenant",
+      "os": "Microsoft 365 GCC High (M365 G5 license)",
+      "location": "GCC High (US Sovereign)",
+      "owner": "IT Admins",
+      "category": "cui-asset",
+      "justification": "Primary CUI document storage. All CUI document libraries reside in SPO GCC High. Sensitivity labels and DLP policies enforced.",
+      "specialized_policy_ref": null,
+      "crma_control_ref": null
+    },
+    {
+      "id": "ODB-GCCH-001",
+      "name": "OneDrive for Business (GCC High)",
+      "type": "saas-tenant",
+      "os": "Microsoft 365 GCC High (M365 G5 license)",
+      "location": "GCC High (US Sovereign)",
+      "owner": "IT Admins",
+      "category": "cui-asset",
+      "justification": "Individual CUI file storage for authorized users. Per-user OneDrive instances within the GCC High tenant boundary.",
+      "specialized_policy_ref": null,
+      "crma_control_ref": null
+    },
+    {
+      "id": "EXO-GCCH-001",
+      "name": "Exchange Online (GCC High)",
+      "type": "saas-tenant",
+      "os": "Microsoft 365 GCC High (M365 G5 license)",
+      "location": "GCC High (US Sovereign)",
+      "owner": "IT Admins",
+      "category": "cui-asset",
+      "justification": "CUI transmitted and stored in email. Exchange Online Protection + Defender for Office 365 provide transport security. Email forwarding disabled for in-scope users.",
+      "specialized_policy_ref": null,
+      "crma_control_ref": null
+    },
+    {
+      "id": "TEAMS-GCCH-001",
+      "name": "Microsoft Teams (GCC High)",
+      "type": "saas-tenant",
+      "os": "Microsoft 365 GCC High (M365 G5 license)",
+      "location": "GCC High (US Sovereign)",
+      "owner": "IT Admins",
+      "category": "cui-asset",
+      "justification": "Primary collaboration tool for CUI discussions and file sharing. Teams files stored in SPO backend. Guest access tightly controlled.",
+      "specialized_policy_ref": null,
+      "crma_control_ref": null
+    },
+    {
+      "id": "AZ-SA-001",
+      "name": "vfsgovevops01 (Storage)",
+      "type": "virtual-appliance",
+      "os": "Azure Storage v2 (Standard_ZRS)",
+      "location": "Azure Gov (usgovvirginia), rg-eo-prod",
+      "owner": "IT Admins / EvidenceOps-Automation",
+      "category": "cui-asset",
+      "justification": "Stores compliance evidence including CUI-derived audit artifacts. CMK-encrypted (RSA-HSM 4096-bit), WORM-enabled containers (audit-logs, compliance-reports, incident-evidence) with 365-day immutable retention. Public access disabled, private endpoint only. Encryption via Azure Storage crypto module (FIPS 140-2 Cert #4536) with CMK managed by Key Vault HSM.",
+      "specialized_policy_ref": null,
+      "crma_control_ref": null
+    },
+    {
+      "id": "AZ-KV-001",
+      "name": "vfsgov-kv-prod (Key Vault)",
+      "type": "virtual-appliance",
+      "os": "Azure Key Vault Premium (HSM-backed)",
+      "location": "Azure Gov (usgovvirginia), rg-eo-prod",
+      "owner": "IT Admins",
+      "category": "security-protection",
+      "justification": "Manages customer-managed encryption keys (CMK) for storage account encryption. Premium SKU with HSM backing, RBAC authorization, purge protection, 90-day soft delete. Private endpoint access only. HSM-backed by Marvell CNN35XX-NFBE HSM module (FIPS 140-2 Level 3, Cert #3718).",
+      "specialized_policy_ref": null,
+      "crma_control_ref": null
+    },
+    {
+      "id": "AZ-LAW-001",
+      "name": "vfsgov-law-prod (LAW)",
+      "type": "virtual-appliance",
+      "os": "Azure Log Analytics (PerGB2018)",
+      "location": "Azure Gov (usgovvirginia), rg-eo-prod",
+      "owner": "IT Admins",
+      "category": "security-protection",
+      "justification": "Centralized audit log aggregation for all M365 and Azure resources. 365-day retention. Receives Entra sign-in logs, Key Vault audit events, Storage access logs, Subscription activity logs, and Automation job logs.",
+      "specialized_policy_ref": null,
+      "crma_control_ref": null
+    },
+    {
+      "id": "AZ-SEN-001",
+      "name": "Microsoft Sentinel",
+      "type": "virtual-appliance",
+      "os": "Azure Sentinel (on LAW)",
+      "location": "Azure Gov (usgovvirginia), rg-eo-prod",
+      "owner": "IT Admins",
+      "category": "security-protection",
+      "justification": "Cloud-native SIEM providing threat detection, investigation, and response. CMMC 2.0 Content Hub solution deployed. Connected to vfsgov-law-prod workspace.",
+      "specialized_policy_ref": null,
+      "crma_control_ref": null
+    },
+    {
+      "id": "AZ-DEF-001",
+      "name": "Defender for Cloud",
+      "type": "virtual-appliance",
+      "os": "Microsoft Defender for Cloud (Standard tier)",
+      "location": "Azure Gov (subscription scope)",
+      "owner": "IT Admins",
+      "category": "security-protection",
+      "justification": "Cloud security posture management and workload protection. Standard tier enabled for VirtualMachines (P2), StorageAccounts, CloudPosture, and ARM.",
+      "specialized_policy_ref": null,
+      "crma_control_ref": null
+    },
+    {
+      "id": "ENTRA-001",
+      "name": "Entra ID + Conditional Access",
+      "type": "saas-tenant",
+      "os": "Microsoft Entra ID P2 (GCC High)",
+      "location": "GCC High (US Sovereign)",
+      "owner": "IT Admins",
+      "category": "security-protection",
+      "justification": "Identity provider and access control enforcement. Conditional Access policies enforce MFA (phishing-resistant), block legacy auth, restrict CUI access to browser-only sessions. Break-glass account (breakglass@vfsgov.us) configured with MFA.",
+      "specialized_policy_ref": null,
+      "crma_control_ref": null
+    },
+    {
+      "id": "DLP-001",
+      "name": "Microsoft Purview DLP",
+      "type": "saas-tenant",
+      "os": "Microsoft 365 GCC High (M365 G5 license)",
+      "location": "GCC High (US Sovereign)",
+      "owner": "IT Admins",
+      "category": "security-protection",
+      "justification": "Data loss prevention policies preventing unauthorized CUI egress across Exchange, SPO, OneDrive, and Teams.",
+      "specialized_policy_ref": null,
+      "crma_control_ref": null
+    },
+    {
+      "id": "MDO-001",
+      "name": "Defender for Office 365",
+      "type": "saas-tenant",
+      "os": "Microsoft 365 GCC High (M365 G5 license)",
+      "location": "GCC High (US Sovereign)",
+      "owner": "IT Admins",
+      "category": "security-protection",
+      "justification": "Email and collaboration threat protection — anti-phishing, safe attachments, safe links.",
+      "specialized_policy_ref": null,
+      "crma_control_ref": null
+    },
+    {
+      "id": "INTUNE-001",
+      "name": "Microsoft Intune (MDM/MAM)",
+      "type": "saas-tenant",
+      "os": "Microsoft 365 GCC High (M365 G5 license)",
+      "location": "GCC High (US Sovereign)",
+      "owner": "IT Admins",
+      "category": "security-protection",
+      "justification": "Device and application management. Enforces compliance policies on endpoints accessing the CUI enclave. MAM policies for BYOD VDI scenarios.",
+      "specialized_policy_ref": null,
+      "crma_control_ref": null
+    },
+    {
+      "id": "AZ-POLICY-001",
+      "name": "CMMC L2 Policy Initiative",
+      "type": "virtual-appliance",
+      "os": "Azure Policy",
+      "location": "Azure Gov (subscription scope)",
+      "owner": "IT Admins",
+      "category": "security-protection",
+      "justification": "Azure Policy initiative enforcing CMMC Level 2 controls across all Azure Gov resources in the subscription. Default enforcement mode.",
+      "specialized_policy_ref": null,
+      "crma_control_ref": null
+    },
+    {
+      "id": "AZ-VNET-001",
+      "name": "vfsgov-vnet-eo (VNet)",
+      "type": "network-device",
+      "os": "Azure Virtual Network",
+      "location": "Azure Gov (usgovvirginia), rg-eo-prod",
+      "owner": "IT Admins",
+      "category": "security-protection",
+      "justification": "Network segmentation boundary for Azure infrastructure. Address space 10.0.0.0/16 with 4 purpose-built subnets (PE, management, identity, firewall). Private DNS zones for Key Vault and Blob storage.",
+      "specialized_policy_ref": null,
+      "crma_control_ref": null
+    },
+    {
+      "id": "AZ-NSG-001",
+      "name": "vfsgov-nsg-pe (NSG)",
+      "type": "network-device",
+      "os": "Azure NSG",
+      "location": "Azure Gov (usgovvirginia), rg-eo-prod",
+      "owner": "IT Admins",
+      "category": "security-protection",
+      "justification": "Network security group enforcing DenyInternetInbound rule (priority 100) on private endpoint subnet. Prevents any public Internet access to CUI-handling storage and key management resources.",
+      "specialized_policy_ref": null,
+      "crma_control_ref": null
+    },
+    {
+      "id": "AZ-AUTO-001",
+      "name": "vfsgov-automation-eo",
+      "type": "virtual-appliance",
+      "os": "Azure Automation (Basic SKU)",
+      "location": "Azure Gov (usgovvirginia), rg-eo-prod",
+      "owner": "IT Admins / EvidenceOps-Automation",
+      "category": "security-protection",
+      "justification": "Automated evidence collection and compliance reporting. SystemAssigned managed identity with RBAC-scoped access (Security Reader, Log Analytics Reader, Storage Blob Contributor, KV Crypto User).",
+      "specialized_policy_ref": null,
+      "crma_control_ref": null
+    },
+    {
+      "id": "AZ-SP-001",
+      "name": "EvidenceOps-Automation (SP)",
+      "type": "virtual-appliance",
+      "os": "Entra Service Principal",
+      "location": "GCC High (tenant-scoped)",
+      "owner": "IT Admins",
+      "category": "security-protection",
+      "justification": "Service principal for automated evidence collection. Certificate-based authentication (cert thumbprint 4683F3E2..., expires 2028-04-12).",
+      "specialized_policy_ref": null,
+      "crma_control_ref": null
+    },
+    {
+      "id": "BREAKGLASS-001",
+      "name": "breakglass@vfsgov.us",
+      "type": "other",
+      "os": "Entra ID account",
+      "location": "GCC High (tenant-scoped)",
+      "owner": "IT Admins",
+      "category": "security-protection",
+      "justification": "Emergency access account for break-glass scenarios. MFA required, excluded from CA-MFA-All-Users policy to prevent lockout during Entra outages.",
+      "specialized_policy_ref": null,
+      "crma_control_ref": null
+    }
+  ],
+  "esps": [
+    {
+      "name": "Microsoft Corporation",
+      "service_type": "CSP",
+      "scope": "combination",
+      "fedramp_status": "FedRAMP High Authorized",
+      "fedramp_evidence": "M365 GCC High: Package FR1824057433 (FedRAMP High, authorized 2024-12-26, continuous monitoring) — https://www.fedramp.gov/marketplace/products/FR1824057433/; Azure Government: Package F1603087869 (FedRAMP High, authorized 2020-04-29, continuous monitoring) — https://www.fedramp.gov/marketplace/products/F1603087869/",
+      "srm_on_file": false,
+      "srm_ref": "",
+      "ssp_ref": ""
+    }
+  ],
+  "specialized_policies": [],
+  "counts": {
+    "cui_asset": 5,
+    "security_protection": 14,
+    "contractor_risk_managed": 0,
+    "specialized": 0,
+    "out_of_scope": 0
+  },
+  "gaps": [
+    { "field": "esps.srm_on_file", "status": "pending-operator", "note": "Download Microsoft GCC High Customer Responsibility Matrix from Service Trust Portal (https://servicetrust.microsoft.com/). Save to plan-data/vfsgov-xtra/evidence/ and report filename. Once on file, srm_on_file flips to true and srm_ref gets populated." },
+    { "field": "esps.ssp_ref", "status": "closed", "note": "SSP under development (pre-production). Shared responsibility documentation will reference Microsoft CRM (see srm_on_file) in SSP Appendix Q. Section mapping to be finalized during SSP authoring." },
+    { "field": "assets (BYOD endpoints)", "status": "closed", "note": "BYOD personal devices classified as out-of-scope. Justification: Conditional Access App Control enforces browser-only sessions — no local CUI storage, download, copy, or print. CUI processing occurs entirely within M365 GCC High browser sessions. No Intune enrollment required for BYOD devices; MAM policies enforce session-level controls." },
+    { "field": "assets (Cloud PC / VDI)", "note": "If Windows 365 Cloud PCs or Azure Virtual Desktop sessions are used for CUI access, each should be listed as a CUI asset. The current inventory does not include these — confirm deployment model." },
+    { "field": "assets.os", "note": "Document M365 license tier (G3/G5) and Entra ID edition (P1/P2) for assessor review. Source: M365 Admin Center → Billing → Licenses. If M365 Admin Center access unavailable or licenses not yet assigned (pre-deployment), document 'License tier TBD — pending M365 subscription activation' with expected resolution date." },
+    { "field": "counts.cui_users", "note": "In-scope CUI user count: 2-25 (pre-production ramp). Breakdown by role TBD at go-live. deployment_status: pre-production." }
+  ]
+}

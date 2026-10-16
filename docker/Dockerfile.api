@@ -1,0 +1,55 @@
+# syntax=docker/dockerfile:1
+FROM node:20-bookworm-slim AS builder
+
+WORKDIR /app
+
+# 1. Build ces-shared dependency
+COPY ces-mono-main/ces-shared/package*.json ./ces-shared/
+RUN cd ./ces-shared && npm ci
+COPY ces-mono-main/ces-shared/ ./ces-shared/
+RUN cd ./ces-shared && npm run build
+
+# 2. Build ces-tenant dependency
+COPY ces-tenant-main/package*.json ./ces-tenant/
+RUN cd ./ces-tenant && npm ci
+COPY ces-tenant-main/ ./ces-tenant/
+RUN cd ./ces-tenant && npm run build
+
+# 3. Build muster-api
+COPY ces-muster-main/muster-api/package*.json ./ces-muster-main/muster-api/
+COPY ces-muster-main/muster-api/prisma ./ces-muster-main/muster-api/prisma/
+
+WORKDIR /app/ces-muster-main/muster-api
+RUN npm ci
+RUN npx prisma generate
+
+COPY ces-muster-main/muster-api/ ./
+RUN npm run build
+
+# Runner stage
+FROM node:20-bookworm-slim AS runner
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV PORT=4000
+ENV RECIPES_DIR=/app/ces-muster-main/recipes
+
+# Copy built dependencies and app
+COPY --from=builder /app/ces-shared /app/ces-shared
+COPY --from=builder /app/ces-tenant /app/ces-tenant
+COPY --from=builder /app/ces-muster-main/muster-api /app/ces-muster-main/muster-api
+COPY ces-muster-main/recipes /app/ces-muster-main/recipes
+
+# Copy and setup entrypoint
+COPY docker/api-entrypoint.sh /app/docker/api-entrypoint.sh
+RUN chmod +x /app/docker/api-entrypoint.sh
+
+WORKDIR /app/ces-muster-main/muster-api
+
+EXPOSE 4000
+
+HEALTHCHECK --interval=10s --timeout=5s --start-period=15s --retries=3 \
+  CMD node -e "require('http').get('http://127.0.0.1:4000/auth/me', (r) => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))"
+
+ENTRYPOINT ["/app/docker/api-entrypoint.sh"]

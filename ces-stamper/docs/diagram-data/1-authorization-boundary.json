@@ -1,0 +1,80 @@
+{
+  "_changelog": [
+    {
+      "date": "2026-04-19",
+      "changes": [
+        "Fixed Key Vault categorization (moved from cui_assets to security_protection_assets)",
+        "Updated FedRAMP status from Moderate to High for 4 Microsoft services",
+        "Appended FedRAMP package IDs where available (see gaps for unresolved)",
+        "Expanded user count gap with role-based acquisition instruction and fallback for unavailable data",
+        "Expanded CAGE code gap with SAM.gov URL"
+      ],
+      "sources": ["FedRAMP Marketplace", "fabrica-remediation-spec.md", "GAP_ANALYSIS.md"],
+      "notes": "Blocking Issue 4 (Cloud PC/VDI) out of scope per implementation plan"
+    },
+    {
+      "date": "2026-04-19",
+      "changes": [
+        "Populated CAGE code: 17FZ7 (from SAM.gov registration)",
+        "Added user_count 2-25 and deployment_status pre-production to boundary",
+        "Resolved CAGE gap, downgraded user count gap to informational"
+      ],
+      "sources": ["Operator input (SAM.gov CAGE 17FZ7)"]
+    }
+  ],
+  "osa": {
+    "name": "Valor Forge, LLC",
+    "cage": ["17FZ7"],
+    "description": "DoD CUI handling via M365 GCC High enclave"
+  },
+  "boundary": {
+    "label": "VFS GCC High CUI Enclave",
+    "style": "cloud-tenant",
+    "justification": "All CUI processing, storage, and transmission occurs within a dedicated Microsoft 365 GCC High tenant and Azure Government subscription. No on-premises infrastructure handles CUI. The authorization boundary is drawn at the tenant isolation boundary provided by Microsoft's FedRAMP High-authorized GCC High environment.",
+    "user_count": "2-25",
+    "deployment_status": "pre-production"
+  },
+  "cui_assets": [
+    { "name": "SPO GCC High", "role": "file-storage", "hosting": "GCC-High", "count": 1 },
+    { "name": "OneDrive GCC High", "role": "file-storage", "hosting": "GCC-High", "count": 1 },
+    { "name": "Exchange Online", "role": "mail-relay", "hosting": "GCC-High", "count": 1 },
+    { "name": "Teams GCC High", "role": "collaboration", "hosting": "GCC-High", "count": 1 },
+    { "name": "Azure Storage (WORM)", "role": "file-storage", "hosting": "Azure-Gov", "count": 1 }
+  ],
+  "security_protection_assets": [
+    { "name": "Entra ID + CA", "function": "idp-mfa", "operator": "internal", "is_esp": false },
+    { "name": "Defender for Cloud", "function": "edr", "operator": "internal", "is_esp": false },
+    { "name": "MS Sentinel", "function": "siem", "operator": "internal", "is_esp": false },
+    { "name": "Log Analytics (LAW)", "function": "logging", "operator": "internal", "is_esp": false },
+    { "name": "Purview DLP", "function": "dlp", "operator": "internal", "is_esp": false },
+    { "name": "Defender for O365", "function": "edr", "operator": "internal", "is_esp": false },
+    { "name": "Intune MDM/MAM", "function": "other", "operator": "internal", "is_esp": false },
+    { "name": "Azure Policy (CMMC)", "function": "vuln-mgmt", "operator": "internal", "is_esp": false },
+    { "name": "NSG (vfsgov-nsg-pe)", "function": "firewall", "operator": "internal", "is_esp": false },
+    { "name": "Azure Automation", "function": "other", "operator": "internal", "is_esp": false },
+    { "name": "Azure Key Vault", "function": "key-mgmt", "operator": "internal", "is_esp": false }
+  ],
+  "external_sources": [
+    { "name": "DoD SAFE", "data_type": "CTI technical drawings", "protocol": "TLS 1.2+ encrypted portal" },
+    { "name": "Prime contractors", "data_type": "CTI specifications", "protocol": "Teams/SharePoint sharing (TLS 1.2+)" }
+  ],
+  "esps_csps": [
+    { "name": "Microsoft (M365 GCC High)", "service": "SaaS — Exchange, SPO, Teams, OneDrive", "fedramp_status": "High-Authorized (Package ID: FR1824057433)" },
+    { "name": "Microsoft (Azure Gov)", "service": "IaaS/PaaS — compute, storage, networking, Key Vault", "fedramp_status": "High-Authorized (Package ID: F1603087869)" },
+    { "name": "Microsoft (Entra ID)", "service": "IDaaS — identity, conditional access, MFA", "fedramp_status": "High-Authorized (Package ID: FR1824057433)" },
+    { "name": "Microsoft (Sentinel)", "service": "SaaS — SIEM, SOAR", "fedramp_status": "High-Authorized (Package ID: F1603087869)" }
+  ],
+  "physical_sites": [],
+  "out_of_scope": [
+    { "name": "Corporate email (non-CUI)", "segmentation": "tenant-isolation" },
+    { "name": "HR / Accounting systems", "segmentation": "tenant-isolation" },
+    { "name": "Guest Wi-Fi", "segmentation": "policy-only" },
+    { "name": "Personal BYOD devices", "segmentation": "policy-only" }
+  ],
+  "gaps": [
+    { "field": "external_sources", "status": "closed", "note": "No prime contracts awarded yet (pre-production). External sources entry retained as placeholder. Will be updated with specific Prime names and contract numbers when contracts are executed." },
+    { "field": "physical_sites", "status": "closed", "note": "Confirmed: no physical sites handle CUI. Cloud-only deployment. No printing, physical media, or on-premises CUI processing." },
+    { "field": "cui_assets.user_count", "status": "closed", "note": "In-scope CUI user count: 2-25 (pre-production ramp). Breakdown by role TBD at go-live. deployment_status: pre-production." },
+    { "field": "out_of_scope", "status": "closed", "note": "Confirmed: no additional SaaS tools touch CUI. All CUI processing occurs exclusively within M365 GCC High browser-based applications (Office Online, Teams web, Outlook web). No project management, CAD, or third-party SaaS tools are authorized for CUI." }
+  ]
+}

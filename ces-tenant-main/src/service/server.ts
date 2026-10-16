@@ -70,8 +70,10 @@ interface LaunchContextLike {
 }
 
 export interface TenantServiceDaemonOptions {
-  /** Port to bind on 127.0.0.1. Default `DEFAULT_TENANT_SERVICE_PORT`; pass 0 for an ephemeral port (tests). */
+  /** Port to bind. Default `DEFAULT_TENANT_SERVICE_PORT`; pass 0 for an ephemeral port (tests). */
   port?: number;
+  /** Host interface to bind (e.g. '127.0.0.1' or '0.0.0.0'). Defaults to CES_TENANT_HOST env or '127.0.0.1'. */
+  host?: string;
   /** Environment for the wrapped library surfaces. Default `process.env`. */
   env?: NodeJS.ProcessEnv;
   /** Wrapped registry instance. Default: `new FileTenantRegistry({ env, ...registryOptions })`. */
@@ -96,6 +98,7 @@ export class TenantServiceDaemon {
   private readonly launch: LaunchContextLike;
   private readonly logger: Pick<Console, 'log' | 'warn' | 'error'>;
   private readonly port: number;
+  private readonly host: string;
   private server: Server | undefined;
   private startedAt = new Date();
 
@@ -103,6 +106,7 @@ export class TenantServiceDaemon {
     const env = options.env ?? process.env;
     this.logger = options.logger ?? console;
     this.port = options.port ?? 4690;
+    this.host = options.host ?? (env.CES_TENANT_HOST || '127.0.0.1');
     this.ledger = new InProcessTenantStatus();
     this.registry = options.registry ?? new FileTenantRegistry({ env, ...options.registryOptions });
     this.keys = new PlanDataTenantHttpKeyProvider({
@@ -120,7 +124,7 @@ export class TenantServiceDaemon {
     });
   }
 
-  /** Bind 127.0.0.1 (only) and start serving. Resolves with the actual port. */
+  /** Bind host/port and start serving. Resolves with the actual port. */
   start(): Promise<number> {
     if (this.server) throw new Error('[TenantServiceDaemon] already started');
     this.startedAt = new Date();
@@ -134,10 +138,10 @@ export class TenantServiceDaemon {
     this.server = server;
     return new Promise((resolve, reject) => {
       server.once('error', reject);
-      server.listen(this.port, '127.0.0.1', () => {
+      server.listen(this.port, this.host, () => {
         const address = server.address();
         const port = typeof address === 'object' && address ? address.port : this.port;
-        this.logger.log(`[TenantServiceDaemon] auth-state-only service listening on http://127.0.0.1:${port} (status: /status)`);
+        this.logger.log(`[TenantServiceDaemon] auth-state-only service listening on http://${this.host}:${port} (status: /status)`);
         resolve(port);
       });
     });

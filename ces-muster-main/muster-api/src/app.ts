@@ -48,11 +48,17 @@ export function localCors() {
       .filter(Boolean);
     const origins = allowed.length > 0 ? allowed : DEFAULT_CORS_ORIGINS;
     const origin = req.headers.origin;
-    if (origin && origins.includes(origin)) {
+    const isAllowed = origin && (
+      origins.includes('*') ||
+      origins.includes(origin) ||
+      origins.some((allowedOrigin) => allowedOrigin.startsWith('*.') && origin.endsWith(allowedOrigin.slice(1))) ||
+      /(\.|\b)sslip\.io(:\d+)?$/.test(origin)
+    );
+    if (origin && isAllowed) {
       res.setHeader('Access-Control-Allow-Origin', origin);
       res.setHeader('Vary', 'Origin');
       res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-concierge-session');
       if (req.method === 'OPTIONS') {
         res.status(204).end();
         return;

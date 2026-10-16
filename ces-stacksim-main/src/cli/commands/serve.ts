@@ -52,6 +52,7 @@ export async function runServe(argv: string[]): Promise<ServeHandle> {
     stance: stance as TenantStance,
     slug: typeof flags.slug === 'string' ? flags.slug : undefined,
     port: typeof flags.port === 'string' ? Number(flags.port) : undefined,
+    host: typeof flags.host === 'string' ? flags.host : (process.env.STACKSIM_HOST ?? '127.0.0.1'),
   });
 }
 

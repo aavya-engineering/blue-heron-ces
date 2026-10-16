@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CES — Evidence Review</title>
+  <link rel="icon" type="image/svg+xml" href="./ces-favicon.svg">
+  <link rel="stylesheet" href="./ces-ui.css">
+  <script src="./ces-theme-toggle.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--co-font-sans);
+      background: var(--co-bg); color: var(--co-text); padding: 20px; line-height: 1.6;
+    }
+    .evidence-container {
+      max-width: 1200px; margin: 0 auto; background: var(--co-surface);
+      border: 1px solid var(--co-border); border-radius: var(--co-radius); padding: 24px;
+    }
+
+    /* Header */
+    .evidence-header {
+      border-bottom: 1px solid var(--co-border); padding-bottom: 16px; margin-bottom: 20px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .evidence-header-left { flex: 1; }
+    .evidence-title {
+      font-size: 18px; font-weight: 600; margin-bottom: 8px; color: var(--co-primary);
+    }
+    .evidence-meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+    /* Verdict area */
+    .verdict-row {
+      display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;
+      padding: 14px 16px; background: var(--co-bg); border: 1px solid var(--co-border); border-radius: var(--co-radius);
+    }
+    .verdict-badge {
+      display: inline-block; padding: 6px 16px; border-radius: var(--co-radius);
+      font-size: 14px; font-weight: 700; text-transform: uppercase; flex-shrink: 0;
+    }
+    .verdict-SAT { background: var(--co-compliant-bg); color: var(--co-compliant); }
+    .verdict-NOT_SAT { background: var(--co-violation-bg); color: var(--co-violation); }
+    .verdict-PENDING { background: var(--co-review-bg); color: var(--co-review); }
+    .verdict-rationale { font-size: 13px; color: var(--co-text-muted); line-height: 1.5; padding-top: 4px; }
+    .outcome-label {
+      font-size: 12px; color: var(--co-primary); font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.5px; margin-bottom: 2px;
+    }
+    .outcome-rationale { font-size: 13px; color: var(--co-text); }
+
+    /* CMMC pills */
+    .cmmc-controls { display: flex; gap: 6px; flex-wrap: wrap; }
+    .cmmc-control-pill {
+      background: var(--co-primary); color: #fff; padding: 3px 8px;
+      border-radius: var(--co-radius); font-size: 11px; font-weight: 500;
+    }
+
+    /* Sections */
+    .evidence-section { margin-bottom: 16px; }
+    .section-label {
+      font-size: 12px; font-weight: 600; color: var(--co-text-muted); margin-bottom: 6px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+
+    /* Command boxes */
+    .cmd-box {
+      background: var(--co-bg); border: 1px solid var(--co-border); border-radius: var(--co-radius);
+      padding: 10px 14px; font-family: var(--co-font-mono);
+      font-size: 12px; line-height: 1.5; white-space: pre-wrap; word-break: break-all;
+      color: var(--co-text); max-height: 200px; overflow: auto;
+    }
+    .cmd-box.muted { color: var(--co-text-muted); }
+
+    /* Key-value rows */
+    .kv-grid {
+      background: var(--co-bg); border: 1px solid var(--co-border); border-radius: var(--co-radius); padding: 8px 12px;
+    }
+    .kv-row { display: flex; padding: 5px 0; border-bottom: 1px solid var(--co-border); }
+    .kv-row:last-child { border-bottom: none; }
+    .kv-key { flex: 0 0 180px; color: var(--co-text-muted); font-weight: 500; font-size: 13px; }
+    .kv-value { flex: 1; color: var(--co-text); word-break: break-word; font-size: 13px; }
+
+    /* State diff */
+    .state-diff-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .state-column {
+      background: var(--co-bg); border: 1px solid var(--co-border); border-radius: var(--co-radius); padding: 10px;
+    }
+    .state-column-label {
+      font-size: 11px; font-weight: 600; color: var(--co-text-muted);
+      text-transform: uppercase; margin-bottom: 6px;
+    }
+
+    /* JSON viewer */
+    .json-viewer {
+      background: var(--co-bg); border: 1px solid var(--co-border); border-radius: var(--co-radius);
+      padding: 12px; overflow: auto; max-height: 400px;
+      font-family: var(--co-font-mono);
+      font-size: 12px; line-height: 1.4;
+    }
+    .json-viewer pre { margin: 0; white-space: pre-wrap; word-wrap: break-word; }
+    .json-key { color: var(--co-primary-focus); }
+    .json-string { color: var(--co-primary-focus); }
+    .json-number { color: var(--co-primary-focus); }
+    .json-boolean { color: var(--co-violation); }
+    .json-null { color: var(--co-text-muted); }
+
+    /* Collapsible */
+    .collapsible-header {
+      cursor: pointer; display: flex; align-items: center; gap: 6px; user-select: none;
+    }
+    .collapsible-header .arrow { transition: transform 0.2s; font-size: 10px; color: var(--co-text-muted); }
+    .collapsible-header.collapsed .arrow { transform: rotate(-90deg); }
+    .collapsible-body { overflow: hidden; }
+    .collapsible-body.collapsed { display: none; }
+
+    /* Failure diagnostics */
+    .failure-box {
+      background: var(--co-violation-bg); border: 1px solid var(--co-violation); border-radius: var(--co-radius);
+      padding: 12px; margin-top: 8px;
+    }
+    .failure-root { color: var(--co-violation); font-weight: 600; font-size: 13px; margin-bottom: 4px; }
+    .failure-category { color: var(--co-violation); font-size: 12px; text-transform: uppercase; margin-bottom: 8px; }
+    .remediation-list { list-style: disc; padding-left: 20px; }
+    .remediation-list li { color: var(--co-text); font-size: 12px; margin-bottom: 4px; }
+
+    /* OK button */
+    .ok-button {
+      display: block; margin: 24px auto 0; padding: 10px 48px;
+      border-radius: var(--co-radius);
+      font-size: 15px; font-weight: 600; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="evidence-container">
+    <!-- Header: title + CMMC controls -->
+    <div class="evidence-header">
+      <div class="evidence-header-left">
+        <div class="evidence-title" id="evidenceTitle">CES — Evidence Review</div>
+        <div class="evidence-meta">
+          <div class="cmmc-controls" id="cmmcControls"></div>
+        </div>
+      </div>
+      <button id="ces-theme-toggle" title="Toggle light/dark theme">&#9680;</button>
+    </div>
+
+    <!-- 1. Verdict + Rationale (top, prominent) -->
+    <div id="verdictSection" class="evidence-section">
+      <div class="verdict-row">
+        <div id="verdictBadge" class="verdict-badge"></div>
+        <div style="flex:1;">
+          <div class="outcome-label" id="outcomeLabel"></div>
+          <div class="outcome-rationale" id="outcomeRationale"></div>
+          <div class="verdict-rationale" id="verdictRationale"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Failure diagnostics (only if failed) -->
+    <div id="failureSection" class="evidence-section" style="display:none;"></div>
+
+    <!-- 3. Commands: get_cmd, set_cmd (command as sent), evidence_command -->
+    <div id="commandSection" class="evidence-section" style="display:none;"></div>
+
+    <!-- 4. Results as received (rawResponse) -->
+    <div id="resultsSection" class="evidence-section" style="display:none;"></div>
+
+    <!-- 5. State diff (before / after) -->
+    <div id="stateDiffSection" class="evidence-section" style="display:none;">
+      <div class="section-label">State Change (Before / After)</div>
+      <div class="state-diff-container">
+        <div class="state-column">
+          <div class="state-column-label">Before (GET command)</div>
+          <div class="json-viewer" id="preState"></div>
+        </div>
+        <div class="state-column">
+          <div class="state-column-label">After (POST-SET GET)</div>
+          <div class="json-viewer" id="postState"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Registry entry -->
+    <div id="registrySection" class="evidence-section" style="display:none;">
+      <div class="collapsible-header" onclick="toggleCollapse(this)">
+        <span class="arrow">&#9660;</span>
+        <span class="section-label" style="margin-bottom:0;">Registry Entry</span>
+      </div>
+      <div class="collapsible-body">
+        <div class="kv-grid" id="registryMetadata" style="margin-top:6px;"></div>
+      </div>
+    </div>
+
+    <!-- 7. Metadata -->
+    <div id="metadataSection" class="evidence-section" style="display:none;">
+      <div class="collapsible-header" onclick="toggleCollapse(this)">
+        <span class="arrow">&#9660;</span>
+        <span class="section-label" style="margin-bottom:0;">Metadata</span>
+      </div>
+      <div class="collapsible-body">
+        <div class="kv-grid" id="metadataGrid" style="margin-top:6px;"></div>
+      </div>
+    </div>
+
+    <!-- 8. Full evidence JSON (collapsed by default) -->
+    <div id="fullEvidenceSection" class="evidence-section">
+      <div class="collapsible-header collapsed" onclick="toggleCollapse(this)">
+        <span class="arrow">&#9660;</span>
+        <span class="section-label" style="margin-bottom:0;">Full Evidence JSON</span>
+      </div>
+      <div class="collapsible-body collapsed">
+        <div class="json-viewer" id="fullEvidence" style="margin-top:6px;"></div>
+      </div>
+    </div>
+
+    <button class="ok-button btn btn-primary" id="okButton">OK</button>
+  </div>
+
+  <script>
+    var evidenceData = null;
+
+    window.addEventListener('message', function(event) {
+      if (event.data && event.data.type === 'evidence_data') {
+        okClicked = false; // Reset for new evidence review cycle
+        evidenceData = event.data.evidence;
+        renderEvidence(evidenceData);
+      }
+    });
+
+    var okClicked = false;
+
+    window.onbeforeunload = function() {
+      if (!okClicked && window.opener && !window.opener.closed) {
+        window.opener.postMessage({ type: 'evidence_closed' }, '*');
+      }
+    };
+
+    document.getElementById('okButton').addEventListener('click', function() {
+      okClicked = true;
+      if (window.opener && !window.opener.closed) {
+        window.opener.postMessage({ type: 'evidence_ok' }, '*');
+      }
+      window.close();
+    });
+
+    function toggleCollapse(header) {
+      header.classList.toggle('collapsed');
+      var body = header.nextElementSibling;
+      if (body) body.classList.toggle('collapsed');
+    }
+
+    function renderEvidence(evidence) {
+      if (!evidence) return;
+
+      // Parse: handle full SSE event (with evidenceContent) or legacy string
+      var parsed = evidence;
+      if (evidence.evidenceContent) {
+        if (typeof evidence.evidenceContent === 'string') {
+          try {
+            var contentParsed = JSON.parse(evidence.evidenceContent);
+            parsed = Object.assign({}, evidence, contentParsed);
+          } catch (e) { /* keep as-is */ }
+        }
+      } else if (typeof evidence === 'string') {
+        try { parsed = JSON.parse(evidence); } catch (e) { parsed = { rawResponse: evidence }; }
+      }
+
+      // --- 1. Title ---
+      var label = parsed.registryEntry ? parsed.registryEntry.label : '';
+      var entryId = parsed.registryEntry ? parsed.registryEntry.entry_id : '';
+      var titleText = label || parsed.metadata?.commandExecuted || 'Evidence Review';
+      if (entryId && label) titleText = entryId + ' — ' + label;
+      document.getElementById('evidenceTitle').textContent = titleText;
+
+      // --- CMMC controls ---
+      var controls = parsed.metadata?.controlIds || (parsed.registryEntry ? parsed.registryEntry.control_ids : null) || parsed.cmmc_controls || [];
+      var cmmcContainer = document.getElementById('cmmcControls');
+      cmmcContainer.innerHTML = '';
+      controls.forEach(function(ctrl) {
+        var pill = document.createElement('span');
+        pill.className = 'cmmc-control-pill';
+        pill.textContent = ctrl;
+        cmmcContainer.appendChild(pill);
+      });
+
+      // --- 2. Verdict + Rationale ---
+      var verdict = parsed.complianceVerdict || 'PENDING';
+      var verdictBadge = document.getElementById('verdictBadge');
+      verdictBadge.className = 'verdict-badge verdict-' + verdict;
+      verdictBadge.textContent = verdict;
+
+      var outcome = parsed.outcome || '';
+      document.getElementById('outcomeLabel').textContent = outcome ? 'Outcome: ' + outcome.replace(/_/g, ' ') : '';
+      document.getElementById('outcomeRationale').textContent = parsed.outcomeRationale || '';
+      document.getElementById('verdictRationale').textContent = parsed.verdictRationale || '';
+
+      // --- 3. Failure diagnostics ---
+      if (parsed.failureDiagnostics) {
+        var fd = parsed.failureDiagnostics;
+        var failSec = document.getElementById('failureSection');
+        failSec.style.display = 'block';
+        var html = '<div class="section-label">Failure Diagnostics</div><div class="failure-box">';
+        html += '<div class="failure-root">Root Cause: ' + escapeHtml(fd.rootCause || 'unknown') + '</div>';
+        html += '<div class="failure-category">' + escapeHtml(fd.failureCategory || '') + '</div>';
+        if (fd.remediationSteps && fd.remediationSteps.length > 0) {
+          html += '<ul class="remediation-list">';
+          fd.remediationSteps.forEach(function(step) {
+            html += '<li>' + escapeHtml(step) + '</li>';
+          });
+          html += '</ul>';
+        }
+        html += '</div>';
+        failSec.innerHTML = html;
+      }
+
+      // --- 4. Commands ---
+      var cmdHtml = '';
+      var hasCommands = false;
+
+      // Command as sent (set_command / metadata.commandExecuted)
+      var cmdExecuted = parsed.metadata?.commandExecuted || '';
+      if (cmdExecuted && !cmdExecuted.startsWith('[manual')) {
+        hasCommands = true;
+        cmdHtml += '<div style="margin-bottom:10px;">';
+        cmdHtml += '<div class="section-label">Command Executed (SET)</div>';
+        cmdHtml += '<div class="cmd-box">' + escapeHtml(cmdExecuted) + '</div>';
+        cmdHtml += '</div>';
+      }
+
+      // Pre-state output = GET command result
+      if (parsed.metadata?.preStateOutput) {
+        hasCommands = true;
+        cmdHtml += '<div style="margin-bottom:10px;">';
+        cmdHtml += '<div class="section-label">GET Command Result (Pre-State)</div>';
+        cmdHtml += '<div class="cmd-box">' + formatCmdOutput(parsed.metadata.preStateOutput) + '</div>';
+        cmdHtml += '</div>';
+      }
+
+      // Registry commands (get_command, set_command, evidence_command from registryEntry if available)
+      if (parsed.registryEntry) {
+        var reg = parsed.registryEntry;
+        if (reg.get_command) {
+          hasCommands = true;
+          cmdHtml += '<div style="margin-bottom:10px;">';
+          cmdHtml += '<div class="section-label">GET Command (Template)</div>';
+          cmdHtml += '<div class="cmd-box muted">' + escapeHtml(reg.get_command) + '</div>';
+          cmdHtml += '</div>';
+        }
+        if (reg.set_command) {
+          hasCommands = true;
+          cmdHtml += '<div style="margin-bottom:10px;">';
+          cmdHtml += '<div class="section-label">SET Command (Template)</div>';
+          cmdHtml += '<div class="cmd-box muted">' + escapeHtml(reg.set_command) + '</div>';
+          cmdHtml += '</div>';
+        }
+        if (reg.evidence_commands && reg.evidence_commands.length > 0) {
+          hasCommands = true;
+          reg.evidence_commands.forEach(function(ecmd, idx) {
+            cmdHtml += '<div style="margin-bottom:10px;">';
+            cmdHtml += '<div class="section-label">Evidence Command' + (reg.evidence_commands.length > 1 ? ' ' + (idx + 1) : '') + ' (Template)</div>';
+            cmdHtml += '<div class="cmd-box muted">' + escapeHtml(ecmd) + '</div>';
+            cmdHtml += '</div>';
+          });
+        }
+      }
+
+      if (hasCommands) {
+        var cmdSection = document.getElementById('commandSection');
+        cmdSection.style.display = 'block';
+        cmdSection.innerHTML = cmdHtml;
+      }
+
+      // --- 5. Results as received (rawResponse) ---
+      if (parsed.rawResponse) {
+        var resultsSection = document.getElementById('resultsSection');
+        resultsSection.style.display = 'block';
+        resultsSection.innerHTML = '<div class="section-label">Results Received (Raw Response)</div>' +
+          '<div class="cmd-box">' + formatCmdOutput(parsed.rawResponse) + '</div>';
+      }
+
+      // --- 6. State diff ---
+      if (parsed.metadata?.stateChanged && parsed.metadata?.preStateOutput && parsed.metadata?.postStateOutput) {
+        document.getElementById('stateDiffSection').style.display = 'block';
+        document.getElementById('preState').innerHTML = formatCmdOutput(parsed.metadata.preStateOutput);
+        document.getElementById('postState').innerHTML = formatCmdOutput(parsed.metadata.postStateOutput);
+      }
+
+      // --- 7. Registry entry ---
+      if (parsed.registryEntry) {
+        var reg = parsed.registryEntry;
+        document.getElementById('registrySection').style.display = 'block';
+        var rows = [
+          ['Entry ID', reg.entry_id],
+          ['Label', reg.label],
+          ['Engine', reg.engine],
+          ['Layer', reg.layer_hint != null ? 'L' + reg.layer_hint : 'N/A'],
+          ['Sequence', reg.sequence_hint != null ? String(reg.sequence_hint) : 'N/A'],
+          ['Idempotency', reg.idempotency],
+          ['On Failure', reg.on_failure],
+          ['Controls', (reg.control_ids || []).join(', ') || 'None']
+        ];
+        document.getElementById('registryMetadata').innerHTML = rows.map(function(row) {
+          return '<div class="kv-row"><div class="kv-key">' + escapeHtml(row[0]) + '</div>' +
+            '<div class="kv-value">' + escapeHtml(String(row[1] || 'N/A')) + '</div></div>';
+        }).join('');
+      }
+
+      // --- 8. Metadata ---
+      if (parsed.metadata) {
+        var m = parsed.metadata;
+        document.getElementById('metadataSection').style.display = 'block';
+        var metaRows = [
+          ['Timestamp', m.timestamp],
+          ['Executor', m.executorIdentity],
+          ['Environment', m.environment],
+          ['SHA-256', m.sha256Hash],
+          ['State Changed', m.stateChanged != null ? String(m.stateChanged) : 'N/A']
+        ];
+        if (m.moduleVersions && Object.keys(m.moduleVersions).length > 0) {
+          Object.keys(m.moduleVersions).forEach(function(mod) {
+            metaRows.push(['Module: ' + mod, m.moduleVersions[mod]]);
+          });
+        }
+        document.getElementById('metadataGrid').innerHTML = metaRows.map(function(row) {
+          return '<div class="kv-row"><div class="kv-key">' + escapeHtml(row[0]) + '</div>' +
+            '<div class="kv-value">' + escapeHtml(String(row[1] || 'N/A')) + '</div></div>';
+        }).join('');
+      }
+
+      // --- 9. Full evidence JSON (collapsed) ---
+      document.getElementById('fullEvidence').innerHTML = formatJson(parsed);
+    }
+
+    function formatCmdOutput(text) {
+      if (typeof text !== 'string') return formatJson(text);
+      // Try to parse as JSON for pretty display
+      try {
+        var obj = JSON.parse(text);
+        return syntaxHighlight(JSON.stringify(obj, null, 2));
+      } catch (e) {
+        // Plain text output
+        return '<pre>' + escapeHtml(text) + '</pre>';
+      }
+    }
+
+    function formatJson(obj) {
+      return syntaxHighlight(JSON.stringify(obj, null, 2));
+    }
+
+    function syntaxHighlight(json) {
+      json = escapeHtml(json);
+      json = json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function(match) {
+        var cls = 'json-number';
+        if (/^"/.test(match)) {
+          cls = /:$/.test(match) ? 'json-key' : 'json-string';
+        } else if (/true|false/.test(match)) {
+          cls = 'json-boolean';
+        } else if (/null/.test(match)) {
+          cls = 'json-null';
+        }
+        return '<span class="' + cls + '">' + match + '</span>';
+      });
+      return '<pre>' + json + '</pre>';
+    }
+
+    function escapeHtml(text) {
+      var map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+      return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+  </script>
+</body>
+</html>

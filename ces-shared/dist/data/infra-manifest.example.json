@@ -1,0 +1,300 @@
+{
+  "ces": {
+    "artifact": "infrastructure_manifest",
+    "version": "1.0.0",
+    "generated_on": "2026-09-27T12:00:00.000Z",
+    "intent": "Example (W4-SH2): CMMC L2 Azure infrastructure specification for rg-ces-example \u2014 the shape Muster should emit and Stamper translates",
+    "cesId": "ces-example-001"
+  },
+  "infrastructure": {
+    "infrastructure_model": "m365_azure",
+    "identity": [
+      {
+        "resource_id": "res-id-001",
+        "resource_type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+        "name": "id-ces-example-eo",
+        "control_ids": [
+          "AC.L1-3.1.1"
+        ],
+        "registry_entry_ids": [
+          "AZ-ID-001"
+        ],
+        "properties": {
+          "purpose": "EvidenceOps collector identity"
+        },
+        "depends_on": []
+      }
+    ],
+    "logging": [
+      {
+        "resource_id": "res-log-001",
+        "resource_type": "Microsoft.OperationalInsights/workspaces",
+        "name": "law-ces-example",
+        "control_ids": [
+          "AU.L2-3.3.1",
+          "AU.L2-3.3.2"
+        ],
+        "registry_entry_ids": [
+          "AZ-LOG-001",
+          "AZ-LOG-002"
+        ],
+        "properties": {
+          "retentionInDays": 365,
+          "sku": "PerGB2018"
+        },
+        "depends_on": []
+      }
+    ],
+    "security": [
+      {
+        "resource_id": "res-sec-001",
+        "resource_type": "Microsoft.KeyVault/vaults",
+        "name": "kv-ces-example",
+        "control_ids": [
+          "SC.L2-3.13.10"
+        ],
+        "registry_entry_ids": [
+          "AZ-KV-001",
+          "AZ-KV-002"
+        ],
+        "properties": {
+          "enablePurgeProtection": true,
+          "enableRbacAuthorization": true
+        },
+        "depends_on": []
+      },
+      {
+        "resource_id": "res-sec-002",
+        "resource_type": "Microsoft.SecurityInsights/onboardingStates",
+        "name": "sentinel-law-ces-example",
+        "control_ids": [
+          "SI.L1-3.14.1",
+          "AU.L2-3.3.1"
+        ],
+        "registry_entry_ids": [
+          "AZ-SEN-001"
+        ],
+        "properties": {},
+        "depends_on": [
+          "res-log-001"
+        ]
+      }
+    ],
+    "storage": [
+      {
+        "resource_id": "res-sto-001",
+        "resource_type": "Microsoft.Storage/storageAccounts",
+        "name": "stcesexample01",
+        "control_ids": [
+          "SC.L2-3.13.10",
+          "AU.L2-3.3.1"
+        ],
+        "registry_entry_ids": [
+          "AZ-LOG-003"
+        ],
+        "properties": {
+          "minimumTlsVersion": "TLS1_2",
+          "allowBlobPublicAccess": false,
+          "cmkKeyName": "cmk-ces-example"
+        },
+        "depends_on": [
+          "res-sec-001"
+        ]
+      }
+    ],
+    "network": [
+      {
+        "resource_id": "res-net-001",
+        "resource_type": "Microsoft.Network/virtualNetworks",
+        "name": "vnet-ces-example",
+        "control_ids": [
+          "SC.L1-3.13.1",
+          "SC.L1-3.13.5"
+        ],
+        "registry_entry_ids": [
+          "AZ-NET-001",
+          "AZ-NET-002",
+          "AZ-NET-003",
+          "AZ-NET-004",
+          "AZ-NET-005"
+        ],
+        "properties": {
+          "addressSpace": "10.20.0.0/16"
+        },
+        "depends_on": []
+      },
+      {
+        "resource_id": "res-net-002",
+        "resource_type": "Microsoft.Network/networkSecurityGroups",
+        "name": "nsg-ces-example-pe",
+        "control_ids": [
+          "SC.L1-3.13.1",
+          "SC.L2-3.13.6"
+        ],
+        "registry_entry_ids": [
+          "AZ-NSG-001",
+          "AZ-NSG-004"
+        ],
+        "properties": {
+          "defaultInbound": "Deny"
+        },
+        "depends_on": [
+          "res-net-001"
+        ]
+      },
+      {
+        "resource_id": "res-net-003",
+        "resource_type": "Microsoft.Network/azureFirewalls",
+        "name": "afw-ces-example",
+        "control_ids": [
+          "SC.L1-3.13.1",
+          "SC.L2-3.13.6"
+        ],
+        "registry_entry_ids": [
+          "AZ-FW-001",
+          "AZ-FW-002"
+        ],
+        "properties": {
+          "sku": "Standard"
+        },
+        "depends_on": [
+          "res-net-001"
+        ]
+      }
+    ],
+    "automation": [
+      {
+        "resource_id": "res-auto-001",
+        "resource_type": "Microsoft.Automation/automationAccounts",
+        "name": "aa-ces-example",
+        "control_ids": [
+          "CM.L2-3.4.1"
+        ],
+        "registry_entry_ids": [
+          "AZ-AUTO-001"
+        ],
+        "properties": {},
+        "depends_on": [
+          "res-log-001"
+        ]
+      }
+    ],
+    "diagnostics": [
+      {
+        "resource_id": "res-diag-001",
+        "resource_type": "Microsoft.Insights/diagnosticSettings",
+        "name": "diag-kv-to-law",
+        "control_ids": [
+          "AU.L2-3.3.1"
+        ],
+        "registry_entry_ids": [
+          "AZ-DIAG-001"
+        ],
+        "properties": {
+          "target": "law-ces-example"
+        },
+        "depends_on": [
+          "res-log-001",
+          "res-sec-001"
+        ]
+      }
+    ],
+    "stamper_variable_map": {
+      "subscriptionId": "00000000-0000-4000-8000-000000000001",
+      "resourceGroup": "rg-ces-example",
+      "location": "usgovvirginia",
+      "lawWorkspaceName": "law-ces-example",
+      "eoAppDisplayName": "ces-evidenceops-example",
+      "storageAccountName": "stcesexample01",
+      "keyVaultName": "kv-ces-example",
+      "cmkKeyName": "cmk-ces-example",
+      "vnetName": "vnet-ces-example",
+      "vnetCidr": "10.20.0.0/16",
+      "subnetPeName": "snet-pe",
+      "subnetPeCidr": "10.20.3.0/24",
+      "nsgPeName": "nsg-ces-example-pe",
+      "automationAccountName": "aa-ces-example",
+      "mgmtSubnetCidr": "10.20.0.0/24",
+      "workloadSubnetCidr": "10.20.1.0/24",
+      "bastionSubnetCidr": "10.20.4.0/26",
+      "firewallSubnetCidr": "10.20.5.0/26",
+      "identitySubnetCidr": "10.20.2.0/24",
+      "peSubnetCidr": "10.20.3.0/24",
+      "firewallName": "afw-ces-example",
+      "publicIpName": "pip-afw-ces-example",
+      "vmName": "vm-ces-example-mgmt",
+      "vmImage": "Win2022Datacenter",
+      "vmSize": "Standard_B2s"
+    },
+    "registry_coverage": {
+      "total_infra_entries": 18,
+      "covered_entry_ids": [
+        "AZ-ID-001",
+        "AZ-LOG-001",
+        "AZ-LOG-002",
+        "AZ-KV-001",
+        "AZ-KV-002",
+        "AZ-SEN-001",
+        "AZ-LOG-003",
+        "AZ-NET-001",
+        "AZ-NET-002",
+        "AZ-NET-003",
+        "AZ-NET-004",
+        "AZ-NET-005",
+        "AZ-NSG-001",
+        "AZ-NSG-004",
+        "AZ-FW-001",
+        "AZ-FW-002",
+        "AZ-AUTO-001",
+        "AZ-DIAG-001"
+      ],
+      "uncovered_entry_ids": [],
+      "coverage_pct": 100
+    },
+    "provenance": [
+      {
+        "field": "infrastructure_model",
+        "value": "m365_azure",
+        "source": "si_baseline",
+        "rule": "SI Baseline dependencies.infrastructure_model"
+      },
+      {
+        "field": "location",
+        "value": "usgovvirginia",
+        "source": "tcp",
+        "rule": "Tenant Config Profile region"
+      },
+      {
+        "field": "vnetCidr",
+        "value": "10.20.0.0/16",
+        "source": "tcp",
+        "rule": "Tenant Config Profile address space"
+      },
+      {
+        "field": "mgmtSubnetCidr",
+        "value": "10.20.0.0/24",
+        "source": "convention",
+        "rule": "subnet index 0 of vnetCidr"
+      },
+      {
+        "field": "lawWorkspaceName",
+        "value": "law-ces-example",
+        "source": "convention",
+        "rule": "law-<rg suffix>"
+      },
+      {
+        "field": "retentionInDays",
+        "value": 365,
+        "source": "policy_odp",
+        "rule": "AU.L2-3.3.1 retention ODP"
+      }
+    ],
+    "secret_references": [
+      {
+        "variable": "initialPassword",
+        "form": "one_time_operator_held",
+        "ref": "secretref:one-time:00000000-0000-4000-8000-000000000099"
+      }
+    ]
+  }
+}

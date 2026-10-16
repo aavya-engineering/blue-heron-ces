@@ -1,0 +1,99 @@
+{
+  "executionMetadata": {
+    "planId": "unknown",
+    "tenant": "vfsgov-xtra",
+    "timestamp": "2026-04-04T22:25:43.564Z",
+    "operator": "unknown",
+    "sha256Hash": "56c512e6094196ed54d3c337dfd576b96cb69e0de916542543d2da917c717947"
+  },
+  "resources": [
+    {
+      "category": "discovered",
+      "type": "MgUser",
+      "path": "AC.L2-3.1.1.operator-discover",
+      "step": "step_task_AC.L1-3.1.2_mnkmi5kl_ut0i0lk",
+      "timestamp": "2026-04-04T22:14:26.361Z",
+      "cmdlet": "Get-MgUser -Filter \"userPrincipalName eq 'operator@vfsgov.us'\""
+    },
+    {
+      "category": "discovered",
+      "type": "$roleId",
+      "path": "AC.L2-3.1.4.pim-policy-get",
+      "step": "step_task_AC.L2-3.1.4_mnkmi5km_ugbp1sm",
+      "timestamp": "2026-04-04T22:14:58.508Z",
+      "cmdlet": "$roleId = (Get-MgRoleManagementDirectoryRoleDefinition -Filter \"displayName eq 'Compliance Administrator'\").Id; $assignment = Get-MgPolicyRoleManagementPolicyAssignment -Filter \"scopeId eq '/' and scopeType eq 'DirectoryRole' and roleDefinitionId eq '$roleId'\" | Select-Object -First 1; Get-MgPolicyRoleManagementPolicy -UnifiedRoleManagementPolicyId $assignment.PolicyId | Select-Object Id,DisplayName | ConvertTo-Json -Depth 10"
+    },
+    {
+      "category": "discovered",
+      "type": "MgPolicyRoleManagementPolicyRule",
+      "path": "AC.L2-3.1.4.pim-approval",
+      "step": "step_task_AC.L2-3.1.4_mnkmi5km_ugbp1sm",
+      "timestamp": "2026-04-04T22:15:19.091Z",
+      "cmdlet": "Get-MgPolicyRoleManagementPolicyRule -UnifiedRoleManagementPolicyId DirectoryRole_bbe08772-8fde-4e55-961a-8a43779e7d58_f3f3a86a-56e0-453d-af0a-689f9cfc8f06"
+    },
+    {
+      "category": "discovered",
+      "type": "MgUser",
+      "path": "AC.L2-3.1.1.operator-discover",
+      "step": "step_task_AC.L2-3.1.7_mnkmi5km_tcgas8i",
+      "timestamp": "2026-04-04T22:15:34.225Z",
+      "cmdlet": "Get-MgUser -Filter \"userPrincipalName eq 'operator@vfsgov.us'\""
+    },
+    {
+      "category": "discovered",
+      "type": "MgGraphRequest",
+      "path": "CM.L2-3.4.2.asr-rules",
+      "step": "step_task_CM.L2-3.4.2_mnkmi5kq_ga1bhqd",
+      "timestamp": "2026-04-04T22:16:31.549Z",
+      "cmdlet": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/beta/deviceManagement/configurationPolicies').value | Where-Object name -like 'CMMC-ASR*'"
+    },
+    {
+      "category": "discovered",
+      "type": "AzSentinelAlertRule",
+      "path": "AZ-SEN-005",
+      "step": "step_task_SI.L1-3.14.1_mnkmi5kr_ggnyzxm",
+      "timestamp": "2026-04-04T22:18:08.861Z",
+      "cmdlet": "Get-AzSentinelAlertRule -ResourceGroupName rg-eo-prod -WorkspaceName vfsgov-law-prod | Where-Object DisplayName -eq 'CMMC L2 — Privileged Identity Changes'"
+    },
+    {
+      "category": "discovered",
+      "type": "AzVirtualNetwork",
+      "path": "AZ-NET-002",
+      "step": "step_task_SC.L1-3.13.5_mnkmi5ko_17989tj",
+      "timestamp": "2026-04-04T22:20:38.210Z",
+      "cmdlet": "Get-AzVirtualNetwork -ResourceGroupName rg-eo-prod -Name vfsgov-vnet-eo | Select-Object -ExpandProperty Subnets | Where-Object Name -eq 'snet-mgmt'"
+    },
+    {
+      "category": "discovered",
+      "type": "AzVirtualNetwork",
+      "path": "AZ-NET-002",
+      "step": "step_task_SC.L2-3.13.6_mnkmi5kp_7zjpwo0",
+      "timestamp": "2026-04-04T22:21:47.020Z",
+      "cmdlet": "Get-AzVirtualNetwork -ResourceGroupName rg-eo-prod -Name vfsgov-vnet-eo | Select-Object -ExpandProperty Subnets | Where-Object Name -eq 'snet-mgmt'"
+    },
+    {
+      "category": "discovered",
+      "type": "MgUser",
+      "path": "AC.L2-3.1.1.operator-discover",
+      "step": "step_task_AC.L1-3.1.1_mnkmi5kk_6tfi490",
+      "timestamp": "2026-04-04T22:22:06.821Z",
+      "cmdlet": "Get-MgUser -Filter \"userPrincipalName eq 'operator@vfsgov.us'\""
+    },
+    {
+      "category": "discovered",
+      "type": "AzSentinelAlertRule",
+      "path": "AZ-SEN-007",
+      "step": "step_task_AU.L2-3.3.3_mnkmi5kq_jibrqu9",
+      "timestamp": "2026-04-04T22:24:10.905Z",
+      "cmdlet": "Get-AzSentinelAlertRule -ResourceGroupName rg-eo-prod -WorkspaceName vfsgov-law-prod | Where-Object DisplayName -eq 'CMMC L2 — Excessive Failed Logins'"
+    },
+    {
+      "category": "discovered",
+      "type": "AzSentinelAlertRule",
+      "path": "AZ-SEN-005",
+      "step": "step_task_SI.L2-3.14.6_mnkmi5kr_71yjnxu",
+      "timestamp": "2026-04-04T22:25:22.637Z",
+      "cmdlet": "Get-AzSentinelAlertRule -ResourceGroupName rg-eo-prod -WorkspaceName vfsgov-law-prod | Where-Object DisplayName -eq 'CMMC L2 — Privileged Identity Changes'"
+    }
+  ]
+}

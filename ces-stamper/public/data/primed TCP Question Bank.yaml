@@ -1,0 +1,88 @@
+# CES-FE TCP Question Bank
+# Sections TCP-1 through TCP-9 are defined in the planner.
+# Section TCP-10 captures Azure infrastructure context for the Infrastructure Manifest.
+
+sections:
+  - id: TCP-10
+    title: Azure Infrastructure
+    description: >
+      Azure subscription and resource configuration for CMMC L2 infrastructure deployment.
+      These inputs drive the Infrastructure Manifest (5th MP artifact) and feed Stamper's
+      53-entry infra registry with the required variable map.
+
+    questions:
+      - id: TCP.AZ.001
+        prompt: Azure subscription ID
+        type: guid
+        required: true
+        derivation: null
+        help: >
+          The Azure Government subscription ID where CMMC infrastructure will be deployed.
+          Found in Azure Portal > Subscriptions, or via `az account show --query id`.
+
+      - id: TCP.AZ.002
+        prompt: Azure region
+        type: single_select
+        required: true
+        options:
+          - usgovvirginia
+          - usgovarizona
+          - usgovtexas
+        default: usgovvirginia
+        derivation:
+          source: cloud_environment
+          rule: >
+            If tenant_model_preference is gcc_high, default to usgovvirginia.
+            All Azure Gov regions support CMMC workloads; usgovvirginia has broadest service availability.
+
+      - id: TCP.AZ.003
+        prompt: Resource group name
+        type: text
+        required: true
+        default: null
+        derivation:
+          source: primary_domain
+          rule: >
+            Derive from TCP primary_domain slug: rg-cmmc-{domain_slug}.
+            Example: primary_domain=vfsgov.us -> rg-cmmc-vfsgov
+
+      - id: TCP.AZ.004
+        prompt: VNet CIDR block
+        type: text
+        required: true
+        default: "10.0.0.0/16"
+        derivation: null
+        help: >
+          Address space for the compliance VNet. Default 10.0.0.0/16 provides 65,534 addresses.
+          Adjust if this overlaps with existing VNets in the subscription.
+        validation:
+          pattern: "^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}/\\d{1,2}$"
+
+      - id: TCP.AZ.005
+        prompt: Resource naming prefix
+        type: text
+        required: true
+        default: null
+        derivation:
+          source: primary_domain
+          rule: >
+            Derive from TCP primary_domain slug (lowercase, no dots/hyphens truncated to 10 chars).
+            Example: primary_domain=vfsgov.us -> vfsgov
+            Used to construct: {prefix}-law-prod, {prefix}-kv-prod, {prefix}evops01, etc.
+        validation:
+          pattern: "^[a-z][a-z0-9]{2,10}$"
+          message: Prefix must be 3-11 lowercase alphanumeric characters starting with a letter.
+
+      - id: TCP.AZ.006
+        prompt: WORM immutability retention (days)
+        type: number
+        required: true
+        default: 2557
+        derivation:
+          source: policy_odp
+          rule: >
+            Derive from evidence.retention_target_days in Policy Inputs / ODP answers.
+            Default 2557 days (7 years) covers CMMC + FedRAMP + NARA audit log retention.
+        validation:
+          min: 365
+          max: 3650

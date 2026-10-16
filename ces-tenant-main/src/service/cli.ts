@@ -35,6 +35,12 @@ function parsePort(argv: string[]): number {
   return value;
 }
 
+function parseHost(argv: string[]): string | undefined {
+  const idx = argv.findIndex((a) => a === '--host' || a === '-h');
+  if (idx !== -1 && argv[idx + 1]) return argv[idx + 1];
+  return process.env.CES_TENANT_HOST;
+}
+
 async function main(): Promise<void> {
   const argv = process.argv.slice(2);
   // Tolerate both `cli.js serve --port N` and `cli.js --port N`.
@@ -44,9 +50,10 @@ async function main(): Promise<void> {
     process.exit(2);
   }
 
-  const daemon = new TenantServiceDaemon({ port: parsePort(argv) });
+  const host = parseHost(argv);
+  const daemon = new TenantServiceDaemon({ port: parsePort(argv), ...(host ? { host } : {}) });
   const port = await daemon.start();
-  console.log(`[ces-tenant] status page: http://127.0.0.1:${port}/status`);
+  console.log(`[ces-tenant] status page: http://${host || '127.0.0.1'}:${port}/status`);
 
   const shutdown = async (): Promise<void> => {
     console.log('[ces-tenant] shutting down...');
