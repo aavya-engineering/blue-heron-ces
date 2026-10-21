@@ -2,7 +2,7 @@ services:
   # ── 1. PostgreSQL Database ──────────────────────────────────────────────────
   postgres:
     image: postgres:16-alpine
-    container_name: muster-postgres
+    container_name: heron-postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-muster_db}
@@ -12,7 +12,7 @@ services:
       # Host port 5434 by default to avoid conflicts with host PostgreSQL
       - "${POSTGRES_PORT:-5434}:5432"
     volumes:
-      - muster_postgres_data:/var/lib/postgresql/data
+      - heron_postgres_data:/var/lib/postgresql/data
       - ./ces-muster-main/docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U muster_app -d muster_db || pg_isready -U postgres -d muster_db"]
@@ -21,7 +21,10 @@ services:
       retries: 5
       start_period: 5s
     networks:
-      - ces_network
+      ces_network:
+        aliases:
+          - postgres
+          - heron-postgres
 
   # ── 2. Tenant Auth Daemon (:4690) ───────────────────────────────────────────
   ces-tenant:
@@ -151,8 +154,8 @@ services:
       - ces_network
 
 volumes:
-  muster_postgres_data:
-    name: muster_postgres_data
+  heron_postgres_data:
+    name: heron_postgres_data
   ces_pipeline_data:
     name: ces_pipeline_data
   muster_ssl_certs:

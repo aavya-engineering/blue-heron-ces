@@ -3,7 +3,7 @@ services:
   # Runs PostgreSQL 16 with dedicated least-privilege role (NOBYPASSRLS for tenant isolation)
   postgres:
     image: postgres:16-alpine
-    container_name: muster-postgres
+    container_name: heron-postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: muster_db
@@ -13,7 +13,7 @@ services:
       # Exposed on host port 5434 by default to avoid conflict with existing local PostgreSQL instances on 5432
       - "${POSTGRES_PORT:-5434}:5432"
     volumes:
-      - muster_postgres_data:/var/lib/postgresql/data
+      - heron_postgres_data:/var/lib/postgresql/data
       - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U muster_app -d muster_db || pg_isready -U postgres -d muster_db"]
@@ -37,4 +37,4 @@ services:
       - full
 
 volumes:
-  muster_postgres_data:
+  heron_postgres_data:

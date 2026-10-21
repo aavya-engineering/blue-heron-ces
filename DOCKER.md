@@ -40,7 +40,7 @@ Once running, the following endpoints are available:
 | **Muster Backend API** | `muster-api` | `4000` | `4000` | REST API: [http://localhost:4000](http://localhost:4000) (Health: `/auth/me`) |
 | **Tenant Auth Daemon** | `ces-tenant` | `4690` | `4690` | Auth & session daemon: [http://localhost:4690/status](http://localhost:4690/status) |
 | **Mock GCC High Cloud** | `ces-stacksim`| `4390` | `4390` | Microsoft 365 / Azure GCC High simulator: [http://localhost:4390](http://localhost:4390) |
-| **PostgreSQL Database** | `muster-postgres`| `5434` | `5432` | Postgres 16 DB: `muster_db` (user: `muster_app`) |
+| **PostgreSQL Database** | `heron-postgres`| `5434` | `5432` | Postgres 16 DB: `muster_db` (user: `muster_app`) |
 | **Stamper GUI** *(Optional)* | `ces-stamper` | `5002` | `5002` | Remediation UI: [http://localhost:5002](http://localhost:5002) *(run with `--profile full`)* |
 
 > [!TIP]
@@ -140,7 +140,7 @@ CLAUDE_MODEL=claude-3-5-sonnet-20241022
 
 ### 4. Kubernetes (EKS, AKS, GKE, K3s)
 - All services have standard HTTP `/health` or readiness probes configured in Dockerfiles.
-- Persistent volumes are declared for PostgreSQL and pipeline artifacts (`muster_postgres_data`, `ces_pipeline_data`).
+- Persistent volumes are declared for PostgreSQL and pipeline artifacts (`heron_postgres_data`, `ces_pipeline_data`).
 - Environment variables map directly to Kubernetes `ConfigMap` and `Secret` resources.
 
 ---
@@ -168,10 +168,10 @@ docker compose exec muster-api npx prisma db seed
 ### Database Backup & Restore
 ```bash
 # Backup database to host
-docker exec -t muster-postgres pg_dump -U postgres muster_db > backup_$(date +%Y%m%d).sql
+docker exec -t heron-postgres pg_dump -U postgres muster_db > backup_$(date +%Y%m%d).sql
 
 # Restore database from host
-cat backup.sql | docker exec -i muster-postgres psql -U postgres muster_db
+cat backup.sql | docker exec -i heron-postgres psql -U postgres muster_db
 ```
 
 ### Stop the Stack

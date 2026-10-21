@@ -54,12 +54,12 @@ Write-Host "  Waiting for PostgreSQL to be ready..." -ForegroundColor Yellow
 while (-not $pgReady -and $pgAttempts -lt 12) {
     Start-Sleep -Seconds 2
     $pgAttempts++
-    $check = docker exec muster-postgres pg_isready -U muster_app -d muster_db 2>&1
+    $check = docker exec heron-postgres pg_isready -U muster_app -d muster_db 2>&1
     if ($LASTEXITCODE -eq 0) {
         $pgReady = $true
     } elseif ($pgAttempts -eq 1) {
         # First attempt: try postgres superuser as fallback
-        $check2 = docker exec muster-postgres pg_isready -U postgres -d muster_db 2>&1
+        $check2 = docker exec heron-postgres pg_isready -U postgres -d muster_db 2>&1
         if ($LASTEXITCODE -eq 0) { $pgReady = $true }
     }
 }
