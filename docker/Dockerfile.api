@@ -1,17 +1,20 @@
 # syntax=docker/dockerfile:1
 FROM node:20-bookworm-slim AS builder
 
+RUN apt-get update && apt-get install -y --no-install-recommends python3 make g++ \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 # 1. Build ces-shared dependency
 COPY ces-mono-main/ces-shared/package*.json ./ces-shared/
-RUN cd ./ces-shared && npm ci
+RUN cd ./ces-shared && npm install
 COPY ces-mono-main/ces-shared/ ./ces-shared/
 RUN cd ./ces-shared && npm run build
 
 # 2. Build ces-tenant dependency
 COPY ces-tenant-main/package*.json ./ces-tenant/
-RUN cd ./ces-tenant && npm ci
+RUN cd ./ces-tenant && (npm ci || npm install)
 COPY ces-tenant-main/ ./ces-tenant/
 RUN cd ./ces-tenant && npm run build
 
@@ -20,7 +23,7 @@ COPY ces-muster-main/muster-api/package*.json ./ces-muster-main/muster-api/
 COPY ces-muster-main/muster-api/prisma ./ces-muster-main/muster-api/prisma/
 
 WORKDIR /app/ces-muster-main/muster-api
-RUN npm ci
+RUN npm install
 RUN npx prisma generate
 
 COPY ces-muster-main/muster-api/ ./
@@ -28,6 +31,9 @@ RUN npm run build
 
 # Runner stage
 FROM node:20-bookworm-slim AS runner
+
+RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -40,6 +46,7 @@ COPY --from=builder /app/ces-shared /app/ces-shared
 COPY --from=builder /app/ces-tenant /app/ces-tenant
 COPY --from=builder /app/ces-muster-main/muster-api /app/ces-muster-main/muster-api
 COPY ces-muster-main/recipes /app/ces-muster-main/recipes
+COPY ces-muster-main/public /app/ces-muster-main/public
 
 # Copy and setup entrypoint
 COPY docker/api-entrypoint.sh /app/docker/api-entrypoint.sh

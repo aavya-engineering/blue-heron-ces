@@ -110,8 +110,13 @@ CREATE TABLE dispositions (
 -- connection (DATABASE_URL) MUST use a NON-superuser role WITHOUT
 -- BYPASSRLS. If the app ever connects as `postgres`, RLS silently
 -- evaporates and every query sees every tenant's data.
--- ============================================================
-ALTER ROLE postgres BYPASSRLS;
+DO $$
+BEGIN
+  ALTER ROLE postgres BYPASSRLS;
+EXCEPTION
+  WHEN OTHERS THEN
+    NULL;
+END $$;
 
 -- ============================================================
 -- RLS: parties — tenant_id column is direct
