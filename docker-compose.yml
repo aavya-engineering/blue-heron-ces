@@ -139,6 +139,7 @@ services:
   # ── 6. Stamper Remediation GUI (:5002) (Profile: full / stamper) ────────────
   ces-stamper:
     container_name: ces-stamper
+    image: heron_ces-ces-stamper:latest
     build:
       context: .
       dockerfile: docker/Dockerfile.stamper
@@ -146,11 +147,19 @@ services:
     environment:
       NODE_ENV: production
       PORT: 5002
+      CES_NO_OPEN: "1"
+      CES_PIPELINE_ROOT: /app/pipeline
+      CES_STAMPER_AUTH_TOKEN: ${CES_STAMPER_AUTH_TOKEN:-stamper-internal-secret-token}
+    volumes:
+      - ces_pipeline_data:/app/pipeline
     ports:
       - "${STAMPER_PORT:-5002}:5002"
-    profiles:
-      - full
-      - stamper
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://127.0.0.1:5002/health', (r) => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))\""]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
     networks:
       - ces_network
 
