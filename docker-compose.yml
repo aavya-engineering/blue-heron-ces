@@ -126,6 +126,7 @@ services:
       - "${UI_PORT:-5173}:80"
       - "${HTTP_PORT:-8080}:80"
     volumes:
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
       - muster_ssl_certs:/etc/nginx/ssl
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/health || exit 1"]

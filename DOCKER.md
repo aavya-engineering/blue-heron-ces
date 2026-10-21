@@ -33,21 +33,24 @@ docker compose up --build -d
 
 Once running, the following endpoints are available:
 
-| Service | Container | Host Port | Internal Port | Description & URL |
+| Service | Container | Host Port | Single-Domain SSL (sslip.io) | Direct Port URL |
 | :--- | :--- | :--- | :--- | :--- |
-| **Muster Web (HTTPS / SSL)** | `muster-ui` | `443` | `443` | **Secure Web Portal:** [https://127.0.0.1.sslip.io](https://127.0.0.1.sslip.io) |
-| **Muster Web (HTTP)** | `muster-ui` | `5173` & `8080` | `80` | Frontend SPA: [http://localhost:5173](http://localhost:5173) or [http://localhost:8080](http://localhost:8080) |
-| **Muster Backend API** | `muster-api` | `4000` | `4000` | REST API: [http://localhost:4000](http://localhost:4000) (Health: `/auth/me`) |
-| **Tenant Auth Daemon** | `ces-tenant` | `4690` | `4690` | Auth & session daemon: [http://localhost:4690/status](http://localhost:4690/status) |
-| **Mock GCC High Cloud** | `ces-stacksim`| `4390` | `4390` | Microsoft 365 / Azure GCC High simulator: [http://localhost:4390](http://localhost:4390) |
-| **PostgreSQL Database** | `heron-postgres`| `5434` | `5432` | Postgres 16 DB: `muster_db` (user: `muster_app`) |
-| **Stamper GUI** *(Optional)* | `ces-stamper` | `5002` | `5002` | Remediation UI: [http://localhost:5002](http://localhost:5002) *(run with `--profile full`)* |
+| **Muster Web UI** | `muster-ui` | `443` | `https://<ip>.sslip.io/` | `http://<ip>:5173` or `:8080` |
+| **Muster Backend API** | `muster-api` | `4000` | `https://<ip>.sslip.io/api/` | `http://<ip>:4000/api/` |
+| **Authentication** | `muster-api` | `4000` | `https://<ip>.sslip.io/auth/login` | `http://<ip>:4000/auth/login` |
+| **Tenant Auth Daemon** | `ces-tenant` | `4690` | `https://<ip>.sslip.io/tenant/status` | `http://<ip>:4690/status` |
+| **Mock Cloud (Stacksim)** | `ces-stacksim`| `4390` | `https://<ip>.sslip.io/stacksim/` | `http://<ip>:4390/` |
+| **PostgreSQL Database** | `heron-postgres`| `5434` | — | `postgresql://muster_app:password@<ip>:5434/muster_db` |
+| **Stamper GUI** *(Optional)* | `ces-stamper` | `5002` | — | `http://<ip>:5002/` *(profile: full)* |
 
 > [!TIP]
-> **sslip.io & SSL Out of the Box:**
-> - When accessed at `https://127.0.0.1.sslip.io`, Nginx serves the application over TLS/SSL using automatically generated SAN certificates matching `*.sslip.io`, `127.0.0.1.sslip.io`, and `localhost`.
-> - If deployed on a cloud server or VM with public/LAN IP (e.g. `54.21.32.11` or `192.168.1.100`), simply open `https://<your-ip>.sslip.io`!
-> - The container automatically reverse-proxies `/api/` and `/auth/` routes internally over HTTPS without mixed-content or CORS issues.
+> **sslip.io & Single-Port SSL Navigation:**
+> - When accessed at `https://136.108.118.191.sslip.io` (or any server IP), all web-based services are unified through port **443 (HTTPS)** with zero CORS issues.
+> - **Frontend UI:** `https://136.108.118.191.sslip.io/`
+> - **API Endpoints:** `https://136.108.118.191.sslip.io/api/`
+> - **Tenant Status Page:** `https://136.108.118.191.sslip.io/tenant/status`
+> - **Stacksim Cloud Inspector:** `https://136.108.118.191.sslip.io/stacksim/`
+> - You do not need to open extra firewall ports for tenant or stacksim web views when accessing via `https://<ip>.sslip.io/`.
 
 ---
 
