@@ -47,6 +47,8 @@ Write-Host "  Alternative HTTP Web:      http://localhost:8080" -ForegroundColor
 Write-Host "  Muster Backend API:        http://localhost:4000/auth/me" -ForegroundColor White
 Write-Host "  Tenant Auth Daemon:        http://localhost:4690/status" -ForegroundColor White
 Write-Host "  Mock GCC High Cloud:       http://localhost:4390" -ForegroundColor White
+Write-Host "  Stamper Remediation GUI:   http://localhost:5002" -ForegroundColor White
+Write-Host "  Planner Strategy GUI:      http://localhost:5001" -ForegroundColor White
 Write-Host "  PostgreSQL Database:       localhost:5434 (db: muster_db)" -ForegroundColor White
 Write-Host "==========================================================" -ForegroundColor Cyan
 Write-Host "  Note: Open https://127.0.0.1.sslip.io in your browser" -ForegroundColor Yellow

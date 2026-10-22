@@ -42,16 +42,18 @@ Once running, the following endpoints are available:
 | **Mock Cloud (Stacksim)** | `ces-stacksim`| `4390` | `https://<ip>.sslip.io/stacksim/` | `http://<ip>:4390/` |
 | **PostgreSQL Database** | `heron-postgres`| `5434` | — | `postgresql://muster_app:password@<ip>:5434/muster_db` |
 | **Stamper Remediation GUI** | `ces-stamper` | `5002` | `https://<ip>.sslip.io/stamper/` | `http://<ip>:5002/` |
+| **Planner GUI** | `ces-planner` | `5001` | `https://<ip>.sslip.io/planner/` | `http://<ip>:5001/` |
 
 > [!TIP]
 > **sslip.io & Single-Port SSL Navigation:**
 > - When accessed at `https://136.108.118.191.sslip.io` (or any server IP), all web-based services are unified through port **443 (HTTPS)** with zero CORS issues.
 > - **Frontend UI:** `https://136.108.118.191.sslip.io/`
+> - **Planner GUI:** `https://136.108.118.191.sslip.io/planner/`
 > - **Stamper Remediation GUI:** `https://136.108.118.191.sslip.io/stamper/`
 > - **API Endpoints:** `https://136.108.118.191.sslip.io/api/`
 > - **Tenant Status Page:** `https://136.108.118.191.sslip.io/tenant/status`
 > - **Stacksim Cloud Inspector:** `https://136.108.118.191.sslip.io/stacksim/`
-> - You do not need to open extra firewall ports for tenant, stacksim, or stamper web views when accessing via `https://<ip>.sslip.io/`.
+> - You do not need to open extra firewall ports for tenant, stacksim, planner, or stamper web views when accessing via `https://<ip>.sslip.io/`.
 
 ---
 

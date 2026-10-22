@@ -163,6 +163,31 @@ services:
     networks:
       - ces_network
 
+  # ── 7. Planner Mission & Strategy GUI (:5001) ──────────────────────────────
+  ces-planner:
+    container_name: ces-planner
+    image: heron_ces-ces-planner:latest
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.planner
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 5001
+      CES_PIPELINE_ROOT: /app/pipeline
+    volumes:
+      - ces_pipeline_data:/app/pipeline
+    ports:
+      - "${PLANNER_PORT:-5001}:5001"
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://127.0.0.1:5001/', (r) => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))\""]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - ces_network
+
 volumes:
   heron_postgres_data:
     name: heron_postgres_data
