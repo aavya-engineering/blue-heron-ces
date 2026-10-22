@@ -10,7 +10,7 @@
 // Schema loader - loads JSON schemas from decsriptions/ directory
 import type { JSONSchemaType } from 'ajv';
 
-const SCHEMA_BASE_PATH = '/schemas';
+const SCHEMA_BASE_PATH = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/schemas`;
 
 export interface SchemaDefinition {
   name: string;

@@ -30,7 +30,8 @@ export function usePolicyQuestions(): UsePolicyQuestionsResult {
 
     async function load() {
       try {
-        const res = await fetch(encodeURI('/data/primed Policy Inputs Question Bank.yaml'));
+        const dataBasePath = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/data`;
+        const res = await fetch(encodeURI(`${dataBasePath}/primed Policy Inputs Question Bank.yaml`));
         if (!res.ok) throw new Error(`Failed to load Policy Inputs Question Bank: ${res.status}`);
         const text = await res.text();
         const data = yaml.load(text) as any;

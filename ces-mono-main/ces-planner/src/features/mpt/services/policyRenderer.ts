@@ -66,7 +66,8 @@ Handlebars.registerHelper('contains', function (this: unknown, arr: unknown, val
 
 /** Loads the template registry YAML from the public directory */
 async function loadRegistry(): Promise<TemplateRegistry> {
-  const resp = await fetch('/templates/policies/registry.yaml');
+  const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+  const resp = await fetch(`${base}/templates/policies/registry.yaml`);
   if (!resp.ok) throw new Error(`Failed to load policy template registry: ${resp.status}`);
   const text = await resp.text();
   return yaml.load(text) as TemplateRegistry;
@@ -74,7 +75,8 @@ async function loadRegistry(): Promise<TemplateRegistry> {
 
 /** Loads a single template Markdown file */
 async function loadTemplate(filename: string): Promise<string> {
-  const resp = await fetch(`/templates/policies/${filename}`);
+  const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+  const resp = await fetch(`${base}/templates/policies/${filename}`);
   if (!resp.ok) throw new Error(`Failed to load policy template ${filename}: ${resp.status}`);
   return resp.text();
 }

@@ -24,7 +24,7 @@ import type {
 } from '../types/domain';
 import type { GlossaryData, HelpOverlay } from '../types/help';
 
-const DATA_BASE_PATH = '/data';
+const DATA_BASE_PATH = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/data`;
 
 export const DATA_FILES = {
   SI_QUESTION_BANK: 'primed SI Question Bank.yaml',
