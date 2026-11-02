@@ -24,18 +24,25 @@ Cut 2026-11-01, after BHD's last fix wave (PH-13). Each folder's source commit i
 
 Windows 10/11 or Server with Windows PowerShell 5.1, Node.js **24.12.0**, npm 11.6.2 and git 2.52+ (exact list: `handoff\handoff.manifest.yaml`).
 
+**Clone to `C:\ces-nb`, exactly.** Some test and harness files still hard-code `C:\ces-nb` (the list is KNOWN-ISSUES KI-13; making them configurable is PUNCH-LIST PL-114). Until that lands, the clone must be at `C:\ces-nb`. `bootstrap.ps1` and `check.mjs` work at any short root (`-Root`), but the UI end-to-end tests and some harness scripts do not.
+
 ```powershell
-git clone <link BHD sent you> C:\ces-nb          # keep this short path: the scripts expect it
-cd C:\ces-nb; git config core.autocrlf false; git config core.longpaths true
-powershell -ExecutionPolicy Bypass -File C:\ces-nb\handoff\bootstrap.ps1 -Root C:\ces-nb
+git clone -c core.autocrlf=false -c core.longpaths=true <link BHD sent you> C:\ces-nb
+git -C C:\ces-nb ls-files --eol | Select-String 'i/lf\s+w/crlf'     # must print nothing (line endings as committed, KI-21)
+powershell -NoProfile -ExecutionPolicy Bypass -File C:\ces-nb\handoff\bootstrap.ps1 -Root C:\ces-nb
 cd C:\ces-nb\ces; npx playwright install chromium; cd ces-muster; npx playwright install chromium
 node C:\ces-nb\pkg\ces-muster-run\scripts\handoff\check.mjs
-powershell -ExecutionPolicy Bypass -File C:\ces-nb\handoff\verify\smoke.ps1 -Root C:\ces-nb
+powershell -NoProfile -ExecutionPolicy Bypass -File C:\ces-nb\handoff\verify\smoke.ps1 -Root C:\ces-nb
 ```
+The two `-c` options must be on the `git clone` line itself: Git for Windows installs with `core.autocrlf=true`, and setting it after the clone does not rewrite the files already checked out. **Already cloned without them?** If the check line prints anything, either delete the folder and clone again with the line above, or, if you have no local changes (this discards them), fix it in place:
+```powershell
+cd C:\ces-nb; git config core.autocrlf false; git config core.longpaths true; git rm -r -q --cached .; git reset -q --hard HEAD
+```
+then run the check line again. `bootstrap.ps1` is safe to rerun at any time; a rerun reinstalls and rebuilds.
 
 Then run one scenario end to end (about 30 minutes; a browser window opens for the watched UI steps):
 ```powershell
-powershell -ExecutionPolicy Bypass -File C:\ces-nb\pkg\ces-muster-run\scripts\mx-e2e.ps1 -Root C:\ces-nb -Harness tester -Scenario s1-mach
+powershell -NoProfile -ExecutionPolicy Bypass -File C:\ces-nb\pkg\ces-muster-run\scripts\mx-e2e.ps1 -Root C:\ces-nb -Harness tester -Scenario s1-mach
 ```
 and read `C:\ces-nb\out\verify.json`, `summary.json`, `ssp.docx` and `GAPS-s1-mach.md`.
 
@@ -62,4 +69,5 @@ Use `handoff\bootstrap.ps1` only. The older `pkg\ces-muster-run\bootstrap.ps1`, 
 - **BHD**: Blue Heron Defense, the owner of CES. **PH-13**: BHD's last fix wave before this handoff.
 - **CMMC**: Cybersecurity Maturity Model Certification. **GCC High**: Microsoft 365 Government Community Cloud High. **CUI**: Controlled Unclassified Information. **DoD**: Department of Defense.
 - **SSP**: system security plan. **POA&M**: plan of action and milestones. **SPRS**: the DoD Supplier Performance Risk System score.
-- **S1 / S2 / S3 / mp**: the simulator's fictional customers `s1-mach`, `s2-eng`, `s3-def`, `muster-partial`. **V1 to V131**: the verify checks (listed in ACCEPTANCE.md). **KI-nn**: a known issue. **DP-1 / DP-2**: the two cost-gate confirmations.
+- **S1 / S2 / S3 / mp**: the simulator's fictional customers `s1-mach`, `s2-eng`, `s3-def`, `muster-partial`. **V1 to V131**: the verify checks (listed in ACCEPTANCE.md). **KI-nn**: a known issue (`handoff\KNOWN-ISSUES.md`). **PL-nnn**: a punch-list row (`handoff\PUNCH-LIST.md`). **DP-1 / DP-2**: the two cost-gate confirmations.
+- **LF / CRLF**: Unix / Windows line endings. `core.autocrlf` is the git setting that converts between them on checkout; CES needs it off.

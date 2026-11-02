@@ -8,11 +8,11 @@ Build the components in this order. Each step runs in the folder shown, relative
 | --- | --- | --- | --- | --- | --- |
 | 1 | ces-tenant | library | `ces-tenant` | `npm ci && npm run build` | (none) |
 | 2 | ces-shared | library | `.` | `npm ci && npm run build -w ces-shared` | ces-tenant |
-| 3 | ces-stamper | server | `.` | `npm run build -w ces-stamper` | ces-shared, ces-tenant |
-| 4 | ces-eo | server | `.` | `npm run build -w ces-eo` | ces-shared, ces-tenant |
-| 5 | ces-ao | server | `.` | `npm run build -w ces-ao` | ces-shared, ces-stamper, ces-tenant |
-| 6 | ces-ec | server | `.` | `npm run build -w ces-ec` | ces-shared, ces-tenant |
-| 7 | ces-ui-kit | ui | `.` | `npm run build -w ces-ui-kit` | ces-shared |
+| 3 | ces-ui-kit | ui | `.` | `npm run build -w ces-ui-kit` | ces-shared |
+| 4 | ces-stamper | server | `.` | `npm run build -w ces-stamper` | ces-shared, ces-tenant, ces-ui-kit |
+| 5 | ces-eo | server | `.` | `npm run build -w ces-eo` | ces-shared, ces-tenant, ces-ui-kit |
+| 6 | ces-ao | server | `.` | `npm run build -w ces-ao` | ces-shared, ces-stamper, ces-tenant, ces-ui-kit |
+| 7 | ces-ec | server | `.` | `npm run build -w ces-ec` | ces-shared, ces-tenant |
 | 8 | ces-stamper-ui | ui | `.` | `npm run build -w ces-stamper-ui` | ces-ui-kit |
 | 9 | ces-ao-ui | ui | `.` | `npm run build -w ces-ao-ui` | ces-ui-kit |
 | 10 | ces-eo-ui | ui | `.` | `npm run build -w ces-eo-ui` | ces-ui-kit |
@@ -27,11 +27,11 @@ Build the components in this order. Each step runs in the folder shown, relative
 | --- | --- | --- |
 | ces-tenant | `ces-tenant` | `npm test` |
 | ces-shared | `.` | `npm test -w ces-shared` |
+| ces-ui-kit | `.` | `npm test -w ces-ui-kit` |
 | ces-stamper | `.` | `npm test -w ces-stamper` |
 | ces-eo | `.` | `npm test -w ces-eo` |
 | ces-ao | `.` | `npm test -w ces-ao` |
 | ces-ec | `.` | `npm test -w ces-ec` |
-| ces-ui-kit | `.` | `npm test -w ces-ui-kit` |
 | ces-stamper-ui | `.` | `npm test -w ces-stamper-ui` |
 | ces-ao-ui | `.` | `npm test -w ces-ao-ui` |
 | ces-eo-ui | `.` | `npm test -w ces-eo-ui` |
@@ -48,11 +48,11 @@ An arrow points from a component to the components that build after it.
 graph TD
   ces_tenant["ces-tenant (library)"]
   ces_shared["ces-shared (library)"]
+  ces_ui_kit["ces-ui-kit (ui)"]
   ces_stamper["ces-stamper (server)"]
   ces_eo["ces-eo (server)"]
   ces_ao["ces-ao (server)"]
   ces_ec["ces-ec (server)"]
-  ces_ui_kit["ces-ui-kit (ui)"]
   ces_stamper_ui["ces-stamper-ui (ui)"]
   ces_ao_ui["ces-ao-ui (ui)"]
   ces_eo_ui["ces-eo-ui (ui)"]
@@ -61,16 +61,19 @@ graph TD
   ces_muster["ces-muster (ui)"]
   muster_api["muster-api (server)"]
   ces_tenant --> ces_shared
+  ces_shared --> ces_ui_kit
   ces_shared --> ces_stamper
   ces_tenant --> ces_stamper
+  ces_ui_kit --> ces_stamper
   ces_shared --> ces_eo
   ces_tenant --> ces_eo
+  ces_ui_kit --> ces_eo
   ces_shared --> ces_ao
   ces_stamper --> ces_ao
   ces_tenant --> ces_ao
+  ces_ui_kit --> ces_ao
   ces_shared --> ces_ec
   ces_tenant --> ces_ec
-  ces_shared --> ces_ui_kit
   ces_ui_kit --> ces_stamper_ui
   ces_ui_kit --> ces_ao_ui
   ces_ui_kit --> ces_eo_ui

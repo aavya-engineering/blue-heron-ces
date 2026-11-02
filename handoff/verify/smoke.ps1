@@ -1,5 +1,5 @@
 # CES handoff smoke check (Blue Heron Defense, CES team). Windows PowerShell 5.1.
-#   powershell -ExecutionPolicy Bypass -File handoff\verify\smoke.ps1 -Root C:\mx [-Scenario s1-mach] [-Seconds 120]
+#   powershell -NoProfile -ExecutionPolicy Bypass -File handoff\verify\smoke.ps1 -Root C:\ces-nb [-Scenario s1-mach] [-Seconds 120] [-PortOffset 0]
 # Run after bootstrap.ps1. For every manifest component that lists ports, it starts the server from the built
 # workspace at <Root>\ces, waits until every listed port accepts a connection and answers HTTP, checks the
 # listening address against the manifest's `bind`, then stops the server. The simulator (tenant-stacksim) starts
@@ -9,11 +9,14 @@
 # Safety: it refuses to start while any target port is held, and it only ever stops processes it started.
 # Exit: 0 all servers pass; 1 a server failed; 2 refused (port held, manifest problem, workspace not built).
 # Output: <Root>\out\smoke\smoke.json and <Root>\out\smoke\logs\<component>.out|.err.
+# -PortOffset <n> (FIX-KIT, clean-room finding CR-10; parse-checked, not yet run): adds n to every manifest port, so the
+#   smoke test can run beside another CES instance on the same machine (for example -PortOffset 20000).
 param(
   [Parameter(Mandatory = $true)][string]$Root,
   [string]$Manifest = '',
   [string]$Scenario = 's1-mach',
-  [int]$Seconds = 120
+  [int]$Seconds = 120,
+  [int]$PortOffset = 0
 )
 $ErrorActionPreference = 'Stop'
 # Windows PowerShell 5.1 leaves $PSScriptRoot empty inside an advanced script's param defaults, so defaults that need it are set here (H1).
@@ -125,6 +128,10 @@ function Save { $result | ConvertTo-Json -Depth 6 | Set-Content -Encoding utf8 (
 try { $M = Read-HandoffManifest -Path $Manifest } catch { Write-Host "REFUSE $($_.Exception.Message)"; exit 2 }
 $targets = @($M.components | Where-Object { $_ -and @($_.ports | Where-Object { $null -ne $_ }).Count -gt 0 })
 if ($targets.Count -eq 0) { Write-Host 'REFUSE the manifest lists no ports; nothing to smoke-test'; exit 2 }
+if ($PortOffset -ne 0) {
+  foreach ($pe in @($targets | ForEach-Object { $_.ports } | Where-Object { $null -ne $_ })) { $pe.port = [int]$pe.port + $PortOffset }
+  Write-Host "     ports shifted by $PortOffset (-PortOffset)"
+}
 if (-not (Test-Path (Join-Path $CES 'node_modules'))) { Write-Host "REFUSE $CES is not built; run bootstrap.ps1 first"; exit 2 }
 $allPorts = @($targets | ForEach-Object { $_.ports } | Where-Object { $null -ne $_ } | ForEach-Object { [int]$_.port } | Sort-Object -Unique)
 $held = @(Get-Holders $allPorts)

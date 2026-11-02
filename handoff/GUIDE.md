@@ -4,7 +4,7 @@ The full, step-by-step guide for an engineer who has never seen CES. Read `START
 
 Written 2026-11-01 by H1 (handoff agent 1) for the PH-13 code (PH-13 is BHD's last fix wave before the handoff). Facts were read from the code at that cut; where a fact lives in a kit file, this guide points to it rather than repeating it.
 
-**Paths.** `<Root>` is where you clone the monorepo: use `C:\ces-nb` (short paths matter on Windows, KNOWN-ISSUES KI-08, and BHD's scripts expect it). The kit is `<Root>\handoff`, the code is `<Root>\ces`, the harness ("run package") is `<Root>\pkg\ces-muster-run` (written `<PKG>`).
+**Paths.** `<Root>` is where you clone the monorepo, and for now it **must be `C:\ces-nb`**: some test and harness files still hard-code that path (KNOWN-ISSUES KI-13 lists every one; PUNCH-LIST PL-114 makes them configurable). `bootstrap.ps1` and `check.mjs` accept any short root through `-Root`, but the UI end-to-end tests and some harness scripts do not. Short paths also matter on Windows (KI-08). The kit is `<Root>\handoff`, the code is `<Root>\ces`, the harness ("run package") is `<Root>\pkg\ces-muster-run` (written `<PKG>`).
 
 ---
 
@@ -68,11 +68,20 @@ The single source of these versions is `handoff\handoff.manifest.yaml` (`toolcha
 ## 4. Get the code
 
 ```powershell
-git clone <link BHD sent you> C:\ces-nb
-cd C:\ces-nb
-git config core.autocrlf false     # keep line endings exactly as committed (KI-21)
-git config core.longpaths true
+git clone -c core.autocrlf=false -c core.longpaths=true <link BHD sent you> C:\ces-nb
+git -C C:\ces-nb ls-files --eol | Select-String 'i/lf\s+w/crlf'     # must print nothing
 ```
+Put both `-c` options on the clone line itself. They keep line endings exactly as committed (KI-21) and allow paths over 260 characters. Git for Windows installs with `core.autocrlf=true` in its system settings, so a plain `git clone` checks out thousands of LF (Unix line ending) files as CRLF (Windows line ending) before any later `git config` can help; setting it afterwards does not rewrite those files. The second line lists any file whose line endings changed on checkout; it must print nothing. (Files committed with CRLF, such as `mx-e2e.ps1`, show as `i/crlf` and are correct.)
+
+**If you already cloned without the `-c` options** and the check line prints files, either delete `C:\ces-nb` and clone again with the line above (simplest), or, when you have no local changes (this discards them), fix it in place and check again:
+```powershell
+cd C:\ces-nb
+git config core.autocrlf false; git config core.longpaths true
+git rm -r -q --cached .; git reset -q --hard HEAD
+git ls-files --eol | Select-String 'i/lf\s+w/crlf'                 # must now print nothing
+```
+Then rerun `bootstrap.ps1` (6.1) if you had already built.
+
 Delivery is only through the private GitHub organization and that link, never an emailed script or zip.
 
 ## 5. Configure the environment
@@ -83,7 +92,7 @@ You configure CES with environment variables (and, for long-running installs, a 
 - **Every secret** is in `handoff\secrets.inventory.yaml` by name only: what it is for, where it is stored, who creates it, how, and how to rotate it. You create all of them yourself (`sharedByBHD: false`). BHD shares only two access grants: your access to the GitHub organization and, if you have no tenant of your own, a scoped guest account in a GCC High tenant.
 - **Module secrets for a standing install** (tokens, principal secrets, `JWT_SECRET`, `EVIDENCE_OPS_SECRET`, `CES_EO_OPERATOR_SECRET`, `CES_MUSTER_SECRETS_TOKEN`) live in one DPAPI-protected file (Windows Data Protection API) that you generate:
   ```powershell
-  powershell -ExecutionPolicy Bypass -File C:\ces-nb\ces\ces-shared\scripts\New-CesModuleSecrets.ps1 -MusterTenantId <tenant_id>
+  powershell -NoProfile -ExecutionPolicy Bypass -File C:\ces-nb\ces\ces-shared\scripts\New-CesModuleSecrets.ps1 -MusterTenantId <tenant_id>
   ```
   Default path `%ProgramData%\CES\secrets\module-secrets.dpapi` (or `CES_MODULE_SECRETS_PATH`). A value in the store wins over the environment. The muster-api token in it expires (8 h by default): renew it with `handoff\lib\Set-MusterSecretsToken.ps1` (RUNBOOK.md "Secrets rotation").
 - **Settings you will touch first:**
@@ -106,12 +115,12 @@ You configure CES with environment variables (and, for long-running installs, a 
 
 ### 6.1 Bootstrap (one command)
 ```powershell
-powershell -ExecutionPolicy Bypass -File C:\ces-nb\handoff\bootstrap.ps1 -Root C:\ces-nb
+powershell -NoProfile -ExecutionPolicy Bypass -File C:\ces-nb\handoff\bootstrap.ps1 -Root C:\ces-nb
 ```
-It (1) checks every toolchain version, (2) checks that each module folder is there and matches `SOURCES.json` (in the monorepo it clones nothing), (3) runs `npm ci` and the build for every component in dependency order, failing fast with the last log lines, (4) optionally (`-ModuleSecretsPath <file>`) makes the module-secret store. It is idempotent: fix the cause and rerun. It never kills a process and never writes outside `<Root>` (except the store path you name). Logs: `<Root>\out\bootstrap\bootstrap.json` and `<step>.out` / `.err`.
+It (1) checks every toolchain version, (2) checks that each module folder is there and matches `SOURCES.json` (in the monorepo it clones nothing) and warns if `core.autocrlf` is on, (3) runs `npm ci` once per npm install root and then the build for every component in dependency order, failing fast with the last log lines, (4) optionally (`-ModuleSecretsPath <file>`) makes the module-secret store. The install roots are the ces-mono root `<Root>\ces` (one `npm ci` for all its workspaces) and each separate package: `ces-tenant`, `tenant-stacksim`, `ces-tester`, `ces-muster` and `ces-muster\muster-api`. It never runs `npm ci` inside a ces-mono workspace member such as `ces-stamper`, even though four of them still hold an old `package-lock.json` (PUNCH-LIST PL-115): npm would treat that folder as the workspace root and wipe the shared `node_modules`. It is idempotent: fix the cause and rerun, or rerun at any time (a rerun reinstalls and rebuilds; about the same time as the first run). `-NoProfile` keeps your own PowerShell profile out of the run. It never kills a process and never writes outside `<Root>` (except the store path you name). Logs: `<Root>\out\bootstrap\bootstrap.json` and `<step>.out` / `.err`.
 
 ### 6.2 Build order
-`handoff\BUILD-ORDER.md` shows the order and the dependency graph (generated from the manifest): ces-tenant, then ces-shared (it runs the root `npm ci`), then the servers (Stamper before AO, which links Stamper), the UI kit and the three UIs, the simulator, the tester, Muster and muster-api. To build one component by hand, run its `build` command from `handoff\handoff.manifest.yaml` in its folder, for example `npm run build -w ces-ao` from `<Root>\ces`. Use `cmd /c` or PowerShell 7 for commands chained with `&&` (Windows PowerShell 5.1 does not support `&&`).
+`handoff\BUILD-ORDER.md` shows the order and the dependency graph (generated from the manifest): ces-tenant, then ces-shared (it runs the root `npm ci`), then the UI kit, then the servers (Stamper before AO, which links Stamper), the three UIs, the simulator, the tester, Muster and muster-api. The UI kit comes before the servers because `npm run build -w ces-stamper` (likewise `-w ces-eo` and `-w ces-ao`) also builds the UI workspace inside that folder, which imports the UI kit; the three UIs therefore build twice, which is harmless. To build one component by hand, run its `build` command from `handoff\handoff.manifest.yaml` in its folder, for example `npm run build -w ces-ao` from `<Root>\ces`. Use `cmd /c` or PowerShell 7 for commands chained with `&&` (Windows PowerShell 5.1 does not support `&&`).
 
 ### 6.3 Browsers for the watched UI runs
 ```powershell
@@ -123,8 +132,9 @@ The two folders pin different Playwright versions, so each needs its own browser
 ### 6.4 Check the kit and smoke-test the servers
 ```powershell
 node C:\ces-nb\pkg\ces-muster-run\scripts\handoff\check.mjs
-powershell -ExecutionPolicy Bypass -File C:\ces-nb\handoff\verify\smoke.ps1 -Root C:\ces-nb
+powershell -NoProfile -ExecutionPolicy Bypass -File C:\ces-nb\handoff\verify\smoke.ps1 -Root C:\ces-nb
 ```
+If another CES instance holds the manifest ports on this machine, add `-PortOffset <n>` (for example `-PortOffset 20000`) to move every smoke-test port by n; this option is new and has not been run yet (KI-17).
 `check.mjs` exits 0 when the manifest, contracts, settings, secrets inventory, generated files and code agree and no secret or identity string is in the kit (checks (a)-(f), listed in its header). `smoke.ps1` starts each server one at a time (simulator first), waits until its port answers and the listening address matches the manifest, then stops only what it started. It refuses to run if a port it needs is held.
 
 ## 7. Run the simulator and each module by hand
@@ -141,7 +151,7 @@ Stop each with Ctrl+C. Never stop a process you did not start.
 ## 8. Run one scenario end to end
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File C:\ces-nb\pkg\ces-muster-run\scripts\mx-e2e.ps1 -Root C:\ces-nb -Harness tester -Scenario s1-mach
+powershell -NoProfile -ExecutionPolicy Bypass -File C:\ces-nb\pkg\ces-muster-run\scripts\mx-e2e.ps1 -Root C:\ces-nb -Harness tester -Scenario s1-mach
 ```
 About 30 minutes. A browser window opens for the watched UI steps (step EU: paced, captioned, with video and trace); add `-UiHeadless` for an unattended rerun. The run refuses to start while one of its ports (4390, 4011, 4002, 4001, 3000, 3001, 4173) is held.
 
@@ -189,14 +199,14 @@ Compare a run with its stored baseline in `<PKG>\expected-outputs\<slug>\` (mp: 
 ## 10. Run the unit gate
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File C:\ces-nb\pkg\ces-muster-run\scripts\run-tests.ps1 -Root C:\ces-nb
+powershell -NoProfile -ExecutionPolicy Bypass -File C:\ces-nb\pkg\ces-muster-run\scripts\run-tests.ps1 -Root C:\ces-nb
 ```
 It runs every package's suite (ces-tenant, ces-shared, ces-stamper, ces-eo, ces-ao, ces-ec, tenant-stacksim, ces-tester, ces-muster, muster-api) with the stores redirected inside `<Root>\out\unit`, starts the simulator for the live-sim suites if none is running, and passes when every failing test is listed in `<PKG>\known-failures.json` (that list is empty: the gate must pass with zero failures). Output: `<Root>\out\unit-gate.json` and `<Root>\out\unit\<suite>.log`. Run one package's tests with its `test` command from the manifest. Known flakes: KI-07, KI-20.
 
 ## 11. The acceptance test: one proof round
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File C:\ces-nb\handoff\verify\round.ps1 -Root C:\ces-nb
+powershell -NoProfile -ExecutionPolicy Bypass -File C:\ces-nb\handoff\verify\round.ps1 -Root C:\ces-nb
 ```
 The unit gate once, then all four scenarios end to end with the tester harness, each compared with `handoff\verify\expected-results.md`. About two hours. Pass = `<Root>\out\round\round.json` has `"pass": true`. ACCEPTANCE.md has the full definition of done (eight checks), the evidence to attach, the V-check list and the sign-off. At the cut the targets are drafts and some checks are known red (KI-06, KI-19, PUNCH-LIST "R-F11 results").
 
@@ -246,3 +256,4 @@ Rules that do not change on a live tenant: AI stays off; two-person approval sta
 - **SSP**: system security plan. **POA&M**: plan of action and milestones. **SPRS**: Supplier Performance Risk System score.
 - **AO / EO / EC**: AdminOps / EvidenceOps / Evidence Collector. **S1 / S2 / S3 / mp**: the four simulator scenarios. **V-nn**: a verify check. **E-step**: a step of `mx-e2e.ps1`. **C1...C11**: EvidenceOps collectors.
 - **DP-1 / DP-2**: the cost-gate opt-in and typed confirmation. **NOT_SAT**: Stamper's "not satisfied" verdict. **DPAPI**: Windows Data Protection API. **JWT**: JSON Web Token. **MCP**: Model Context Protocol (AO's tool interface). **SPA**: single-page app. **KI-nn**: a known issue. **PL-nnn**: a punch-list row.
+- **LF / CRLF**: Unix / Windows line endings; `core.autocrlf` is the git setting that converts between them on checkout (CES needs it off). **npm install root**: the folder where `npm ci` runs for a package and the packages it hosts (for ces-mono, `<Root>\ces` for all its workspaces). **Workspace member**: a folder listed in the ces-mono root `package.json` `workspaces`, installed from the root.

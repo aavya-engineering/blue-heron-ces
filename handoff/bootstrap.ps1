@@ -1,15 +1,20 @@
 # CES handoff bootstrap (Blue Heron Defense, CES team). Windows PowerShell 5.1 (pwsh not needed).
-#   powershell -ExecutionPolicy Bypass -File handoff\bootstrap.ps1 -Root C:\mx [-Origin <url-or-dir>] [-Checkout] [-Reinstall]
+#   powershell -NoProfile -ExecutionPolicy Bypass -File handoff\bootstrap.ps1 -Root C:\ces-nb [-Origin <url-or-dir>] [-Checkout] [-Reinstall]
 # One entry point. It reads handoff.manifest.yaml (next to this script; the parser is lib\HandoffManifest.ps1) and:
 #   1. checks every toolchain entry: runs its `check` command and matches the output against `version`;
 #   2. clones each repo the components name into the nested layout at <Root>\ces, at the manifest commit,
 #      or verifies an existing clone sits at that commit (-Checkout moves a CLEAN clone there; a dirty one fails);
-#   3. installs (npm ci) and builds every component in build order (the topological order of `deps`, the same
-#      order BUILD-ORDER.md shows), failing fast on the first error with the last log lines.
-# It is idempotent: rerun it after a failure; finished clones are verified, current installs are skipped
-# (-Reinstall forces npm ci), builds rerun. It never kills a process and never writes outside <Root>.
+#   3. installs and builds every component in build order (the topological order of `deps`, the same
+#      order BUILD-ORDER.md shows), failing fast on the first error with the last log lines. It runs ONE `npm ci`
+#      per npm install root: the ces-mono root (<Root>\ces) once, and each separate package (ces-tenant,
+#      tenant-stacksim, ces-tester, ces-muster, ces-muster\muster-api). It never runs `npm ci` inside a ces-mono
+#      workspace member (ces-shared, ces-stamper, ces-eo, ces-ao, ...), even when that folder still holds an old
+#      package-lock.json: npm treats a member as the workspace root, so `npm ci` there would wipe the shared
+#      root node_modules (FIX-KIT, clean-room finding CR-03).
+# It is idempotent: rerun it after a failure or at any time; finished clones are verified, current installs are
+# skipped (-Reinstall forces npm ci), builds rerun. It never kills a process and never writes outside <Root>.
 # Logs: <Root>\out\bootstrap\<step>.out|.err and <Root>\out\bootstrap\bootstrap.json (the summary).
-# Next: verify\smoke.ps1 -Root <Root>, then verify\acceptance.ps1 -Root <Root> (see ACCEPTANCE.md).
+# Next: verify\smoke.ps1 -Root <Root>, then verify\round.ps1 -Root <Root> (the four-scenario round; ACCEPTANCE.md).
 # -Live: toolchain entries named in -LiveOnlyTools (default: the Graph PowerShell module) become required; without it a
 #   missing one is a warning, because the simulator path does not use them.
 # -Origin: a git URL prefix (default: the private org below) or a local directory holding <repo>.git bare mirrors.
@@ -112,6 +117,32 @@ function Invoke-Check([string]$Name, [string]$Command) {
   $text = ((Get-Content (Join-Path $BLOG "$n.out") -Raw -ErrorAction SilentlyContinue) + "`n" + (Get-Content (Join-Path $BLOG "$n.err") -Raw -ErrorAction SilentlyContinue)).Trim()
   return @{ rc = $rc; text = $text }
 }
+# The npm install root of a folder (FIX-KIT, CR-03): the nearest ancestor inside <Root> whose package.json lists the
+# folder in `workspaces` (npm installs a workspace member from that root), else the folder itself. Patterns are
+# matched with -like (* and ?), which covers the literal names the ces-mono root uses.
+$script:InstallRootCache = @{}
+function Get-NpmInstallRoot([string]$Dir) {
+  $Dir = $Dir.TrimEnd('\')
+  if ($script:InstallRootCache.ContainsKey($Dir)) { return $script:InstallRootCache[$Dir] }
+  $found = $Dir
+  $d = Split-Path -Parent $Dir
+  while ($d -and $d.Length -ge $Root.TrimEnd('\').Length) {
+    $pj = Join-Path $d 'package.json'
+    if (Test-Path $pj -PathType Leaf) {
+      $ws = $null
+      try { $ws = (Get-Content -Raw -Path $pj | ConvertFrom-Json).workspaces } catch { $ws = $null }
+      if ($null -ne $ws -and $ws -isnot [array] -and $null -ne $ws.packages) { $ws = $ws.packages }
+      $rel = ($Dir.Substring($d.TrimEnd('\').Length).TrimStart('\')) -replace '\\', '/'
+      $hit = @(@($ws) | Where-Object { $null -ne $_ } | Where-Object { $rel -like ((([string]$_) -replace '^\./', '').TrimEnd('/')) })
+      if ($hit.Count -gt 0) { $found = $d; break }
+    }
+    $parent = Split-Path -Parent $d
+    if (-not $parent -or $parent -eq $d) { break }
+    $d = $parent
+  }
+  $script:InstallRootCache[$Dir] = $found
+  return $found
+}
 
 try {
   # ---------- 0. manifest ----------
@@ -124,7 +155,7 @@ try {
   if ($M.release.status -ne 'pinned') { Write-Host 'WARN release is a draft: commits may read HEAD-at-cut and are not reproducible until the release is pinned.' }
   if ($Root.Length -gt 60) {
     Write-Host "WARN Root is $($Root.Length) characters. Windows PowerShell 5.1 cannot open paths over 260 characters;"
-    Write-Host '     use a short root such as C:\mx. Continuing.'
+    Write-Host '     use a short root such as C:\ces-nb. Continuing.'
   }
 
   # ---------- 1. prerequisites (toolchain) ----------
@@ -158,7 +189,15 @@ try {
   }
   # ces-mono first: the other repos clone into directories inside it.
   $repoOrder = @($repoCommit.Keys | Sort-Object { if ($_ -eq 'ces-mono') { 0 } elseif ($_ -eq 'ces-muster-run') { 2 } else { 1 } })
-  if ($null -ne $Sources) { Say 'contractor monorepo: module folders are checked against SOURCES.json (no clone, no checkout)' }
+  if ($null -ne $Sources) {
+    Say 'contractor monorepo: module folders are checked against SOURCES.json (no clone, no checkout)'
+    # CR-01: a clone made without -c core.autocrlf=false under Git for Windows' default (true) has CRLF copies of LF files.
+    $acr = Git-Out $MonoRoot @('config', 'core.autocrlf')
+    if ($acr -and $acr -ne 'false') {
+      Write-Host "WARN core.autocrlf is '$acr' in this clone, so files may be checked out with changed line endings (KNOWN-ISSUES KI-21)."
+      Write-Host '     Re-clone with: git clone -c core.autocrlf=false -c core.longpaths=true <url> C:\ces-nb (START-HERE.md). Continuing.'
+    }
+  }
   foreach ($r in $repoOrder) {
     $want = $repoCommit[$r]
     $pinned = $want -match '^[0-9a-f]{40}$'
@@ -222,10 +261,12 @@ try {
     $compDir = Get-HandoffComponentDir $c $CES $Pkg
     $buildDir = if ($c.cwd) { Join-Path $CES (([string]$c.cwd) -replace '/', '\') } else { $repoRoot }
     if (-not (Test-Path $compDir)) { $Summary.failed_step = "build-$id"; throw "$id : component path $compDir does not exist at this commit" }
-    # A build that runs `npm ci` itself (the manifest's choice) is the install of its build directory: no second npm ci there.
-    if ([string]$c.build -match '(^|&&|\s)npm\s+ci(\s|$)') { $installed[$buildDir] = $true }
-    # npm ci at every directory from the repo root down to the component (and the build cwd) that holds a
-    # package-lock.json, repo root first. Covers nested lockfiles such as ces-muster\muster-api.
+    # A build that runs `npm ci` itself (the manifest's choice) is the install of its build directory's install root:
+    # no second npm ci there in this run.
+    if ([string]$c.build -match '(^|&&|\s)npm\s+ci(\s|$)') { $installed[(Get-NpmInstallRoot $buildDir)] = $true }
+    # Every directory from the repo root down to the component (and the build cwd) that holds a package-lock.json,
+    # mapped to its npm install root and de-duplicated, repo root first. Covers nested separate packages such as
+    # ces-muster\muster-api. A lockfile inside a workspace member is skipped: the root lockfile governs (CR-03).
     $lockDirs = @()
     $d = $compDir
     while ($d -and $d.Length -ge $repoRoot.Length) {
@@ -234,7 +275,16 @@ try {
       $d = Split-Path -Parent $d
     }
     if ((Test-Path (Join-Path $buildDir 'package-lock.json')) -and $lockDirs -notcontains $buildDir) { $lockDirs += $buildDir }
-    foreach ($ld in @($lockDirs | Sort-Object Length)) {
+    $installRoots = @()
+    foreach ($ld in $lockDirs) {
+      $ir = Get-NpmInstallRoot $ld
+      if ($ir -ne $ld.TrimEnd('\') -and -not $installed.ContainsKey("note:$ld")) {
+        $installed["note:$ld"] = $true
+        Write-Host "     skip npm ci in $ld : workspace member of $ir (its package-lock.json is not used; the root lockfile governs)"
+      }
+      if ($installRoots -notcontains $ir) { $installRoots += $ir }
+    }
+    foreach ($ld in @($installRoots | Sort-Object Length)) {
       if ($installed.ContainsKey($ld)) { continue }
       $installed[$ld] = $true
       $stamp = Join-Path $ld 'node_modules\.package-lock.json'
@@ -265,8 +315,8 @@ try {
   $Summary.ok = $true
   Save-Summary
   Say "DONE: $(@($Order).Count) components built at $CES (summary: $BLOG\bootstrap.json)"
-  Write-Host "     next: powershell -ExecutionPolicy Bypass -File $Kit\verify\smoke.ps1 -Root $Root"
-  Write-Host "     then: powershell -ExecutionPolicy Bypass -File $Kit\verify\acceptance.ps1 -Root $Root"
+  Write-Host "     next: powershell -NoProfile -ExecutionPolicy Bypass -File $Kit\verify\smoke.ps1 -Root $Root"
+  Write-Host "     then: powershell -NoProfile -ExecutionPolicy Bypass -File $Kit\verify\round.ps1 -Root $Root (the four-scenario round, ACCEPTANCE.md)"
   exit 0
 } catch {
   $Summary.error = $_.Exception.Message

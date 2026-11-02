@@ -51,13 +51,25 @@ components:
     ports: []
     test: "npm test -w ces-shared"
 
+  # ces-ui-kit builds before the servers: `npm run build -w ces-stamper` (likewise -w ces-eo, -w ces-ao) also builds the
+  # nested UI workspace under that folder (ces-stamper/ui ...), which imports ces-ui-kit (FIX-KIT, clean-room finding CR-04).
+  - id: ces-ui-kit
+    repo: ces-mono
+    path: ces-shared/ui/kit
+    commit: "43655a300e533392b2f21d1794479741eb531f9e"
+    kind: ui
+    build: "npm run build -w ces-ui-kit"
+    deps: [ces-shared]
+    ports: []
+    test: "npm test -w ces-ui-kit"
+
   - id: ces-stamper
     repo: ces-mono
     path: ces-stamper
     commit: "43655a300e533392b2f21d1794479741eb531f9e"
     kind: server
     build: "npm run build -w ces-stamper"
-    deps: [ces-shared, ces-tenant]
+    deps: [ces-shared, ces-tenant, ces-ui-kit]
     ports:
       - { port: 3000, service: "Stamper GUI and API (root script npm run stamper uses --port 5002)", bind: "0.0.0.0", configKey: "--port" }
     test: "npm test -w ces-stamper"
@@ -68,7 +80,7 @@ components:
     commit: "43655a300e533392b2f21d1794479741eb531f9e"
     kind: server
     build: "npm run build -w ces-eo"
-    deps: [ces-shared, ces-tenant]
+    deps: [ces-shared, ces-tenant, ces-ui-kit]
     ports:
       - { port: 4002, service: "EO server and console (bind address: CES_EO_BIND; root script npm run eo sets EO_PORT=5004)", bind: "0.0.0.0", configKey: EO_PORT }
     test: "npm test -w ces-eo"
@@ -79,7 +91,7 @@ components:
     commit: "43655a300e533392b2f21d1794479741eb531f9e"
     kind: server
     build: "npm run build -w ces-ao"
-    deps: [ces-shared, ces-stamper, ces-tenant]
+    deps: [ces-shared, ces-stamper, ces-tenant, ces-ui-kit]
     ports:
       - { port: 3000, service: "AO GUI and API, including the leaver-flow routes /api/leaver/* (bind address: CES_AO_BIND; root script npm run ao uses --port 5003; the e2e run uses 3001)", bind: "0.0.0.0", configKey: "--port" }
     test: "npm test -w ces-ao"
@@ -94,16 +106,6 @@ components:
     ports:
       - { port: 4001, service: "EC API (bind address: EC_HOST, default all)", bind: "0.0.0.0", configKey: EC_PORT }
     test: "npm test -w ces-ec"
-
-  - id: ces-ui-kit
-    repo: ces-mono
-    path: ces-shared/ui/kit
-    commit: "43655a300e533392b2f21d1794479741eb531f9e"
-    kind: ui
-    build: "npm run build -w ces-ui-kit"
-    deps: [ces-shared]
-    ports: []
-    test: "npm test -w ces-ui-kit"
 
   - id: ces-stamper-ui
     repo: ces-mono

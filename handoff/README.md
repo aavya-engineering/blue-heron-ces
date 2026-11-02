@@ -55,11 +55,11 @@ All repositories are in the private organization https://github.com/blue-heron-d
 | --- | --- | --- | --- | --- | --- | --- |
 | ces-tenant | Tenant connection library: the tenant registry, how each module signs in, and the PowerShell session factory. | library | ces-tenant | `.` | `npm ci && npm run build` | `npm test` |
 | ces-shared | Shared library: contracts, the SQLite store (ces.db), module secrets and HTTP auth helpers. | library | ces-mono | `ces-shared` | `npm ci && npm run build -w ces-shared` | `npm test -w ces-shared` |
+| ces-ui-kit | Shared UI kit the three module consoles are built from. | ui | ces-mono | `ces-shared/ui/kit` | `npm run build -w ces-ui-kit` | `npm test -w ces-ui-kit` |
 | ces-stamper | Stamper: applies the mission plan to the tenant and records what it did (GUI and CLI). | server | ces-mono | `ces-stamper` | `npm run build -w ces-stamper` | `npm test -w ces-stamper` |
 | ces-eo | EO (EvidenceOps): evidence store, assessment, SSP and SPRS outputs. | server | ces-mono | `ces-eo` | `npm run build -w ces-eo` | `npm test -w ces-eo` |
 | ces-ao | AO (AdminOps): runs approved admin commands against the tenant and writes AdminOps evidence. | server | ces-mono | `ces-ao` | `npm run build -w ces-ao` | `npm test -w ces-ao` |
 | ces-ec | EC (Evidence Collector): manual evidence intake and a hash-verified integrity ledger. | server | ces-mono | `ces-ec` | `npm run build -w ces-ec` | `npm test -w ces-ec` |
-| ces-ui-kit | Shared UI kit the three module consoles are built from. | ui | ces-mono | `ces-shared/ui/kit` | `npm run build -w ces-ui-kit` | `npm test -w ces-ui-kit` |
 | ces-stamper-ui | Stamper's web console. | ui | ces-mono | `ces-stamper/ui` | `npm run build -w ces-stamper-ui` | `npm test -w ces-stamper-ui` |
 | ces-ao-ui | AO's web console. | ui | ces-mono | `ces-ao/ui` | `npm run build -w ces-ao-ui` | `npm test -w ces-ao-ui` |
 | ces-eo-ui | EO's web console. | ui | ces-mono | `ces-eo/ui` | `npm run build -w ces-eo-ui` | `npm test -w ces-eo-ui` |
