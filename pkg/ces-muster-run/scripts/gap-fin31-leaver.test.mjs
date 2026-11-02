@@ -84,3 +84,74 @@ test('V131 S3 (unconfirmed): reminder and escalation, no AO write; the EO findin
   assert.match(judgeV131({ slug: 's3-def', rec: rec(base), steps, rows: rowsOf({ flow: s3flow, outbox: out, escalations: esc }) }).detail, /acted without a confirm/);
   assert.match(judgeV131({ slug: 's3-def', rec: rec(base), steps, rows: rowsOf({ flow: s3flow, outbox: out, escalations: [], evidence: [] }) }).detail, /no unconfirmed_in_window escalation/);
 });
+
+// ---------- FIX-EL (R-F11): step EL in V7 (sim writes) and V45 (AO rows) ----------
+import { elLeaverOf, isElLeaverWrite, elAoRows, c10HoldsOnlyElRows } from './verify-fin31-leaver.mjs';
+import * as fsEl from 'node:fs';
+import * as pathEl from 'node:path';
+import { fileURLToPath as toPathEl } from 'node:url';
+
+const elSteps = { ...steps, EL: { started: '2026-11-01T10:05:30.000Z', ended: '2026-11-01T10:09:00.000Z' } };
+const elRec = (o = {}) => rec({ flow_after: { status: 200, flow: flow({ leaver: { upn: 'merrin.hollinmere@s1-mach.simtenant.onmicrosoft.us', userId: 'user-7' } }) }, ...o });
+const w = (o) => ({ ts: '2026-11-01T10:07:00.000Z', type: 'mutate', actor: 'ao', sessionType: 'graph', ...o });
+
+test('FIX-EL V7: only a confirm-mode EL record of this run opens the EL window, for the leaver it names', () => {
+  const l = elLeaverOf(elRec(), elSteps);
+  assert.deepEqual(l, { userId: 'user-7', flowId: FLOW, window: elSteps.EL });
+  assert.equal(elLeaverOf(elRec({ mode: 'unconfirmed' }), elSteps), null, 'S3: nobody confirmed, no EL write is allowed');
+  assert.equal(elLeaverOf(elRec(), steps), null, 'no EL step this run');
+  assert.equal(elLeaverOf(elRec({ started: '2026-10-31T10:00:00.000Z' }), elSteps), null, 'an earlier run\'s record');
+  assert.equal(elLeaverOf(elRec({ schema: 'other@1' }), elSteps), null);
+  assert.equal(elLeaverOf(rec({ flow_after: { status: 200, flow: flow() } }), elSteps), null, 'no leaver userId on the flow');
+  assert.equal(elLeaverOf(null, elSteps), null);
+});
+
+test('FIX-EL V7: A-22\'s writes on the leaver (user, group membership, MFA methods) inside EL are allowed; anything else stays outside', () => {
+  const l = elLeaverOf(elRec(), elSteps);
+  for (const e of [
+    w({ objectType: 'users', objectId: 'user-7', source: 'Update-MgUser' }),
+    w({ objectType: 'users', objectId: 'user-7', source: 'Revoke-MgUserSignInSession' }),
+    w({ objectType: 'users', objectId: 'user-7', source: 'Set-MgUserLicense' }),
+    w({ objectType: 'groupMember', objectId: 'group-3|user-7', source: 'Remove-MgGroupMemberByRef' }),
+    w({ objectType: 'authMethods', objectId: 'm-1', source: 'Invoke-MgGraphRequest DELETE /v1.0/users/user-7/authentication/softwareOathMethods/m-1' }),
+  ]) assert.equal(isElLeaverWrite(e, l), true, JSON.stringify(e));
+  for (const e of [
+    w({ objectType: 'users', objectId: 'user-1', source: 'Update-MgUser' }),
+    w({ objectType: 'users', objectId: 'user-70', source: 'Update-MgUser' }),
+    w({ objectType: 'groupMember', objectId: 'group-3|user-1', source: 'Remove-MgGroupMemberByRef' }),
+    w({ objectType: 'authMethods', objectId: 'm-2', source: 'Invoke-MgGraphRequest DELETE /v1.0/users/user-1/authentication/phoneMethods/m-2' }),
+    w({ objectType: 'caPolicies', objectId: 'user-7', source: 'Update-MgIdentityConditionalAccessPolicy' }),
+    w({ objectType: 'users', objectId: 'user-7', ts: '2026-11-01T10:09:00.001Z' }),
+    w({ objectType: 'users', objectId: 'user-7', ts: '2026-11-01T10:05:29.999Z' }),
+  ]) assert.equal(isElLeaverWrite(e, l), false, JSON.stringify(e));
+  assert.equal(isElLeaverWrite(w({ objectType: 'users', objectId: 'user-7' }), null), false, 'no leaver: nothing allowed');
+});
+
+test('FIX-EL V45: EL\'s rows are counted on their own (correlation, tenant, EL window); a C10 record of EL rows only is not E7A\'s', () => {
+  const l = elLeaverOf(elRec(), elSteps);
+  const row = (id, m = {}) => ({ id, tenantId: 'sim-tenant-s1-mach', metadata: { commandId: 'A-22', mode: 'live', dryRun: false, tenantId: 'sim-tenant-s1-mach', correlationId: `leaver-flow:${FLOW}`, timestamp: '2026-11-01T10:08:00.000Z', ...m } });
+  const r = elAoRows(l, [
+    row('A-22:a'),
+    row('A-22:b', { mode: 'dry_run', dryRun: true }),
+    row('A-22:c', { tenantId: 'sim-tenant-s2-eng' }),
+    row('A-22:d', { correlationId: 'leaver-flow:lvf-2' }),
+    row('A-22:e', { timestamp: '2026-11-01T10:20:00.000Z' }),
+  ], 'sim-tenant-s1-mach');
+  assert.deepEqual(r.rows.map((x) => x.id), ['A-22:a', 'A-22:b']);
+  assert.deepEqual(r.live.map((x) => x.id), ['A-22:a']);
+  assert.equal(elAoRows(null, [row('A-22:a')], 'sim-tenant-s1-mach').rows.length, 0, 'no confirm-mode EL: no row is EL\'s');
+  assert.equal(c10HoldsOnlyElRows([{ rowId: 'A-22:a' }], r.ids), true);
+  assert.equal(c10HoldsOnlyElRows({ rowId: 'A-22:a' }, r.ids), true);
+  assert.equal(c10HoldsOnlyElRows([{ rowId: 'A-22:a' }, { rowId: 'A-02:x' }], r.ids), false, 'an E7A row collected in E7 stays red');
+  assert.equal(c10HoldsOnlyElRows([], r.ids), false);
+  assert.equal(c10HoldsOnlyElRows([{ rowId: 'A-22:a' }], new Set()), false);
+});
+
+test('FIX-EL: verify.mjs wires the EL helpers into V7 and V45 (LF kept)', () => {
+  const v = fsEl.readFileSync(pathEl.join(pathEl.dirname(toPathEl(import.meta.url)), 'verify.mjs'), 'utf8');
+  assert.equal(v.includes('\r'), false);
+  assert.match(v, /import \{ elLeaverOf, isElLeaverWrite, elAoRows, c10HoldsOnlyElRows \} from '\.\/verify-fin31-leaver\.mjs';/);
+  assert.match(v, /\|\| isElLeaverWrite\(e, leaver\);/);
+  assert.match(v, /aoWindowProblems\(e7aCalls\.length \+ el\.rows\.length, applies \+ el\.live\.length, el\.ids\)/);
+  assert.match(v, /!c10HoldsOnlyElRows\(payloadOf\(r\), elIds\)/);
+});

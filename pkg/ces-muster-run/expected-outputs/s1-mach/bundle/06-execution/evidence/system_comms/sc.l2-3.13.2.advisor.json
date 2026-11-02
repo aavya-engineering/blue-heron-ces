@@ -1,5 +1,5 @@
 {
-  "rawResponse": "{\"value\":[]}\r\n",
+  "rawResponse": "{\r\n    \"count\":  0,\r\n    \"recommendations\":  [\r\n\r\n                        ]\r\n}\r\n",
   "outcome": "automated_success",
   "outcomeRationale": "Command completed successfully (exit code 0)",
   "complianceVerdict": "SAT",
@@ -18,17 +18,17 @@
     "get_command": "az advisor recommendation list --output json",
     "set_command": "",
     "evidence_commands": [
-      "az advisor recommendation list --output json"
+      "$j = (az advisor recommendation list --output json | Out-String) | ConvertFrom-Json; $items = @(); if ($null -ne $j) { if ($j -isnot [array] -and $j.PSObject.Properties.Name -contains 'value') { $items = @($j.value | Where-Object { $_ }) } else { $items = @($j | Where-Object { $_ }) } }; [pscustomobject]@{ count = $items.Count; recommendations = @($items | ForEach-Object { [pscustomobject]@{ category = $_.category; impact = $_.impact; problem = $_.shortDescription.problem } }) } | ConvertTo-Json -Depth 6"
     ]
   },
   "metadata": {
     "controlIds": [
       "SC.L2-3.13.2"
     ],
-    "timestamp": "2026-11-01T15:28:30.767Z",
+    "timestamp": "2026-11-02T01:44:34.035Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "[manual/evidence-only] Azure Advisor Security Recommendations Evidence",
-    "sha256Hash": "58f1ec56c33427b383753c4916dd81c2b6475833194e5858c5991a120a43f21b",
+    "sha256Hash": "b194e4045efa9887f4d26a342252b26e3dd06245035912220c8c22a86211f451",
     "moduleVersions": {},
     "environment": "GCC-High"
   }

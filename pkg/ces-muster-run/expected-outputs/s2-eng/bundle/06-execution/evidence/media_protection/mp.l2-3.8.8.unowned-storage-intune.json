@@ -1,5 +1,5 @@
 {
-  "rawResponse": "",
+  "rawResponse": "{\r\n    \"displayName\":  \"S2-Block-Removable-Storage\",\r\n    \"id\":  \"52520000-00b4-4000-8000-000000000003\",\r\n    \"odataType\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n    \"storageBlockRemovableStorage\":  true,\r\n    \"usbBlocked\":  true\r\n}\r\n",
   "outcome": "automated_success",
   "outcomeRationale": "Command completed successfully (exit code 0)",
   "complianceVerdict": "SAT",
@@ -15,20 +15,20 @@
     "control_ids": [
       "MP.L2-3.8.8"
     ],
-    "get_command": "Get-MgDeviceManagementDeviceConfiguration | Where-Object {$_.AdditionalProperties.'@odata.type' -like '*deviceRestriction*'} | Select-Object DisplayName,Id",
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object { $_.storageBlockRemovableStorage -eq $true -or $_.usbBlocked -eq $true } | ForEach-Object { [pscustomobject]@{ displayName = $_.displayName; id = $_.id } } | ConvertTo-Json -Depth 3",
     "set_command": "",
     "evidence_commands": [
-      "Get-MgDeviceManagementDeviceConfiguration | Where-Object {$_.AdditionalProperties.'@odata.type' -like '*deviceRestriction*'} | Select-Object DisplayName,Id | ConvertTo-Json -Depth 10"
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object { $_.storageBlockRemovableStorage -eq $true -or $_.usbBlocked -eq $true } | ForEach-Object { [pscustomobject]@{ displayName = $_.displayName; id = $_.id; odataType = $_.'@odata.type'; storageBlockRemovableStorage = $_.storageBlockRemovableStorage; usbBlocked = $_.usbBlocked } } | ConvertTo-Json -Depth 5"
     ]
   },
   "metadata": {
     "controlIds": [
       "MP.L2-3.8.8"
     ],
-    "timestamp": "2026-11-01T16:05:08.158Z",
+    "timestamp": "2026-11-02T02:30:07.328Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "[manual/evidence-only] Verify Intune Policy Prohibiting Unidentified Portable Storage",
-    "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sha256Hash": "3d5461c16c0b1287f6b7ab202dbdc5de9a46e9c06d49635f46ca2d92dcc70b40",
     "moduleVersions": {},
     "environment": "GCC-High",
     "gateContext": "manual_gate"

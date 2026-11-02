@@ -1,0 +1,131 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"52520000-00c5-4000-8000-000000000002\",\r\n    \"name\":  \"S2 Windows time synchronisation (NTP)\",\r\n    \"platforms\":  \"windows10\",\r\n    \"ntpClientEnabled\":  true,\r\n    \"ntpConfigured\":  true,\r\n    \"timeServer\":  \"time.windows.com,0x9\",\r\n    \"ntpType\":  \"ntp\",\r\n    \"pollInterval\":  3600,\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"52520000-00c5-4000-8000-000000000002_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ]\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Resource already exists — creation skipped (idempotent)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "existing equivalent 'S2 Windows time synchronisation (NTP)' verified by effect (8 conditions) (existing equivalent 'S2 Windows time synchronisation (NTP)' matched by effect)",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "existing equivalent 'S2 Windows time synchronisation (NTP)' verified by effect (8 conditions)"
+  },
+  "registryEntry": {
+    "entry_id": "AU.L2-3.3.7.time-sync",
+    "label": "Deploy Windows Time Synchronisation (NTP) Settings Catalog Policy",
+    "engine": "mgraph",
+    "layer_hint": 4,
+    "sequence_hint": 9,
+    "idempotency": "get-then-set",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "AU.L2-3.3.7"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/beta/deviceManagement/configurationPolicies?$expand=settings,assignments').value | ForEach-Object { $p = $_; $si = @($p.settings | ForEach-Object { $_.settingInstance }); $cfg = @($si | Where-Object { $_.settingDefinitionId -eq 'device_vendor_msft_policy_config_admx_w32time_w32time_policy_configure_ntpclient' })[0]; $kids = @($cfg.choiceSettingValue.children); [pscustomobject]@{ id = $p.id; name = $p.name; platforms = $p.platforms; ntpClientEnabled = (@($si | Where-Object { $_.settingDefinitionId -eq 'device_vendor_msft_policy_config_admx_w32time_w32time_policy_enable_ntpclient' -and $_.choiceSettingValue.value -eq 'device_vendor_msft_policy_config_admx_w32time_w32time_policy_enable_ntpclient_1' }).Count -gt 0); ntpConfigured = ($cfg.choiceSettingValue.value -eq 'device_vendor_msft_policy_config_admx_w32time_w32time_policy_configure_ntpclient_1'); timeServer = @($kids | Where-Object { $_.settingDefinitionId -like '*_ntpserver' })[0].simpleSettingValue.value; ntpType = (@($kids | Where-Object { $_.settingDefinitionId -like '*_type' })[0].choiceSettingValue.value -replace '^.*_type_', ''); pollInterval = @($kids | Where-Object { $_.settingDefinitionId -like '*_specialpollinterval' })[0].simpleSettingValue.value; assignments = @($p.assignments) } } | Where-Object { ($_.name -eq 'CMMC-Time-Sync') -or (($_.platforms -eq 'windows10') -and ($_.ntpClientEnabled -eq $true) -and ($_.ntpConfigured -eq $true) -and (@($_.timeServer | Where-Object { $_ }).Count -gt 0) -and ($_.ntpType -eq 'ntp') -and ($null -ne $_.pollInterval -and [double]$_.pollInterval -ge 1) -and ($null -ne $_.pollInterval -and [double]$_.pollInterval -le 3600) -and (@($_.assignments | Where-Object { $_ }).Count -gt 0)) } | Sort-Object { $_.name -ne 'CMMC-Time-Sync' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
+    "set_command": "$timeServer='time.windows.com'; $created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/beta/deviceManagement/configurationPolicies' -Body (@{name='CMMC-Time-Sync';description='CMMC AU.L2-3.3.7: Windows Time service syncs to the authoritative NTP source, polled hourly';platforms='windows10';technologies='mdm';settings=@(@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationSetting';settingInstance=@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance';settingDefinitionId='device_vendor_msft_policy_config_admx_w32time_w32time_policy_enable_ntpclient';choiceSettingValue=@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationChoiceSettingValue';value='device_vendor_msft_policy_config_admx_w32time_w32time_policy_enable_ntpclient_1';children=@()}}},@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationSetting';settingInstance=@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance';settingDefinitionId='device_vendor_msft_policy_config_admx_w32time_w32time_policy_configure_ntpclient';choiceSettingValue=@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationChoiceSettingValue';value='device_vendor_msft_policy_config_admx_w32time_w32time_policy_configure_ntpclient_1';children=@(@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationSimpleSettingInstance';settingDefinitionId='device_vendor_msft_policy_config_admx_w32time_w32time_policy_configure_ntpclient_w32time_ntpclient_ntpserver';simpleSettingValue=@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationStringSettingValue';value=$timeServer}},@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance';settingDefinitionId='device_vendor_msft_policy_config_admx_w32time_w32time_policy_configure_ntpclient_w32time_ntpclient_type';choiceSettingValue=@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationChoiceSettingValue';value='device_vendor_msft_policy_config_admx_w32time_w32time_policy_configure_ntpclient_w32time_ntpclient_type_ntp';children=@()}},@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationSimpleSettingInstance';settingDefinitionId='device_vendor_msft_policy_config_admx_w32time_w32time_policy_configure_ntpclient_w32time_ntpclient_specialpollinterval';simpleSettingValue=@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationIntegerSettingValue';value=3600}})}}})} | ConvertTo-Json -Depth 20) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/beta/deviceManagement/configurationPolicies/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | ConvertTo-Json -Depth 10",
+    "evidence_commands": [
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/beta/deviceManagement/configurationPolicies?$expand=settings,assignments').value | Where-Object name -eq 'CMMC-Time-Sync' | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AU.L2-3.3.7"
+    ],
+    "timestamp": "2026-11-02T02:29:49.600Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "$timeServer='time.windows.com'; $created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/beta/deviceManagement/configurationPolicies' -Body (@{name='CMMC-Time-Sync';description='CMMC AU.L2-3.3.7: Windows Time service syncs to the authoritative NTP source, polled hourly';platforms='windows10';technologies='mdm';settings=@(@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationSetting';settingInstance=@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance';settingDefinitionId='device_vendor_msft_policy_config_admx_w32time_w32time_policy_enable_ntpclient';choiceSettingValue=@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationChoiceSettingValue';value='device_vendor_msft_policy_config_admx_w32time_w32time_policy_enable_ntpclient_1';children=@()}}},@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationSetting';settingInstance=@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance';settingDefinitionId='device_vendor_msft_policy_config_admx_w32time_w32time_policy_configure_ntpclient';choiceSettingValue=@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationChoiceSettingValue';value='device_vendor_msft_policy_config_admx_w32time_w32time_policy_configure_ntpclient_1';children=@(@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationSimpleSettingInstance';settingDefinitionId='device_vendor_msft_policy_config_admx_w32time_w32time_policy_configure_ntpclient_w32time_ntpclient_ntpserver';simpleSettingValue=@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationStringSettingValue';value=$timeServer}},@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance';settingDefinitionId='device_vendor_msft_policy_config_admx_w32time_w32time_policy_configure_ntpclient_w32time_ntpclient_type';choiceSettingValue=@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationChoiceSettingValue';value='device_vendor_msft_policy_config_admx_w32time_w32time_policy_configure_ntpclient_w32time_ntpclient_type_ntp';children=@()}},@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationSimpleSettingInstance';settingDefinitionId='device_vendor_msft_policy_config_admx_w32time_w32time_policy_configure_ntpclient_w32time_ntpclient_specialpollinterval';simpleSettingValue=@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationIntegerSettingValue';value=3600}})}}})} | ConvertTo-Json -Depth 20) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/beta/deviceManagement/configurationPolicies/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | ConvertTo-Json -Depth 10",
+    "sha256Hash": "ad40445009d2a34c8963838088ed1ad132aa1d1c28f6217f62f3936974fed833",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "{\r\n    \"id\":  \"52520000-00c5-4000-8000-000000000002\",\r\n    \"name\":  \"S2 Windows time synchronisation (NTP)\",\r\n    \"platforms\":  \"windows10\",\r\n    \"ntpClientEnabled\":  true,\r\n    \"ntpConfigured\":  true,\r\n    \"timeServer\":  \"time.windows.com,0x9\",\r\n    \"ntpType\":  \"ntp\",\r\n    \"pollInterval\":  3600,\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"52520000-00c5-4000-8000-000000000002_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ]\r\n}\r\n",
+    "postcheckMode": "state",
+    "orgValues": [
+      {
+        "path": "$.timeServer",
+        "token": "timeServer",
+        "op": "equals",
+        "control_ids": [
+          "AU.L2-3.3.7"
+        ],
+        "source": "answered",
+        "organisation_value": "time.windows.com",
+        "registry_value": "time.windows.com,0x9",
+        "configured_value": "time.windows.com",
+        "basis": "organisation"
+      }
+    ],
+    "lookupMatch": {
+      "basis": "effect",
+      "object": "S2 Windows time synchronisation (NTP)",
+      "conditions": [
+        {
+          "path": "$.platforms",
+          "op": "equals",
+          "expected": "windows10",
+          "observed": "windows10",
+          "pass": true
+        },
+        {
+          "path": "$.ntpClientEnabled",
+          "op": "equals",
+          "expected": true,
+          "observed": true,
+          "pass": true
+        },
+        {
+          "path": "$.ntpConfigured",
+          "op": "equals",
+          "expected": true,
+          "observed": true,
+          "pass": true
+        },
+        {
+          "path": "$.timeServer",
+          "op": "not_empty",
+          "observed": "time.windows.com,0x9",
+          "pass": true
+        },
+        {
+          "path": "$.ntpType",
+          "op": "equals",
+          "expected": "ntp",
+          "observed": "ntp",
+          "pass": true
+        },
+        {
+          "path": "$.pollInterval",
+          "op": "gte",
+          "expected": 1,
+          "observed": 3600,
+          "pass": true
+        },
+        {
+          "path": "$.pollInterval",
+          "op": "lte",
+          "expected": 3600,
+          "observed": 3600,
+          "pass": true
+        },
+        {
+          "path": "$.assignments",
+          "op": "not_empty",
+          "observed": [
+            {
+              "id": "52520000-00c5-4000-8000-000000000002_group-1",
+              "target": {
+                "@odata.type": "#microsoft.graph.groupAssignmentTarget",
+                "groupId": "group-1"
+              }
+            }
+          ],
+          "pass": true
+        }
+      ]
+    }
+  }
+}

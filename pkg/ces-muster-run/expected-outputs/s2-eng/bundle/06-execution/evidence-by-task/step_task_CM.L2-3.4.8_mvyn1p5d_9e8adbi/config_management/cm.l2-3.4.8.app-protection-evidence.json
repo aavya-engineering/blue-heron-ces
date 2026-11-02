@@ -1,0 +1,36 @@
+{
+  "rawResponse": "{\r\n    \"name\":  \"CMMC-ASR-Rules\",\r\n    \"id\":  \"deviceManagementConfigurationPolicy-5\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "CM.L2-3.4.8.app-protection-evidence",
+    "label": "Application Control Evidence: Intune AppLocker profiles and ASR policies",
+    "engine": "mgraph",
+    "layer_hint": 4,
+    "sequence_hint": 9,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "CM.L2-3.4.8"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object { $_.'@odata.type' -eq '#microsoft.graph.windows10EndpointProtectionConfiguration' -and [string]$_.appLockerApplicationControl -like 'enforce*' } | Select-Object displayName,appLockerApplicationControl | ConvertTo-Json -Depth 5",
+    "set_command": "",
+    "evidence_commands": [
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object { $_.'@odata.type' -eq '#microsoft.graph.windows10EndpointProtectionConfiguration' } | Select-Object displayName,appLockerApplicationControl | ConvertTo-Json -Depth 5",
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/beta/deviceManagement/configurationPolicies').value | Where-Object name -like 'CMMC-ASR*' | Select-Object name,id | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "CM.L2-3.4.8"
+    ],
+    "timestamp": "2026-11-02T02:30:03.280Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Application Control Evidence: Intune AppLocker profiles and ASR policies",
+    "sha256Hash": "a8279b57a9376d254058eebf94f6ede150b506a1e004c90d0eda6ed8cfff0bd6",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

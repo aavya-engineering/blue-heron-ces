@@ -189,18 +189,29 @@ These come after the simulator finish line (gate G-FSIM). See `GUIDE.md` section
 
 ## R-F11 results
 
-**R-F10 (observed 2026-11-01, the round before the cut):** S1 88 (predicted 92), S2 93 (97), S3 21 (20), mp 37 (41). All the misses share three causes. The new `IA.L1-3.5.1.app-consent-restrict` SET failed against the simulator's policy shape (−5; fixed at the cut, LOG-PH13-FX.md). The audit-alert policy now credits AU.L2-3.3.4 (+1; accepted by the founder). mp's all-users MFA policy moved IA.L2-3.5.3 (+5; predicted). R-F10 was not re-baselined; R-F11 proves the frozen code.
-
-<!-- R-F11: filled in by the orchestrator at wrap. Do not edit above this line from the round. -->
-
-*To be filled in at wrap: per scenario (S1, S2, S3, mp) the observed SPRS against `PREDICT-RF11.md`, the red V-checks, which PL rows the round closed or opened, and whether the BHD owner accepted the re-baseline.*
+R-F11 (2026-11-01 evening) ran the frozen handoff code on all four scenarios (BHD workspace, `-Harness tester`). The diagnosis is in BHD's log LOG-RF11-DIAG.md.
 
 | Scenario | Predicted SPRS | Observed SPRS | Red checks | PL rows closed / opened | Accepted |
 |---|---|---|---|---|---|
-| S1 s1-mach | | | | | |
-| S2 s2-eng | | | | | |
-| S3 s3-def | | | | | |
-| mp muster-partial | | | | | |
+| S1 s1-mach | 93 | **93** | V98, V124, V125 (open, predicted); V7, V45, V73, V11 (the leaver step's bookkeeping: fixed after the round, PL-118); V8, V17, V27, V85, V108 (baseline difference; cleared by the re-baseline) | opened PL-118 | **yes, re-baselined** (`expected-outputs\s1-mach\proof-runs\gc-rf11-s1`) |
+| S2 s2-eng | 97 | **97** | as S1, plus V43b (predicted) | - | **yes, re-baselined** (`gc-rf11-s2`) |
+| S3 s3-def | 19 | **18** (E7B; passes 17) | V36 and V47 (the AC.L2-3.1.7 precedence, PL-113), V129 (pinned AU.L2-3.3.8 expectation out of date), V94, V98, V124, V125 | opened PL-119, PL-120 | **no**: the −1 is MP.L2-3.8.5's evidence read running before the step that creates its policy (PL-119) |
+| mp muster-partial | 34 | **38** | V129 (as S3), V98, baseline difference | opened PL-121 | **no**: AC.L2-3.1.17 stayed met through a Wi-Fi profile with the placeholder SSID; founder ruling 2026-11-01: a setting built from a placeholder never counts (PL-121; mp then 33) |
+
+### New rows from R-F11 and the clean-room test
+
+| Id | Area | What | Why it matters | Owner | Pri | Evidence |
+|---|---|---|---|---|---|---|
+| PL-118 | tester, harness | The leaver step EL registered with V7 (write windows), V45 (AO rows) and V73 (UI twin), plus the A-22 knowledge-bank YAML. **Fixed after R-F11, not yet proven in a round.** | Four reds came only from bookkeeping. | BHD owner | P1 | LOG-FIX-EL.md |
+| PL-119 | registry | MP.L2-3.8.5's evidence read runs before the task that creates the removable-storage policy (an ordering artefact under the empty-read rule; S3 −1). Use `read_after`, as done for SI.L1-3.14.4. | A false drop. | contractor | P1 | LOG-RF11-DIAG.md |
+| PL-120 | harness | V129's pinned AU.L2-3.3.8 expectation is stale (S3, mp). | A false red. | contractor | P2 | LOG-RF11-DIAG.md |
+| PL-121 | Stamper | Placeholder rule: a setting built from an unanswered placeholder (for example the Wi-Fi SSID `MUSTER-DEFAULT-SSID`) must not count. Extend the AU.L2-3.3.4 placeholder check to every such entry. | A dishonest credit (mp +5). | contractor | P1 | founder ruling 2026-11-01 |
+| PL-122 | AdminOps, security | **Leaver confirm tokens appear in the run's `ces.db` copies** (`out\e7b\pl`, `out\e8r\pl`, `out\e9\pl`; V101). Store only a hash of the token. | Single-use links work like passwords. | contractor | **P1** | clean-room log CR-24 |
+| PL-123 | tests (monorepo) | The unit gate fails 11 tests in the monorepo layout: six Stamper tests run `git show` in a nested repo (CR-13); stacksim scenario tests need BHD's private token file (CR-14); `run-tests.mjs` never creates its isolation folders (CR-15); a test writes then deletes under `~\.stamper` (CR-17); an EO test reads BHD's live evidence (CR-18). | The unit gate must be green on a clean clone. | contractor | P1 | clean-room log CR-13 to CR-18 |
+| PL-124 | harness (monorepo) | Verify in the monorepo: V109, V21 and V22 look for nested `.git` folders (CR-19); V91 needs a coverage file only a BHD script makes (CR-22); `summary.json`'s headline SPRS is E7 pass 1, while the authoritative one is E7B (CR-25, GUIDE §9); the first E7 pass scored 80 against BHD's 93 on a first run (CR-23). | Verify must judge a clean clone fairly. | contractor | P1 | clean-room log CR-19 to CR-25 |
+| PL-125 | kit | Small kit items from the clean room: add `-NoProfile` to every command (CR-12); `.env.example` wording (CR-05); smoke "next" line (CR-07); built-guard (CR-08); `/pl/` in `.gitignore` (CR-21); simulator shim files dirty after a run (CR-20); `npm audit` triage, 63 root findings (CR-11). | Polish and hygiene. | contractor | P2 | clean-room log |
+
+**Clean-room test (fresh clone, fixed kit):** clone, bootstrap (92 s), browsers, `check.mjs` and `smoke.ps1` pass. S1 end to end runs every step and scores 93 at E7B, the same as BHD. Verify fails on the monorepo-only items above (PL-123, PL-124).
 
 ## Legend
 - **PL-nnn**: a punch-list row in this file. **KI-nn**: a known issue in `KNOWN-ISSUES.md`. **H1 / H2**: the handoff agents (kit and instructions / monorepo builder).

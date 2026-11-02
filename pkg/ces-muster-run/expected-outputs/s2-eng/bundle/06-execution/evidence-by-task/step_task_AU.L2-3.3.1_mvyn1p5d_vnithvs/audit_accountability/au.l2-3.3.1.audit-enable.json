@@ -1,0 +1,52 @@
+{
+  "rawResponse": "{\r\n    \"UnifiedAuditLogIngestionEnabled\":  true,\r\n    \"LogLevel\":  null\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Already compliant — state unchanged, evidence confirms resource exists",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "Already compliant — state unchanged, evidence confirms resource exists"
+  },
+  "registryEntry": {
+    "entry_id": "AU.L2-3.3.1.audit-enable",
+    "label": "Enable Unified Audit Log Ingestion",
+    "engine": "exchange",
+    "layer_hint": 7,
+    "sequence_hint": 41,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "AU.L2-3.3.1",
+      "CM.L2-3.4.3"
+    ],
+    "get_command": "Get-AdminAuditLogConfig | Select-Object UnifiedAuditLogIngestionEnabled | ConvertTo-Json -Depth 10",
+    "set_command": "Set-AdminAuditLogConfig -UnifiedAuditLogIngestionEnabled $true",
+    "evidence_commands": [
+      "Get-AdminAuditLogConfig | Select-Object UnifiedAuditLogIngestionEnabled,LogLevel | ConvertTo-Json"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AU.L2-3.3.1",
+      "CM.L2-3.4.3"
+    ],
+    "timestamp": "2026-11-02T02:31:02.801Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "Set-AdminAuditLogConfig -UnifiedAuditLogIngestionEnabled $true",
+    "sha256Hash": "0720797878de204d8dd180930efca0b8c8666b1e25bf6fc623f4476fd35d286c",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "{\r\n    \"UnifiedAuditLogIngestionEnabled\":  true\r\n}\r\n",
+    "postStateOutput": "{\r\n    \"UnifiedAuditLogIngestionEnabled\":  true\r\n}\r\n",
+    "stateChanged": false,
+    "postcheckMode": "state"
+  }
+}

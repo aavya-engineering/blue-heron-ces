@@ -1,0 +1,52 @@
+{
+  "rawResponse": "[\r\n    {\r\n        \"id\":  \"deviceCompliancePolicy-s2-android\",\r\n        \"@odata.type\":  \"#microsoft.graph.androidWorkProfileCompliancePolicy\",\r\n        \"displayName\":  \"S2 Android work profile compliance (BYOD)\",\r\n        \"platformType\":  \"androidWorkProfile\",\r\n        \"createdDateTime\":  \"2026-02-15T00:00:00.000Z\",\r\n        \"lastModifiedDateTime\":  \"2026-08-24T00:00:00.000Z\",\r\n        \"passwordRequired\":  true,\r\n        \"passwordMinimumLength\":  6,\r\n        \"passwordMinutesOfInactivityBeforeLock\":  5,\r\n        \"securityBlockJailbrokenDevices\":  true,\r\n        \"osMinimumVersion\":  \"13\",\r\n        \"storageRequireEncryption\":  true,\r\n        \"deviceThreatProtectionEnabled\":  false,\r\n        \"assignments\":  [\r\n                            {\r\n                                \"id\":  \"deviceCompliancePolicy-s2-android_group-10\",\r\n                                \"target\":  {\r\n                                               \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                               \"groupId\":  \"group-10\"\r\n                                           }\r\n                            }\r\n                        ]\r\n    },\r\n    {\r\n        \"id\":  \"deviceCompliancePolicy-7\",\r\n        \"createdDateTime\":  \"2026-11-02T02:29:47.516Z\",\r\n        \"passwordRequired\":  true,\r\n        \"@odata.type\":  \"#microsoft.graph.androidWorkProfileCompliancePolicy\",\r\n        \"description\":  \"CMMC L2 Android Enterprise work profile compliance baseline\",\r\n        \"passwordRequiredType\":  \"numericComplex\",\r\n        \"storageRequireEncryption\":  true,\r\n        \"scheduledActionsForRule\":  [\r\n                                        {\r\n                                            \"scheduledActionConfigurations\":  [\r\n                                                                                  {\r\n                                                                                      \"actionType\":  \"block\",\r\n                                                                                      \"notificationTemplateId\":  \"\",\r\n                                                                                      \"gracePeriodHours\":  0,\r\n                                                                                      \"notificationMessageCCList\":  [\r\n\r\n                                                                                                                    ]\r\n                                                                                  }\r\n                                                                              ],\r\n                                            \"ruleName\":  \"PasswordRequired\"\r\n                                        }\r\n                                    ],\r\n        \"securityBlockJailbrokenDevices\":  true,\r\n        \"passwordMinutesOfInactivityBeforeLock\":  15,\r\n        \"passwordMinimumLength\":  6,\r\n        \"displayName\":  \"CMMC-Compliance-Android\",\r\n        \"assignments\":  [\r\n                            {\r\n                                \"id\":  \"deviceCompliancePolicy-7_group-1\",\r\n                                \"target\":  {\r\n                                               \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                               \"groupId\":  \"group-1\"\r\n                                           }\r\n                            }\r\n                        ],\r\n        \"isAssigned\":  true\r\n    }\r\n]\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "AC.L2-3.1.19.android-compliance",
+    "label": "Android Enterprise (work profile) Device Compliance Policy (CMMC baseline)",
+    "engine": "mgraph",
+    "layer_hint": 4,
+    "sequence_hint": 14,
+    "idempotency": "get-then-set",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "AC.L2-3.1.19",
+      "AC.L2-3.1.18"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceCompliancePolicies?$expand=assignments').value | Where-Object { $_.displayName -eq 'CMMC-Compliance-Android' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
+    "set_command": "$created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceCompliancePolicies' -Body (@{'@odata.type'='#microsoft.graph.androidWorkProfileCompliancePolicy';displayName='CMMC-Compliance-Android';description='CMMC L2 Android Enterprise work profile compliance baseline';passwordRequired=$true;passwordRequiredType='numericComplex';passwordMinimumLength=6;passwordMinutesOfInactivityBeforeLock=15;storageRequireEncryption=$true;securityBlockJailbrokenDevices=$true;scheduledActionsForRule=@(@{ruleName='PasswordRequired';scheduledActionConfigurations=@(@{actionType='block';gracePeriodHours=0;notificationTemplateId='';notificationMessageCCList=@()})})} | ConvertTo-Json -Depth 10) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/v1.0/deviceManagement/deviceCompliancePolicies/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | ConvertTo-Json -Depth 10",
+    "evidence_commands": [
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceCompliancePolicies?$expand=assignments').value | Where-Object { $_.'@odata.type' -eq '#microsoft.graph.androidWorkProfileCompliancePolicy' } | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AC.L2-3.1.19",
+      "AC.L2-3.1.18"
+    ],
+    "timestamp": "2026-11-02T02:29:48.352Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "$created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceCompliancePolicies' -Body (@{'@odata.type'='#microsoft.graph.androidWorkProfileCompliancePolicy';displayName='CMMC-Compliance-Android';description='CMMC L2 Android Enterprise work profile compliance baseline';passwordRequired=$true;passwordRequiredType='numericComplex';passwordMinimumLength=6;passwordMinutesOfInactivityBeforeLock=15;storageRequireEncryption=$true;securityBlockJailbrokenDevices=$true;scheduledActionsForRule=@(@{ruleName='PasswordRequired';scheduledActionConfigurations=@(@{actionType='block';gracePeriodHours=0;notificationTemplateId='';notificationMessageCCList=@()})})} | ConvertTo-Json -Depth 10) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/v1.0/deviceManagement/deviceCompliancePolicies/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | ConvertTo-Json -Depth 10",
+    "sha256Hash": "d7c7a0b2d1419c0183b86eb3453e8f8d8cfda8fe5a396191f63c21a8d16e8fa6",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\r\n    \"id\":  \"deviceCompliancePolicy-7\",\r\n    \"createdDateTime\":  \"2026-11-02T02:29:47.516Z\",\r\n    \"passwordRequired\":  true,\r\n    \"@odata.type\":  \"#microsoft.graph.androidWorkProfileCompliancePolicy\",\r\n    \"description\":  \"CMMC L2 Android Enterprise work profile compliance baseline\",\r\n    \"passwordRequiredType\":  \"numericComplex\",\r\n    \"storageRequireEncryption\":  true,\r\n    \"scheduledActionsForRule\":  [\r\n                                    {\r\n                                        \"scheduledActionConfigurations\":  [\r\n                                                                              {\r\n                                                                                  \"actionType\":  \"block\",\r\n                                                                                  \"notificationTemplateId\":  \"\",\r\n                                                                                  \"gracePeriodHours\":  0,\r\n                                                                                  \"notificationMessageCCList\":  [\r\n\r\n                                                                                                                ]\r\n                                                                              }\r\n                                                                          ],\r\n                                        \"ruleName\":  \"PasswordRequired\"\r\n                                    }\r\n                                ],\r\n    \"securityBlockJailbrokenDevices\":  true,\r\n    \"passwordMinutesOfInactivityBeforeLock\":  15,\r\n    \"passwordMinimumLength\":  6,\r\n    \"displayName\":  \"CMMC-Compliance-Android\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceCompliancePolicy-7_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ],\r\n    \"isAssigned\":  true\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

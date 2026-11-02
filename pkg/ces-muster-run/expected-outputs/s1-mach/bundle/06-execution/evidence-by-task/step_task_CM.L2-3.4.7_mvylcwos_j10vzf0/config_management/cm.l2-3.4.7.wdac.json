@@ -1,0 +1,50 @@
+{
+  "rawResponse": "{\r\n    \"value\":  [\r\n                  {\r\n                      \"id\":  \"deviceConfiguration-6\",\r\n                      \"createdDateTime\":  \"2026-11-02T01:42:40.680Z\",\r\n                      \"appsAllowTrustedAppsSideloading\":  \"blocked\",\r\n                      \"displayName\":  \"CMMC-AppControl-Policy\",\r\n                      \"smartScreenBlockPromptOverride\":  true,\r\n                      \"smartScreenBlockPromptOverrideForFiles\":  true,\r\n                      \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n                      \"isAssigned\":  true\r\n                  }\r\n              ]\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "CM.L2-3.4.7.wdac",
+    "label": "WDAC Application Control Policy via Intune",
+    "engine": "mgraph",
+    "layer_hint": 4,
+    "sequence_hint": 2,
+    "idempotency": "get-then-set",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "CM.L2-3.4.7"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations?$expand=assignments').value | Where-Object { ($_.displayName -eq 'CMMC-AppControl-Policy') -or ((@('#microsoft.graph.windows10GeneralConfiguration') -contains $_.'@odata.type') -and ($_.smartScreenBlockPromptOverride -eq $true) -and ($_.smartScreenBlockPromptOverrideForFiles -eq $true) -and ($_.appsAllowTrustedAppsSideloading -eq 'blocked') -and (@($_.assignments | Where-Object { $_ }).Count -gt 0)) } | Sort-Object { $_.displayName -ne 'CMMC-AppControl-Policy' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
+    "set_command": "$created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations' -Body (@{'@odata.type'='#microsoft.graph.windows10GeneralConfiguration';displayName='CMMC-AppControl-Policy';smartScreenBlockPromptOverride=$true;smartScreenBlockPromptOverrideForFiles=$true;appsAllowTrustedAppsSideloading='blocked'} | ConvertTo-Json -Depth 10) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | ConvertTo-Json -Depth 10",
+    "evidence_commands": [
+      "Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations?$filter=displayName eq ''CMMC-AppControl-Policy''' | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "CM.L2-3.4.7"
+    ],
+    "timestamp": "2026-11-02T01:42:41.551Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "$created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations' -Body (@{'@odata.type'='#microsoft.graph.windows10GeneralConfiguration';displayName='CMMC-AppControl-Policy';smartScreenBlockPromptOverride=$true;smartScreenBlockPromptOverrideForFiles=$true;appsAllowTrustedAppsSideloading='blocked'} | ConvertTo-Json -Depth 10) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | ConvertTo-Json -Depth 10",
+    "sha256Hash": "c40245b2c3fcf564e0c61846f8ba8970b92c7aa8cc4da96a5df0449b13384ea0",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\r\n    \"id\":  \"deviceConfiguration-6\",\r\n    \"createdDateTime\":  \"2026-11-02T01:42:40.680Z\",\r\n    \"appsAllowTrustedAppsSideloading\":  \"blocked\",\r\n    \"displayName\":  \"CMMC-AppControl-Policy\",\r\n    \"smartScreenBlockPromptOverride\":  true,\r\n    \"smartScreenBlockPromptOverrideForFiles\":  true,\r\n    \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceConfiguration-6_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ],\r\n    \"isAssigned\":  true\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"sim-tenant-s1-mach_DefaultWindowsHelloForBusiness\",\r\n    \"state\":  \"enabled\",\r\n    \"pinMinimumLength\":  6,\r\n    \"securityDeviceRequired\":  true\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "IA.L2-3.5.3.whfb-tenant",
+    "label": "Windows Hello for Business - Tenant Default Enabled (Hardware-Bound)",
+    "engine": "mgraph",
+    "layer_hint": 7,
+    "sequence_hint": 10,
+    "idempotency": "get-then-set",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "IA.L2-3.5.3"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceEnrollmentConfigurations').value | Where-Object { $_.'@odata.type' -eq '#microsoft.graph.deviceEnrollmentWindowsHelloForBusinessConfiguration' -and $_.id -like '*_DefaultWindowsHelloForBusiness' } | Select-Object -First 1 | ForEach-Object { [pscustomobject]@{ id = $_.id; state = $_.state; pinMinimumLength = $_.pinMinimumLength; securityDeviceRequired = $_.securityDeviceRequired } } | ConvertTo-Json -Depth 5",
+    "set_command": "$c = @((Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceEnrollmentConfigurations').value | Where-Object { $_.'@odata.type' -eq '#microsoft.graph.deviceEnrollmentWindowsHelloForBusinessConfiguration' -and $_.id -like '*_DefaultWindowsHelloForBusiness' })[0]; Invoke-MgGraphRequest -Method PATCH -Uri \"https://graph.microsoft.us/v1.0/deviceManagement/deviceEnrollmentConfigurations/$($c.id)\" -Body (@{'@odata.type'='#microsoft.graph.deviceEnrollmentWindowsHelloForBusinessConfiguration';state='enabled';pinMinimumLength=6;securityDeviceRequired=$true;unlockWithBiometricsEnabled=$true} | ConvertTo-Json) -ContentType 'application/json'",
+    "evidence_commands": [
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceEnrollmentConfigurations').value | Where-Object { $_.'@odata.type' -eq '#microsoft.graph.deviceEnrollmentWindowsHelloForBusinessConfiguration' -and $_.id -like '*_DefaultWindowsHelloForBusiness' } | Select-Object -First 1 | ForEach-Object { [pscustomobject]@{ id = $_.id; state = $_.state; pinMinimumLength = $_.pinMinimumLength; securityDeviceRequired = $_.securityDeviceRequired } } | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "IA.L2-3.5.3"
+    ],
+    "timestamp": "2026-11-02T01:44:07.860Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "$c = @((Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceEnrollmentConfigurations').value | Where-Object { $_.'@odata.type' -eq '#microsoft.graph.deviceEnrollmentWindowsHelloForBusinessConfiguration' -and $_.id -like '*_DefaultWindowsHelloForBusiness' })[0]; Invoke-MgGraphRequest -Method PATCH -Uri \"https://graph.microsoft.us/v1.0/deviceManagement/deviceEnrollmentConfigurations/$($c.id)\" -Body (@{'@odata.type'='#microsoft.graph.deviceEnrollmentWindowsHelloForBusinessConfiguration';state='enabled';pinMinimumLength=6;securityDeviceRequired=$true;unlockWithBiometricsEnabled=$true} | ConvertTo-Json) -ContentType 'application/json'",
+    "sha256Hash": "c56cf2958c859e662593535acfbdf4ad34f0f8f6aa7261566106c19f3bda8fc8",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "{\r\n    \"id\":  \"sim-tenant-s1-mach_DefaultWindowsHelloForBusiness\",\r\n    \"state\":  \"notConfigured\",\r\n    \"pinMinimumLength\":  4,\r\n    \"securityDeviceRequired\":  false\r\n}\r\n",
+    "postStateOutput": "{\r\n    \"id\":  \"sim-tenant-s1-mach_DefaultWindowsHelloForBusiness\",\r\n    \"state\":  \"enabled\",\r\n    \"pinMinimumLength\":  6,\r\n    \"securityDeviceRequired\":  true\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

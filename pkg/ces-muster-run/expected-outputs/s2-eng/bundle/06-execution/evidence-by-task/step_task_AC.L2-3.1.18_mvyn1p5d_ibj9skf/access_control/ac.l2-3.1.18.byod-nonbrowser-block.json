@@ -1,0 +1,39 @@
+{
+  "rawResponse": "[\r\n    {\r\n        \"displayName\":  \"S2-CA02 Block legacy authentication\",\r\n        \"state\":  \"enabled\",\r\n        \"conditions\":  {\r\n                           \"users\":  {\r\n                                         \"includeUsers\":  [\r\n                                                              \"All\"\r\n                                                          ],\r\n                                         \"excludeUsers\":  [\r\n                                                              \"user-33\",\r\n                                                              \"user-34\"\r\n                                                          ],\r\n                                         \"excludeGroups\":  [\r\n                                                               \"group-12\"\r\n                                                           ]\r\n                                     },\r\n                           \"applications\":  {\r\n                                                \"includeApplications\":  [\r\n                                                                            \"All\"\r\n                                                                        ]\r\n                                            },\r\n                           \"clientAppTypes\":  [\r\n                                                  \"exchangeActiveSync\",\r\n                                                  \"other\"\r\n                                              ]\r\n                       },\r\n        \"grantControls\":  {\r\n                              \"operator\":  \"OR\",\r\n                              \"builtInControls\":  [\r\n                                                      \"block\"\r\n                                                  ]\r\n                          }\r\n    },\r\n    {\r\n        \"displayName\":  \"CMMC-MFA-CompliantDevice\",\r\n        \"state\":  \"enabled\",\r\n        \"conditions\":  {\r\n                           \"clientAppTypes\":  [\r\n                                                  \"browser\",\r\n                                                  \"mobileAppsAndDesktopClients\"\r\n                                              ],\r\n                           \"users\":  {\r\n                                         \"excludeUsers\":  [\r\n                                                              \"user-33\"\r\n                                                          ],\r\n                                         \"includeGroups\":  [\r\n                                                               \"group-1\"\r\n                                                           ]\r\n                                     },\r\n                           \"applications\":  {\r\n                                                \"includeApplications\":  [\r\n                                                                            \"All\"\r\n                                                                        ]\r\n                                            }\r\n                       },\r\n        \"grantControls\":  {\r\n                              \"builtInControls\":  [\r\n                                                      \"mfa\",\r\n                                                      \"compliantDevice\"\r\n                                                  ],\r\n                              \"operator\":  \"AND\"\r\n                          }\r\n    }\r\n]\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "AC.L2-3.1.18.byod-nonbrowser-block",
+    "label": "BYOD Non-Browser Client Block CA Policies",
+    "engine": "mgraph",
+    "layer_hint": 4,
+    "sequence_hint": 20,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "AC.L2-3.1.18",
+      "AC.L2-3.1.19",
+      "CM.L2-3.4.6"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/identity/conditionalAccess/policies').value | Where-Object { $_.state -eq 'enabled' -and ($_.conditions.clientAppTypes -contains 'mobileAppsAndDesktopClients' -or $_.conditions.clientAppTypes -contains 'exchangeActiveSync') } | Select-Object displayName,state,conditions,grantControls | ConvertTo-Json -Depth 10",
+    "set_command": "",
+    "evidence_commands": [
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/identity/conditionalAccess/policies').value | Where-Object { $_.state -eq 'enabled' -and ($_.conditions.clientAppTypes -contains 'mobileAppsAndDesktopClients' -or $_.conditions.clientAppTypes -contains 'exchangeActiveSync') } | Select-Object displayName,state,conditions,grantControls | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AC.L2-3.1.18",
+      "AC.L2-3.1.19",
+      "CM.L2-3.4.6"
+    ],
+    "timestamp": "2026-11-02T02:29:43.119Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] BYOD Non-Browser Client Block CA Policies",
+    "sha256Hash": "291cd811cb70a948b58375b77b7c73e71367e04cca472bc4942e6c4ee491903e",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "rawResponse": "{\r\n    \"Name\":  \"CMMC-L2-Initiative\",\r\n    \"DisplayName\":  \"CMMC Level 2 Requirements\",\r\n    \"EnforcementMode\":  \"Default\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "AZ-FOUND-002",
+    "label": "Assign CMMC L2 Azure Policy Initiative",
+    "engine": "az",
+    "layer_hint": 7,
+    "sequence_hint": 5,
+    "idempotency": "get-then-set",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "CM.L2-3.4.1"
+    ],
+    "get_command": "Get-AzPolicyAssignment -Name 'CMMC-L2-Initiative' -Scope '/subscriptions/{subscriptionId}' -ErrorAction SilentlyContinue | Select-Object Name, DisplayName, EnforcementMode | ConvertTo-Json",
+    "set_command": "$policySetDef = Get-AzPolicySetDefinition -Id '/providers/Microsoft.Authorization/policySetDefinitions/4e50fd13-098b-3206-61d6-d1d78205cb45'; $existing = Get-AzPolicyAssignment -Name 'CMMC-L2-Initiative' -Scope '/subscriptions/{subscriptionId}' -ErrorAction SilentlyContinue; if (-not $existing) { New-AzPolicyAssignment -Name 'CMMC-L2-Initiative' -DisplayName 'CMMC Level 2 Requirements' -PolicySetDefinition $policySetDef -Scope '/subscriptions/{subscriptionId}' -IdentityType 'SystemAssigned' -Location '{location}' } else { Write-Output 'Assignment already exists - skipping creation' }",
+    "evidence_commands": [
+      "Get-AzPolicyAssignment -Name 'CMMC-L2-Initiative' -Scope '/subscriptions/{subscriptionId}' -ErrorAction SilentlyContinue | Select-Object Name, DisplayName, EnforcementMode | ConvertTo-Json"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "CM.L2-3.4.1"
+    ],
+    "timestamp": "2026-11-02T02:31:17.795Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "$policySetDef = Get-AzPolicySetDefinition -Id '/providers/Microsoft.Authorization/policySetDefinitions/4e50fd13-098b-3206-61d6-d1d78205cb45'; $existing = Get-AzPolicyAssignment -Name 'CMMC-L2-Initiative' -Scope '/subscriptions/{subscriptionId}' -ErrorAction SilentlyContinue; if (-not $existing) { New-AzPolicyAssignment -Name 'CMMC-L2-Initiative' -DisplayName 'CMMC Level 2 Requirements' -PolicySetDefinition $policySetDef -Scope '/subscriptions/{subscriptionId}' -IdentityType 'SystemAssigned' -Location '{location}' } else { Write-Output 'Assignment already exists - skipping creation' }",
+    "sha256Hash": "d2c386cf37273c5837c562c5d6b7114de7e8f696f3a3360c82eff0a910b89b0b",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\r\n    \"Name\":  \"CMMC-L2-Initiative\",\r\n    \"DisplayName\":  \"CMMC Level 2 Requirements\",\r\n    \"EnforcementMode\":  \"Default\"\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

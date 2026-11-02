@@ -1,0 +1,35 @@
+{
+  "rawResponse": "{\r\n    \"displayName\":  \"S2-Defender-AV\",\r\n    \"id\":  \"52520000-00b4-4000-8000-000000000002\",\r\n    \"odataType\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n    \"defenderSignatureUpdateIntervalInHours\":  4,\r\n    \"lastModifiedDateTime\":  \"2026-09-18T00:00:00.000Z\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "SI.L1-3.14.4.av-signatures",
+    "label": "Antivirus Signature Currency via Intune",
+    "engine": "mgraph",
+    "layer_hint": 4,
+    "sequence_hint": 7,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "SI.L1-3.14.4"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object { $null -ne $_.defenderSignatureUpdateIntervalInHours } | ForEach-Object { [pscustomobject]@{ displayName = $_.displayName; id = $_.id; defenderSignatureUpdateIntervalInHours = $_.defenderSignatureUpdateIntervalInHours } } | ConvertTo-Json -Depth 5",
+    "set_command": "",
+    "evidence_commands": [
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object { $null -ne $_.defenderSignatureUpdateIntervalInHours } | ForEach-Object { [pscustomobject]@{ displayName = $_.displayName; id = $_.id; odataType = $_.'@odata.type'; defenderSignatureUpdateIntervalInHours = $_.defenderSignatureUpdateIntervalInHours; lastModifiedDateTime = $_.lastModifiedDateTime } } | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SI.L1-3.14.4"
+    ],
+    "timestamp": "2026-11-02T02:30:16.579Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Antivirus Signature Currency via Intune",
+    "sha256Hash": "d3fb3feded2e33b9cffb48e067eef867ed1491dd27fd72702f8b094c4d67bee6",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

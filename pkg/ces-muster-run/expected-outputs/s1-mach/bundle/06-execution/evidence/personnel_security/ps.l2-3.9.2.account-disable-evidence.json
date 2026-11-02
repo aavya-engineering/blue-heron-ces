@@ -1,5 +1,5 @@
 {
-  "rawResponse": "",
+  "rawResponse": "{\r\n    \"count\":  1,\r\n    \"disableAccount\":  1,\r\n    \"revokeSessions\":  0,\r\n    \"events\":  [\r\n                   {\r\n                       \"activityDisplayName\":  \"Disable account\",\r\n                       \"activityDateTime\":  \"2026-09-23T01:00:00.000Z\",\r\n                       \"initiatedBy\":  {\r\n                                           \"user\":  {\r\n                                                        \"id\":  \"user-47\",\r\n                                                        \"displayName\":  \"Corvane Marrowholt (Admin)\",\r\n                                                        \"userPrincipalName\":  \"adm.corvane.marrowholt@s1-mach.simtenant.onmicrosoft.us\",\r\n                                                        \"ipAddress\":  \"198.51.100.20\"\r\n                                                    }\r\n                                       },\r\n                       \"targetResources\":  [\r\n                                               {\r\n                                                   \"id\":  \"user-40\",\r\n                                                   \"displayName\":  \"Dorrel Kettlestead\",\r\n                                                   \"type\":  \"User\",\r\n                                                   \"userPrincipalName\":  \"dorrel.kettlestead@s1-mach.simtenant.onmicrosoft.us\",\r\n                                                   \"modifiedProperties\":  [\r\n\r\n                                                                          ]\r\n                                               }\r\n                                           ]\r\n                   }\r\n               ]\r\n}\r\n",
   "outcome": "automated_success",
   "outcomeRationale": "Command completed successfully (exit code 0)",
   "complianceVerdict": "SAT",
@@ -18,18 +18,17 @@
     "get_command": "(Invoke-MgGraphRequest -Uri \"https://graph.microsoft.us/v1.0/auditLogs/directoryAudits?`$filter=activityDisplayName eq 'Disable account'&`$top=5&`$orderby=activityDateTime desc\").value | Select-Object activityDisplayName,activityDateTime,initiatedBy,targetResources | ConvertTo-Json -Depth 10",
     "set_command": "",
     "evidence_commands": [
-      "(Invoke-MgGraphRequest -Uri \"https://graph.microsoft.us/v1.0/auditLogs/directoryAudits?`$filter=activityDisplayName eq 'Disable account'&`$top=10&`$orderby=activityDateTime desc\").value | ConvertTo-Json -Depth 10",
-      "(Invoke-MgGraphRequest -Uri \"https://graph.microsoft.us/v1.0/auditLogs/directoryAudits?`$filter=activityDisplayName eq 'Revoke sign in sessions'&`$top=10&`$orderby=activityDateTime desc\").value | ConvertTo-Json -Depth 10"
+      "$d = @((Invoke-MgGraphRequest -Uri \"https://graph.microsoft.us/v1.0/auditLogs/directoryAudits?`$filter=activityDisplayName eq 'Disable account'&`$top=10&`$orderby=activityDateTime desc\").value | Where-Object { $_ }); $s = @((Invoke-MgGraphRequest -Uri \"https://graph.microsoft.us/v1.0/auditLogs/directoryAudits?`$filter=activityDisplayName eq 'Revoke sign in sessions'&`$top=10&`$orderby=activityDateTime desc\").value | Where-Object { $_ }); [pscustomobject]@{ count = $d.Count + $s.Count; disableAccount = $d.Count; revokeSessions = $s.Count; events = @(@($d) + @($s) | ForEach-Object { [pscustomobject]@{ activityDisplayName = $_.activityDisplayName; activityDateTime = $_.activityDateTime; initiatedBy = $_.initiatedBy; targetResources = $_.targetResources } }) } | ConvertTo-Json -Depth 10"
     ]
   },
   "metadata": {
     "controlIds": [
       "PS.L2-3.9.2"
     ],
-    "timestamp": "2026-11-01T15:28:29.723Z",
+    "timestamp": "2026-11-02T01:44:31.246Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "[manual/evidence-only] Terminated User Account Disable Audit Evidence",
-    "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sha256Hash": "74aa0730f2dde73c7d91299804346b336b6ec200a8b386b29d076b6f566b8bac",
     "moduleVersions": {},
     "environment": "GCC-High"
   }

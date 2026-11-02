@@ -36,9 +36,11 @@ import {
   uiE2ePaths,
   variantSkipReason,
   UI_RUN_PORTS,
+  elStoreOf,
   type VariantRunContext,
   type VariantRunOutput,
 } from '../src/flow/ui-e2e-run.js';
+import { SIM_STORE_EL } from '../src/flow/muster-e2e-run.js';
 import { runRunScenarioCommand } from '../src/cli/index.js';
 import { parseActsTestArgs, watchPaneDeps } from '../src/cli/acts-test-command.js';
 import { WATCHED_MODE, HEADLESS_MODE } from '../src/demo/watch-mode.js';
@@ -462,5 +464,59 @@ describe('demo:acts-test --watch (UI-TRACK §4)', () => {
     }));
     expect(await deps.openPane!(true)).toBe('pane');
     expect(seen).toEqual([{ geometry: { width: 1280, height: 900, x: 0, y: 0 }, headless: false, slowMo: WATCHED_MODE.slowMo }]);
+  });
+});
+
+// FIX-EL (R-F11): step EL runs A-22 on the confirmed leaver before E6, so the twin's E6 starts from the post-EL store.
+// The UI run starts each execute from that same store (out/sim-store-el.json), never from a looser comparison.
+describe('ui-e2e-run: the EL precondition (FIX-EL)', () => {
+  it('elStoreOf takes this run\'s post-EL snapshot only', () => {
+    const at = (ms: number) => () => ({ mtimeMs: ms });
+    const EL = { started: '2026-11-01T10:00:00.000Z' };
+    const t0 = Date.parse(EL.started);
+    expect(elStoreOf('x/sim-store-el.json', EL, at(t0 + 5000))).toBe('x/sim-store-el.json');
+    expect(elStoreOf('x/sim-store-el.json', EL, at(t0 - 1))).toBeNull();
+    expect(elStoreOf('x/sim-store-el.json', undefined, at(t0 + 5000))).toBeNull();
+    expect(elStoreOf('x/sim-store-el.json', EL, () => null)).toBeNull();
+    expect(SIM_STORE_EL).toBe('sim-store-el.json');
+  });
+
+  it('readTwin and runUiE2e hand the post-EL store to every variant and name it in the record', async () => {
+    const { ws, pkg, P } = makeWorkspace();
+    fs.writeFileSync(P.stepsFile, JSON.stringify({ EL: { rc: 0, started: '2000-01-01T00:00:00.000Z', ended: '2000-01-01T00:00:05.000Z' }, E6: { rc: 0, ...W } }));
+    const elFile = path.join(P.out, SIM_STORE_EL);
+    fs.writeFileSync(elFile, JSON.stringify({ el: true }));
+    expect(readTwin(P).elStore).toBe(elFile);
+    const seen: Array<string | null | undefined> = [];
+    const calls: string[] = [];
+    const inner = matchingVariant(calls, P);
+    const rec = await runUiE2e({
+      scenario: await loadUiE2eFile(UI_FILE), wsRoot: ws, packageRoot: pkg, testerRoot, watch: WATCHED_MODE, log: () => undefined,
+      deps: { runVariant: async (ctx) => { seen.push(ctx.twin.elStore); return inner(ctx); }, loadProjector: fakeProjector, heldPorts: async () => [] },
+    });
+    expect(seen).toEqual([elFile]);
+    expect(rec.twin.pre_execute_store).toBe(SIM_STORE_EL);
+    fs.rmSync(ws, { recursive: true, force: true });
+  });
+
+  it('without an EL step (muster-partial) the twin has no post-EL store and nothing is restored', () => {
+    const { ws, P } = makeWorkspace();
+    fs.writeFileSync(path.join(P.out, SIM_STORE_EL), '{}');
+    expect(readTwin(P).elStore).toBeNull();
+    fs.rmSync(ws, { recursive: true, force: true });
+  });
+
+  it('wiring (by text): EL snapshots the store after its record; the Stamper variant restores it after the reset, before serving', () => {
+    const src = (f: string) => fs.readFileSync(path.join(testerRoot, 'src', 'flow', f), 'utf8');
+    const mu = src('muster-e2e-run.ts');
+    expect(mu).toMatch(/fs\.writeFileSync\(path\.join\(P\.out, 'leaver-flow\.json'\)[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*snapshotStoreTo\(SIM_STORE_EL\);/);
+    expect(mu).toMatch(/\/\^sim-store-el\\.json\$\//);
+    const ui = src('ui-e2e-run.ts');
+    const reset = ui.indexOf("['bin/stacksim.mjs', 'scenario', slug]");
+    const restore = ui.indexOf("fs.copyFileSync(twin.elStore, path.join(P.simTenantDir, 'store.json'))");
+    const serve = ui.indexOf('serve = await startServe(', reset);
+    expect(reset).toBeGreaterThan(0);
+    expect(restore).toBeGreaterThan(reset);
+    expect(serve).toBeGreaterThan(restore);
   });
 });

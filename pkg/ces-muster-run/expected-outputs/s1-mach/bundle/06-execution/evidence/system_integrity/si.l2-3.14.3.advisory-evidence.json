@@ -1,5 +1,5 @@
 {
-  "rawResponse": "[\r\n    {\r\n        \"id\":  \"MC900102\",\r\n        \"title\":  \"Action required: retire legacy authentication protocols for Exchange Online (GCC High)\",\r\n        \"severity\":  \"high\",\r\n        \"startDateTime\":  \"2026-10-23T00:00:00.000Z\",\r\n        \"lastModifiedDateTime\":  \"2026-10-25T00:00:00.000Z\",\r\n        \"category\":  \"planForChange\"\r\n    },\r\n    {\r\n        \"id\":  \"MC900104\",\r\n        \"title\":  \"Microsoft Purview: sensitivity label encryption change for co-authoring\",\r\n        \"severity\":  \"high\",\r\n        \"startDateTime\":  \"2026-10-05T00:00:00.000Z\",\r\n        \"lastModifiedDateTime\":  \"2026-10-07T00:00:00.000Z\",\r\n        \"category\":  \"preventOrFixIssue\"\r\n    }\r\n]\r\n",
+  "rawResponse": "{\r\n    \"count\":  2,\r\n    \"advisories\":  [\r\n                       {\r\n                           \"id\":  \"MC900102\",\r\n                           \"title\":  \"Action required: retire legacy authentication protocols for Exchange Online (GCC High)\",\r\n                           \"severity\":  \"high\",\r\n                           \"startDateTime\":  \"2026-10-24T00:00:00.000Z\",\r\n                           \"lastModifiedDateTime\":  \"2026-10-26T00:00:00.000Z\",\r\n                           \"category\":  \"planForChange\"\r\n                       },\r\n                       {\r\n                           \"id\":  \"MC900104\",\r\n                           \"title\":  \"Microsoft Purview: sensitivity label encryption change for co-authoring\",\r\n                           \"severity\":  \"high\",\r\n                           \"startDateTime\":  \"2026-10-06T00:00:00.000Z\",\r\n                           \"lastModifiedDateTime\":  \"2026-10-08T00:00:00.000Z\",\r\n                           \"category\":  \"preventOrFixIssue\"\r\n                       }\r\n                   ]\r\n}\r\n",
   "outcome": "automated_success",
   "outcomeRationale": "Command completed successfully (exit code 0)",
   "complianceVerdict": "SAT",
@@ -18,17 +18,17 @@
     "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/admin/serviceAnnouncement/messages?$top=5&$orderby=lastModifiedDateTime desc').value | Select-Object id,title,severity,startDateTime | ConvertTo-Json -Depth 5",
     "set_command": "",
     "evidence_commands": [
-      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/admin/serviceAnnouncement/messages?$top=25&$orderby=lastModifiedDateTime desc&$filter=severity eq ''high''').value | Select-Object id,title,severity,startDateTime,lastModifiedDateTime,category | ConvertTo-Json -Depth 5"
+      "$r = @((Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/admin/serviceAnnouncement/messages?$top=25&$orderby=lastModifiedDateTime desc&$filter=severity eq ''high''').value | Where-Object { $_ }); [pscustomobject]@{ count = $r.Count; advisories = @($r | ForEach-Object { [pscustomobject]@{ id = $_.id; title = $_.title; severity = $_.severity; startDateTime = $_.startDateTime; lastModifiedDateTime = $_.lastModifiedDateTime; category = $_.category } }) } | ConvertTo-Json -Depth 5"
     ]
   },
   "metadata": {
     "controlIds": [
       "SI.L2-3.14.3"
     ],
-    "timestamp": "2026-11-01T15:28:32.424Z",
+    "timestamp": "2026-11-02T01:44:35.330Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "[manual/evidence-only] Microsoft Service Health and Security Advisory Evidence",
-    "sha256Hash": "90a104f69aa777835d46654f979ae715faab9cc482496716e668b39321cac09a",
+    "sha256Hash": "8c6791cbb73caccab84330bb30cba80288eab08862268e26bd2024fdc9d8f7b5",
     "moduleVersions": {},
     "environment": "GCC-High"
   }

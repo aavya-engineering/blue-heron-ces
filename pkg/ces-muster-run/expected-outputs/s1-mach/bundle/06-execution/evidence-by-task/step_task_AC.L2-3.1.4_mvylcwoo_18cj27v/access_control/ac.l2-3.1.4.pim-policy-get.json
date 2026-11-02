@@ -1,0 +1,35 @@
+{
+  "rawResponse": "[\r\n    {\r\n        \"id\":  \"DirectoryRole_sim-tenant-s1-mach_51510000-009a-4000-8000-000000000001\",\r\n        \"displayName\":  \"Directory Role\"\r\n    },\r\n    {\r\n        \"id\":  \"DirectoryRole_sim-tenant-s1-mach_51510000-009a-4000-8000-000000000002\",\r\n        \"displayName\":  \"Directory Role\"\r\n    },\r\n    {\r\n        \"id\":  \"DirectoryRole_sim-tenant-s1-mach_51510000-009a-4000-8000-000000000003\",\r\n        \"displayName\":  \"Directory Role\"\r\n    },\r\n    {\r\n        \"id\":  \"DirectoryRole_sim-tenant-s1-mach_51510000-009a-4000-8000-000000000004\",\r\n        \"displayName\":  \"Directory Role\"\r\n    },\r\n    {\r\n        \"id\":  \"DirectoryRole_sim-tenant-s1-mach_51510000-009a-4000-8000-000000000005\",\r\n        \"displayName\":  \"Directory Role\"\r\n    },\r\n    {\r\n        \"id\":  \"DirectoryRole_sim-tenant-s1-mach_51510000-009a-4000-8000-000000000006\",\r\n        \"displayName\":  \"Directory Role\"\r\n    }\r\n]\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "AC.L2-3.1.4.pim-policy-get",
+    "label": "Get PIM Policy for Compliance Admin Role",
+    "engine": "mgraph",
+    "layer_hint": 1,
+    "sequence_hint": 99,
+    "idempotency": "safe",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "AC.L2-3.1.4"
+    ],
+    "get_command": "$roleId = (Get-MgRoleManagementDirectoryRoleDefinition -Filter \"displayName eq 'Compliance Administrator'\").Id; $assignment = Get-MgPolicyRoleManagementPolicyAssignment -Filter \"scopeId eq '/' and scopeType eq 'DirectoryRole' and roleDefinitionId eq '$roleId'\" | Select-Object -First 1; Get-MgPolicyRoleManagementPolicy -UnifiedRoleManagementPolicyId $assignment.PolicyId | Select-Object Id,DisplayName | ConvertTo-Json -Depth 10",
+    "set_command": "",
+    "evidence_commands": [
+      "$roleId = (Get-MgRoleManagementDirectoryRoleDefinition -Filter \"displayName eq 'Compliance Administrator'\").Id; $assignment = Get-MgPolicyRoleManagementPolicyAssignment -Filter \"scopeId eq '/' and scopeType eq 'DirectoryRole' and roleDefinitionId eq '$roleId'\" | Select-Object -First 1; Get-MgPolicyRoleManagementPolicy -UnifiedRoleManagementPolicyId $assignment.PolicyId | Select-Object Id,DisplayName | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AC.L2-3.1.4"
+    ],
+    "timestamp": "2026-11-02T01:40:40.541Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Get PIM Policy for Compliance Admin Role",
+    "sha256Hash": "c38823e31fdc58a0ffde46896b3ed131dd8b56857107532703abcbc2010f5e5a",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

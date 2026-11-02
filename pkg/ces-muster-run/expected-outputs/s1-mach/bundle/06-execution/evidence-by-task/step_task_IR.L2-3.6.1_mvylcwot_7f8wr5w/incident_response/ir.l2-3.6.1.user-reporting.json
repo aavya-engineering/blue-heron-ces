@@ -1,0 +1,50 @@
+{
+  "rawResponse": "{\r\n    \"Identity\":  \"DefaultReportSubmissionPolicy\",\r\n    \"EnableReportToMicrosoft\":  true,\r\n    \"ReportJunkToCustomizedAddress\":  true,\r\n    \"ReportJunkAddresses\":  [\r\n                                \"security@s1-mach.simtenant.onmicrosoft.us\"\r\n                            ],\r\n    \"ReportNotJunkToCustomizedAddress\":  true,\r\n    \"ReportNotJunkAddresses\":  [\r\n                                   \"security@s1-mach.simtenant.onmicrosoft.us\"\r\n                               ],\r\n    \"ReportPhishToCustomizedAddress\":  true,\r\n    \"ReportPhishAddresses\":  [\r\n                                 \"security@s1-mach.simtenant.onmicrosoft.us\"\r\n                             ]\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "IR.L2-3.6.1.user-reporting",
+    "label": "Route User-Reported Messages to Microsoft and the Security Mailbox",
+    "engine": "exchange",
+    "layer_hint": 0,
+    "sequence_hint": 11,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "IR.L2-3.6.1"
+    ],
+    "get_command": "Get-ReportSubmissionPolicy -Identity DefaultReportSubmissionPolicy | Select-Object Identity,EnableReportToMicrosoft,ReportJunkToCustomizedAddress,ReportJunkAddresses,ReportNotJunkToCustomizedAddress,ReportNotJunkAddresses,ReportPhishToCustomizedAddress,ReportPhishAddresses | ConvertTo-Json -Depth 5",
+    "set_command": "Set-ReportSubmissionPolicy -Identity DefaultReportSubmissionPolicy -EnableReportToMicrosoft $true -ReportJunkToCustomizedAddress $true -ReportJunkAddresses '{securityEmail}' -ReportNotJunkToCustomizedAddress $true -ReportNotJunkAddresses '{securityEmail}' -ReportPhishToCustomizedAddress $true -ReportPhishAddresses '{securityEmail}'",
+    "evidence_commands": [
+      "Get-ReportSubmissionPolicy -Identity DefaultReportSubmissionPolicy | Select-Object Identity,EnableReportToMicrosoft,ReportJunkToCustomizedAddress,ReportJunkAddresses,ReportNotJunkToCustomizedAddress,ReportNotJunkAddresses,ReportPhishToCustomizedAddress,ReportPhishAddresses | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "IR.L2-3.6.1"
+    ],
+    "timestamp": "2026-11-02T01:40:05.165Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "Set-ReportSubmissionPolicy -Identity DefaultReportSubmissionPolicy -EnableReportToMicrosoft $true -ReportJunkToCustomizedAddress $true -ReportJunkAddresses '{securityEmail}' -ReportNotJunkToCustomizedAddress $true -ReportNotJunkAddresses '{securityEmail}' -ReportPhishToCustomizedAddress $true -ReportPhishAddresses '{securityEmail}'",
+    "sha256Hash": "83b4f3105281f8556740d2a3c30428187b4fae6615b55a79de9bdd8409b9bff4",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "{\r\n    \"Identity\":  \"DefaultReportSubmissionPolicy\",\r\n    \"EnableReportToMicrosoft\":  true,\r\n    \"ReportJunkToCustomizedAddress\":  false,\r\n    \"ReportJunkAddresses\":  [\r\n\r\n                            ],\r\n    \"ReportNotJunkToCustomizedAddress\":  false,\r\n    \"ReportNotJunkAddresses\":  [\r\n\r\n                               ],\r\n    \"ReportPhishToCustomizedAddress\":  false,\r\n    \"ReportPhishAddresses\":  [\r\n\r\n                             ]\r\n}\r\n",
+    "postStateOutput": "{\r\n    \"Identity\":  \"DefaultReportSubmissionPolicy\",\r\n    \"EnableReportToMicrosoft\":  true,\r\n    \"ReportJunkToCustomizedAddress\":  true,\r\n    \"ReportJunkAddresses\":  [\r\n                                \"security@s1-mach.simtenant.onmicrosoft.us\"\r\n                            ],\r\n    \"ReportNotJunkToCustomizedAddress\":  true,\r\n    \"ReportNotJunkAddresses\":  [\r\n                                   \"security@s1-mach.simtenant.onmicrosoft.us\"\r\n                               ],\r\n    \"ReportPhishToCustomizedAddress\":  true,\r\n    \"ReportPhishAddresses\":  [\r\n                                 \"security@s1-mach.simtenant.onmicrosoft.us\"\r\n                             ]\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

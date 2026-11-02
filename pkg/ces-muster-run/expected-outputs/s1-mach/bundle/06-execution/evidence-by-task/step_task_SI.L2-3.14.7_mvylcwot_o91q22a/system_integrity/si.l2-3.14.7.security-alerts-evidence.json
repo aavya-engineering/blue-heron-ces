@@ -1,0 +1,35 @@
+{
+  "rawResponse": "[\r\n    {\r\n        \"id\":  \"alert-s1-1\",\r\n        \"title\":  \"Email messages containing malicious URL removed after delivery\",\r\n        \"severity\":  \"medium\",\r\n        \"status\":  \"resolved\",\r\n        \"category\":  \"InitialAccess\",\r\n        \"createdDateTime\":  \"2026-10-20T22:00:00.000Z\",\r\n        \"detectionSource\":  \"microsoftDefenderForOffice365\"\r\n    },\r\n    {\r\n        \"id\":  \"alert-s1-2\",\r\n        \"title\":  \"Unfamiliar sign-in properties\",\r\n        \"severity\":  \"medium\",\r\n        \"status\":  \"resolved\",\r\n        \"category\":  \"InitialAccess\",\r\n        \"createdDateTime\":  \"2026-10-21T00:00:00.000Z\",\r\n        \"detectionSource\":  \"azureAdIdentityProtection\"\r\n    },\r\n    {\r\n        \"id\":  \"alert-s1-3\",\r\n        \"title\":  \"Suspicious inbox forwarding rule\",\r\n        \"severity\":  \"low\",\r\n        \"status\":  \"resolved\",\r\n        \"category\":  \"Exfiltration\",\r\n        \"createdDateTime\":  \"2026-09-22T00:00:00.000Z\",\r\n        \"detectionSource\":  \"microsoftDefenderForOffice365\"\r\n    },\r\n    {\r\n        \"id\":  \"alert-s1-4\",\r\n        \"title\":  \"Potentially unwanted application detected\",\r\n        \"severity\":  \"low\",\r\n        \"status\":  \"resolved\",\r\n        \"category\":  \"Malware\",\r\n        \"createdDateTime\":  \"2026-08-31T00:00:00.000Z\",\r\n        \"detectionSource\":  \"microsoftDefenderForEndpoint\"\r\n    },\r\n    {\r\n        \"id\":  \"alert-s1-5\",\r\n        \"title\":  \"Suspicious PowerShell command line\",\r\n        \"severity\":  \"high\",\r\n        \"status\":  \"inProgress\",\r\n        \"category\":  \"Execution\",\r\n        \"createdDateTime\":  \"2026-10-30T00:00:00.000Z\",\r\n        \"detectionSource\":  \"microsoftDefenderForEndpoint\"\r\n    },\r\n    {\r\n        \"id\":  \"alert-s1-6\",\r\n        \"title\":  \"Atypical travel\",\r\n        \"severity\":  \"low\",\r\n        \"status\":  \"new\",\r\n        \"category\":  \"InitialAccess\",\r\n        \"createdDateTime\":  \"2026-10-31T19:00:00.000Z\",\r\n        \"detectionSource\":  \"azureAdIdentityProtection\"\r\n    }\r\n]\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "SI.L2-3.14.7.security-alerts-evidence",
+    "label": "Security Alert and Detection Rule Evidence",
+    "engine": "mgraph",
+    "layer_hint": 7,
+    "sequence_hint": 56,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "SI.L2-3.14.7"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/security/alerts_v2?$top=5&$orderby=createdDateTime desc').value | Select-Object id,title,severity,status | ConvertTo-Json -Depth 5",
+    "set_command": "",
+    "evidence_commands": [
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/security/alerts_v2?$top=50&$orderby=createdDateTime desc').value | Select-Object id,title,severity,status,category,createdDateTime,detectionSource | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SI.L2-3.14.7"
+    ],
+    "timestamp": "2026-11-02T01:44:39.843Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Security Alert and Detection Rule Evidence",
+    "sha256Hash": "7d3de0aaba4857d8f9c8404b2b809e87cef73b2649e8c1f8843c76e57f31b095",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

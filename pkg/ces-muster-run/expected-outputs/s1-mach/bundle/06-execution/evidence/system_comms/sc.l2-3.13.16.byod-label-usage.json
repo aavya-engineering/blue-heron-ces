@@ -1,5 +1,5 @@
 {
-  "rawResponse": "",
+  "rawResponse": "{\r\n    \"count\":  0,\r\n    \"windowDays\":  30,\r\n    \"labelEvents\":  [\r\n\r\n                    ]\r\n}\r\n",
   "outcome": "automated_success",
   "outcomeRationale": "Command completed successfully (exit code 0)",
   "complianceVerdict": "SAT",
@@ -18,17 +18,17 @@
     "get_command": "Search-UnifiedAuditLog -RecordType MIPLabel -StartDate (Get-Date).AddDays(-30) -EndDate (Get-Date) -ResultSize 10 | Select-Object CreationDate,Operations,AuditData | ConvertTo-Json -Depth 5",
     "set_command": "",
     "evidence_commands": [
-      "Search-UnifiedAuditLog -RecordType MIPLabel -StartDate (Get-Date).AddDays(-30) -EndDate (Get-Date) -ResultSize 10 | Select-Object CreationDate,Operations,AuditData | ConvertTo-Json -Depth 5"
+      "$r = @(Search-UnifiedAuditLog -RecordType MIPLabel -StartDate (Get-Date).AddDays(-30) -EndDate (Get-Date) -ResultSize 10 | Where-Object { $_ }); [pscustomobject]@{ count = $r.Count; windowDays = 30; labelEvents = @($r | ForEach-Object { [pscustomobject]@{ CreationDate = $_.CreationDate; Operations = $_.Operations } }) } | ConvertTo-Json -Depth 5"
     ]
   },
   "metadata": {
     "controlIds": [
       "SC.L2-3.13.16"
     ],
-    "timestamp": "2026-11-01T15:25:42.355Z",
+    "timestamp": "2026-11-02T01:44:18.418Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "[manual/evidence-only] BYOD Sensitivity Label Usage Audit Events (Runtime Sample)",
-    "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sha256Hash": "f603aec478a3f9f87574d26331274310eb956560cf9323db225d2515d3b66c32",
     "moduleVersions": {},
     "environment": "GCC-High"
   }

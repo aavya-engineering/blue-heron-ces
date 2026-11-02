@@ -1,0 +1,35 @@
+{
+  "rawResponse": "{\r\n    \"count\":  0,\r\n    \"permanentAssignments\":  [\r\n\r\n                             ]\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "AC.L2-3.1.7.pim-roles-permanent",
+    "label": "Verify No Permanent Privileged Role Assignments",
+    "engine": "mgraph",
+    "layer_hint": 1,
+    "sequence_hint": 0,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "AC.L2-3.1.7"
+    ],
+    "get_command": "Get-MgRoleManagementDirectoryRoleAssignmentSchedule -All | Where-Object { $_.RoleDefinitionId -in @('{globalAdminRoleDefId}', '{privilegedRoleAdminDefId}', '{securityAdminRoleDefId}') -and $_.ScheduleInfo.Expiration.Type -eq 'noExpiration' } | Select-Object PrincipalId,RoleDefinitionId,Status,DirectoryScopeId",
+    "set_command": "",
+    "evidence_commands": [
+      "$p = @(Get-MgRoleManagementDirectoryRoleAssignmentSchedule -All | Where-Object { $_.RoleDefinitionId -in @('{globalAdminRoleDefId}', '{privilegedRoleAdminDefId}', '{securityAdminRoleDefId}') -and $_.ScheduleInfo.Expiration.Type -eq 'noExpiration' }); [pscustomobject]@{ count = $p.Count; permanentAssignments = @($p | ForEach-Object { [pscustomobject]@{ PrincipalId = $_.PrincipalId; RoleDefinitionId = $_.RoleDefinitionId; Status = $_.Status; DirectoryScopeId = $_.DirectoryScopeId } }) } | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AC.L2-3.1.7"
+    ],
+    "timestamp": "2026-11-02T01:40:43.796Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Verify No Permanent Privileged Role Assignments",
+    "sha256Hash": "31d520870d936238d92b52713f1d346dc6d47ac7c69e2612033f1d91922b2089",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

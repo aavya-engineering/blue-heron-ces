@@ -1,9 +1,9 @@
 {
-  "rawResponse": "{\r\n    \"value\":  [\r\n\r\n              ]\r\n}\r\n",
+  "rawResponse": "{\r\n    \"id\":  \"52520000-00b4-4000-8000-000000000003\",\r\n    \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n    \"displayName\":  \"S2-Block-Removable-Storage\",\r\n    \"description\":  \"Device restriction: block removable storage and USB on all managed Windows devices\",\r\n    \"version\":  1,\r\n    \"createdDateTime\":  \"2025-12-07T00:00:00.000Z\",\r\n    \"lastModifiedDateTime\":  \"2026-10-03T00:00:00.000Z\",\r\n    \"storageBlockRemovableStorage\":  true,\r\n    \"usbBlocked\":  true,\r\n    \"AdditionalProperties\":  {\r\n                                 \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n                                 \"storageBlockRemovableStorage\":  true,\r\n                                 \"usbBlocked\":  true\r\n                             },\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"52520000-00b4-4000-8000-000000000003_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ]\r\n}\r\n",
   "outcome": "automated_success",
   "outcomeRationale": "Command completed successfully (exit code 0)",
-  "complianceVerdict": "NOT_SAT",
-  "verdictRationale": "read returned nothing: absence not shown",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
   "registryEntry": {
     "entry_id": "MP.L2-3.8.5.media-access",
     "label": "Prohibition: CUI Media Access Control via Intune Removable Storage Policy",
@@ -15,20 +15,20 @@
     "control_ids": [
       "MP.L2-3.8.5"
     ],
-    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object { $_.displayName -like '*Removable*' -or $_.displayName -like '*Storage*' } | Select-Object displayName,createdDateTime",
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations?$expand=assignments').value | Where-Object { ($_.storageBlockRemovableStorage -eq $true) -and (@($_.assignments | Where-Object { $_ }).Count -gt 0) } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
     "set_command": "",
     "evidence_commands": [
-      "Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations?$filter=displayName eq ''CMMC-Removable-Media-Policy''' | ConvertTo-Json -Depth 5"
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations?$expand=assignments').value | Where-Object { ($_.storageBlockRemovableStorage -eq $true) -and (@($_.assignments | Where-Object { $_ }).Count -gt 0) } | ConvertTo-Json -Depth 10"
     ]
   },
   "metadata": {
     "controlIds": [
       "MP.L2-3.8.5"
     ],
-    "timestamp": "2026-11-01T16:06:17.345Z",
+    "timestamp": "2026-11-02T02:31:59.933Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "[manual/evidence-only] Prohibition: CUI Media Access Control via Intune Removable Storage Policy",
-    "sha256Hash": "c29d4a1d55559e853b5949be6fbe4a986a0df0a44b9cafa189104f415354d439",
+    "sha256Hash": "bfedfaf85965a64677d0815f071812892520a30b2ebede21cb65afa6d588f45e",
     "moduleVersions": {},
     "environment": "GCC-High"
   }

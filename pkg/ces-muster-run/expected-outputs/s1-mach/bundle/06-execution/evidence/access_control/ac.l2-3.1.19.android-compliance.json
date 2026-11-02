@@ -1,0 +1,52 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"deviceCompliancePolicy-6\",\r\n    \"createdDateTime\":  \"2026-11-02T01:42:33.082Z\",\r\n    \"passwordRequired\":  true,\r\n    \"@odata.type\":  \"#microsoft.graph.androidWorkProfileCompliancePolicy\",\r\n    \"description\":  \"CMMC L2 Android Enterprise work profile compliance baseline\",\r\n    \"passwordRequiredType\":  \"numericComplex\",\r\n    \"storageRequireEncryption\":  true,\r\n    \"scheduledActionsForRule\":  [\r\n                                    {\r\n                                        \"scheduledActionConfigurations\":  [\r\n                                                                              {\r\n                                                                                  \"actionType\":  \"block\",\r\n                                                                                  \"notificationTemplateId\":  \"\",\r\n                                                                                  \"gracePeriodHours\":  0,\r\n                                                                                  \"notificationMessageCCList\":  [\r\n\r\n                                                                                                                ]\r\n                                                                              }\r\n                                                                          ],\r\n                                        \"ruleName\":  \"PasswordRequired\"\r\n                                    }\r\n                                ],\r\n    \"securityBlockJailbrokenDevices\":  true,\r\n    \"passwordMinutesOfInactivityBeforeLock\":  15,\r\n    \"passwordMinimumLength\":  6,\r\n    \"displayName\":  \"CMMC-Compliance-Android\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceCompliancePolicy-6_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ],\r\n    \"isAssigned\":  true\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "AC.L2-3.1.19.android-compliance",
+    "label": "Android Enterprise (work profile) Device Compliance Policy (CMMC baseline)",
+    "engine": "mgraph",
+    "layer_hint": 4,
+    "sequence_hint": 14,
+    "idempotency": "get-then-set",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "AC.L2-3.1.19",
+      "AC.L2-3.1.18"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceCompliancePolicies?$expand=assignments').value | Where-Object { $_.displayName -eq 'CMMC-Compliance-Android' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
+    "set_command": "$created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceCompliancePolicies' -Body (@{'@odata.type'='#microsoft.graph.androidWorkProfileCompliancePolicy';displayName='CMMC-Compliance-Android';description='CMMC L2 Android Enterprise work profile compliance baseline';passwordRequired=$true;passwordRequiredType='numericComplex';passwordMinimumLength=6;passwordMinutesOfInactivityBeforeLock=15;storageRequireEncryption=$true;securityBlockJailbrokenDevices=$true;scheduledActionsForRule=@(@{ruleName='PasswordRequired';scheduledActionConfigurations=@(@{actionType='block';gracePeriodHours=0;notificationTemplateId='';notificationMessageCCList=@()})})} | ConvertTo-Json -Depth 10) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/v1.0/deviceManagement/deviceCompliancePolicies/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | ConvertTo-Json -Depth 10",
+    "evidence_commands": [
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceCompliancePolicies?$expand=assignments').value | Where-Object { $_.'@odata.type' -eq '#microsoft.graph.androidWorkProfileCompliancePolicy' } | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AC.L2-3.1.19",
+      "AC.L2-3.1.18"
+    ],
+    "timestamp": "2026-11-02T01:42:33.941Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "$created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceCompliancePolicies' -Body (@{'@odata.type'='#microsoft.graph.androidWorkProfileCompliancePolicy';displayName='CMMC-Compliance-Android';description='CMMC L2 Android Enterprise work profile compliance baseline';passwordRequired=$true;passwordRequiredType='numericComplex';passwordMinimumLength=6;passwordMinutesOfInactivityBeforeLock=15;storageRequireEncryption=$true;securityBlockJailbrokenDevices=$true;scheduledActionsForRule=@(@{ruleName='PasswordRequired';scheduledActionConfigurations=@(@{actionType='block';gracePeriodHours=0;notificationTemplateId='';notificationMessageCCList=@()})})} | ConvertTo-Json -Depth 10) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/v1.0/deviceManagement/deviceCompliancePolicies/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | ConvertTo-Json -Depth 10",
+    "sha256Hash": "b7a3b2be14f257dae94b014d63bc89fbc53200f8edc75874960490a41b90dee1",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\r\n    \"id\":  \"deviceCompliancePolicy-6\",\r\n    \"createdDateTime\":  \"2026-11-02T01:42:33.082Z\",\r\n    \"passwordRequired\":  true,\r\n    \"@odata.type\":  \"#microsoft.graph.androidWorkProfileCompliancePolicy\",\r\n    \"description\":  \"CMMC L2 Android Enterprise work profile compliance baseline\",\r\n    \"passwordRequiredType\":  \"numericComplex\",\r\n    \"storageRequireEncryption\":  true,\r\n    \"scheduledActionsForRule\":  [\r\n                                    {\r\n                                        \"scheduledActionConfigurations\":  [\r\n                                                                              {\r\n                                                                                  \"actionType\":  \"block\",\r\n                                                                                  \"notificationTemplateId\":  \"\",\r\n                                                                                  \"gracePeriodHours\":  0,\r\n                                                                                  \"notificationMessageCCList\":  [\r\n\r\n                                                                                                                ]\r\n                                                                              }\r\n                                                                          ],\r\n                                        \"ruleName\":  \"PasswordRequired\"\r\n                                    }\r\n                                ],\r\n    \"securityBlockJailbrokenDevices\":  true,\r\n    \"passwordMinutesOfInactivityBeforeLock\":  15,\r\n    \"passwordMinimumLength\":  6,\r\n    \"displayName\":  \"CMMC-Compliance-Android\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceCompliancePolicy-6_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ],\r\n    \"isAssigned\":  true\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"/subscriptions/51510000-00a2-4000-8000-000000000001/resourceGroups/rg-s1-mach-prod\",\r\n    \"name\":  \"rg-s1-mach-prod\",\r\n    \"type\":  \"Microsoft.Resources/resourceGroups\",\r\n    \"ResourceGroupName\":  \"rg-s1-mach-prod\",\r\n    \"Location\":  \"usgovvirginia\",\r\n    \"ProvisioningState\":  \"Succeeded\",\r\n    \"Tags\":  {\r\n                 \"environment\":  \"prod\",\r\n                 \"owner\":  \"it\",\r\n                 \"fictional\":  \"true\"\r\n             },\r\n    \"ResourceId\":  \"/subscriptions/51510000-00a2-4000-8000-000000000001/resourceGroups/rg-s1-mach-prod\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Resource already exists — creation skipped (idempotent)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Already compliant — state unchanged, evidence confirms resource exists",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "Already compliant — state unchanged, evidence confirms resource exists"
+  },
+  "registryEntry": {
+    "entry_id": "AZ-FOUND-001",
+    "label": "Create Azure Resource Group",
+    "engine": "az",
+    "layer_hint": 6,
+    "sequence_hint": 4,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "SC.L1-3.13.1"
+    ],
+    "get_command": "Get-AzResourceGroup -Name '{resourceGroup}' | ConvertTo-Json -Depth 5",
+    "set_command": "New-AzResourceGroup -Name '{resourceGroup}' -Location '{location}' -Tag @{environment='cmmc-l2'; managed_by='bhd-stamper'}",
+    "evidence_commands": [
+      "Get-AzResourceGroup -Name '{resourceGroup}' | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SC.L1-3.13.1"
+    ],
+    "timestamp": "2026-11-02T01:43:11.265Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "New-AzResourceGroup -Name '{resourceGroup}' -Location '{location}' -Tag @{environment='cmmc-l2'; managed_by='bhd-stamper'}",
+    "sha256Hash": "39404b5b338dde6054faaad9ee92169f3278d9c63fd8fbfb60f585a4664cff26",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "{\r\n    \"id\":  \"/subscriptions/51510000-00a2-4000-8000-000000000001/resourceGroups/rg-s1-mach-prod\",\r\n    \"name\":  \"rg-s1-mach-prod\",\r\n    \"type\":  \"Microsoft.Resources/resourceGroups\",\r\n    \"ResourceGroupName\":  \"rg-s1-mach-prod\",\r\n    \"Location\":  \"usgovvirginia\",\r\n    \"ProvisioningState\":  \"Succeeded\",\r\n    \"Tags\":  {\r\n                 \"environment\":  \"prod\",\r\n                 \"owner\":  \"it\",\r\n                 \"fictional\":  \"true\"\r\n             },\r\n    \"ResourceId\":  \"/subscriptions/51510000-00a2-4000-8000-000000000001/resourceGroups/rg-s1-mach-prod\"\r\n}\r\n",
+    "postcheckMode": "state"
+  }
+}

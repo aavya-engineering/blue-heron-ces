@@ -1,0 +1,50 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"managedDeviceCleanupRule-1\",\r\n    \"createdDateTime\":  \"2026-11-02T01:44:00.010Z\",\r\n    \"description\":  \"CMMC CM.L2-3.4.1[f]: retire devices that have not checked in for 90 days so the inventory stays current\",\r\n    \"displayName\":  \"CMMC-Device-Cleanup-90d\",\r\n    \"deviceInactivityBeforeRetirementInDays\":  90,\r\n    \"deviceCleanupRulePlatformType\":  \"all\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "CM.L2-3.4.1.device-cleanup",
+    "label": "Intune Device Clean-up Rule (keep the device inventory current)",
+    "engine": "mgraph",
+    "layer_hint": 7,
+    "sequence_hint": 14,
+    "idempotency": "get-then-set",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "CM.L2-3.4.1"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/beta/deviceManagement/managedDeviceCleanupRules').value | Where-Object displayName -eq 'CMMC-Device-Cleanup-90d' | Select-Object -First 1 | ConvertTo-Json -Depth 10",
+    "set_command": "Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/beta/deviceManagement/managedDeviceCleanupRules' -Body (@{displayName='CMMC-Device-Cleanup-90d';description='CMMC CM.L2-3.4.1[f]: retire devices that have not checked in for 90 days so the inventory stays current';deviceCleanupRulePlatformType='all';deviceInactivityBeforeRetirementInDays=90} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | ConvertTo-Json -Depth 10",
+    "evidence_commands": [
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/beta/deviceManagement/managedDeviceCleanupRules').value | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "CM.L2-3.4.1"
+    ],
+    "timestamp": "2026-11-02T01:44:00.857Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/beta/deviceManagement/managedDeviceCleanupRules' -Body (@{displayName='CMMC-Device-Cleanup-90d';description='CMMC CM.L2-3.4.1[f]: retire devices that have not checked in for 90 days so the inventory stays current';deviceCleanupRulePlatformType='all';deviceInactivityBeforeRetirementInDays=90} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | ConvertTo-Json -Depth 10",
+    "sha256Hash": "06b6cdab35e480decf677cbc68d9bba5f33d5810530acbcdd3a779fdab7d3e15",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\r\n    \"id\":  \"managedDeviceCleanupRule-1\",\r\n    \"createdDateTime\":  \"2026-11-02T01:44:00.010Z\",\r\n    \"description\":  \"CMMC CM.L2-3.4.1[f]: retire devices that have not checked in for 90 days so the inventory stays current\",\r\n    \"displayName\":  \"CMMC-Device-Cleanup-90d\",\r\n    \"deviceInactivityBeforeRetirementInDays\":  90,\r\n    \"deviceCleanupRulePlatformType\":  \"all\"\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

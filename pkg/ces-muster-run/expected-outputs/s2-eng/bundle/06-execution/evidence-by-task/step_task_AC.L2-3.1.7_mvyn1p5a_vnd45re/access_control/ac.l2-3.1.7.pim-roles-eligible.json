@@ -1,0 +1,35 @@
+{
+  "rawResponse": "[\r\n    {\r\n        \"principalId\":  \"user-30\",\r\n        \"roleDefinitionId\":  \"62e90394-69f5-4237-9190-012177145e10\",\r\n        \"status\":  \"Provisioned\",\r\n        \"directoryScopeId\":  \"/\",\r\n        \"scheduleInfo\":  {\r\n                             \"startDateTime\":  \"\\/Date(1767657600000)\\/\",\r\n                             \"expiration\":  {\r\n                                                \"type\":  \"afterDateTime\",\r\n                                                \"endDateTime\":  \"\\/Date(1799193600000)\\/\"\r\n                                            }\r\n                         }\r\n    },\r\n    {\r\n        \"principalId\":  \"user-31\",\r\n        \"roleDefinitionId\":  \"e8611ab8-c189-46e8-94e1-60213ab1f814\",\r\n        \"status\":  \"Provisioned\",\r\n        \"directoryScopeId\":  \"/\",\r\n        \"scheduleInfo\":  {\r\n                             \"startDateTime\":  \"\\/Date(1769385600000)\\/\",\r\n                             \"expiration\":  {\r\n                                                \"type\":  \"afterDateTime\",\r\n                                                \"endDateTime\":  \"\\/Date(1800921600000)\\/\"\r\n                                            }\r\n                         }\r\n    },\r\n    {\r\n        \"principalId\":  \"user-32\",\r\n        \"roleDefinitionId\":  \"194ae4cb-b126-40b2-bd5b-6091b380977d\",\r\n        \"status\":  \"Provisioned\",\r\n        \"directoryScopeId\":  \"/\",\r\n        \"scheduleInfo\":  {\r\n                             \"startDateTime\":  \"\\/Date(1771113600000)\\/\",\r\n                             \"expiration\":  {\r\n                                                \"type\":  \"afterDateTime\",\r\n                                                \"endDateTime\":  \"\\/Date(1802649600000)\\/\"\r\n                                            }\r\n                         }\r\n    },\r\n    {\r\n        \"principalId\":  \"user-32\",\r\n        \"roleDefinitionId\":  \"62e90394-69f5-4237-9190-012177145e10\",\r\n        \"status\":  \"Provisioned\",\r\n        \"directoryScopeId\":  \"/\",\r\n        \"scheduleInfo\":  {\r\n                             \"startDateTime\":  \"\\/Date(1778025600000)\\/\",\r\n                             \"expiration\":  {\r\n                                                \"type\":  \"afterDateTime\",\r\n                                                \"endDateTime\":  \"\\/Date(1809561600000)\\/\"\r\n                                            }\r\n                         }\r\n    }\r\n]\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "AC.L2-3.1.7.pim-roles-eligible",
+    "label": "PIM Eligible Role Assignments for Privileged Users",
+    "engine": "mgraph",
+    "layer_hint": 1,
+    "sequence_hint": 0,
+    "idempotency": "evidence-only",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "AC.L2-3.1.7"
+    ],
+    "get_command": "Get-MgRoleManagementDirectoryRoleEligibilitySchedule -All | Where-Object { $_.RoleDefinitionId -in @('{globalAdminRoleDefId}', '{privilegedRoleAdminDefId}', '{securityAdminRoleDefId}') } | Select-Object PrincipalId,RoleDefinitionId,Status,DirectoryScopeId",
+    "set_command": "",
+    "evidence_commands": [
+      "Get-MgRoleManagementDirectoryRoleEligibilitySchedule -All | Where-Object { $_.RoleDefinitionId -in @('{globalAdminRoleDefId}', '{privilegedRoleAdminDefId}', '{securityAdminRoleDefId}') } | Select-Object PrincipalId,RoleDefinitionId,Status,DirectoryScopeId,ScheduleInfo | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AC.L2-3.1.7"
+    ],
+    "timestamp": "2026-11-02T02:27:58.101Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] PIM Eligible Role Assignments for Privileged Users",
+    "sha256Hash": "8dec538cea7f37df11c1ed988503462bc9e755a7362270ed28005b5d33274111",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

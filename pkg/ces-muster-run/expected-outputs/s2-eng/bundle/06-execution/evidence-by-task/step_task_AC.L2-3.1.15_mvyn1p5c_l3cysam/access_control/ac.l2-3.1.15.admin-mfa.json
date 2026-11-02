@@ -1,0 +1,50 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"CMMC-AdminMFA-PhishingResistant\",\r\n    \"displayName\":  \"CMMC-AdminMFA-PhishingResistant\",\r\n    \"grantControls\":  {\r\n                          \"authenticationStrength\":  {\r\n                                                         \"id\":  \"00000000-0000-0000-0000-000000000004\"\r\n                                                     },\r\n                          \"operator\":  \"AND\"\r\n                      },\r\n    \"conditions\":  {\r\n                       \"clientAppTypes\":  [\r\n                                              \"all\"\r\n                                          ],\r\n                       \"users\":  {\r\n                                     \"includeRoles\":  [\r\n                                                          \"62e90394-69f5-4237-9190-012177145e10\",\r\n                                                          \"f28a1f50-f6e7-4571-818b-6a12f2af6b6c\"\r\n                                                      ],\r\n                                     \"excludeUsers\":  [\r\n                                                          \"user-33\"\r\n                                                      ]\r\n                                 },\r\n                       \"applications\":  {\r\n                                            \"includeApplications\":  [\r\n                                                                        \"All\"\r\n                                                                    ]\r\n                                        }\r\n                   },\r\n    \"state\":  \"enabled\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "AC.L2-3.1.15.admin-mfa",
+    "label": "Conditional Access - Admin MFA Phishing-Resistant",
+    "engine": "mgraph",
+    "layer_hint": 2,
+    "sequence_hint": 11,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "AC.L2-3.1.15"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/identity/conditionalAccess/policies').value | Where-Object { ($_.displayName -eq 'CMMC-AdminMFA-PhishingResistant') -or (($_.state -eq 'enabled') -and (@($_.conditions.users.includeRoles) -contains '62e90394-69f5-4237-9190-012177145e10') -and (@($_.conditions.applications.includeApplications) -contains 'All') -and ((@($_.conditions.clientAppTypes | Where-Object { $_ }).Count -eq 0) -or (@($_.conditions.clientAppTypes) -contains 'all')) -and ((@($_.conditions.platforms.includePlatforms | Where-Object { $_ }).Count -eq 0) -or (@($_.conditions.platforms.includePlatforms) -contains 'all')) -and ((@($_.conditions.locations.includeLocations | Where-Object { $_ }).Count -eq 0) -or (@($_.conditions.locations.includeLocations) -contains 'All')) -and (@($_.conditions.signInRiskLevels | Where-Object { $_ }).Count -eq 0) -and (@($_.conditions.userRiskLevels | Where-Object { $_ }).Count -eq 0) -and (@('00000000-0000-0000-0000-000000000004','{phishingResistantStrengthId}') -contains $_.grantControls.authenticationStrength.id)) } | Sort-Object { $_.displayName -ne 'CMMC-AdminMFA-PhishingResistant' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
+    "set_command": "New-MgIdentityConditionalAccessPolicy -BodyParameter @{displayName='CMMC-AdminMFA-PhishingResistant';state='enabled';conditions=@{users=@{includeRoles=@('62e90394-69f5-4237-9190-012177145e10','f28a1f50-f6e7-4571-818b-6a12f2af6b6c');excludeUsers=@('{breakGlassUserId}')};applications=@{includeApplications=@('All')};clientAppTypes=@('all')};grantControls=@{operator='AND';authenticationStrength=@{id='{phishingResistantStrengthId}'}}}",
+    "evidence_commands": [
+      "Get-MgIdentityConditionalAccessPolicy -Filter \"displayName eq 'CMMC-AdminMFA-PhishingResistant'\" | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AC.L2-3.1.15"
+    ],
+    "timestamp": "2026-11-02T02:28:19.108Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "New-MgIdentityConditionalAccessPolicy -BodyParameter @{displayName='CMMC-AdminMFA-PhishingResistant';state='enabled';conditions=@{users=@{includeRoles=@('62e90394-69f5-4237-9190-012177145e10','f28a1f50-f6e7-4571-818b-6a12f2af6b6c');excludeUsers=@('{breakGlassUserId}')};applications=@{includeApplications=@('All')};clientAppTypes=@('all')};grantControls=@{operator='AND';authenticationStrength=@{id='{phishingResistantStrengthId}'}}}",
+    "sha256Hash": "e64f6bfab283cb4803d7918c0b60e2de7c57f54cb3d0994fe2aeded2181da8d1",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\r\n    \"id\":  \"CMMC-AdminMFA-PhishingResistant\",\r\n    \"displayName\":  \"CMMC-AdminMFA-PhishingResistant\",\r\n    \"grantControls\":  {\r\n                          \"authenticationStrength\":  {\r\n                                                         \"id\":  \"00000000-0000-0000-0000-000000000004\"\r\n                                                     },\r\n                          \"operator\":  \"AND\"\r\n                      },\r\n    \"conditions\":  {\r\n                       \"clientAppTypes\":  [\r\n                                              \"all\"\r\n                                          ],\r\n                       \"users\":  {\r\n                                     \"includeRoles\":  [\r\n                                                          \"62e90394-69f5-4237-9190-012177145e10\",\r\n                                                          \"f28a1f50-f6e7-4571-818b-6a12f2af6b6c\"\r\n                                                      ],\r\n                                     \"excludeUsers\":  [\r\n                                                          \"user-33\"\r\n                                                      ]\r\n                                 },\r\n                       \"applications\":  {\r\n                                            \"includeApplications\":  [\r\n                                                                        \"All\"\r\n                                                                    ]\r\n                                        }\r\n                   },\r\n    \"state\":  \"enabled\"\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

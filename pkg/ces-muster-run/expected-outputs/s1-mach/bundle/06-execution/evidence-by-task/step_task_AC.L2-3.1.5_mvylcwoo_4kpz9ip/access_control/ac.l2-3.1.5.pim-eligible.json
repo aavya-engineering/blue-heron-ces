@@ -1,0 +1,52 @@
+{
+  "rawResponse": "{\r\n    \"principalId\":  \"user-48\",\r\n    \"roleDefinitionId\":  \"62e90394-69f5-4237-9190-012177145e10\",\r\n    \"status\":  \"Provisioned\",\r\n    \"directoryScopeId\":  \"/\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Resource already exists — creation skipped (idempotent)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Already compliant — state unchanged, evidence confirms resource exists",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "Already compliant — state unchanged, evidence confirms resource exists"
+  },
+  "registryEntry": {
+    "entry_id": "AC.L2-3.1.5.pim-eligible",
+    "label": "PIM JIT Eligible Role Assignment",
+    "engine": "mgraph",
+    "layer_hint": 7,
+    "sequence_hint": 4,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "AC.L2-3.1.5",
+      "AC.L2-3.1.7",
+      "SC.L2-3.13.3"
+    ],
+    "get_command": "Get-MgRoleManagementDirectoryRoleEligibilitySchedule -Filter 'principalId eq ''{operatorUserId}'' and roleDefinitionId eq ''{roleDefId}''' | Select-Object PrincipalId,RoleDefinitionId,Status,DirectoryScopeId | ConvertTo-Json -Depth 10",
+    "set_command": "New-MgRoleManagementDirectoryRoleEligibilityScheduleRequest -BodyParameter @{action='adminAssign';justification='CMMC L2 least privilege';roleDefinitionId='{roleDefId}';directoryScopeId='/';principalId='{operatorUserId}';scheduleInfo=@{startDateTime=(Get-Date).ToString('o');expiration=@{type='afterDuration';duration='P1Y'}}}",
+    "evidence_commands": [
+      "Get-MgRoleManagementDirectoryRoleEligibilitySchedule -Filter 'roleDefinitionId eq ''{roleDefId}''' -All | Select-Object PrincipalId,DirectoryScopeId,ScheduleInfo,MemberType | ConvertTo-Json -Depth 3"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AC.L2-3.1.5",
+      "AC.L2-3.1.7",
+      "SC.L2-3.13.3"
+    ],
+    "timestamp": "2026-11-02T01:43:43.598Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "New-MgRoleManagementDirectoryRoleEligibilityScheduleRequest -BodyParameter @{action='adminAssign';justification='CMMC L2 least privilege';roleDefinitionId='{roleDefId}';directoryScopeId='/';principalId='{operatorUserId}';scheduleInfo=@{startDateTime=(Get-Date).ToString('o');expiration=@{type='afterDuration';duration='P1Y'}}}",
+    "sha256Hash": "dc8e12474b2c67b36508393065e0409e15977fd6e0eb3a4c00a1eea76c615da1",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "{\r\n    \"principalId\":  \"user-48\",\r\n    \"roleDefinitionId\":  \"62e90394-69f5-4237-9190-012177145e10\",\r\n    \"status\":  \"Provisioned\",\r\n    \"directoryScopeId\":  \"/\"\r\n}\r\n",
+    "postcheckMode": "state"
+  }
+}

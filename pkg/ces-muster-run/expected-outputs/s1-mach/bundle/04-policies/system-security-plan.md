@@ -18,7 +18,7 @@
 | **Assessment Route** | certification |
 | **Boundary Strategy** | single_enclave |
 | **Deployment Posture** | cloud_only |
-| **SSP Date** | 2026-11-01 |
+| **SSP Date** | 2026-11-02 |
 
 ## 2. System Description
 
@@ -94,9 +94,9 @@ Hollinford Precision Machining LLC (FICTIONAL) implements security controls acro
 | Status | Count | Percentage |
 |--------|-------|-----------|
 | Met | 0 | 0% |
-| Partial | 41 | — |
-| Not Met | 77 | — |
-| Unknown | 12 | — |
+| Partial | 40 | — |
+| Not Met | 79 | — |
+| Unknown | 11 | — |
 | **Total** | **130** | — |
 
 ## 5. Organizational Defined Parameters (ODPs)
@@ -131,7 +131,7 @@ Hollinford Precision Machining LLC (FICTIONAL) implements security controls acro
 
 | Field | Value |
 |-------|-------|
-| Policy Effective Date | 2026-11-01 |
+| Policy Effective Date | 2026-11-02 |
 | Review Cycle | Every 12 months |
 | Next Review Date | 2027-11-01 |
 | Affirming Official | Alvane Ashenmere |
@@ -146,7 +146,7 @@ Hollinford Precision Machining LLC (FICTIONAL) implements security controls acro
 ---
 
 **Prepared by:** Corvane Marrowholt
-**Date:** 2026-11-01
+**Date:** 2026-11-02
 
 ## Approval
 

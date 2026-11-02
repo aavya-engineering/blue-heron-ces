@@ -1,0 +1,248 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"deviceCompliancePolicy-3\",\r\n    \"@odata.type\":  \"#microsoft.graph.windows10CompliancePolicy\",\r\n    \"displayName\":  \"S2 Windows 11 Defender for Endpoint risk compliance\",\r\n    \"platformType\":  \"windows10\",\r\n    \"description\":  \"S2 Windows 11 Defender for Endpoint risk compliance\",\r\n    \"createdDateTime\":  \"2025-11-27T00:00:00.000Z\",\r\n    \"lastModifiedDateTime\":  \"2026-10-03T00:00:00.000Z\",\r\n    \"passwordRequired\":  true,\r\n    \"passwordBlockSimple\":  true,\r\n    \"passwordMinimumLength\":  14,\r\n    \"passwordRequiredType\":  \"alphanumeric\",\r\n    \"passwordMinutesOfInactivityBeforeLock\":  15,\r\n    \"passwordPreviousPasswordBlockCount\":  24,\r\n    \"passwordExpirationDays\":  null,\r\n    \"osMinimumVersion\":  \"10.0.22631\",\r\n    \"bitLockerEnabled\":  true,\r\n    \"secureBootEnabled\":  true,\r\n    \"codeIntegrityEnabled\":  true,\r\n    \"storageRequireEncryption\":  true,\r\n    \"tpmRequired\":  true,\r\n    \"defenderEnabled\":  true,\r\n    \"rtpEnabled\":  true,\r\n    \"antivirusRequired\":  true,\r\n    \"antiSpywareRequired\":  true,\r\n    \"deviceThreatProtectionEnabled\":  true,\r\n    \"deviceThreatProtectionRequiredSecurityLevel\":  \"medium\",\r\n    \"scheduledActionsForRule\":  [\r\n                                    {\r\n                                        \"ruleName\":  \"PasswordRequired\",\r\n                                        \"scheduledActionConfigurations\":  [\r\n                                                                              {\r\n                                                                                  \"actionType\":  \"block\",\r\n                                                                                  \"gracePeriodHours\":  24\r\n                                                                              }\r\n                                                                          ]\r\n                                    }\r\n                                ],\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceCompliancePolicy-3_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ]\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Resource already exists — creation skipped (idempotent)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "existing equivalent 'S2 Windows 11 Defender for Endpoint risk compliance' verified by effect (13 conditions) (existing passwordMinimumLength observed 14, bound >= 14 (organisation configured 14)) (existing passwordPreviousPasswordBlockCount observed 24, bound >= 24 (organisation configured 24)) (existing passwordMinutesOfInactivityBeforeLock observed 15, bound [1, 15] (organisation configured 15)) (existing equivalent 'S2 Windows 11 Defender for Endpoint risk compliance' matched by effect)",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "existing equivalent 'S2 Windows 11 Defender for Endpoint risk compliance' verified by effect (13 conditions)"
+  },
+  "registryEntry": {
+    "entry_id": "CM.L2-3.4.1.compliance-policy-windows",
+    "label": "Windows 10/11 Device Compliance Policy (CMMC baseline)",
+    "engine": "mgraph",
+    "layer_hint": 7,
+    "sequence_hint": 12,
+    "idempotency": "get-then-set",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "CM.L2-3.4.1",
+      "CM.L2-3.4.2",
+      "IA.L2-3.5.7",
+      "IA.L2-3.5.8",
+      "AC.L2-3.1.10",
+      "SC.L2-3.13.16",
+      "SI.L1-3.14.1",
+      "SI.L1-3.14.2"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceCompliancePolicies?$expand=assignments').value | Where-Object { ($_.displayName -eq 'CMMC-Compliance-Windows') -or ((@('#microsoft.graph.windows10CompliancePolicy') -contains $_.'@odata.type') -and ($_.passwordRequired -eq $true) -and ($null -ne $_.passwordMinimumLength -and [double]$_.passwordMinimumLength -ge 14) -and ($null -ne $_.passwordPreviousPasswordBlockCount -and [double]$_.passwordPreviousPasswordBlockCount -ge 24) -and ($null -ne $_.passwordMinutesOfInactivityBeforeLock -and [double]$_.passwordMinutesOfInactivityBeforeLock -ge 1) -and ($null -ne $_.passwordMinutesOfInactivityBeforeLock -and [double]$_.passwordMinutesOfInactivityBeforeLock -le 15) -and ($_.bitLockerEnabled -eq $true) -and ($_.secureBootEnabled -eq $true) -and ($_.codeIntegrityEnabled -eq $true) -and ($_.defenderEnabled -eq $true) -and ($_.rtpEnabled -eq $true) -and (@($_.osMinimumVersion | Where-Object { $_ }).Count -gt 0) -and (@($_.assignments | Where-Object { $_ }).Count -gt 0)) } | Sort-Object { $_.displayName -ne 'CMMC-Compliance-Windows' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
+    "set_command": "$created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceCompliancePolicies' -Body (@{'@odata.type'='#microsoft.graph.windows10CompliancePolicy';displayName='CMMC-Compliance-Windows';description='CMMC L2 Windows 10/11 device compliance baseline';passwordRequired=$true;passwordBlockSimple=$true;passwordRequiredType='alphanumeric';passwordMinimumLength=14;passwordPreviousPasswordBlockCount=24;passwordMinutesOfInactivityBeforeLock=15;bitLockerEnabled=$true;secureBootEnabled=$true;codeIntegrityEnabled=$true;storageRequireEncryption=$true;defenderEnabled=$true;rtpEnabled=$true;antivirusRequired=$true;antiSpywareRequired=$true;osMinimumVersion='10.0.19045';scheduledActionsForRule=@(@{ruleName='PasswordRequired';scheduledActionConfigurations=@(@{actionType='block';gracePeriodHours=0;notificationTemplateId='';notificationMessageCCList=@()})})} | ConvertTo-Json -Depth 10) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/v1.0/deviceManagement/deviceCompliancePolicies/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | ConvertTo-Json -Depth 10",
+    "evidence_commands": [
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceCompliancePolicies?$expand=assignments').value | Select-Object displayName,passwordRequired,passwordMinimumLength,passwordPreviousPasswordBlockCount,passwordMinutesOfInactivityBeforeLock,bitLockerEnabled,secureBootEnabled,codeIntegrityEnabled,defenderEnabled,rtpEnabled,osMinimumVersion,assignments | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "CM.L2-3.4.1",
+      "CM.L2-3.4.2",
+      "IA.L2-3.5.7",
+      "IA.L2-3.5.8",
+      "AC.L2-3.1.10",
+      "SC.L2-3.13.16",
+      "SI.L1-3.14.1",
+      "SI.L1-3.14.2"
+    ],
+    "timestamp": "2026-11-02T02:31:14.388Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "$created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceCompliancePolicies' -Body (@{'@odata.type'='#microsoft.graph.windows10CompliancePolicy';displayName='CMMC-Compliance-Windows';description='CMMC L2 Windows 10/11 device compliance baseline';passwordRequired=$true;passwordBlockSimple=$true;passwordRequiredType='alphanumeric';passwordMinimumLength=14;passwordPreviousPasswordBlockCount=24;passwordMinutesOfInactivityBeforeLock=15;bitLockerEnabled=$true;secureBootEnabled=$true;codeIntegrityEnabled=$true;storageRequireEncryption=$true;defenderEnabled=$true;rtpEnabled=$true;antivirusRequired=$true;antiSpywareRequired=$true;osMinimumVersion='10.0.19045';scheduledActionsForRule=@(@{ruleName='PasswordRequired';scheduledActionConfigurations=@(@{actionType='block';gracePeriodHours=0;notificationTemplateId='';notificationMessageCCList=@()})})} | ConvertTo-Json -Depth 10) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/v1.0/deviceManagement/deviceCompliancePolicies/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | ConvertTo-Json -Depth 10",
+    "sha256Hash": "9a5c6d76c2b6c2a07f6f1adabfb6492a56cc711218d1c2b1d19c51e2d1a71248",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "{\r\n    \"id\":  \"deviceCompliancePolicy-3\",\r\n    \"@odata.type\":  \"#microsoft.graph.windows10CompliancePolicy\",\r\n    \"displayName\":  \"S2 Windows 11 Defender for Endpoint risk compliance\",\r\n    \"platformType\":  \"windows10\",\r\n    \"description\":  \"S2 Windows 11 Defender for Endpoint risk compliance\",\r\n    \"createdDateTime\":  \"2025-11-27T00:00:00.000Z\",\r\n    \"lastModifiedDateTime\":  \"2026-10-03T00:00:00.000Z\",\r\n    \"passwordRequired\":  true,\r\n    \"passwordBlockSimple\":  true,\r\n    \"passwordMinimumLength\":  14,\r\n    \"passwordRequiredType\":  \"alphanumeric\",\r\n    \"passwordMinutesOfInactivityBeforeLock\":  15,\r\n    \"passwordPreviousPasswordBlockCount\":  24,\r\n    \"passwordExpirationDays\":  null,\r\n    \"osMinimumVersion\":  \"10.0.22631\",\r\n    \"bitLockerEnabled\":  true,\r\n    \"secureBootEnabled\":  true,\r\n    \"codeIntegrityEnabled\":  true,\r\n    \"storageRequireEncryption\":  true,\r\n    \"tpmRequired\":  true,\r\n    \"defenderEnabled\":  true,\r\n    \"rtpEnabled\":  true,\r\n    \"antivirusRequired\":  true,\r\n    \"antiSpywareRequired\":  true,\r\n    \"deviceThreatProtectionEnabled\":  true,\r\n    \"deviceThreatProtectionRequiredSecurityLevel\":  \"medium\",\r\n    \"scheduledActionsForRule\":  [\r\n                                    {\r\n                                        \"ruleName\":  \"PasswordRequired\",\r\n                                        \"scheduledActionConfigurations\":  [\r\n                                                                              {\r\n                                                                                  \"actionType\":  \"block\",\r\n                                                                                  \"gracePeriodHours\":  24\r\n                                                                              }\r\n                                                                          ]\r\n                                    }\r\n                                ],\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceCompliancePolicy-3_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ]\r\n}\r\n",
+    "postcheckMode": "state",
+    "orgValues": [
+      {
+        "path": "$.passwordMinimumLength",
+        "token": "passwordMinimumLength",
+        "op": "gte",
+        "control_ids": [
+          "IA.L2-3.5.7"
+        ],
+        "source": "answered",
+        "organisation_value": 14,
+        "registry_value": 14,
+        "configured_value": 14,
+        "basis": "organisation"
+      },
+      {
+        "path": "$.passwordPreviousPasswordBlockCount",
+        "token": "passwordPreviousPasswordBlockCount",
+        "op": "gte",
+        "control_ids": [
+          "IA.L2-3.5.8"
+        ],
+        "source": "answered",
+        "organisation_value": 24,
+        "registry_value": 24,
+        "configured_value": 24,
+        "basis": "organisation"
+      },
+      {
+        "path": "$.passwordMinutesOfInactivityBeforeLock",
+        "token": "passwordMinutesOfInactivityBeforeLock",
+        "op": "lte",
+        "control_ids": [
+          "AC.L2-3.1.10"
+        ],
+        "source": "answered",
+        "organisation_value": 15,
+        "registry_value": 15,
+        "configured_value": 15,
+        "basis": "organisation",
+        "exists_bound": "registry"
+      }
+    ],
+    "orgValueChecks": [
+      {
+        "path": "$.passwordMinimumLength",
+        "token": "passwordMinimumLength",
+        "op": "gte",
+        "configured_value": 14,
+        "bound": {
+          "min": 14
+        },
+        "observed_value": 14,
+        "within_bound": true,
+        "basis": "existing"
+      },
+      {
+        "path": "$.passwordPreviousPasswordBlockCount",
+        "token": "passwordPreviousPasswordBlockCount",
+        "op": "gte",
+        "configured_value": 24,
+        "bound": {
+          "min": 24
+        },
+        "observed_value": 24,
+        "within_bound": true,
+        "basis": "existing"
+      },
+      {
+        "path": "$.passwordMinutesOfInactivityBeforeLock",
+        "token": "passwordMinutesOfInactivityBeforeLock",
+        "op": "lte",
+        "configured_value": 15,
+        "bound": {
+          "min": 1,
+          "max": 15
+        },
+        "observed_value": 15,
+        "within_bound": true,
+        "basis": "existing"
+      }
+    ],
+    "lookupMatch": {
+      "basis": "effect",
+      "object": "S2 Windows 11 Defender for Endpoint risk compliance",
+      "conditions": [
+        {
+          "path": "@odata.type",
+          "op": "in",
+          "expected": [
+            "#microsoft.graph.windows10CompliancePolicy"
+          ],
+          "observed": "#microsoft.graph.windows10CompliancePolicy",
+          "pass": true
+        },
+        {
+          "path": "$.passwordRequired",
+          "op": "equals",
+          "expected": true,
+          "observed": true,
+          "pass": true
+        },
+        {
+          "path": "$.passwordMinimumLength",
+          "op": "gte",
+          "expected": 14,
+          "observed": 14,
+          "pass": true
+        },
+        {
+          "path": "$.passwordPreviousPasswordBlockCount",
+          "op": "gte",
+          "expected": 24,
+          "observed": 24,
+          "pass": true
+        },
+        {
+          "path": "$.passwordMinutesOfInactivityBeforeLock",
+          "op": "gte",
+          "expected": 1,
+          "observed": 15,
+          "pass": true
+        },
+        {
+          "path": "$.passwordMinutesOfInactivityBeforeLock",
+          "op": "lte",
+          "expected": 15,
+          "observed": 15,
+          "pass": true
+        },
+        {
+          "path": "$.bitLockerEnabled",
+          "op": "equals",
+          "expected": true,
+          "observed": true,
+          "pass": true
+        },
+        {
+          "path": "$.secureBootEnabled",
+          "op": "equals",
+          "expected": true,
+          "observed": true,
+          "pass": true
+        },
+        {
+          "path": "$.codeIntegrityEnabled",
+          "op": "equals",
+          "expected": true,
+          "observed": true,
+          "pass": true
+        },
+        {
+          "path": "$.defenderEnabled",
+          "op": "equals",
+          "expected": true,
+          "observed": true,
+          "pass": true
+        },
+        {
+          "path": "$.rtpEnabled",
+          "op": "equals",
+          "expected": true,
+          "observed": true,
+          "pass": true
+        },
+        {
+          "path": "$.osMinimumVersion",
+          "op": "not_empty",
+          "observed": "10.0.22631",
+          "pass": true
+        },
+        {
+          "path": "$.assignments",
+          "op": "not_empty",
+          "observed": [
+            {
+              "id": "deviceCompliancePolicy-3_group-1",
+              "target": {
+                "@odata.type": "#microsoft.graph.groupAssignmentTarget",
+                "groupId": "group-1"
+              }
+            }
+          ],
+          "pass": true
+        }
+      ]
+    }
+  }
+}

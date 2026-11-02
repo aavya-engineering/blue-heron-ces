@@ -1,0 +1,52 @@
+{
+  "rawResponse": "{\r\n    \"defaultUserRolePermissions\":  {\r\n                                       \"allowedToCreateApps\":  false,\r\n                                       \"allowedToCreateSecurityGroups\":  false,\r\n                                       \"allowedToCreateTenants\":  false,\r\n                                       \"allowedToReadBitlockerKeysForOwnedDevice\":  true,\r\n                                       \"allowedToReadOtherUsers\":  true,\r\n                                       \"permissionGrantPoliciesAssigned\":  [\r\n\r\n                                                                           ]\r\n                                   }\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "AC.L1-3.1.2.default-user-permissions",
+    "label": "Restrict Default User Permissions (no app registration, group or tenant creation; no user consent to apps)",
+    "engine": "mgraph",
+    "layer_hint": 1,
+    "sequence_hint": 3,
+    "idempotency": "get-then-set",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "AC.L1-3.1.2",
+      "AC.L1-3.1.1"
+    ],
+    "get_command": "Get-MgPolicyAuthorizationPolicy | Select-Object -First 1 | ForEach-Object { [pscustomobject]@{ id = $_.Id; allowedToCreateApps = $_.DefaultUserRolePermissions.AllowedToCreateApps; allowedToCreateSecurityGroups = $_.DefaultUserRolePermissions.AllowedToCreateSecurityGroups; allowedToCreateTenants = $_.DefaultUserRolePermissions.AllowedToCreateTenants; userConsentAllowed = (@(@($_.DefaultUserRolePermissions.PermissionGrantPoliciesAssigned) | Where-Object { $_ -like 'ManagePermissionGrantsForSelf.*' }).Count -gt 0) } } | ConvertTo-Json -Depth 5",
+    "set_command": "Update-MgPolicyAuthorizationPolicy -BodyParameter @{defaultUserRolePermissions=@{allowedToCreateApps=$false;allowedToCreateSecurityGroups=$false;allowedToCreateTenants=$false;permissionGrantPoliciesAssigned=@()}}",
+    "evidence_commands": [
+      "Get-MgPolicyAuthorizationPolicy | Select-Object DefaultUserRolePermissions | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AC.L1-3.1.2",
+      "AC.L1-3.1.1"
+    ],
+    "timestamp": "2026-11-02T01:40:39.112Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "Update-MgPolicyAuthorizationPolicy -BodyParameter @{defaultUserRolePermissions=@{allowedToCreateApps=$false;allowedToCreateSecurityGroups=$false;allowedToCreateTenants=$false;permissionGrantPoliciesAssigned=@()}}",
+    "sha256Hash": "932a12beaf36ddbfad969ceefd885723f3155ff57e9adceefaee81c158d8fa8f",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "{\r\n    \"id\":  \"authorizationPolicy\",\r\n    \"allowedToCreateApps\":  true,\r\n    \"allowedToCreateSecurityGroups\":  true,\r\n    \"allowedToCreateTenants\":  false,\r\n    \"userConsentAllowed\":  true\r\n}\r\n",
+    "postStateOutput": "{\r\n    \"id\":  \"authorizationPolicy\",\r\n    \"allowedToCreateApps\":  false,\r\n    \"allowedToCreateSecurityGroups\":  false,\r\n    \"allowedToCreateTenants\":  false,\r\n    \"userConsentAllowed\":  false\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

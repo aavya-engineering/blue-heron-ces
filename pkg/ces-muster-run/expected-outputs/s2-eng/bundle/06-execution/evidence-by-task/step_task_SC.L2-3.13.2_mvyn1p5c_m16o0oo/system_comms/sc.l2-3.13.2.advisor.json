@@ -1,0 +1,35 @@
+{
+  "rawResponse": "{\r\n    \"count\":  0,\r\n    \"recommendations\":  [\r\n\r\n                        ]\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "SC.L2-3.13.2.advisor",
+    "label": "Azure Advisor Security Recommendations Evidence",
+    "engine": "az",
+    "layer_hint": 7,
+    "sequence_hint": 1,
+    "idempotency": "evidence-only",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "SC.L2-3.13.2"
+    ],
+    "get_command": "az advisor recommendation list --output json",
+    "set_command": "",
+    "evidence_commands": [
+      "$j = (az advisor recommendation list --output json | Out-String) | ConvertFrom-Json; $items = @(); if ($null -ne $j) { if ($j -isnot [array] -and $j.PSObject.Properties.Name -contains 'value') { $items = @($j.value | Where-Object { $_ }) } else { $items = @($j | Where-Object { $_ }) } }; [pscustomobject]@{ count = $items.Count; recommendations = @($items | ForEach-Object { [pscustomobject]@{ category = $_.category; impact = $_.impact; problem = $_.shortDescription.problem } }) } | ConvertTo-Json -Depth 6"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SC.L2-3.13.2"
+    ],
+    "timestamp": "2026-11-02T02:31:48.744Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Azure Advisor Security Recommendations Evidence",
+    "sha256Hash": "b194e4045efa9887f4d26a342252b26e3dd06245035912220c8c22a86211f451",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

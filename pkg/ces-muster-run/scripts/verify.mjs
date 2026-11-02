@@ -25,6 +25,7 @@ import { v49Scope, isSyntheticCustomer } from './v49-scope.mjs';
 import { judgeV43b, aoTierCalls, aoTwoPersonMode } from './verify-w4.mjs';
 import { projectionSentences, judgeV109, runWindowStart, judgeV6Accounting } from './verify-gap.mjs';
 import { TENANT_IDENTITY_KEYS, HARNESS_GENERATED_KEYS, ALLOWED_PROVENANCE, OVERRIDES_NOT_NEEDED_LINE, isPresent, tmBody, provenanceFor } from './overrides-gate.mjs';
+import { elLeaverOf, isElLeaverWrite, elAoRows, c10HoldsOnlyElRows } from './verify-fin31-leaver.mjs';
 
 const a = {};
 for (let i = 2; i < process.argv.length; i += 2) a[process.argv[i].replace(/^--/, '')] = process.argv[i + 1];
@@ -225,7 +226,7 @@ check('V6', 'Translate exit 0; execute report exists; every MP directive planned
 });
 
 // V7
-check('V7', 'Only the scenario build (E1), Stamper (E6), the S3 injection (E6X) and AdminOps (E7A) wrote to the sim ledger, each in its own window; discovery added zero writes', () => {
+check('V7', 'Only the scenario build (E1), Stamper (E6), the S3 injection (E6X), the leaver flow (EL: A-22 on the confirmed leaver only) and AdminOps (E7A) wrote to the sim ledger, each in its own window; discovery added zero writes', () => {
   const ledgerPath = path.join(out, 'ledger.json');
   if (!exists(ledgerPath)) return { pass: false, detail: 'no ledger snapshot' };
   const entries = readJson(ledgerPath).data ?? [];
@@ -246,15 +247,22 @@ check('V7', 'Only the scenario build (E1), Stamper (E6), the S3 injection (E6X) 
   const e7aRec = exists(path.join(out, 'adminops-e7a.json')) ? readJson(path.join(out, 'adminops-e7a.json')) : null;
   const allowX = (e6xRec?.injections ?? []).length > 0 && !!steps.E6X;
   const allowA = (e7aRec?.write_ops ?? 0) > 0 && !!steps.E7A;
-  const allowed = (e) => inWin(e, steps.E6) || (allowX && inWin(e, steps.E6X)) || (allowA && inWin(e, steps.E7A));
+  // FIX-EL (R-F11): step EL (after E5, before E6) runs A-22 on the leaver a tenant administrator confirmed. Its window is
+  // allowed only on a confirm-mode record of this run (out/leaver-flow.json), and only for A-22's writes on that leaver
+  // (the user, its group memberships, its MFA methods: verify-fin31-leaver.mjs isElLeaverWrite); any other write stays outside.
+  const elRec = exists(path.join(out, 'leaver-flow.json')) ? readJson(path.join(out, 'leaver-flow.json')) : null;
+  const leaver = elLeaverOf(elRec, steps);
+  const allowed = (e) => inWin(e, steps.E6) || (allowX && inWin(e, steps.E6X)) || (allowA && inWin(e, steps.E7A)) || isElLeaverWrite(e, leaver);
   const outside = writes.filter((e) => !allowed(e));
   const byE6 = writes.filter((e) => inWin(e, steps.E6));
   const byE6X = writes.filter((e) => inWin(e, steps.E6X));
   const byE7A = writes.filter((e) => inWin(e, steps.E7A));
+  const byEL = writes.filter((e) => isElLeaverWrite(e, leaver));
+  const inELWin = writes.filter((e) => inWin(e, steps.EL));
   const buildOk = !!steps.E1?.started && !!steps.E2?.started && buildSteps !== null && byBuild.length === buildSteps;
   return {
-    pass: buildOk && byE2.length === 0 && outside.length === 0 && byE6.length > 0 && (!allowA || byE7A.length > 0),
-    detail: `${entries.length} entries; non-seed writes ${allWrites.length}: scenario build [E1 start, E2 start) ${byBuild.length} (scenario write steps ${buildSteps ?? 'unknown: no sim scenario file'}), during E6 (Stamper) ${byE6.length}, during E6X (injection; ${allowX ? 'allowed' : 'not allowed'}) ${byE6X.length}, during E7A (AdminOps; ${allowA ? `allowed, ${e7aRec.write_ops} write op(s)` : 'not allowed'}) ${byE7A.length}, during E2 (discovery) ${byE2.length}, outside the allowed windows ${outside.length}`,
+    pass: buildOk && byE2.length === 0 && outside.length === 0 && byE6.length > 0 && (!allowA || byE7A.length > 0) && (!leaver || byEL.length > 0),
+    detail: `${entries.length} entries; non-seed writes ${allWrites.length}: scenario build [E1 start, E2 start) ${byBuild.length} (scenario write steps ${buildSteps ?? 'unknown: no sim scenario file'}), during EL (leaver flow; ${leaver ? `allowed for A-22 on ${leaver.userId} only` : 'not allowed'}) ${byEL.length} of ${inELWin.length}, during E6 (Stamper) ${byE6.length}, during E6X (injection; ${allowX ? 'allowed' : 'not allowed'}) ${byE6X.length}, during E7A (AdminOps; ${allowA ? `allowed, ${e7aRec.write_ops} write op(s)` : 'not allowed'}) ${byE7A.length}, during E2 (discovery) ${byE2.length}, outside the allowed windows ${outside.length}`,
   };
 });
 
@@ -1596,17 +1604,19 @@ const simWrites = (p) => (exists(p) ? (readJson(p).data ?? []) : null)?.filter((
 const objKey = (e) => `${e.objectType}/${e.objectId}`;
 // W2 follow-up (per-run AdminOps isolation): ces.db is append-only and shared across runs, so EO reads only the AO rows timed
 // from this run's start (CES_EO_ADMINOPS_SINCE = E1's start, recorded by E7 and by the E7A record). Every C10
-// (collect.adminOps) record of this run then holds a row of this run, no E7 pass collects one, and E7B's reader counts this
-// run's rows only. Six-year retention is a production property; the window is the simulator's.
+// (collect.adminOps) record of this run then holds a row of this run, no E7 pass collects one of E7A's rows (FIX-EL: step EL's
+// A-22 row predates E7 by design, so an E7 C10 record holding only EL's rows is allowed), and E7B's reader counts this run's
+// rows only. Six-year retention is a production property; the window is the simulator's.
 const aoSince = e7a?.adminops_since ?? steps.E7?.adminops_since ?? null;
-const aoWindowProblems = (rowsExpected, appliesExpected) => {
+const aoWindowProblems = (rowsExpected, appliesExpected, elIds = new Set()) => {
   const problems = [];
   if (!aoSince) return ['no AdminOps run window (E7 adminops_since) recorded'];
   if (!steps.E1 || toMs(aoSince) !== toMs(steps.E1.started)) problems.push(`AdminOps run window ${aoSince} is not E1's start (${steps.E1?.started})`);
   const c10 = storeRecords.filter((r) => r.sourceId === 'collect.adminOps');
   const early = c10.filter((r) => r.status === 'success').flatMap((r) => { const pl = payloadOf(r); return Array.isArray(pl) ? pl : pl ? [pl] : []; }).filter((x) => !x?.timestamp || toMs(x.timestamp) < toMs(aoSince));
   if (early.length) problems.push(`${early.length} C10 records hold an AO row from before this run (e.g. ${early[0]?.rowId})`);
-  const inE7 = c10.filter((r) => r.status === 'success' && inStep('E7', r.collectedAt));
+  // FIX-EL: EL's A-22 row exists before E7, so E7's C10 may collect it; a C10 record holding EL's rows only is not E7A's.
+  const inE7 = c10.filter((r) => r.status === 'success' && inStep('E7', r.collectedAt) && !c10HoldsOnlyElRows(payloadOf(r), elIds));
   if (inE7.length) problems.push(`${inE7.length} C10 records with AO rows were collected in E7, before E7A`);
   const aa = ev(passByName('E7B'), 'assess_adminops');
   if (aa && rowsExpected !== null && aa.total !== rowsExpected) problems.push(`E7B assess_adminops.total ${aa.total} (this run's rows: ${rowsExpected})`);
@@ -1653,8 +1663,19 @@ check('V45', 'AdminOps: every E7A op has a result and its AO evidence rows (T2 d
   const applies = (e7a.ops ?? []).filter((o) => (o.calls ?? []).some((c) => c.call === 'apply')).length;
   const aa = ev(passByName('E7B'), 'assess_adminops');
   if (!aa) problems.push('no assess_adminops event on E7B');
-  // The run window makes E7B's counts this run's: live = the applies, total = the rows E7A's calls reported.
-  problems.push(...aoWindowProblems(e7aCalls.length, applies));
+  // FIX-EL (R-F11): step EL's A-22 rows (correlation leaver-flow:<flowId>, this tenant, stamped inside EL) are this run's
+  // rows too. They are counted on their own, from ces.db; E7A's accounting above is unchanged.
+  const elRecFile = path.join(out, 'leaver-flow.json');
+  const leaver = elLeaverOf(exists(elRecFile) ? readJson(elRecFile) : null, steps);
+  const elDb = leaver && aoDb()
+    ? aoDb().prepare("SELECT id, tenant_id, data FROM ces_records WHERE collection = 'adminops_evidence' AND json_extract(data, '$.metadata.correlationId') = ?").all(`leaver-flow:${leaver.flowId}`).map((r) => ({ id: r.id, tenantId: r.tenant_id, ...JSON.parse(r.data) }))
+    : [];
+  const el = elAoRows(leaver, elDb, e7a.tenant_id);
+  if (leaver && !el.live.length) problems.push(`EL confirmed ${leaver.userId} but no live A-22 row with correlation leaver-flow:${leaver.flowId} on ${e7a.tenant_id} inside EL`);
+  for (const r of el.rows) if (r.metadata?.sha256) rowSha.push(r.metadata.sha256);
+  // The run window makes E7B's counts this run's: live = the applies (+ EL's live rows), total = the rows E7A's calls
+  // reported (+ EL's rows).
+  problems.push(...aoWindowProblems(e7aCalls.length + el.rows.length, applies + el.live.length, el.ids));
   const c10Built = exists(path.join(ces, 'ces-eo', 'dist', 'eo', 'collect', 'adminOpsCollector.js'));
   let c10 = 'C10 not built yet: AO evidence rows checked in ces.db only';
   if (c10Built) {
@@ -1668,7 +1689,7 @@ check('V45', 'AdminOps: every E7A op has a result and its AO evidence rows (T2 d
     pass: problems.length === 0,
     detail: problems.length ? problems.slice(0, 8).join('; ') : (e7a.ops ?? []).length === 0
       ? `no AdminOps ops in this scenario (adminops_ops empty); E7B assess_adminops live ${aa?.live}`
-      : `${e7a.ops.length} ops (${e7a.ops.map((o) => `${o.op} ${o.tier}`).join(', ')}): ${rows} AO evidence rows on ${e7a.tenant_id}; run window ${aoSince} (E1 start): E7B total ${aa.total} = ${e7aCalls.length} rows, live ${aa.live} = ${applies} applies, no earlier run's row; ${c10}`,
+      : `${e7a.ops.length} ops (${e7a.ops.map((o) => `${o.op} ${o.tier}`).join(', ')}): ${rows} AO evidence rows on ${e7a.tenant_id}; run window ${aoSince} (E1 start): E7B total ${aa.total} = ${e7aCalls.length} rows${leaver ? ` + ${el.rows.length} EL row(s)` : ''}, live ${aa.live} = ${applies} applies${leaver ? ` + ${el.live.length} EL apply(ies) (A-22, leaver-flow:${leaver.flowId})` : ''}, no earlier run's row; ${c10}`,
   };
 });
 

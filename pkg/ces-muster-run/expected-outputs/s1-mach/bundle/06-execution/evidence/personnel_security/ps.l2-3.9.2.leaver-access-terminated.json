@@ -1,0 +1,50 @@
+{
+  "rawResponse": "{\r\n    \"displayName\":  \"CES leaver access inventory\",\r\n    \"pastLeaverCount\":  2,\r\n    \"enabledPastLeaverCount\":  0,\r\n    \"licensedPastLeaverCount\":  0,\r\n    \"enabledPastLeavers\":  [\r\n\r\n                           ],\r\n    \"licensedPastLeavers\":  [\r\n\r\n                            ]\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Resource already exists — creation skipped (idempotent)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Already compliant — state unchanged, evidence confirms resource exists",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "Already compliant — state unchanged, evidence confirms resource exists"
+  },
+  "registryEntry": {
+    "entry_id": "PS.L2-3.9.2.leaver-access-terminated",
+    "label": "Verify every past leaver (employeeLeaveDateTime passed) is disabled and holds no licence",
+    "engine": "mgraph",
+    "layer_hint": 7,
+    "sequence_hint": 55,
+    "idempotency": "safe",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "PS.L2-3.9.2"
+    ],
+    "get_command": "& { $now=(Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ'); $u=@(@((Invoke-MgGraphRequest -Uri \"https://graph.microsoft.us/v1.0/users?`$filter=employeeLeaveDateTime le $now&`$select=id,userPrincipalName,accountEnabled,employeeLeaveDateTime,assignedLicenses&`$top=999\").value) | Where-Object { $_ }); $open=@($u | Where-Object { $_.accountEnabled -eq $true }); $lic=@($u | Where-Object { @($_.assignedLicenses | Where-Object { $_ }).Count -gt 0 }); [pscustomobject]@{ displayName='CES leaver access inventory'; pastLeaverCount=$u.Count; enabledPastLeaverCount=$open.Count; licensedPastLeaverCount=$lic.Count; enabledPastLeavers=@($open | ForEach-Object { $_.userPrincipalName }); licensedPastLeavers=@($lic | ForEach-Object { $_.userPrincipalName }) } } | Where-Object { ($_.displayName -eq 'CES leaver access inventory') -or (($null -ne $_.pastLeaverCount -and [double]$_.pastLeaverCount -ge 1) -and ($null -ne $_.enabledPastLeaverCount -and [double]$_.enabledPastLeaverCount -le 0) -and ($null -ne $_.licensedPastLeaverCount -and [double]$_.licensedPastLeaverCount -le 0)) } | Sort-Object { $_.displayName -ne 'CES leaver access inventory' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
+    "set_command": "",
+    "evidence_commands": []
+  },
+  "metadata": {
+    "controlIds": [
+      "PS.L2-3.9.2"
+    ],
+    "timestamp": "2026-11-02T01:44:33.349Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[verify-only: SET not sent]",
+    "sha256Hash": "5087213e5b4b91a5f92a2713da796333df3d7ef1775f7d9fa4305fa2835d79ec",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "{\r\n    \"displayName\":  \"CES leaver access inventory\",\r\n    \"pastLeaverCount\":  2,\r\n    \"enabledPastLeaverCount\":  0,\r\n    \"licensedPastLeaverCount\":  0,\r\n    \"enabledPastLeavers\":  [\r\n\r\n                           ],\r\n    \"licensedPastLeavers\":  [\r\n\r\n                            ]\r\n}\r\n",
+    "postcheckMode": "state",
+    "lookupMatch": {
+      "basis": "name",
+      "object": "CES leaver access inventory"
+    }
+  }
+}

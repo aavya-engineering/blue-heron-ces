@@ -2,7 +2,7 @@
 
 **SIMULATED CUSTOMER (FICTIONAL): Tamberlow Systems Engineering LLC (FICTIONAL)** This organisation is a simulated customer of the CES simulator. Its name, people, identifiers, addresses and tenant are invented; this document describes no real company and is not a compliance record.
 
-**Effective Date:** 2026-11-01
+**Effective Date:** 2026-11-02
 **Organization:** Tamberlow Systems Engineering LLC (FICTIONAL)
 **Authorizing Official:** Aubrel Ashbyfield
 **Methodology:** NIST SP 800-30 Revision 1 (Rev 1 (September 2012))
@@ -51,7 +51,7 @@ Technical vulnerability data sources include Microsoft Defender for Cloud findin
 
 Organizational vulnerabilities are derived from readiness posture assessment results, specifically controls assessed as NOT MET in the current compliance posture.
 
-Current posture: 0 MET, 40 PARTIAL, 82 NOT MET, 12 UNKNOWN out of 134 total controls (0% compliance).
+Current posture: 0 MET, 39 PARTIAL, 84 NOT MET, 11 UNKNOWN out of 134 total controls (0% compliance).
 
 ### Environmental Vulnerabilities
 
@@ -92,6 +92,6 @@ I, Aubrel Ashbyfield, as the Authorizing Official, have reviewed and approve thi
 
 ---
 
-**Effective Date:** 2026-11-01
+**Effective Date:** 2026-11-02
 **CMMC Controls:** 3.11.1
 **Policy Owner:** Aubrel Ashbyfield

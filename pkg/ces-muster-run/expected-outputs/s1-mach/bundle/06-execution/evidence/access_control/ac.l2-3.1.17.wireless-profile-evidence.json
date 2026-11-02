@@ -1,5 +1,5 @@
 {
-  "rawResponse": "{\r\n    \"displayName\":  \"S1-MACH-CORP Wi-Fi\",\r\n    \"id\":  \"51510000-00b4-4000-8000-000000000001\",\r\n    \"AdditionalProperties\":  {\r\n                                 \"@odata.type\":  \"#microsoft.graph.windowsWifiConfiguration\",\r\n                                 \"ssid\":  \"S1-MACH-CORP\",\r\n                                 \"networkName\":  \"S1-MACH-CORP\",\r\n                                 \"wifiSecurityType\":  \"wpa2Enterprise\",\r\n                                 \"connectAutomatically\":  true,\r\n                                 \"connectWhenNetworkNameIsHidden\":  false,\r\n                                 \"meteredConnectionLimit\":  \"unrestricted\",\r\n                                 \"proxySetting\":  \"none\"\r\n                             }\r\n}\r\n",
+  "rawResponse": "{\r\n    \"displayName\":  \"S1-MACH-CORP Wi-Fi\",\r\n    \"id\":  \"51510000-00b4-4000-8000-000000000001\",\r\n    \"odataType\":  \"#microsoft.graph.windowsWifiConfiguration\",\r\n    \"ssid\":  \"S1-MACH-CORP\",\r\n    \"wifiSecurityType\":  \"wpa2Enterprise\"\r\n}\r\n",
   "outcome": "automated_success",
   "outcomeRationale": "Command completed successfully (exit code 0)",
   "complianceVerdict": "SAT",
@@ -15,20 +15,20 @@
     "control_ids": [
       "AC.L2-3.1.17"
     ],
-    "get_command": "Get-MgDeviceManagementDeviceConfiguration | Where-Object {'#microsoft.graph.windowsWifiConfiguration' -eq $_.AdditionalProperties.'@odata.type' -or '#microsoft.graph.iosWiFiConfiguration' -eq $_.AdditionalProperties.'@odata.type'} | Select-Object DisplayName,Id",
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object { $_.'@odata.type' -like '*wifi*' } | ForEach-Object { [pscustomobject]@{ displayName = $_.displayName; id = $_.id } } | ConvertTo-Json -Depth 3",
     "set_command": "",
     "evidence_commands": [
-      "Get-MgDeviceManagementDeviceConfiguration | Where-Object {$_.AdditionalProperties.'@odata.type' -like '*wifi*' -or $_.AdditionalProperties.'@odata.type' -like '*WiFi*'} | Select-Object DisplayName,Id,AdditionalProperties | ConvertTo-Json -Depth 10"
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object { $_.'@odata.type' -like '*wifi*' } | ForEach-Object { [pscustomobject]@{ displayName = $_.displayName; id = $_.id; odataType = $_.'@odata.type'; ssid = $_.ssid; wifiSecurityType = $_.wifiSecurityType } } | ConvertTo-Json -Depth 5"
     ]
   },
   "metadata": {
     "controlIds": [
       "AC.L2-3.1.17"
     ],
-    "timestamp": "2026-11-01T15:27:17.770Z",
+    "timestamp": "2026-11-02T01:42:26.510Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "[manual/evidence-only] Verify Intune Wi-Fi Configuration Profiles Enforce WPA2/3",
-    "sha256Hash": "7c9091b1e6bc9496ffc0bc012856c738574ccfac73cb1603a69ffca463b506e5",
+    "sha256Hash": "078d036d923d3d390040127216b765fc0bdd81ca15efcbd2694402472c0df7e3",
     "moduleVersions": {},
     "environment": "GCC-High"
   }

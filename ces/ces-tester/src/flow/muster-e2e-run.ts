@@ -152,6 +152,8 @@ export const MUSTER_E2E_STEP_IDS = ['E0', 'E1', 'E2', 'E3', 'E4', 'E5', 'EL', 'E
 /** The steps the package's verify V1 requires at rc 0; V23 requires them too. */
 export const REQUIRED_STEPS = ['E1', 'E2', 'E3', 'E4', 'E5', 'E6', 'E6X', 'E8.5', 'E8.6', 'E7', 'E7A', 'E7B', 'E8', 'E8B'];
 export const RUN_PORTS = [4390, 4011, 4002, 4001];
+/** FIX-EL (R-F11): out/<this>, the sim store as step EL left it (the state E6 starts from); the Stamper UI run restores it. */
+export const SIM_STORE_EL = 'sim-store-el.json';
 
 const SIM_URL = 'http://127.0.0.1:4390';
 const API_URL = 'http://127.0.0.1:4011';
@@ -315,7 +317,7 @@ export function countModulesWrittenSince(psmodulesDir: string, sinceMs: number):
 const PER_RUN_FILE = [
   /^eo-assess.*\.json$/, /^eo-ledger\.json$/, /^eo-connect\.json$/, /^ssp\./, /^poam\.json$/, /^scorecard-.*\.json$/, /^GAPS-/,
   /^steps\.json$/, /^tester-run\.json$/, /^coverage-ao\.json$/, /^summary\.json$/, /^verify\.json$/, /^push-response\.json$/,
-  /^ec-upload.*\.json$/, /^adminops-e7a\.json$/, /^e6x\.json$/, /^eo-package/, /^sim-store-e6\.json$/, /^sim-store-e7a-pre\.json$/, /^sim-store-e7b\.json$/, /^ui-e2e-(ao|eo|muster)\.json$/,
+  /^ec-upload.*\.json$/, /^adminops-e7a\.json$/, /^e6x\.json$/, /^eo-package/, /^sim-store-e6\.json$/, /^sim-store-el\.json$/, /^sim-store-e7a-pre\.json$/, /^sim-store-e7b\.json$/, /^ui-e2e-(ao|eo|muster)\.json$/,
   /^muster-results\.json$/, /^eo-records\.json$/, // retired FLOW-6 read-back (ROLE-1: removed so V100 never sees an old one), NS-3 (V81)
   /^plan-compile\.json$/, // API-3a (V88)
   /^eo-intake\.json$/, // FLOW-3 (V84)
@@ -1217,6 +1219,9 @@ export async function runMusterE2e(opts: MusterE2eRunOptions): Promise<MusterE2e
           const admins = elAdminRecipients(regResources.resources);
           const rec = await runLeaverFlow({ aoUrl, bearer, slug, admins, bhdMailbox: EL_BHD_MAILBOX, register: (n, v) => runSecrets.register(n, v) });
           fs.writeFileSync(path.join(P.out, 'leaver-flow.json'), JSON.stringify(rec, null, 2));
+          // FIX-EL (R-F11): the sim store as EL left it, the state E6 starts from; the Stamper UI run (ui-e2e-run.ts) puts it
+          // in place after its reset, so its execute is compared with the twin's from the same state (V73).
+          snapshotStoreTo(SIM_STORE_EL);
           log(`  EL: ${rec.mode}; scan ${rec.scan.status} (past ${rec.scan.pastLeavers}, enabled ${rec.scan.enabledPastLeavers}); flow ${rec.flow_id ?? 'none'} -> ${String((rec.flow_after.flow as { status?: unknown } | null)?.status ?? 'n/a')}${rec.problems.length ? `; problems: ${rec.problems.join('; ')}` : ''}`);
           return {
             rc: rec.problems.length ? 1 : 0,

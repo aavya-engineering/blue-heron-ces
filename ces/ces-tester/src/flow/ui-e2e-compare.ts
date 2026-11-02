@@ -336,6 +336,11 @@ export interface VariantRecord {
     readonly ledger?: string;
     /** W8-UIT3: the variant's sim store snapshot, taken after the drive. */
     readonly sim_store?: string;
+    /**
+     * FIX-EL (R-F11): the twin's sim store as step EL left it (`sim-store-el.json`), put in place after the reset so the
+     * UI execute starts from the state the twin's E6 started from (A-22 already applied to the confirmed leaver).
+     */
+    readonly pre_execute_store?: string;
     readonly video?: string;
     readonly trace?: string;
   };
@@ -359,6 +364,8 @@ export interface UiE2eStamperRecord {
     readonly ledger: string;
     /** W8-UIT3: the twin's sim store snapshot (copied before the first UI reset), when there was one. */
     readonly sim_store?: string;
+    /** FIX-EL (R-F11): the twin's post-EL sim store every variant started from, when step EL left one. */
+    readonly pre_execute_store?: string;
     readonly e6_window: TimeWindow | null;
   };
   readonly variants: readonly VariantRecord[];

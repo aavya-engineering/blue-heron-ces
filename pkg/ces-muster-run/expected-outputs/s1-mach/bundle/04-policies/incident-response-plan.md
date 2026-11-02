@@ -9,7 +9,7 @@
 | **Organization** | Hollinford Precision Machining LLC (FICTIONAL) |
 | **Address** | 4100 Quarrystone Parkway, Unit 2, Fennick Falls, ZZ, 00000 |
 | **CMMC Level** | L2 |
-| **Effective Date** | 2026-11-01 |
+| **Effective Date** | 2026-11-02 |
 | **Prepared By** | Dorrel Nettlecombe |
 | **Approved By** | Alvane Ashenmere |
 
@@ -142,6 +142,6 @@ Contact law enforcement when criminal activity is suspected, with guidance from 
 
 ---
 
-**Effective Date:** 2026-11-01
+**Effective Date:** 2026-11-02
 **NIST SP 800-171 Controls:** 3.6.1–3.6.3
 **Plan Owner:** Dorrel Nettlecombe

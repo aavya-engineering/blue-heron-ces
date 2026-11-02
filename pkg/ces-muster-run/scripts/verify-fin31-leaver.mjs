@@ -118,6 +118,56 @@ export function judgeV131({ slug, rec = null, stale = null, steps = {}, rows = n
   return { pass: true, detail: `${slug}: detected ${flow.leaver?.upn}; ${requests.length} admin confirm request(s); nobody confirmed: reminder, then escalation ${esc[0].escalationId} (${V131_OBJECTIVE}); no AO write; ${eoNote}` };
 }
 
+// ---------- FIX-EL (R-F11): step EL in the run-window checks V7 (sim writes) and V45 (AO rows) ----------
+// EL runs A-22 on the leaver before E6, so its sim writes and its one AO evidence row fall outside the E6/E6X/E7A
+// windows and outside E7A's own row count. These helpers let V7 and V45 account for exactly those, and nothing else.
+
+/** The leaver EL acted on, or null: only a confirm-mode record of this run's EL (started inside steps.EL). Pure. */
+export function elLeaverOf(rec, steps = {}) {
+  const el = steps?.EL;
+  if (!rec || rec.schema !== LEAVER_FLOW_SCHEMA || rec.mode !== 'confirm' || !el?.started || !el?.ended) return null;
+  if (!(ms(rec.started) >= ms(el.started) && ms(rec.started) <= ms(el.ended))) return null;
+  const flow = rec.flow_after?.flow ?? null;
+  const userId = flow?.leaver?.userId ? String(flow.leaver.userId) : null;
+  const flowId = rec.flow_id ? String(rec.flow_id) : null;
+  if (!userId || !flowId || (flow?.flowId && String(flow.flowId) !== flowId)) return null;
+  return { userId, flowId, window: { started: el.started, ended: el.ended } };
+}
+
+/**
+ * V7: is this sim ledger write one of A-22's writes on the leaver, inside EL's window? A-22 writes the user object
+ * (Update-MgUser, Revoke-MgUserSignInSession, Set-MgUserLicense), its group memberships (Remove-MgGroupMemberByRef:
+ * the sim keys them '<groupId>|<userId>', ResolverTable resolveTargetedMutation) and its MFA methods
+ * (DELETE /v1.0/users/<id>/authentication/<kind>Methods/<id>). Any other write in EL's window stays outside. Pure.
+ */
+export function isElLeaverWrite(e, leaver) {
+  if (!leaver || !e?.ts || !(ms(e.ts) >= ms(leaver.window.started) && ms(e.ts) <= ms(leaver.window.ended))) return false;
+  const id = String(e.objectId ?? '');
+  if (e.objectType === 'users') return id === leaver.userId;
+  if (e.objectType === 'groupMember') return id.endsWith(`|${leaver.userId}`);
+  if (e.objectType === 'authMethods') return String(e.source ?? '').includes(`/users/${leaver.userId}/authentication/`);
+  return false;
+}
+
+/**
+ * V45: EL's AO evidence rows that EO's run window reads: correlationId 'leaver-flow:<flowId>', the run's tenant, stamped
+ * inside EL's window. rows: [{ id, tenantId, metadata }] (the ces.db adminops_evidence rows with that correlation). Pure.
+ */
+export function elAoRows(leaver, rows, tenantId) {
+  if (!leaver) return { rows: [], live: [], ids: new Set() };
+  const corr = `leaver-flow:${leaver.flowId}`;
+  const mine = (rows ?? []).filter((r) => r?.metadata?.correlationId === corr && (r.tenantId ?? r.metadata?.tenantId) === tenantId && r.metadata?.tenantId === tenantId
+    && ms(r.metadata?.timestamp) >= ms(leaver.window.started) && ms(r.metadata?.timestamp) <= ms(leaver.window.ended));
+  const live = mine.filter((r) => r.metadata?.commandId === V131_OP && r.metadata?.mode === 'live' && r.metadata?.dryRun === false);
+  return { rows: mine, live, ids: new Set(mine.map((r) => String(r.id))) };
+}
+
+/** V45: a C10 record collected in E7 is EL's only when every payload row it holds is one of EL's rows. Pure. */
+export function c10HoldsOnlyElRows(items, elIds) {
+  const xs = Array.isArray(items) ? items : items ? [items] : [];
+  return xs.length > 0 && !!elIds?.size && xs.every((x) => elIds.has(String(x?.rowId ?? '')));
+}
+
 // ---------- the area entry point ----------
 export async function fin31LeaverChecks(vctx) {
   const rows = [];

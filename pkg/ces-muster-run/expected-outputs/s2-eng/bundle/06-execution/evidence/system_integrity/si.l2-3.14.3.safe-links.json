@@ -1,5 +1,5 @@
 {
-  "rawResponse": "{\r\n    \"id\":  \"S2 Safe Links - all users\",\r\n    \"Identity\":  \"S2 Safe Links - all users\",\r\n    \"Name\":  \"S2 Safe Links - all users\",\r\n    \"IsDefault\":  false,\r\n    \"EnableSafeLinksForEmail\":  true,\r\n    \"EnableSafeLinksForTeams\":  true,\r\n    \"EnableSafeLinksForOffice\":  true,\r\n    \"ScanUrls\":  true,\r\n    \"EnableForInternalSenders\":  true,\r\n    \"DeliverMessageAfterScan\":  true,\r\n    \"DisableUrlRewrite\":  false,\r\n    \"TrackClicks\":  true,\r\n    \"AllowClickThrough\":  false,\r\n    \"EnableOrganizationBranding\":  false,\r\n    \"WhenCreated\":  \"2025-10-17T00:00:00.000Z\",\r\n    \"WhenChanged\":  \"2026-07-04T00:00:00.000Z\",\r\n    \"IsValid\":  true\r\n}\r\n",
+  "rawResponse": "{\r\n    \"id\":  \"S2 Safe Links - all users\",\r\n    \"Identity\":  \"S2 Safe Links - all users\",\r\n    \"Name\":  \"S2 Safe Links - all users\",\r\n    \"IsDefault\":  false,\r\n    \"EnableSafeLinksForEmail\":  true,\r\n    \"EnableSafeLinksForTeams\":  true,\r\n    \"EnableSafeLinksForOffice\":  true,\r\n    \"ScanUrls\":  true,\r\n    \"EnableForInternalSenders\":  true,\r\n    \"DeliverMessageAfterScan\":  true,\r\n    \"DisableUrlRewrite\":  false,\r\n    \"TrackClicks\":  true,\r\n    \"AllowClickThrough\":  false,\r\n    \"EnableOrganizationBranding\":  false,\r\n    \"WhenCreated\":  \"2025-10-18T00:00:00.000Z\",\r\n    \"WhenChanged\":  \"2026-07-05T00:00:00.000Z\",\r\n    \"IsValid\":  true\r\n}\r\n",
   "outcome": "automated_success",
   "outcomeRationale": "Resource already exists — creation skipped (idempotent)",
   "complianceVerdict": "SAT",
@@ -24,7 +24,8 @@
     "idempotency": "get-then-set",
     "on_failure": "abort_step",
     "control_ids": [
-      "SI.L2-3.14.3"
+      "SI.L2-3.14.3",
+      "SI.L2-3.14.6"
     ],
     "get_command": "Get-SafeLinksPolicy | Where-Object { ($_.Name -eq 'CMMC-SafeLinks') -or (($_.IsDefault -ne $true) -and ($_.EnableSafeLinksForEmail -eq $true) -and ($_.ScanUrls -eq $true) -and ($_.EnableForInternalSenders -eq $true)) } | Sort-Object { $_.Name -ne 'CMMC-SafeLinks' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
     "set_command": "New-SafeLinksPolicy -Name 'CMMC-SafeLinks' -EnableSafeLinksForEmail $true -ScanUrls $true -EnableForInternalSenders $true -DeliverMessageAfterScan $true | Out-Null; Get-SafeLinksPolicy -Identity 'CMMC-SafeLinks' | Select-Object Name | ConvertTo-Json",
@@ -32,15 +33,16 @@
   },
   "metadata": {
     "controlIds": [
-      "SI.L2-3.14.3"
+      "SI.L2-3.14.3",
+      "SI.L2-3.14.6"
     ],
-    "timestamp": "2026-11-01T16:06:09.729Z",
+    "timestamp": "2026-11-02T02:31:49.151Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "New-SafeLinksPolicy -Name 'CMMC-SafeLinks' -EnableSafeLinksForEmail $true -ScanUrls $true -EnableForInternalSenders $true -DeliverMessageAfterScan $true | Out-Null; Get-SafeLinksPolicy -Identity 'CMMC-SafeLinks' | Select-Object Name | ConvertTo-Json",
-    "sha256Hash": "36640519f60c3844a67505884e51898af40254c95da319db25ac69ac64d3e564",
+    "sha256Hash": "fb6934bdc5ae183b0d4ad1dda74998210c98ff360131e0781d94adc2f62addaa",
     "moduleVersions": {},
     "environment": "GCC-High",
-    "preStateOutput": "{\r\n    \"id\":  \"S2 Safe Links - all users\",\r\n    \"Identity\":  \"S2 Safe Links - all users\",\r\n    \"Name\":  \"S2 Safe Links - all users\",\r\n    \"IsDefault\":  false,\r\n    \"EnableSafeLinksForEmail\":  true,\r\n    \"EnableSafeLinksForTeams\":  true,\r\n    \"EnableSafeLinksForOffice\":  true,\r\n    \"ScanUrls\":  true,\r\n    \"EnableForInternalSenders\":  true,\r\n    \"DeliverMessageAfterScan\":  true,\r\n    \"DisableUrlRewrite\":  false,\r\n    \"TrackClicks\":  true,\r\n    \"AllowClickThrough\":  false,\r\n    \"EnableOrganizationBranding\":  false,\r\n    \"WhenCreated\":  \"2025-10-17T00:00:00.000Z\",\r\n    \"WhenChanged\":  \"2026-07-04T00:00:00.000Z\",\r\n    \"IsValid\":  true\r\n}\r\n",
+    "preStateOutput": "{\r\n    \"id\":  \"S2 Safe Links - all users\",\r\n    \"Identity\":  \"S2 Safe Links - all users\",\r\n    \"Name\":  \"S2 Safe Links - all users\",\r\n    \"IsDefault\":  false,\r\n    \"EnableSafeLinksForEmail\":  true,\r\n    \"EnableSafeLinksForTeams\":  true,\r\n    \"EnableSafeLinksForOffice\":  true,\r\n    \"ScanUrls\":  true,\r\n    \"EnableForInternalSenders\":  true,\r\n    \"DeliverMessageAfterScan\":  true,\r\n    \"DisableUrlRewrite\":  false,\r\n    \"TrackClicks\":  true,\r\n    \"AllowClickThrough\":  false,\r\n    \"EnableOrganizationBranding\":  false,\r\n    \"WhenCreated\":  \"2025-10-18T00:00:00.000Z\",\r\n    \"WhenChanged\":  \"2026-07-05T00:00:00.000Z\",\r\n    \"IsValid\":  true\r\n}\r\n",
     "postcheckMode": "state",
     "lookupMatch": {
       "basis": "effect",

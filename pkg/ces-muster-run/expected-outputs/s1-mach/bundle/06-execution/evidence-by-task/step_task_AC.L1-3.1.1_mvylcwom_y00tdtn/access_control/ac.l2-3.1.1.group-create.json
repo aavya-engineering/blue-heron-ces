@@ -1,0 +1,48 @@
+{
+  "rawResponse": "{\r\n    \"securityEnabled\":  true,\r\n    \"mailEnabled\":  true,\r\n    \"createdDateTime\":  \"\\/Date(1733702400000)\\/\",\r\n    \"id\":  \"group-1\",\r\n    \"displayName\":  \"CUI-Authorized-Users\",\r\n    \"groupTypes\":  [\r\n\r\n                   ],\r\n    \"mailNickname\":  \"cui-authorized-users\",\r\n    \"mail\":  \"cui-authorized-users@s1-mach.simtenant.onmicrosoft.us\",\r\n    \"proxyAddresses\":  [\r\n                           \"SMTP:cui-authorized-users@s1-mach.simtenant.onmicrosoft.us\"\r\n                       ],\r\n    \"description\":  \"CUI enclave members (SharePoint enclave + 2 Teams channels)\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Resource already exists — creation skipped (idempotent)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Already compliant — state unchanged, evidence confirms resource exists",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "Already compliant — state unchanged, evidence confirms resource exists"
+  },
+  "registryEntry": {
+    "entry_id": "AC.L2-3.1.1.group-create",
+    "label": "Create CUI Security Group",
+    "engine": "mgraph",
+    "layer_hint": 7,
+    "sequence_hint": 0,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "AC.L1-3.1.1"
+    ],
+    "get_command": "Get-MgGroup -Filter 'displayName eq ''{cuiGroupName}''' | ConvertTo-Json",
+    "set_command": "New-MgGroup -DisplayName '{cuiGroupName}' -MailEnabled:$false -MailNickname '{cuiGroupName}' -SecurityEnabled:$true",
+    "evidence_commands": [
+      "Get-MgGroup -Filter 'displayName eq ''{cuiGroupName}''' | Select-Object Id,DisplayName,SecurityEnabled,CreatedDateTime | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AC.L1-3.1.1"
+    ],
+    "timestamp": "2026-11-02T01:42:15.289Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "New-MgGroup -DisplayName '{cuiGroupName}' -MailEnabled:$false -MailNickname '{cuiGroupName}' -SecurityEnabled:$true",
+    "sha256Hash": "164c75d588475fe8df680965ef4a70eea5acbc9c86785edeb5e6177be0d15416",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "{\r\n    \"securityEnabled\":  true,\r\n    \"mailEnabled\":  true,\r\n    \"createdDateTime\":  \"\\/Date(1733702400000)\\/\",\r\n    \"id\":  \"group-1\",\r\n    \"displayName\":  \"CUI-Authorized-Users\",\r\n    \"groupTypes\":  [\r\n\r\n                   ],\r\n    \"mailNickname\":  \"cui-authorized-users\",\r\n    \"mail\":  \"cui-authorized-users@s1-mach.simtenant.onmicrosoft.us\",\r\n    \"proxyAddresses\":  [\r\n                           \"SMTP:cui-authorized-users@s1-mach.simtenant.onmicrosoft.us\"\r\n                       ],\r\n    \"description\":  \"CUI enclave members (SharePoint enclave + 2 Teams channels)\"\r\n}\r\n",
+    "postcheckMode": "state"
+  }
+}

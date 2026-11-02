@@ -1,0 +1,95 @@
+# FIX-EL (2026-11-01) created this entry from the AO registry entry A-22 (ces-ao/src/registry/ao-commands.registry.json)
+# and the A-22 command templates (ces-ao/src/registry/TemplateRegistry.ts), in the shape of A-21. The permission and
+# role names are the ones CES already states (A-01, A-02, A-04 and the PH-13 leaver-flow log's Microsoft Learn read of
+# employeeLeaveDateTime); nothing else here comes from outside CES code.
+controlId: PS.L2-3.9.2
+practiceStatement: >-
+  Ensure that organizational systems containing CUI are protected during and after personnel actions such as
+  terminations and transfers.
+useCaseId: A-22
+useCaseTitle: Leaver Access Termination
+domain: Identity & Access Management
+priority: P1 Critical
+trigger: OFFBOARDING
+sodTier: Tier 2
+entraRolesRequired:
+  - User Administrator
+approvalRequired: false
+services:
+  - name: Microsoft Entra ID
+    purpose: >-
+      Disables the leaver's account, revokes every sign-in session, removes the user from every assigned group and
+      removes the directly assigned licences.
+  - name: Microsoft Graph
+    purpose: >-
+      Reads the user, the user's group memberships and registered authentication methods, then deletes every MFA
+      method Graph can delete (DELETE /users/{id}/authentication/<kind>Methods/{id}).
+configurationSteps:
+  portalPath: >-
+    Microsoft Entra admin center > Identity > Users > All users > select the leaver > Edit properties > Account
+    enabled: off; then Revoke sessions, Groups (remove), Licenses (remove) and Authentication methods (delete)
+  powershellCmdlets:
+    - cmdlet: Get-MgUser
+      parameters:
+        - -Filter "userPrincipalName eq '{targetUPN}'"
+        - -Property Id,UserPrincipalName,AccountEnabled,AssignedLicenses,EmployeeLeaveDateTime,SignInSessionsValidFromDateTime
+    - cmdlet: Update-MgUser
+      parameters:
+        - -UserId
+        - -AccountEnabled:$false
+    - cmdlet: Revoke-MgUserSignInSession
+      parameters:
+        - -UserId
+    - cmdlet: Remove-MgGroupMemberByRef
+      parameters:
+        - -GroupId
+        - -DirectoryObjectId
+    - cmdlet: Set-MgUserLicense
+      parameters:
+        - -UserId
+        - -AddLicenses @()
+        - -RemoveLicenses
+    - cmdlet: Invoke-MgGraphRequest
+      parameters:
+        - -Method DELETE
+        - -Uri /v1.0/users/{id}/authentication/{kind}Methods/{methodId}
+  graphApiEndpoint: GET then PATCH https://graph.microsoft.us/v1.0/users/{userId} (plus revokeSignInSessions, members/$ref, assignLicense and the authentication method deletes)
+  requiredPermissions:
+    - User.ReadWrite.All
+    - Group.ReadWrite.All
+    - UserAuthenticationMethod.ReadWrite.All
+    - User-LifeCycleInfo.Read.All
+  targetRule: >-
+    The named leaver (parameter targetUPN). In the AdminOps leaver flow, a past leaver (employeeLeaveDateTime has
+    passed) whose account is still enabled, and only after a tenant administrator confirms it through the flow's
+    single-use link. A DynamicMembership group is left to its membership rule (Graph refuses a direct removal); a
+    licence a group assigns leaves with the group membership; the password method has no delete API and stays.
+  idempotency: >-
+    Get-then-set. The read before the apply lists the planned change and carries signInSessionsValidFromDateTime, so a
+    re-run on a terminated account shows the one real change it makes (the sessions are revoked again).
+evidenceArtifacts:
+  - type: Use Case Execution Evidence
+    retentionPeriod: Not set by CES (the organisation's evidence retention policy applies)
+    storageLocation: CES repository, adminops_evidence collection (one row per run, correlation leaver-flow:<flowId>)
+    format: >-
+      The AdminOps evidence row: the leaver's account state, group memberships, licences and MFA methods before the
+      apply, the steps taken, and the state read after the apply.
+    hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+    - https://graph.microsoft.us
+  complianceBoundary: ''
+  endpointValidation: All Graph calls target graph.microsoft.us.
+  notes: >-
+    Plain Microsoft Graph calls; no Microsoft Entra ID Governance licence is used (unlike A-21). Deleting the MFA
+    methods of a privileged user needs a privileged authentication role; CES code does not state that role, so confirm
+    it per tenant.
+relatedPolicies: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: >-
+  Evidence objective in the AO registry: PS.L2-3.9.2[b] (system access and credentials terminated on termination).
+  Run by the AdminOps leaver flow (detect, ask the tenant administrators, act on a confirm, tell) or by an operator
+  for a named leaver. It does not remove directory roles (A-10 does), recover equipment or CUI, or record the HR action
+  itself; those come from the organisation's records. A-21 stays the primary knowledge-bank entry for PS.L2-3.9.2.

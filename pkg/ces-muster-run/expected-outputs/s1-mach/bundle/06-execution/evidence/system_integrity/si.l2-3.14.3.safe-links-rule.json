@@ -1,5 +1,5 @@
 {
-  "rawResponse": "{\r\n    \"id\":  \"S1 Safe Links rule\",\r\n    \"Identity\":  \"S1 Safe Links rule\",\r\n    \"Name\":  \"S1 Safe Links rule\",\r\n    \"SafeLinksPolicy\":  \"S1 Safe Links - all users\",\r\n    \"RecipientDomainIs\":  [\r\n                              \"s1-mach.simtenant.onmicrosoft.us\"\r\n                          ],\r\n    \"State\":  \"Enabled\",\r\n    \"Priority\":  0,\r\n    \"WhenCreated\":  \"2025-10-17T00:00:00.000Z\",\r\n    \"WhenChanged\":  \"2026-07-04T00:00:00.000Z\"\r\n}\r\n",
+  "rawResponse": "{\r\n    \"id\":  \"S1 Safe Links rule\",\r\n    \"Identity\":  \"S1 Safe Links rule\",\r\n    \"Name\":  \"S1 Safe Links rule\",\r\n    \"SafeLinksPolicy\":  \"S1 Safe Links - all users\",\r\n    \"RecipientDomainIs\":  [\r\n                              \"s1-mach.simtenant.onmicrosoft.us\"\r\n                          ],\r\n    \"State\":  \"Enabled\",\r\n    \"Priority\":  0,\r\n    \"WhenCreated\":  \"2025-10-18T00:00:00.000Z\",\r\n    \"WhenChanged\":  \"2026-07-05T00:00:00.000Z\"\r\n}\r\n",
   "outcome": "automated_success",
   "outcomeRationale": "Resource already exists — creation skipped (idempotent)",
   "complianceVerdict": "SAT",
@@ -24,7 +24,8 @@
     "idempotency": "get-then-set",
     "on_failure": "abort_step",
     "control_ids": [
-      "SI.L2-3.14.3"
+      "SI.L2-3.14.3",
+      "SI.L2-3.14.6"
     ],
     "get_command": "Get-SafeLinksRule | Where-Object { ($_.Name -eq 'CMMC-SafeLinks-Rule') -or (($_.State -eq 'Enabled') -and ($_.SafeLinksPolicy -eq '{safeLinksPolicyName}') -and (@($_.RecipientDomainIs) -contains '{primaryDomain}')) } | Sort-Object { $_.Name -ne 'CMMC-SafeLinks-Rule' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
     "set_command": "New-SafeLinksRule -Name 'CMMC-SafeLinks-Rule' -SafeLinksPolicy '{safeLinksPolicyName}' -RecipientDomainIs '{primaryDomain}' -Enabled $true",
@@ -32,15 +33,16 @@
   },
   "metadata": {
     "controlIds": [
-      "SI.L2-3.14.3"
+      "SI.L2-3.14.3",
+      "SI.L2-3.14.6"
     ],
-    "timestamp": "2026-11-01T15:28:32.021Z",
+    "timestamp": "2026-11-02T01:44:34.908Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "New-SafeLinksRule -Name 'CMMC-SafeLinks-Rule' -SafeLinksPolicy '{safeLinksPolicyName}' -RecipientDomainIs '{primaryDomain}' -Enabled $true",
-    "sha256Hash": "09f6754004b3a6e727c05b56df0bc6ea32df023cf3a1714fd320b342b720ffae",
+    "sha256Hash": "02ed1770bad7e87394b95430fd9d02d0f9b37eb6113d81c68a1fe7221d967151",
     "moduleVersions": {},
     "environment": "GCC-High",
-    "preStateOutput": "{\r\n    \"id\":  \"S1 Safe Links rule\",\r\n    \"Identity\":  \"S1 Safe Links rule\",\r\n    \"Name\":  \"S1 Safe Links rule\",\r\n    \"SafeLinksPolicy\":  \"S1 Safe Links - all users\",\r\n    \"RecipientDomainIs\":  [\r\n                              \"s1-mach.simtenant.onmicrosoft.us\"\r\n                          ],\r\n    \"State\":  \"Enabled\",\r\n    \"Priority\":  0,\r\n    \"WhenCreated\":  \"2025-10-17T00:00:00.000Z\",\r\n    \"WhenChanged\":  \"2026-07-04T00:00:00.000Z\"\r\n}\r\n",
+    "preStateOutput": "{\r\n    \"id\":  \"S1 Safe Links rule\",\r\n    \"Identity\":  \"S1 Safe Links rule\",\r\n    \"Name\":  \"S1 Safe Links rule\",\r\n    \"SafeLinksPolicy\":  \"S1 Safe Links - all users\",\r\n    \"RecipientDomainIs\":  [\r\n                              \"s1-mach.simtenant.onmicrosoft.us\"\r\n                          ],\r\n    \"State\":  \"Enabled\",\r\n    \"Priority\":  0,\r\n    \"WhenCreated\":  \"2025-10-18T00:00:00.000Z\",\r\n    \"WhenChanged\":  \"2026-07-05T00:00:00.000Z\"\r\n}\r\n",
     "postcheckMode": "state",
     "lookupMatch": {
       "basis": "effect",

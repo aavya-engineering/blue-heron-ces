@@ -1,0 +1,120 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"52520000-00b4-4000-8000-000000000002\",\r\n    \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n    \"displayName\":  \"S2-Defender-AV\",\r\n    \"description\":  \"Microsoft Defender Antivirus: weekly full scan, real-time protection, cloud-delivered protection\",\r\n    \"version\":  1,\r\n    \"createdDateTime\":  \"2025-11-07T00:00:00.000Z\",\r\n    \"lastModifiedDateTime\":  \"2026-09-18T00:00:00.000Z\",\r\n    \"defenderRequireRealTimeMonitoring\":  true,\r\n    \"defenderRequireBehaviorMonitoring\":  true,\r\n    \"defenderRequireCloudProtection\":  true,\r\n    \"defenderCloudBlockLevel\":  \"high\",\r\n    \"defenderMonitorFileActivity\":  \"monitorAllFiles\",\r\n    \"defenderScanType\":  \"full\",\r\n    \"defenderSystemScanSchedule\":  \"saturday\",\r\n    \"defenderScheduledScanTime\":  \"02:00:00.0000000\",\r\n    \"defenderScheduledQuickScanTime\":  \"12:00:00.0000000\",\r\n    \"defenderSignatureUpdateIntervalInHours\":  4,\r\n    \"defenderScanArchiveFiles\":  true,\r\n    \"defenderScanDownloads\":  true,\r\n    \"defenderScanIncomingMail\":  true,\r\n    \"defenderScanRemovableDrivesDuringFullScan\":  true,\r\n    \"defenderPromptForSampleSubmission\":  \"sendSafeSamplesAutomatically\",\r\n    \"defenderDaysBeforeDeletingQuarantinedMalware\":  30,\r\n    \"AdditionalProperties\":  {\r\n                                 \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n                                 \"defenderRequireRealTimeMonitoring\":  true,\r\n                                 \"defenderRequireBehaviorMonitoring\":  true,\r\n                                 \"defenderRequireCloudProtection\":  true,\r\n                                 \"defenderCloudBlockLevel\":  \"high\",\r\n                                 \"defenderMonitorFileActivity\":  \"monitorAllFiles\",\r\n                                 \"defenderScanType\":  \"full\",\r\n                                 \"defenderSystemScanSchedule\":  \"saturday\",\r\n                                 \"defenderScheduledScanTime\":  \"02:00:00.0000000\",\r\n                                 \"defenderScheduledQuickScanTime\":  \"12:00:00.0000000\",\r\n                                 \"defenderSignatureUpdateIntervalInHours\":  4,\r\n                                 \"defenderScanArchiveFiles\":  true,\r\n                                 \"defenderScanDownloads\":  true,\r\n                                 \"defenderScanIncomingMail\":  true,\r\n                                 \"defenderScanRemovableDrivesDuringFullScan\":  true,\r\n                                 \"defenderPromptForSampleSubmission\":  \"sendSafeSamplesAutomatically\",\r\n                                 \"defenderDaysBeforeDeletingQuarantinedMalware\":  30\r\n                             },\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"52520000-00b4-4000-8000-000000000002_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ]\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Resource already exists — creation skipped (idempotent)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "existing equivalent 'S2-Defender-AV' verified by effect (6 conditions) (existing equivalent 'S2-Defender-AV' matched by effect)",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "existing equivalent 'S2-Defender-AV' verified by effect (6 conditions)"
+  },
+  "registryEntry": {
+    "entry_id": "SI.L1-3.14.5.scan-schedule-evidence",
+    "label": "Create/Verify CMMC Defender Antivirus Policy via Intune",
+    "engine": "mgraph",
+    "layer_hint": 4,
+    "sequence_hint": 39,
+    "idempotency": "get-then-set",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "SI.L1-3.14.5",
+      "SI.L1-3.14.4"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations?$expand=assignments').value | Where-Object { ($_.displayName -eq 'CMMC-Defender-AntivirusPolicy') -or ((@('#microsoft.graph.windows10GeneralConfiguration','#microsoft.graph.windows10EndpointProtectionConfiguration') -contains $_.'@odata.type') -and (@('quick','full') -contains $_.defenderScanType) -and (@('everyday','sunday','monday','tuesday','wednesday','thursday','friday','saturday') -contains $_.defenderSystemScanSchedule) -and (@($_.defenderScheduledScanTime | Where-Object { $_ }).Count -gt 0) -and ($null -ne $_.defenderSignatureUpdateIntervalInHours -and [double]$_.defenderSignatureUpdateIntervalInHours -ge 1) -and (@($_.assignments | Where-Object { $_ }).Count -gt 0)) } | Sort-Object { $_.displayName -ne 'CMMC-Defender-AntivirusPolicy' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
+    "set_command": "$existing = Get-MgDeviceManagementDeviceConfiguration -All | Where-Object {$_.DisplayName -eq 'CMMC-Defender-AntivirusPolicy'}; if (-not $existing) { $policy = @{ '@odata.type' = '#microsoft.graph.windows10GeneralConfiguration'; displayName = 'CMMC-Defender-AntivirusPolicy'; description = 'CMMC L2 required Defender antivirus and scheduled scan configuration'; defenderScanType = 'full'; defenderScheduledScanTime = '02:00'; defenderScheduledQuickScanTime = '06:00'; defenderDaysBeforeDeletingQuarantinedMalware = 30; defenderSignatureUpdateIntervalInHours = 4; defenderMonitorFileActivity = 'monitorAllFiles'; defenderCloudBlockLevel = 'high'; defenderSystemScanSchedule = 'sunday' }; $created = New-MgDeviceManagementDeviceConfiguration -BodyParameter $policy; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations/$($created.Id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | ConvertTo-Json -Depth 10 } else { Write-Output 'Policy already exists - skipping creation' }",
+    "evidence_commands": [
+      "Get-MgDeviceManagementDeviceConfiguration -All | Where-Object {$_.DisplayName -eq 'CMMC-Defender-AntivirusPolicy'} | Select-Object DisplayName,Id,LastModifiedDateTime | ConvertTo-Json -Depth 5",
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object { $_.defenderScanType } | Select-Object displayName,id,defenderScanType,defenderSystemScanSchedule,defenderScheduledScanTime,defenderSignatureUpdateIntervalInHours,defenderCloudBlockLevel | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SI.L1-3.14.5",
+      "SI.L1-3.14.4"
+    ],
+    "timestamp": "2026-11-02T02:30:13.316Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "$existing = Get-MgDeviceManagementDeviceConfiguration -All | Where-Object {$_.DisplayName -eq 'CMMC-Defender-AntivirusPolicy'}; if (-not $existing) { $policy = @{ '@odata.type' = '#microsoft.graph.windows10GeneralConfiguration'; displayName = 'CMMC-Defender-AntivirusPolicy'; description = 'CMMC L2 required Defender antivirus and scheduled scan configuration'; defenderScanType = 'full'; defenderScheduledScanTime = '02:00'; defenderScheduledQuickScanTime = '06:00'; defenderDaysBeforeDeletingQuarantinedMalware = 30; defenderSignatureUpdateIntervalInHours = 4; defenderMonitorFileActivity = 'monitorAllFiles'; defenderCloudBlockLevel = 'high'; defenderSystemScanSchedule = 'sunday' }; $created = New-MgDeviceManagementDeviceConfiguration -BodyParameter $policy; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations/$($created.Id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | ConvertTo-Json -Depth 10 } else { Write-Output 'Policy already exists - skipping creation' }",
+    "sha256Hash": "bfe26225151bfd64e73ef6afe8e627c9078e647838113f336bd1c41ae812a209",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "{\r\n    \"id\":  \"52520000-00b4-4000-8000-000000000002\",\r\n    \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n    \"displayName\":  \"S2-Defender-AV\",\r\n    \"description\":  \"Microsoft Defender Antivirus: weekly full scan, real-time protection, cloud-delivered protection\",\r\n    \"version\":  1,\r\n    \"createdDateTime\":  \"2025-11-07T00:00:00.000Z\",\r\n    \"lastModifiedDateTime\":  \"2026-09-18T00:00:00.000Z\",\r\n    \"defenderRequireRealTimeMonitoring\":  true,\r\n    \"defenderRequireBehaviorMonitoring\":  true,\r\n    \"defenderRequireCloudProtection\":  true,\r\n    \"defenderCloudBlockLevel\":  \"high\",\r\n    \"defenderMonitorFileActivity\":  \"monitorAllFiles\",\r\n    \"defenderScanType\":  \"full\",\r\n    \"defenderSystemScanSchedule\":  \"saturday\",\r\n    \"defenderScheduledScanTime\":  \"02:00:00.0000000\",\r\n    \"defenderScheduledQuickScanTime\":  \"12:00:00.0000000\",\r\n    \"defenderSignatureUpdateIntervalInHours\":  4,\r\n    \"defenderScanArchiveFiles\":  true,\r\n    \"defenderScanDownloads\":  true,\r\n    \"defenderScanIncomingMail\":  true,\r\n    \"defenderScanRemovableDrivesDuringFullScan\":  true,\r\n    \"defenderPromptForSampleSubmission\":  \"sendSafeSamplesAutomatically\",\r\n    \"defenderDaysBeforeDeletingQuarantinedMalware\":  30,\r\n    \"AdditionalProperties\":  {\r\n                                 \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n                                 \"defenderRequireRealTimeMonitoring\":  true,\r\n                                 \"defenderRequireBehaviorMonitoring\":  true,\r\n                                 \"defenderRequireCloudProtection\":  true,\r\n                                 \"defenderCloudBlockLevel\":  \"high\",\r\n                                 \"defenderMonitorFileActivity\":  \"monitorAllFiles\",\r\n                                 \"defenderScanType\":  \"full\",\r\n                                 \"defenderSystemScanSchedule\":  \"saturday\",\r\n                                 \"defenderScheduledScanTime\":  \"02:00:00.0000000\",\r\n                                 \"defenderScheduledQuickScanTime\":  \"12:00:00.0000000\",\r\n                                 \"defenderSignatureUpdateIntervalInHours\":  4,\r\n                                 \"defenderScanArchiveFiles\":  true,\r\n                                 \"defenderScanDownloads\":  true,\r\n                                 \"defenderScanIncomingMail\":  true,\r\n                                 \"defenderScanRemovableDrivesDuringFullScan\":  true,\r\n                                 \"defenderPromptForSampleSubmission\":  \"sendSafeSamplesAutomatically\",\r\n                                 \"defenderDaysBeforeDeletingQuarantinedMalware\":  30\r\n                             },\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"52520000-00b4-4000-8000-000000000002_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ]\r\n}\r\n",
+    "postcheckMode": "state",
+    "lookupMatch": {
+      "basis": "effect",
+      "object": "S2-Defender-AV",
+      "conditions": [
+        {
+          "path": "@odata.type",
+          "op": "in",
+          "expected": [
+            "#microsoft.graph.windows10GeneralConfiguration",
+            "#microsoft.graph.windows10EndpointProtectionConfiguration"
+          ],
+          "observed": "#microsoft.graph.windows10GeneralConfiguration",
+          "pass": true
+        },
+        {
+          "path": "$.defenderScanType",
+          "op": "in",
+          "expected": [
+            "quick",
+            "full"
+          ],
+          "observed": "full",
+          "pass": true
+        },
+        {
+          "path": "$.defenderSystemScanSchedule",
+          "op": "in",
+          "expected": [
+            "everyday",
+            "sunday",
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday"
+          ],
+          "observed": "saturday",
+          "pass": true
+        },
+        {
+          "path": "$.defenderScheduledScanTime",
+          "op": "not_empty",
+          "observed": "02:00:00.0000000",
+          "pass": true
+        },
+        {
+          "path": "$.defenderSignatureUpdateIntervalInHours",
+          "op": "gte",
+          "expected": 1,
+          "observed": 4,
+          "pass": true
+        },
+        {
+          "path": "$.assignments",
+          "op": "not_empty",
+          "observed": [
+            {
+              "id": "52520000-00b4-4000-8000-000000000002_group-1",
+              "target": {
+                "@odata.type": "#microsoft.graph.groupAssignmentTarget",
+                "groupId": "group-1"
+              }
+            }
+          ],
+          "pass": true
+        }
+      ]
+    }
+  }
+}

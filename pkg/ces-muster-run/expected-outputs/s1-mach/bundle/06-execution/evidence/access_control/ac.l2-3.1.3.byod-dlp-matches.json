@@ -1,5 +1,5 @@
 {
-  "rawResponse": "",
+  "rawResponse": "{\r\n    \"count\":  0,\r\n    \"windowDays\":  30,\r\n    \"matches\":  [\r\n\r\n                ]\r\n}\r\n",
   "outcome": "automated_success",
   "outcomeRationale": "Command completed successfully (exit code 0)",
   "complianceVerdict": "SAT",
@@ -18,17 +18,17 @@
     "get_command": "Search-UnifiedAuditLog -RecordType ComplianceDLPExchange -StartDate (Get-Date).AddDays(-30) -EndDate (Get-Date) -ResultSize 10 | Select-Object CreationDate,Operations,AuditData | ConvertTo-Json -Depth 5",
     "set_command": "",
     "evidence_commands": [
-      "Search-UnifiedAuditLog -RecordType ComplianceDLPExchange -StartDate (Get-Date).AddDays(-30) -EndDate (Get-Date) -ResultSize 10 | Select-Object CreationDate,Operations,AuditData | ConvertTo-Json -Depth 5"
+      "$r = @(Search-UnifiedAuditLog -RecordType ComplianceDLPExchange -StartDate (Get-Date).AddDays(-30) -EndDate (Get-Date) -ResultSize 10 | Where-Object { $_ }); [pscustomobject]@{ count = $r.Count; windowDays = 30; matches = @($r | ForEach-Object { [pscustomobject]@{ CreationDate = $_.CreationDate; Operations = $_.Operations } }) } | ConvertTo-Json -Depth 5"
     ]
   },
   "metadata": {
     "controlIds": [
       "AC.L1-3.1.22"
     ],
-    "timestamp": "2026-11-01T15:28:05.077Z",
+    "timestamp": "2026-11-02T01:43:36.921Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "[manual/evidence-only] BYOD DLP Rule Match Audit Events (Runtime Sample)",
-    "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sha256Hash": "38b16955de4ab78b345ae9d5a0e0933b5cdc3c21d41e38dfe1f99dd334b627bb",
     "moduleVersions": {},
     "environment": "GCC-High"
   }
