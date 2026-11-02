@@ -2,7 +2,9 @@
 
 This repository holds everything needed to build, run and prove **CES**, the BHD compliance engine: it takes a small defense contractor's Microsoft 365 GCC High tenant to CMMC Level 2 (the DoD's Cybersecurity Maturity Model Certification) by asking the customer questions, planning and applying the tenant configuration, running governed admin operations, collecting evidence and writing the assessor's documents. You build and prove it first against a **simulator** with four fictional customers; a real tenant comes later.
 
-Cut 2026-11-01, after BHD's last fix wave (PH-13). Each folder's source commit is in `SOURCES.json`.
+Cut 2026-11-01, after BHD's last fix wave (PH-13). Each folder's source commit is in `SOURCES.json`. What is new since October: **`handoff\WHAT-CHANGED.md`**.
+
+> **Status of these instructions (2026-11-01):** the code is proven by BHD's proof rounds. BHD is now testing these build-kit steps from a fresh clone of this repository. Fixes arrive as commits here, so pull before you start and check `handoff\KNOWN-ISSUES.md` (KI-17).
 
 ## What you have
 
@@ -41,6 +43,7 @@ Use `handoff\bootstrap.ps1` only. The older `pkg\ces-muster-run\bootstrap.ps1`, 
 
 ## Read next
 
+0. **`handoff\SCENARIO-STEPS.md`**: what one end-to-end run does, step by step, for the three main scenarios.
 1. **`handoff\GUIDE.md`**: the full guide: modules, rules, prerequisites, configuration, build, running each module, one scenario, results, unit gate, first day, and moving to a real GCC High tenant.
 2. **`handoff\PUNCH-LIST.md`**: every open item with owner and priority; start with its P1 rows.
 3. **`handoff\KNOWN-ISSUES.md`**: problems you will meet and their workarounds.
