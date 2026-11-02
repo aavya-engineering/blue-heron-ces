@@ -1,0 +1,44 @@
+## Control {{controlId}}: Cryptographic Mechanisms for Remote Access Confidentiality
+
+**Implementation Status:** {{status}}
+
+This organization employs cryptographic mechanisms to protect the confidentiality of remote access sessions within the {{tenantName}} M365 GCC High tenant. Transport-layer encryption (TLS 1.2+) protects all remote access communications, while authentication methods enforce cryptographic validation through phishing-resistant credentials.
+
+{{#if mfaEnabled}}
+Multi-factor authentication is enforced with {{authMethodsCount}} configured authentication methods providing cryptographic session protection:
+{{#if authMethods}}
+{{#each authMethods}}
+- **{{displayName}}** ({{state}}): Provides cryptographic authentication validation{{#if (eq id "Fido2")}} via hardware security key{{/if}}{{#if (eq id "MicrosoftAuthenticator")}} via push notification with number matching{{/if}}.
+{{/each}}
+{{/if}}
+All remote sessions use TLS 1.2 or higher for transport encryption, with Azure AD enforcing FIPS 140-2 validated cryptographic modules in the GCC High environment.
+{{else}}
+MFA and cryptographic authentication methods have not been configured. Remote access confidentiality relies on transport encryption only, pending MFA deployment.
+{{/if}}
+
+{{#if policies}}
+Conditional Access policies enforce cryptographic protection:
+{{#each policies}}
+- **{{displayName}}** ({{state}}): Requires {{#each grantControls.builtInControls}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{#if grantControls.authenticationStrength}} with {{grantControls.authenticationStrength}} authentication strength{{/if}}.
+{{/each}}
+{{/if}}
+
+{{#if infraResources}}
+Supporting infrastructure:
+{{#each infraResources}}
+- {{resourceType}} "{{name}}"{{#if properties.retention_days}} (retention: {{properties.retention_days}} days){{/if}}
+{{/each}}
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Review authentication method configurations, TLS enforcement settings, Conditional Access authentication strength requirements, and FIPS 140-2 compliance documentation.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

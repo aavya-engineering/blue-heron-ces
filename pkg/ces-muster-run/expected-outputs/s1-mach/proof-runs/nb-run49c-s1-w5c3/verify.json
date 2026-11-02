@@ -1,0 +1,356 @@
+{
+  "pass": true,
+  "scenario": "s1-mach",
+  "baseline": "summary.json",
+  "harness": "tester",
+  "checks": [
+    {
+      "id": "V1",
+      "title": "All E-step exit codes are 0",
+      "pass": true,
+      "detail": "E1, E2, E3, E4, E5, E6, E6X, E8.5, E7, E7A, E7B, E8, E8B rc=0; E4 mode=api"
+    },
+    {
+      "id": "V2",
+      "title": "MP and TM parse with the ces-shared schemas",
+      "pass": true,
+      "detail": "MP ok; TM ok"
+    },
+    {
+      "id": "V3",
+      "title": "The MP has 110 control directives",
+      "pass": true,
+      "detail": "110 directives {\"implement\":82,\"manual\":25,\"document-prohibition\":3}"
+    },
+    {
+      "id": "V4",
+      "title": "Provenance: the plan came from discovery",
+      "pass": true,
+      "detail": "observations 321 (met 56, unknown 245) match discovery; auto_detected facts 119; MP posture {\"met\":0,\"partial\":38,\"not_met\":78,\"unknown\":29} = compiled results; no 1970 dates"
+    },
+    {
+      "id": "V5",
+      "title": "Stamper's picker regex matches all pushed files; MP hand-off refs resolve with matching hashes",
+      "pass": true,
+      "detail": "8 files; unmatched: none; IM present (expected); refs si_baseline_ref=da2d2b63ada9… (recomputed), tcp_ref=9741647db730… (recomputed), readiness_posture_ref=50977f2ff896… (recomputed)"
+    },
+    {
+      "id": "V6",
+      "title": "Translate exit 0; execute report exists; counts within baseline +/-2",
+      "pass": true,
+      "detail": "completed 110 (baseline 110), failed 0 (baseline 0), tolerance 2"
+    },
+    {
+      "id": "V7",
+      "title": "Only the scenario build (E1), Stamper (E6), the S3 injection (E6X) and AdminOps (E7A) wrote to the sim ledger, each in its own window; discovery added zero writes",
+      "pass": true,
+      "detail": "3033 entries; non-seed writes 191: scenario build [E1 start, E2 start) 134 (scenario write steps 134), during E6 (Stamper) 55, during E6X (injection; not allowed) 0, during E7A (AdminOps; allowed, 1 write op(s)) 2, during E2 (discovery) 0, outside the allowed windows 0"
+    },
+    {
+      "id": "V8",
+      "title": "SSP sections, implementation count, TM and MP loaded",
+      "pass": true,
+      "detail": "all 14 sections; 110 implementations (baseline 110), status {\"met\":88,\"not_assessed\":20,\"not_met\":2} = baseline; sources [\"Mission Plan\",\"Tenant Manifest\",\"Infrastructure Manifest\"]; DOCX 199995 bytes; POA&M ok; system name source: manifest-or-variables (K4)"
+    },
+    {
+      "id": "V9",
+      "title": "The SSP's MP is the pushed MP",
+      "pass": true,
+      "detail": "EO loaded manual-mission-plan-s1-mach-2026-10-28T21-36-08-200Z.json; pushed manual-mission-plan-s1-mach-2026-10-28T21-36-08-200Z.json"
+    },
+    {
+      "id": "V10",
+      "title": "Nothing written outside the workspace (C:\\CES_Pipeline, ~/.ces, ~/.stamper, %LOCALAPPDATA%\\CES)",
+      "pass": true,
+      "detail": "C:\\CES_Pipeline: 1811 files, unchanged; ~\\.ces: 5 files, unchanged; ~\\.stamper: 552 files, unchanged; %LOCALAPPDATA%\\CES: 55 files, unchanged"
+    },
+    {
+      "id": "V11",
+      "title": "Unit-suite failures are a subset of known-failures.json",
+      "pass": true,
+      "detail": "5133 passed, 0 failed (0 known), 0 unexpected"
+    },
+    {
+      "id": "V14",
+      "title": "Three back-to-back EO assessments give identical counts",
+      "pass": true,
+      "detail": "3 runs identical: {\"controls_met\":88,\"controls_not_met\":2,\"controls_partial\":0,\"controls_not_assessed\":20,\"sprs_score\":61,\"liveAssessmentCount\":107}"
+    },
+    {
+      "id": "V15",
+      "title": "Stamper evidence in the tenant folder, one record per task, found by EO, failures recorded",
+      "pass": true,
+      "detail": "117 evidence files; 107 task folders; evidence_collected 142; EO filesFound 117; 0 failure records checked"
+    },
+    {
+      "id": "V16",
+      "title": "No leftover {name} placeholders reached the sim; inactive-account task disabled only stale users",
+      "pass": true,
+      "detail": "no placeholders stored or sent; disabled by Stamper in E6 [] ⊆ stale (90 d at E6 start) [] of 53 users; disabled, not written in E6 (seed or build): [\"user-40\",\"user-7\"]"
+    },
+    {
+      "id": "V21",
+      "title": "Question register present, every row names an output field, register test green",
+      "pass": true,
+      "detail": "346 rows, all with output fields; ces-muster suite green"
+    },
+    {
+      "id": "V22",
+      "title": "MG-04 parity suite green against the reviewed allow-list",
+      "pass": true,
+      "detail": "29 allow-list entries, all with owner and reason; ces-muster suite green"
+    },
+    {
+      "id": "V12",
+      "title": "SSP system name from the TM; every TM boundary definition a boundary fact; no zone named like a questionnaire key",
+      "pass": true,
+      "detail": "systemName \"SIMULATED CUSTOMER (FICTIONAL): Hollinford Precision Machining LLC (FICTIONAL) - Hollinford Precision Machining LLC (FICTIONAL)\" from the TM; 28 TM definition(s) all boundary facts (28 facts); 6 zone(s), none named like a questionnaire key"
+    },
+    {
+      "id": "V18",
+      "title": "22 policy documents (markdown + DOCX) with zero unresolved tokens",
+      "pass": true,
+      "detail": "22 markdown + 22 DOCX documents; no unresolved {{tokens}}"
+    },
+    {
+      "id": "V19",
+      "title": "Three assessor reports and the tech-ref guide present and non-empty",
+      "pass": true,
+      "detail": "8 report files: control-assessment-report.html, control-assessment-report.json, exclusions-report.json, exclusions-report.txt, tech-ref-implementation-guide.html, tech-ref-implementation-guide.json, traceability-report.html, traceability-report.json"
+    },
+    {
+      "id": "V28",
+      "title": "MP requirement text = ces-shared reference; collect rows catalog-sourced or marked placeholder",
+      "pass": true,
+      "detail": "124 steps with reference text; 145 collect rows: 2 catalog, 143 placeholder; titles not checked (EVC.2b)"
+    },
+    {
+      "id": "V29",
+      "title": "Evidence catalog: release log hash matches, release 0 complete, loader tests green",
+      "pass": true,
+      "detail": "hash c254a6bf7f9d… matches the release log; 14 definitions, all with objective ids; loader and schema tests green"
+    },
+    {
+      "id": "V13",
+      "title": "Forced-failure run: the forced control's SSP status differs; no failed/blocked control is met",
+      "pass": true,
+      "detail": "SC.L2-3.13.15: met -> not_met; forced report failed 1 (step_task_SC.L2-3.13.15_mvsmw500_0ammzws), forced_failures lists SC.L2-3.13.15.anti-spam; no all-failed control met in either run"
+    },
+    {
+      "id": "V17",
+      "title": "Exact Stamper failed-task set equals expected-outputs; completed = total - failed",
+      "pass": true,
+      "detail": "failed set [] = baseline []; completed 110 of 110 (want 110)"
+    },
+    {
+      "id": "V20",
+      "title": "POA&M covers every not-met, not-assessed, failed or blocked control (item or eligibility blocker)",
+      "pass": true,
+      "detail": "22 controls (2 not met/partial, 20 not assessed, 0 failed/blocked) covered: 10 items, 12 blockers"
+    },
+    {
+      "id": "V25",
+      "title": "Shared evidence bundle: items 1-13 present (12 = evidence index), hashes match, identity scan = 0",
+      "pass": true,
+      "detail": "run-20261028T213610Z: 13 items, 391 hashes match; identity scan clean (12 extra tokens, token file present); cesId fqetlcWs0wwGNCWGhAcih"
+    },
+    {
+      "id": "V27",
+      "title": "EC upload: catalog ids validated, in EO's package and ledger, statuses unchanged",
+      "pass": true,
+      "detail": "eci-48b9cde3-a12a-4907-9a2c-e225f30f7315 (access_control_policy, EMX-IAM-004, matched by form_id, validated); package evidence-package-2026-10-28T21-40-21/evidence/ec/AC.L1-3.1.1/eci-48b9cde3-a12a-4907-9a2c-e225f30f7315.json; ledger lists it; EO counts = baseline; SSP AC.L1-3.1.1 met = baseline; assess_ec_items 16"
+    },
+    {
+      "id": "V23",
+      "title": "Tester run record: muster-e2e PASS, including the ledger comparison",
+      "pass": true,
+      "detail": "s1-mach-e2e PASS: 13 required steps rc 0; ledger 13/13 (191 writes of 3033 entries); state 8/8; facts 5/5"
+    },
+    {
+      "id": "V26",
+      "title": "stacksim coverage-ao (AO, 95 commands): pass, run by the tester",
+      "pass": true,
+      "detail": "stacksim coverage-ao: PASS 95 / HONEST-OPEN 0 / FAIL 0 (of 95) (report 2026-10-28T21:43:45.893Z)"
+    },
+    {
+      "id": "V30",
+      "title": "Met-control narratives vs the negation lexicon: every hit flagged, every flag a hit; lexicon = EO's",
+      "pass": true,
+      "detail": "lexicon 12 phrases, hash 87b5adeac67e… = EO's; 88 met controls, 0 hit the lexicon and every hit is flagged (honest flags; the hits themselves are scorecard metric 9)"
+    },
+    {
+      "id": "V31",
+      "title": "No not-assessed control shows \"Not Applicable\" in the DOCX text",
+      "pass": true,
+      "detail": "20 not-assessed controls, each block checks \"Not Yet Assessed\" and never says Not Applicable; 0 checked Not Applicable / Planned (read with jszip)"
+    },
+    {
+      "id": "V32",
+      "title": "evidenceDetails cover the bundle's Stamper-evidenced controls; hashes match the files",
+      "pass": true,
+      "detail": "84 Stamper-evidenced controls all carry evidenceDetails; 293 details (151 from the evidence store, verified against its records), all relative, all hashes match"
+    },
+    {
+      "id": "V33",
+      "title": "§2.4 rows = CRM shared rows; no excluded id present",
+      "pass": true,
+      "detail": "110 §2.4 rows; Shared 108 = CRM shared 108, same ids and per-row responsibility; 7 excluded ids, none present"
+    },
+    {
+      "id": "V34",
+      "title": "SSP components = IM resources",
+      "pass": true,
+      "detail": "32 components in 7 sections = 32 IM resources"
+    },
+    {
+      "id": "V35",
+      "title": "§14 = poam.json; every ledger-deficient control is an item, a blocker or no_poam",
+      "pass": true,
+      "detail": "§14 = poam.json a29af7b4… (10 items, 12 blockers, SPRS 61, projected 71); 22 ledger-deficient controls: 10 items, 12 blockers, 0 no_poam"
+    },
+    {
+      "id": "V36",
+      "title": "Exactly one assessed SPRS in the bundle (EO's); the POA&M number labelled projection",
+      "pass": true,
+      "detail": "one assessed SPRS 61 (5 sources); projection 71 labelled \"projected\" in 0 DOCX sentence(s); readiness estimates (not assessed) sprs_now -203, sprs_after -121; W4.1 posture block pending"
+    },
+    {
+      "id": "V37",
+      "title": "Freshness: every store-backed ledger objective is fresh; none stale or demoted",
+      "pass": true,
+      "detail": "239 store-backed objectives all fresh; freshness on 264 of 320 objectives {\"fresh\":264}; 0 stale, 0 demoted"
+    },
+    {
+      "id": "V38",
+      "title": "Provenance: every store-backed detail resolves to a record with a collector identity",
+      "pass": true,
+      "detail": "639 refs (151 SSP, 488 ledger) resolve to 42 records; 271 records, collector identities [\"ces-eo/2.2.3@sim-app-s1-mach\"]; Stamper executor identities (info) [\"stamper/2.2.3@no-mgcontext\"]"
+    },
+    {
+      "id": "V39",
+      "title": "No positive source rests on an empty payload",
+      "pass": true,
+      "detail": "119 positive Stamper sources, each on a non-empty payload (117 evidence files from out\\runs\\run-20261028T213610Z\\evidence\\raw\\06-execution\\evidence); 18 empty-payload SATs, all uncounted (no_query); snapshot 01fc50da-d9bc-4d04-ac5c-800153b0039d"
+    },
+    {
+      "id": "V40",
+      "title": "Tenant-scoped sources: no record, ref or ledger objective from another tenant",
+      "pass": true,
+      "detail": "tenant sim-tenant-s1-mach (s1-mach): 271 records, 488 ledger refs, 151 SSP store details, 0 tenant-suite objectives, 4 collect events; ledger tenant sim-tenant-s1-mach"
+    },
+    {
+      "id": "V41",
+      "title": "Watermarks monotonic; passes 2-3 collect nothing new; E7B collects exactly the E7A writes; E8F collects exactly its forced rows",
+      "pass": true,
+      "detail": "14 collectors over 5 passes: no watermark regresses (collect events and record windows); passes 2-3 +0 everywhere; E8F C2 +15 = the 15 sim writes of the forced execute (ids equal); E7B C2 +2 = the 2 E7A (AdminOps) sim writes (ids equal); other collectors +0 on E8F"
+    },
+    {
+      "id": "V42",
+      "title": "Hash chain intact: records, links and payloads recompute; manifest head and count match",
+      "pass": true,
+      "detail": "271 records recompute (record hash, prev link, payload bytes); manifest head 2d7aadacbcc7… and count 271 match; tenant sim-tenant-s1-mach"
+    },
+    {
+      "id": "V43a",
+      "title": "Regression: E8F regressions = exactly SC.L2-3.13.15 (plus the scenario allowed_reverts controls); the auto-reconcile added or reopened >= 1",
+      "pass": true,
+      "detail": "E8F regressions [\"SC.L2-3.13.15\"]: SC.L2-3.13.15 met -> not_met (tier 2 -> 1); reconcile new 0 + reopened 1"
+    },
+    {
+      "id": "V43b",
+      "title": "Drift: no drift across the E7 passes (2 and 3 empty; pass 1 no regression)",
+      "pass": true,
+      "detail": "E7 passes 2 and 3: drift empty; pass 1: no regression"
+    },
+    {
+      "id": "V44",
+      "title": "Date filter honoured: collected rows inside their window; seeded rows older than the window never collected",
+      "pass": true,
+      "detail": "852 rows in 27 collector records, all inside their windows; negative case: 162 seeded UAL rows older than 30 days (2026-09-28, 2026-09-28, 2026-09-27, 2026-09-27, 2026-09-27, 2026-09-26, 2026-09-26, 2026-09-26, 2026-09-25, 2026-09-25, 2026-09-24, 2026-09-24, 2026-09-24, 2026-09-23, 2026-09-23, 2026-09-23, 2026-09-22, 2026-09-22, 2026-09-21, 2026-09-21, 2026-09-21, 2026-09-20, 2026-09-20, 2026-09-20, 2026-09-19, 2026-09-19, 2026-09-18, 2026-09-18, 2026-09-18, 2026-09-17, 2026-09-17, 2026-09-17, 2026-09-16, 2026-09-16, 2026-09-15, 2026-09-15, 2026-09-15, 2026-09-14, 2026-09-14, 2026-09-14, 2026-09-13, 2026-09-13, 2026-09-12, 2026-09-12, 2026-09-12, 2026-09-11, 2026-09-11, 2026-09-11, 2026-09-10, 2026-09-10, 2026-09-09, 2026-09-09, 2026-09-09, 2026-09-08, 2026-09-08, 2026-09-08, 2026-09-07, 2026-09-07, 2026-09-06, 2026-09-06, 2026-09-06, 2026-09-05, 2026-09-05, 2026-09-05, 2026-09-04, 2026-09-04, 2026-09-03, 2026-09-03, 2026-09-03, 2026-09-02, 2026-09-02, 2026-09-02, 2026-09-01, 2026-09-01, 2026-08-31, 2026-08-31, 2026-08-31, 2026-08-30, 2026-08-30, 2026-08-30, 2026-08-29, 2026-08-29, 2026-08-28, 2026-08-28, 2026-08-28, 2026-08-27, 2026-08-27, 2026-08-27, 2026-08-26, 2026-08-26, 2026-08-25, 2026-08-25, 2026-08-25, 2026-08-24, 2026-08-24, 2026-08-24, 2026-08-23, 2026-08-23, 2026-08-22, 2026-08-22, 2026-08-22, 2026-08-21, 2026-08-21, 2026-08-21, 2026-08-20, 2026-08-20, 2026-08-19, 2026-08-19, 2026-08-19, 2026-08-18, 2026-08-18, 2026-08-18, 2026-08-17, 2026-08-17, 2026-08-16, 2026-08-16, 2026-08-16, 2026-08-15, 2026-08-15, 2026-08-15, 2026-08-14, 2026-08-14, 2026-08-13, 2026-08-13, 2026-08-13, 2026-08-12, 2026-08-12, 2026-08-12, 2026-08-11, 2026-08-11, 2026-08-10, 2026-08-10, 2026-08-10, 2026-08-09, 2026-08-09, 2026-08-09, 2026-08-08, 2026-08-08, 2026-08-07, 2026-08-07, 2026-08-07, 2026-08-06, 2026-08-06, 2026-08-06, 2026-08-05, 2026-08-05, 2026-08-04, 2026-08-04, 2026-08-04, 2026-08-03, 2026-08-03, 2026-08-03, 2026-08-02, 2026-08-02, 2026-08-01, 2026-08-01, 2026-08-01, 2026-07-31, 2026-07-31, 2026-07-31, 2026-07-30, 2026-07-30) and all 223 rows before the earliest C1a window (2026-10-21T21:39:47.458Z) absent from every payload"
+    },
+    {
+      "id": "V49",
+      "title": "Identity scan of the synthetic-customer scope = 0 hits; org ids match the fictional patterns",
+      "pass": true,
+      "detail": "468 files scanned (bundle 1, simulator 3, customer 4, adminops 1, eo-store 2; adminops 0 rows); 12 extra tokens, token file present; 4 customer JSON files id-checked"
+    },
+    {
+      "id": "V58",
+      "title": "Every SSP, DOCX, POA&M, policy and report of a synthetic customer carries \"SIMULATED CUSTOMER (FICTIONAL): ...\"",
+      "pass": true,
+      "detail": "56 documents carry the marker (SSP JSON + DOCX cover, POA&M, 44 policy files, 8 report files, forced SSP)"
+    },
+    {
+      "id": "V54",
+      "title": "Overrides retired: the twelve keys come from Muster with provenance; only initialPassword is generated",
+      "pass": true,
+      "detail": "overrides not needed; 12 keys equal TM tenant_identity with provenance (discovered 4, asked 6, derived 2); no overrides file in 784 bundle entries; 0 UNRESOLVED_VARIABLE besides initialPassword; 807 files free of the retired placeholder"
+    },
+    {
+      "id": "V45",
+      "title": "AdminOps: every E7A op has a result and its AO evidence rows (T2 dry_run + executed; T3 blocked_pending_approval + executed, approver != requestor) on the registry tenant; E7B reads exactly this run's rows (run window = E1 start); every row has a C10 (collect.adminOps) record with its hash, when C10 is built",
+      "pass": true,
+      "detail": "3 ops (A-11 T2, A-02 T2, A-09 T2): 6 AO evidence rows on sim-tenant-s1-mach; run window 2026-10-28T21:34:24.580Z (E1 start): E7B total 6 = 6 rows, live 3 = 3 applies, no earlier run's row; C10: 6/6 AO rows recorded in collect.adminOps with the matching hash"
+    },
+    {
+      "id": "V46",
+      "title": "AdminOps writes: each write op's confirming sim read shows the new state; AO writes and AO evidence rows fall in the E7A window only",
+      "pass": true,
+      "detail": "1 write op(s) (A-02): confirming reads pass; 2 sim writes in E7A (users/user-7); 6 AO rows stamped inside E7A"
+    },
+    {
+      "id": "V47",
+      "title": "E7B drift: improvements = the scenario expected_improvements exactly; no regression; drift baseline = E7 pass 3; nothing new opens on the POA&M",
+      "pass": true,
+      "detail": "E7B vs E7 pass 3: improvements [] = expected; 0 regressions (1 tier/source-only); POA&M closed 0 this run, none opened"
+    },
+    {
+      "id": "V48",
+      "title": "Overlap: no Stamper (E6 or E8F) write and no E8F revert on an AdminOps-touched object outside allowed_reverts",
+      "pass": true,
+      "detail": "1 AO-touched objects (users/user-7): no E6 or E8F Stamper write on them; 1 confirming reads pass before and after E8F; allowed_reverts 0"
+    },
+    {
+      "id": "V55",
+      "title": "Postchecks assert state: every executed SET-path record carries postcheckMode; presence-only SATs <= threshold; no-action gates <= threshold; no SAT without an action",
+      "pass": true,
+      "detail": "SET-path records 58: state 57 (passed 57, failed 0), presence 1 (SAT 1: AC.L2-3.1.1.group-create [the state to assert is SecurityEnabled true, but the muster-partial seed group carries no securityEnabled property (S1 does), and this entry aborts the 13-control AC.L1-3.1.1 task on failure; presence until the simulator seed carries the property]; presence_max 2); manual gates 21 (no action 21), renderables 7 (policy-referenced 7); no-action 21 / gates_max 24 (default thresholds); postchecks (info) {\"manual:fail\":77,\"state:not_assessed\":6,\"presence:fail\":276,\"state:pass\":165}"
+    },
+    {
+      "id": "V50",
+      "title": "Scorecard computed and written (out/scorecard-<slug>.json; every row computed or exempt)",
+      "pass": true,
+      "detail": "scorecard-s1-mach.json: 10 rows (S1, thresholds PLAN.md §1 table (S1)); SC-1 pass, SC-2 pass, SC-3a fail, SC-3b pass, SC-4 pass, SC-5 pass, SC-6 pass, SC-7 pass, SC-8a fail, SC-8b pass"
+    },
+    {
+      "id": "V51",
+      "title": "Every scorecard row within its scenario threshold (PLAN §1, B21)",
+      "pass": true,
+      "detail": "report-only (scorecard_gate off until W5): 2 rows outside: SC-3a outside, SC-8a outside"
+    },
+    {
+      "id": "V52",
+      "title": "GAPS written: >= 1 row per not-met / not-assessed control and per presence-only met control; one row per documentary item",
+      "pass": true,
+      "detail": "GAPS-s1-mach.md: 416 rows; 22 not-met / not-assessed and 14 presence-only controls covered; 185 documentary rows; by source {\"scorecard\":2,\"ssp-review\":1,\"control-status\":22,\"presence-only\":14,\"examine-automatable\":129,\"documentary\":185,\"unsure\":31,\"defaulted\":1,\"postcheck-presence\":1,\"manual-gate\":21,\"policy-reconciliation\":4,\"orphan\":5}"
+    },
+    {
+      "id": "V53",
+      "title": "SC-1 / SC-2 predicates evaluated: 7 P0 and 11 P1 rows, each with a verdict",
+      "pass": true,
+      "detail": "P0 7 rows (7 pass), P1 11 rows (10 pass)"
+    },
+    {
+      "id": "V56",
+      "title": "Scorecard SC-4 = the SSP's presenceOnly count / met (recounted from out/ssp.json)",
+      "pass": true,
+      "detail": "scorecard 14/88; ssp.json 14/88"
+    },
+    {
+      "id": "V57",
+      "title": "GAPS row count monotonic non-increasing across proof runs for the slug (newest archived GAPS; first run passes)",
+      "pass": true,
+      "detail": "412 rows now vs 506 in nb-run48-s1-w5c2 (-94); 4 policy-reconciliation rows excluded (findings about the organisation, not loop gaps)"
+    }
+  ]
+}

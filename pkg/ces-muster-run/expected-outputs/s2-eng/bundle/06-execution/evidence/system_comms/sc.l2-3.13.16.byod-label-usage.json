@@ -1,0 +1,35 @@
+{
+  "rawResponse": "",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "SC.L2-3.13.16.byod-label-usage",
+    "label": "BYOD Sensitivity Label Usage Audit Events (Runtime Sample)",
+    "engine": "exchange",
+    "layer_hint": 4,
+    "sequence_hint": 4,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "SC.L2-3.13.16"
+    ],
+    "get_command": "Search-UnifiedAuditLog -RecordType MIPLabel -StartDate (Get-Date).AddDays(-30) -EndDate (Get-Date) -ResultSize 10 | Select-Object CreationDate,Operations,AuditData | ConvertTo-Json -Depth 5",
+    "set_command": "",
+    "evidence_commands": [
+      "Search-UnifiedAuditLog -RecordType MIPLabel -StartDate (Get-Date).AddDays(-30) -EndDate (Get-Date) -ResultSize 10 | Select-Object CreationDate,Operations,AuditData | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SC.L2-3.13.16"
+    ],
+    "timestamp": "2026-11-01T16:03:19.447Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] BYOD Sensitivity Label Usage Audit Events (Runtime Sample)",
+    "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

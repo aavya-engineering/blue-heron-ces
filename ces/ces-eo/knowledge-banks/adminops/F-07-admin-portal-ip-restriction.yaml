@@ -1,0 +1,77 @@
+controlId: "AC.L2-3.1.12"
+relatedControlIds:
+  - "AC.L1-3.1.1"
+  - "SC.L1-3.13.1"  # [VERIFY] mapping not yet confirmed
+practiceStatement: Limit system access to authorized users, processes acting on behalf of users, and devices.
+useCaseId: F-07
+useCaseTitle: "Admin Portal IP Restriction"
+domain: Security Operations
+priority: P4 Standard
+trigger: 'CHANGE: When trusted IP ranges change or new admin portals are deployed'
+sodTier: Tier 2 (per SoD model in front matter)
+entraRolesRequired:
+- Security Administrator
+- Compliance Administrator
+approvalRequired: true
+services:
+- name: Entra Admin Center -- Conditional Access policies, Named Locations
+  purpose: ''
+- name: Microsoft Graph API -- `conditionalAccess/policies` and `conditionalAccess/namedLocations` endpoints
+  purpose: ''
+- name: Microsoft Sentinel -- alert for admin sign-ins from non-trusted IPs
+  purpose: ''
+- name: Azure Immutable Blob Storage -- evidence artifact storage
+  purpose: ''
+configurationSteps:
+  portalPath: //entra.microsoft.us > Protection > Conditional Access > Named locations.
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes Policy.ReadWrite.ConditionalAccess, Policy.Read.All
+  - cmdlet: Get-MgIdentityConditionalAccessNamedLocation
+    parameters:
+    - -MgIdentityConditionalAccessNamedLocation
+    - -Filter
+    - -69f5
+    - '-4237'
+    - '-9190'
+  - cmdlet: New-MgIdentityConditionalAccessPolicy
+    parameters:
+    - -MgIdentityConditionalAccessPolicy
+    - -BodyParameter
+    - -MgIdentityConditionalAccessPolicy
+    - -Filter
+    - -Json
+  - cmdlet: Get-MgIdentityConditionalAccessPolicy
+    parameters:
+    - -MgIdentityConditionalAccessPolicy
+    - -Filter
+    - -Json
+    - -Depth
+    - -File
+  graphApiEndpoint: POST https://graph.microsoft.us/v1.0/identity/conditionalAccess/policies
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-f-security/F-07/2026/03/
+  format: JSON
+  filenamePattern: F-07_AdminIPRestriction_{YYYYMMDD}_{HHmmss}_Policy.json
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://entra.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |-
+    - Conditional Access Named Locations and policies are fully available in GCC High. Named Location IP ranges support both IPv4 and IPv6 CIDR notation.
+    - Cloud app IDs for Azure Management, Intune, and other admin portals may differ between commercial and GCC High. Verify app IDs in `https://entra.microsoft.us` > Enterprise applications > filter by the target portal name. The GUIDs shown in the PowerShell section are the well-known commercial IDs; confirm them in your GCC High tenant. [VERIFY]
+    - Break-glass accounts (see A-15) MUST be excluded from this policy to prevent admin lockout. Add break
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

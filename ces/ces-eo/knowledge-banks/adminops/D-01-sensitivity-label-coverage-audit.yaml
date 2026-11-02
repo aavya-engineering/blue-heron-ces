@@ -1,0 +1,64 @@
+controlId: "MP.L2-3.8.2"
+relatedControlIds:
+  - "MP.L2-3.8.1"
+  - "SC.L1-3.13.1"
+  - "AC.L2-3.1.3"  # [VERIFY] mapping not yet confirmed
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: D-01
+useCaseTitle: "Sensitivity Label Coverage"
+domain: Data Protection & Information Management
+priority: P2 High
+trigger: 'SCHEDULE: Weekly'
+sodTier: Tier 2 -- Config Manager
+entraRolesRequired:
+- Compliance Administrator
+approvalRequired: false
+services:
+- name: Microsoft Purview Compliance Portal
+  purpose: '`https://compliance.microsoft.us`'
+- name: Microsoft Purview Content Explorer
+  purpose: ''
+- name: Microsoft Purview sensitivity labels
+  purpose: ''
+- name: Purview Trainable Classifiers
+  purpose: for auto-label recommendations
+- name: Microsoft Graph API
+  purpose: Information Protection endpoints
+- name: Exchange Online
+  purpose: mailbox label telemetry
+- name: SharePoint Online
+  purpose: site and document label telemetry
+configurationSteps:
+  portalPath: //compliance.microsoft.us > **Information protection** > **Labels**.
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes InformationProtectionPolicy.Read
+  graphApiEndpoint: GET https://graph.microsoft.us/beta/informationProtection/policy/labels
+  graphApiPayloadExample: {}
+  requiredPermissions:
+  - InformationProtectionPolicy.Read.All
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-d-dataprotection/D-01/2026/03/
+  format: CSV (label inventory), JSON (coverage report with label counts and unlabeled percentages)
+  filenamePattern: D-01_LabelCoverage_{YYYYMMDD}_{HHmmss}_Weekly.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://compliance.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |-
+    - All Purview Information Protection endpoints use `https://compliance.microsoft.us`. Do not reference `compliance.microsoft.com`.
+    - Content Explorer is available in GCC High for viewing labeled and unlabeled content counts.
+    - **Purview Trainable Classifiers** for auto-labeling recommendations: `[UNCONFIRMED IN GCC HIGH -- verify in tenant]`
+      - **Workaround:** Use regex-based Sensitive Information Types (SITs) and Exact Data Match (EDM) classifiers, which are confirmed available. Build custom SITs targeting CUI patterns such as ITAR markings (e.g., `This document contains.*ITAR`), export cont
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

@@ -1,0 +1,1873 @@
+# CES Implementation Patterns
+# Vendor-agnostic implementation actions for each CMMC practice.
+# Each pattern describes WHAT to do, not HOW (vendor-specific HOW lives in playbooks).
+#
+# action_type values:
+#   policy         - Create/update a written policy or procedure document
+#   configuration  - Configure a system, service, or tool
+#   process        - Establish an operational process or workflow
+#   monitoring     - Set up ongoing monitoring, alerting, or review
+#   training       - Deliver training or awareness content
+#   assessment     - Perform an evaluation, scan, or test
+#
+# evidence_outputs reference evidence archetypes that the action produces.
+# These map to vendor playbook evidence collection commands.
+
+ces:
+  artifact: implementation_patterns
+  version: "1.0.0"
+  generated_on: "2026-02-07"
+
+# =============================================================================
+# IDENTITY & ACCESS MANAGEMENT (IAM)
+# =============================================================================
+patterns:
+
+  # --- AC.L1-3.1.1 / AC.L2-3.1.1 Authorized Access ---
+  - practice_id: AC.L1-3.1.1
+    capability: identity_access_management
+    pattern_id: IAM-001
+    pattern_name: Enforce Authorized Access
+    actions:
+      - id: IAM-001-01
+        action: Define access control policy specifying who is authorized to access which systems and data
+        action_type: policy
+        evidence_outputs: [access_control_policy]
+      - id: IAM-001-02
+        action: Configure identity provider to provision and deprovision user accounts based on authorization
+        action_type: configuration
+        evidence_outputs: [user_provisioning_config, active_user_list]
+      - id: IAM-001-03
+        action: Implement access reviews on a defined schedule to validate continued authorization
+        action_type: process
+        evidence_outputs: [access_review_log, access_review_schedule]
+
+  - practice_id: AC.L2-3.1.1
+    capability: identity_access_management
+    pattern_id: IAM-002
+    pattern_name: Account Management Lifecycle
+    actions:
+      - id: IAM-002-01
+        action: Define account management procedures covering creation, modification, disabling, and removal
+        action_type: policy
+        evidence_outputs: [account_management_policy]
+      - id: IAM-002-02
+        action: Configure automated account provisioning tied to HR onboarding and offboarding workflows
+        action_type: configuration
+        evidence_outputs: [provisioning_automation_config, account_lifecycle_logs]
+      - id: IAM-002-03
+        action: Configure account expiration and inactive account disablement rules
+        action_type: configuration
+        evidence_outputs: [account_expiration_policy_config]
+      - id: IAM-002-04
+        action: Establish periodic account review process with management sign-off
+        action_type: process
+        evidence_outputs: [account_review_records, manager_signoff_evidence]
+
+  # --- AC.L1-3.1.2 / AC.L2-3.1.2 Transaction & Function Control ---
+  - practice_id: AC.L1-3.1.2
+    capability: identity_access_management
+    pattern_id: IAM-003
+    pattern_name: Transaction and Function Authorization
+    actions:
+      - id: IAM-003-01
+        action: Define role-based access control model mapping roles to permitted transactions and functions
+        action_type: policy
+        evidence_outputs: [rbac_model_document]
+      - id: IAM-003-02
+        action: Configure role assignments in identity provider and applications
+        action_type: configuration
+        evidence_outputs: [role_assignment_export, application_permission_config]
+
+  - practice_id: AC.L2-3.1.2
+    capability: identity_access_management
+    pattern_id: IAM-004
+    pattern_name: Privileged Access Restriction
+    actions:
+      - id: IAM-004-01
+        action: Identify and document all privileged roles and accounts
+        action_type: policy
+        evidence_outputs: [privileged_account_inventory]
+      - id: IAM-004-02
+        action: Configure privileged identity management with just-in-time elevation and approval workflows
+        action_type: configuration
+        evidence_outputs: [pim_config_export, elevation_approval_logs]
+      - id: IAM-004-03
+        action: Implement privileged access workstations or secure admin interfaces
+        action_type: configuration
+        evidence_outputs: [admin_workstation_config, admin_access_path_diagram]
+
+  # --- AC.L2-3.1.4 Separation of Duties ---
+  - practice_id: AC.L2-3.1.4
+    capability: identity_access_management
+    pattern_id: IAM-005
+    pattern_name: Separation of Duties
+    actions:
+      - id: IAM-005-01
+        action: Define separation of duties matrix identifying conflicting roles
+        action_type: policy
+        evidence_outputs: [sod_matrix_document]
+      - id: IAM-005-02
+        action: Configure role exclusions preventing conflicting role assignments
+        action_type: configuration
+        evidence_outputs: [role_exclusion_config, sod_violation_report]
+
+  # --- AC.L2-3.1.5 / 3.1.6 / 3.1.7 Least Privilege ---
+  - practice_id: AC.L2-3.1.5
+    capability: identity_access_management
+    pattern_id: IAM-006
+    pattern_name: Least Privilege Enforcement
+    actions:
+      - id: IAM-006-01
+        action: Define least privilege policy requiring minimum necessary access for each role
+        action_type: policy
+        evidence_outputs: [least_privilege_policy]
+      - id: IAM-006-02
+        action: Configure default deny access with explicit grants per role
+        action_type: configuration
+        evidence_outputs: [default_deny_config, permission_grant_audit]
+      - id: IAM-006-03
+        action: Implement periodic access certification to remove excess permissions
+        action_type: process
+        evidence_outputs: [access_certification_records]
+
+  - practice_id: AC.L2-3.1.6
+    capability: identity_access_management
+    pattern_id: IAM-007
+    pattern_name: Non-Privileged Account Use
+    actions:
+      - id: IAM-007-01
+        action: Configure separate non-privileged accounts for daily use by administrators
+        action_type: configuration
+        evidence_outputs: [admin_account_separation_evidence, dual_account_policy]
+
+  - practice_id: AC.L2-3.1.7
+    capability: identity_access_management
+    pattern_id: IAM-008
+    pattern_name: Privileged Function Restriction
+    actions:
+      - id: IAM-008-01
+        action: Configure system to prevent non-privileged users from executing privileged functions
+        action_type: configuration
+        evidence_outputs: [privilege_escalation_controls_config, function_restriction_audit]
+
+  # --- AC.L2-3.1.8 Unsuccessful Logon ---
+  - practice_id: AC.L2-3.1.8
+    capability: identity_access_management
+    pattern_id: IAM-009
+    pattern_name: Failed Logon Lockout
+    actions:
+      - id: IAM-009-01
+        action: Configure account lockout policy after defined number of failed attempts
+        action_type: configuration
+        evidence_outputs: [lockout_policy_config, lockout_event_logs]
+
+  # --- AC.L2-3.1.9 System Use Notification ---
+  - practice_id: AC.L2-3.1.9
+    capability: identity_access_management
+    pattern_id: IAM-010
+    pattern_name: System Use Notification Banner
+    actions:
+      - id: IAM-010-01
+        action: Define system use notification text per organizational and regulatory requirements
+        action_type: policy
+        evidence_outputs: [notification_banner_text]
+      - id: IAM-010-02
+        action: Configure logon banners on all in-scope systems displaying use notification
+        action_type: configuration
+        evidence_outputs: [banner_config_export, banner_screenshot]
+
+  # --- AC.L2-3.1.10 / 3.1.11 Session Controls ---
+  - practice_id: AC.L2-3.1.10
+    capability: identity_access_management
+    pattern_id: IAM-011
+    pattern_name: Session Lock
+    actions:
+      - id: IAM-011-01
+        action: Configure automatic session lock after defined inactivity period
+        action_type: configuration
+        evidence_outputs: [session_lock_policy_config, screen_lock_timeout_setting]
+
+  - practice_id: AC.L2-3.1.11
+    capability: identity_access_management
+    pattern_id: IAM-012
+    pattern_name: Session Termination
+    actions:
+      - id: IAM-012-01
+        action: Configure automatic session termination after defined conditions or time period
+        action_type: configuration
+        evidence_outputs: [session_timeout_config, session_termination_logs]
+
+  # --- AC.L3-3.1.1e Dual Authorization ---
+  - practice_id: AC.L3-3.1.1e
+    capability: identity_access_management
+    pattern_id: IAM-013
+    pattern_name: Dual Authorization for Critical Operations
+    actions:
+      - id: IAM-013-01
+        action: Identify critical operations requiring dual authorization
+        action_type: policy
+        evidence_outputs: [critical_operations_inventory]
+      - id: IAM-013-02
+        action: Configure approval workflows requiring two authorized individuals for critical actions
+        action_type: configuration
+        evidence_outputs: [dual_auth_workflow_config, approval_logs]
+
+  # --- IA.L1-3.5.1 / IA.L2-3.5.1 Identification ---
+  - practice_id: IA.L1-3.5.1
+    capability: identity_access_management
+    pattern_id: IAM-020
+    pattern_name: User Identification
+    actions:
+      - id: IAM-020-01
+        action: Configure unique user identifiers for all system users
+        action_type: configuration
+        evidence_outputs: [user_identifier_list, unique_id_policy]
+
+  - practice_id: IA.L2-3.5.1
+    capability: identity_access_management
+    pattern_id: IAM-021
+    pattern_name: User, Process, and Device Identification
+    actions:
+      - id: IAM-021-01
+        action: Configure unique identification for users, processes acting on behalf of users, and devices
+        action_type: configuration
+        evidence_outputs: [identity_inventory, service_account_list, device_identity_config]
+
+  # --- IA.L1-3.5.2 / IA.L2-3.5.2 Authentication ---
+  - practice_id: IA.L1-3.5.2
+    capability: identity_access_management
+    pattern_id: IAM-022
+    pattern_name: User Authentication
+    actions:
+      - id: IAM-022-01
+        action: Configure authentication mechanism to verify identity before granting access
+        action_type: configuration
+        evidence_outputs: [authentication_config, auth_method_documentation]
+
+  - practice_id: IA.L2-3.5.2
+    capability: identity_access_management
+    pattern_id: IAM-023
+    pattern_name: Device Authentication
+    actions:
+      - id: IAM-023-01
+        action: Configure device authentication and enrollment requirements
+        action_type: configuration
+        evidence_outputs: [device_enrollment_config, device_compliance_policy, device_auth_logs]
+
+  # --- IA.L2-3.5.3 Multifactor Authentication ---
+  - practice_id: IA.L2-3.5.3
+    capability: identity_access_management
+    pattern_id: IAM-024
+    pattern_name: Multifactor Authentication
+    actions:
+      - id: IAM-024-01
+        action: Define MFA policy specifying where MFA is required (local access, network access, privileged access)
+        action_type: policy
+        evidence_outputs: [mfa_policy_document]
+      - id: IAM-024-02
+        action: Configure MFA enforcement via conditional access for all in-scope access paths
+        action_type: configuration
+        evidence_outputs: [conditional_access_mfa_config, mfa_registration_report, mfa_enforcement_logs]
+
+  # --- IA.L2-3.5.4 Replay-Resistant ---
+  - practice_id: IA.L2-3.5.4
+    capability: identity_access_management
+    pattern_id: IAM-025
+    pattern_name: Replay-Resistant Authentication
+    actions:
+      - id: IAM-025-01
+        action: Configure authentication protocols that are replay-resistant (FIDO2, certificate-based, OATH tokens)
+        action_type: configuration
+        evidence_outputs: [auth_protocol_config, replay_resistant_method_evidence]
+
+  # --- IA.L2-3.5.5 / 3.5.6 Identifier Management ---
+  - practice_id: IA.L2-3.5.5
+    capability: identity_access_management
+    pattern_id: IAM-026
+    pattern_name: Identifier Reuse Prevention
+    actions:
+      - id: IAM-026-01
+        action: Configure identity provider to prevent reuse of user identifiers for a defined period
+        action_type: configuration
+        evidence_outputs: [identifier_reuse_policy_config]
+
+  - practice_id: IA.L2-3.5.6
+    capability: identity_access_management
+    pattern_id: IAM-027
+    pattern_name: Identifier Disablement
+    actions:
+      - id: IAM-027-01
+        action: Configure automatic disablement of identifiers after defined inactivity period
+        action_type: configuration
+        evidence_outputs: [inactive_account_policy_config, disabled_account_report]
+
+  # --- IA.L2-3.5.7 / 3.5.8 / 3.5.9 / 3.5.10 / 3.5.11 Password Management ---
+  - practice_id: IA.L2-3.5.7
+    capability: identity_access_management
+    pattern_id: IAM-028
+    pattern_name: Password Complexity
+    actions:
+      - id: IAM-028-01
+        action: Configure minimum password complexity requirements (length, character types)
+        action_type: configuration
+        evidence_outputs: [password_policy_config]
+
+  - practice_id: IA.L2-3.5.8
+    capability: identity_access_management
+    pattern_id: IAM-029
+    pattern_name: Password Reuse Prevention
+    actions:
+      - id: IAM-029-01
+        action: Configure password history enforcement preventing reuse of recent passwords
+        action_type: configuration
+        evidence_outputs: [password_history_config]
+
+  - practice_id: IA.L2-3.5.9
+    capability: identity_access_management
+    pattern_id: IAM-030
+    pattern_name: Temporary Password Management
+    actions:
+      - id: IAM-030-01
+        action: Configure temporary passwords to require change on first use with defined expiration
+        action_type: configuration
+        evidence_outputs: [temporary_password_policy_config]
+
+  - practice_id: IA.L2-3.5.10
+    capability: identity_access_management
+    pattern_id: IAM-031
+    pattern_name: Cryptographic Password Storage
+    actions:
+      - id: IAM-031-01
+        action: Verify identity provider stores passwords using approved cryptographic hashing
+        action_type: assessment
+        evidence_outputs: [password_storage_verification, crypto_hash_config]
+
+  - practice_id: IA.L2-3.5.11
+    capability: identity_access_management
+    pattern_id: IAM-032
+    pattern_name: Authenticator Feedback Obscuring
+    actions:
+      - id: IAM-032-01
+        action: Configure all login interfaces to obscure password entry feedback
+        action_type: configuration
+        evidence_outputs: [login_interface_config, password_masking_evidence]
+
+  # --- IA.L3 Enhanced ---
+  - practice_id: IA.L3-3.5.1e
+    capability: identity_access_management
+    pattern_id: IAM-033
+    pattern_name: System-to-System Authentication
+    actions:
+      - id: IAM-033-01
+        action: Configure mutual authentication between systems and components using certificates or tokens
+        action_type: configuration
+        evidence_outputs: [system_auth_config, certificate_inventory]
+
+  - practice_id: IA.L3-3.5.2e
+    capability: identity_access_management
+    pattern_id: IAM-034
+    pattern_name: Automated Authenticator Management
+    actions:
+      - id: IAM-034-01
+        action: Configure automated credential rotation and lifecycle management
+        action_type: configuration
+        evidence_outputs: [credential_rotation_config, rotation_logs]
+
+  - practice_id: IA.L3-3.5.3e
+    capability: identity_access_management
+    pattern_id: IAM-035
+    pattern_name: Compromised Authenticator Prevention
+    actions:
+      - id: IAM-035-01
+        action: Configure banned password lists and credential breach detection
+        action_type: configuration
+        evidence_outputs: [banned_password_config, breach_detection_config]
+
+  # =============================================================================
+  # NETWORK & BOUNDARY PROTECTION (NBP)
+  # =============================================================================
+
+  - practice_id: AC.L1-3.1.20
+    capability: network_boundary_protection
+    pattern_id: NBP-001
+    pattern_name: External Connection Control
+    actions:
+      - id: NBP-001-01
+        action: Inventory and document all external system connections
+        action_type: policy
+        evidence_outputs: [external_connection_inventory]
+      - id: NBP-001-02
+        action: Configure firewall rules and access controls for each authorized external connection
+        action_type: configuration
+        evidence_outputs: [firewall_rule_export, connection_authorization_records]
+
+  - practice_id: AC.L2-3.1.12
+    capability: network_boundary_protection
+    pattern_id: NBP-002
+    pattern_name: Remote Access Monitoring
+    actions:
+      - id: NBP-002-01
+        action: Configure logging and monitoring for all remote access sessions
+        action_type: monitoring
+        evidence_outputs: [remote_access_logs, monitoring_dashboard_config]
+      - id: NBP-002-02
+        action: Define and enforce permitted remote access methods
+        action_type: configuration
+        evidence_outputs: [remote_access_policy_config, allowed_methods_list]
+
+  - practice_id: AC.L2-3.1.13
+    capability: network_boundary_protection
+    pattern_id: NBP-003
+    pattern_name: Remote Access Encryption
+    actions:
+      - id: NBP-003-01
+        action: Configure encrypted tunnels (VPN/TLS) for all remote access connections
+        action_type: configuration
+        evidence_outputs: [vpn_config_export, tls_config_evidence]
+
+  - practice_id: AC.L2-3.1.14
+    capability: network_boundary_protection
+    pattern_id: NBP-004
+    pattern_name: Remote Access Routing
+    actions:
+      - id: NBP-004-01
+        action: Configure remote access to route through managed access control points
+        action_type: configuration
+        evidence_outputs: [remote_access_gateway_config, network_diagram_showing_routing]
+
+  - practice_id: AC.L2-3.1.15
+    capability: network_boundary_protection
+    pattern_id: NBP-005
+    pattern_name: Privileged Remote Access Control
+    actions:
+      - id: NBP-005-01
+        action: Configure privileged access to require additional authorization for remote sessions
+        action_type: configuration
+        evidence_outputs: [privileged_remote_policy_config, remote_admin_approval_logs]
+
+  - practice_id: AC.L2-3.1.20
+    capability: network_boundary_protection
+    pattern_id: NBP-006
+    pattern_name: External System Verification
+    actions:
+      - id: NBP-006-01
+        action: Establish process to verify and authorize external system connections
+        action_type: process
+        evidence_outputs: [external_system_authorization_records, connection_review_logs]
+
+  - practice_id: AC.L2-3.1.16
+    capability: network_boundary_protection
+    pattern_id: NBP-007
+    pattern_name: Wireless Access Authorization
+    actions:
+      - id: NBP-007-01
+        action: Configure wireless network authentication requiring authorization before connection
+        action_type: configuration
+        evidence_outputs: [wireless_auth_config, authorized_wireless_user_list]
+
+  - practice_id: AC.L2-3.1.17
+    capability: network_boundary_protection
+    pattern_id: NBP-008
+    pattern_name: Wireless Access Protection
+    actions:
+      - id: NBP-008-01
+        action: Configure wireless encryption (WPA3/WPA2-Enterprise) and authentication protocols
+        action_type: configuration
+        evidence_outputs: [wireless_encryption_config, wireless_security_settings]
+
+  - practice_id: SC.L1-3.13.1
+    capability: network_boundary_protection
+    pattern_id: NBP-010
+    pattern_name: Basic Boundary Protection
+    actions:
+      - id: NBP-010-01
+        action: Deploy and configure boundary protection devices at network perimeter
+        action_type: configuration
+        evidence_outputs: [firewall_config_export, boundary_device_inventory]
+
+  - practice_id: SC.L1-3.13.5
+    capability: network_boundary_protection
+    pattern_id: NBP-011
+    pattern_name: Public-Access System Separation
+    actions:
+      - id: NBP-011-01
+        action: Separate public-facing systems into isolated network segments
+        action_type: configuration
+        evidence_outputs: [network_segmentation_diagram, dmz_config_export]
+
+  - practice_id: SC.L2-3.13.1
+    capability: network_boundary_protection
+    pattern_id: NBP-012
+    pattern_name: Boundary Monitoring and Control
+    actions:
+      - id: NBP-012-01
+        action: Configure monitoring on all boundary protection devices
+        action_type: monitoring
+        evidence_outputs: [boundary_monitoring_config, boundary_alert_rules]
+      - id: NBP-012-02
+        action: Establish boundary traffic review process
+        action_type: process
+        evidence_outputs: [traffic_review_schedule, boundary_incident_logs]
+
+  - practice_id: SC.L2-3.13.2
+    capability: network_boundary_protection
+    pattern_id: NBP-013
+    pattern_name: Security Architecture Design
+    actions:
+      - id: NBP-013-01
+        action: Document security architecture applying defense-in-depth principles
+        action_type: policy
+        evidence_outputs: [security_architecture_document, network_topology_diagram]
+
+  - practice_id: SC.L2-3.13.3
+    capability: network_boundary_protection
+    pattern_id: NBP-014
+    pattern_name: Application Partitioning
+    actions:
+      - id: NBP-014-01
+        action: Separate user-facing application components from backend management functions
+        action_type: configuration
+        evidence_outputs: [application_architecture_diagram, partition_config]
+
+  - practice_id: SC.L2-3.13.4
+    capability: network_boundary_protection
+    pattern_id: NBP-015
+    pattern_name: Shared Resource Information Transfer Control
+    actions:
+      - id: NBP-015-01
+        action: Configure controls preventing unauthorized data transfer through shared system resources
+        action_type: configuration
+        evidence_outputs: [shared_resource_controls_config]
+
+  - practice_id: SC.L2-3.13.5
+    capability: network_boundary_protection
+    pattern_id: NBP-016
+    pattern_name: Network Segmentation
+    actions:
+      - id: NBP-016-01
+        action: Implement network segments isolating CUI processing from public-accessible components
+        action_type: configuration
+        evidence_outputs: [vlan_config_export, subnet_diagram, acl_rules_export]
+
+  - practice_id: SC.L2-3.13.6
+    capability: network_boundary_protection
+    pattern_id: NBP-017
+    pattern_name: Default Deny Network Policy
+    actions:
+      - id: NBP-017-01
+        action: Configure firewall and network ACLs to deny all traffic by default, with explicit allow rules
+        action_type: configuration
+        evidence_outputs: [default_deny_rule_config, allow_list_export]
+
+  - practice_id: SC.L2-3.13.7
+    capability: network_boundary_protection
+    pattern_id: NBP-018
+    pattern_name: Split Tunneling Prevention
+    actions:
+      - id: NBP-018-01
+        action: Configure VPN and remote access to prevent split tunneling for in-scope connections
+        action_type: configuration
+        evidence_outputs: [vpn_split_tunnel_config, remote_access_routing_evidence]
+
+  - practice_id: SC.L2-3.13.9
+    capability: network_boundary_protection
+    pattern_id: NBP-019
+    pattern_name: Network Session Termination
+    actions:
+      - id: NBP-019-01
+        action: Configure automatic termination of network connections at session end or after inactivity
+        action_type: configuration
+        evidence_outputs: [session_timeout_network_config]
+
+  - practice_id: SC.L2-3.13.12
+    capability: network_boundary_protection
+    pattern_id: NBP-020
+    pattern_name: Collaborative Computing Control
+    actions:
+      - id: NBP-020-01
+        action: Configure policies preventing unauthorized remote activation of collaborative computing devices
+        action_type: configuration
+        evidence_outputs: [collaboration_device_policy, remote_activation_controls]
+
+  - practice_id: SC.L2-3.13.14
+    capability: network_boundary_protection
+    pattern_id: NBP-021
+    pattern_name: VoIP Protection
+    actions:
+      - id: NBP-021-01
+        action: Configure VoIP security controls including encryption and access restrictions
+        action_type: configuration
+        evidence_outputs: [voip_security_config, voip_encryption_evidence]
+
+  - practice_id: SC.L2-3.13.15
+    capability: network_boundary_protection
+    pattern_id: NBP-022
+    pattern_name: Session Authenticity
+    actions:
+      - id: NBP-022-01
+        action: Configure session authenticity protection using TLS, IPsec, or equivalent
+        action_type: configuration
+        evidence_outputs: [session_authenticity_config, tls_certificate_inventory]
+
+  - practice_id: SC.L3-3.13.1e
+    capability: network_boundary_protection
+    pattern_id: NBP-023
+    pattern_name: System Component Diversity
+    actions:
+      - id: NBP-023-01
+        action: Implement diverse components to reduce single-vendor attack surface
+        action_type: configuration
+        evidence_outputs: [component_diversity_inventory, vendor_diversity_assessment]
+
+  - practice_id: SC.L3-3.13.5e
+    capability: network_boundary_protection
+    pattern_id: NBP-024
+    pattern_name: Function Relocation
+    actions:
+      - id: NBP-024-01
+        action: Implement capability to redistribute system functions across infrastructure
+        action_type: configuration
+        evidence_outputs: [function_distribution_plan, relocation_procedure]
+
+  # =============================================================================
+  # DATA PROTECTION & CLASSIFICATION (DPC)
+  # =============================================================================
+
+  - practice_id: AC.L1-3.1.22
+    capability: data_protection
+    pattern_id: DPC-001
+    pattern_name: Public Information Control
+    actions:
+      - id: DPC-001-01
+        action: Define policy governing what information may be posted to public-facing systems
+        action_type: policy
+        evidence_outputs: [public_posting_policy]
+      - id: DPC-001-02
+        action: Implement review and approval process before public posting
+        action_type: process
+        evidence_outputs: [posting_approval_workflow, approval_records]
+
+  - practice_id: AC.L2-3.1.3
+    capability: data_protection
+    pattern_id: DPC-002
+    pattern_name: CUI Flow Control
+    actions:
+      - id: DPC-002-01
+        action: Document CUI data flows including storage, processing, and transmission points
+        action_type: policy
+        evidence_outputs: [cui_data_flow_diagram]
+      - id: DPC-002-02
+        action: Configure Data Loss Prevention rules to control CUI movement
+        action_type: configuration
+        evidence_outputs: [dlp_policy_config, dlp_rule_export]
+
+  - practice_id: AC.L2-3.1.22
+    capability: data_protection
+    pattern_id: DPC-003
+    pattern_name: CUI Public Posting Prevention
+    actions:
+      - id: DPC-003-01
+        action: Configure controls preventing CUI from being posted to publicly accessible systems
+        action_type: configuration
+        evidence_outputs: [public_posting_controls_config, dlp_external_sharing_rules]
+
+  - practice_id: AC.L3-3.1.2e
+    capability: data_protection
+    pattern_id: DPC-004
+    pattern_name: Restricted System and Component Access
+    actions:
+      - id: DPC-004-01
+        action: Configure granular access restrictions for systems processing CUI
+        action_type: configuration
+        evidence_outputs: [system_access_restrictions_config]
+
+  - practice_id: AC.L3-3.1.3e
+    capability: data_protection
+    pattern_id: DPC-005
+    pattern_name: Secure Information Transfer
+    actions:
+      - id: DPC-005-01
+        action: Configure approved secure transfer solutions for CUI exchange
+        action_type: configuration
+        evidence_outputs: [secure_transfer_config, approved_transfer_methods_list]
+
+  - practice_id: SC.L2-3.13.16
+    capability: data_protection
+    pattern_id: DPC-006
+    pattern_name: CUI Confidentiality at Rest
+    actions:
+      - id: DPC-006-01
+        action: Configure encryption at rest for all storage locations containing CUI
+        action_type: configuration
+        evidence_outputs: [encryption_at_rest_config, storage_encryption_evidence]
+
+  - practice_id: SC.L2-3.13.13
+    capability: data_protection
+    pattern_id: DPC-007
+    pattern_name: Mobile Code Restriction
+    actions:
+      - id: DPC-007-01
+        action: Define acceptable mobile code technologies and configure restrictions on unauthorized types
+        action_type: configuration
+        evidence_outputs: [mobile_code_policy, browser_security_config]
+
+  - practice_id: SC.L3-3.13.3e
+    capability: data_protection
+    pattern_id: DPC-008
+    pattern_name: Data Exfiltration Prevention
+    actions:
+      - id: DPC-008-01
+        action: Configure technical controls to detect and prevent data exfiltration
+        action_type: configuration
+        evidence_outputs: [exfiltration_prevention_config, dlp_advanced_rules]
+
+  - practice_id: SC.L3-3.13.4e
+    capability: data_protection
+    pattern_id: DPC-009
+    pattern_name: Data Obfuscation
+    actions:
+      - id: DPC-009-01
+        action: Implement data obfuscation or concealment techniques for CUI at rest and in transit
+        action_type: configuration
+        evidence_outputs: [obfuscation_config, data_masking_evidence]
+
+  # =============================================================================
+  # CRYPTOGRAPHIC PROTECTION (CRY)
+  # =============================================================================
+
+  - practice_id: SC.L2-3.13.8
+    capability: cryptographic_protection
+    pattern_id: CRY-001
+    pattern_name: CUI Transmission Encryption
+    actions:
+      - id: CRY-001-01
+        action: Configure TLS 1.2+ for all CUI transmission paths
+        action_type: configuration
+        evidence_outputs: [tls_config_export, cipher_suite_settings]
+
+  - practice_id: SC.L2-3.13.10
+    capability: cryptographic_protection
+    pattern_id: CRY-002
+    pattern_name: Cryptographic Key Management
+    actions:
+      - id: CRY-002-01
+        action: Configure centralized key management with defined key lifecycle (generation, distribution, storage, rotation, destruction)
+        action_type: configuration
+        evidence_outputs: [key_management_config, key_rotation_schedule, key_inventory]
+
+  - practice_id: SC.L2-3.13.11
+    capability: cryptographic_protection
+    pattern_id: CRY-003
+    pattern_name: FIPS-Validated Cryptography
+    actions:
+      - id: CRY-003-01
+        action: Configure all cryptographic modules to use FIPS 140-2/3 validated implementations
+        action_type: configuration
+        evidence_outputs: [fips_mode_config, fips_validation_certificates]
+      - id: CRY-003-02
+        action: Verify FIPS compliance across all in-scope systems and services
+        action_type: assessment
+        evidence_outputs: [fips_compliance_assessment_report]
+
+  - practice_id: AC.L2-3.1.19
+    capability: cryptographic_protection
+    pattern_id: CRY-004
+    pattern_name: Mobile Device CUI Encryption
+    actions:
+      - id: CRY-004-01
+        action: Configure mobile device encryption for CUI data at rest
+        action_type: configuration
+        evidence_outputs: [mobile_encryption_policy_config, device_encryption_compliance_report]
+
+  - practice_id: MP.L2-3.8.6
+    capability: cryptographic_protection
+    pattern_id: CRY-005
+    pattern_name: Media Transport Encryption
+    actions:
+      - id: CRY-005-01
+        action: Configure encryption for CUI stored on media during transport
+        action_type: configuration
+        evidence_outputs: [media_encryption_config, transport_encryption_evidence]
+
+  # =============================================================================
+  # ENDPOINT MANAGEMENT (EPM)
+  # =============================================================================
+
+  - practice_id: AC.L2-3.1.18
+    capability: endpoint_management
+    pattern_id: EPM-001
+    pattern_name: Mobile Device Connection Control
+    actions:
+      - id: EPM-001-01
+        action: Configure mobile device management enrollment requirements
+        action_type: configuration
+        evidence_outputs: [mdm_enrollment_config, device_compliance_policy_export]
+      - id: EPM-001-02
+        action: Configure conditional access requiring device compliance for mobile connections
+        action_type: configuration
+        evidence_outputs: [conditional_access_device_policy, non_compliant_device_block_evidence]
+
+  - practice_id: AC.L2-3.1.21
+    capability: endpoint_management
+    pattern_id: EPM-002
+    pattern_name: Portable Storage Restriction
+    actions:
+      - id: EPM-002-01
+        action: Configure endpoint policy to restrict or block portable storage devices
+        action_type: configuration
+        evidence_outputs: [removable_storage_policy_config, usb_block_evidence]
+
+  - practice_id: CM.L2-3.4.1
+    capability: endpoint_management
+    pattern_id: EPM-003
+    pattern_name: Baseline Configuration
+    actions:
+      - id: EPM-003-01
+        action: Define and document baseline configurations for each system type in scope
+        action_type: policy
+        evidence_outputs: [baseline_configuration_document]
+      - id: EPM-003-02
+        action: Configure and deploy baseline configuration profiles to all in-scope endpoints
+        action_type: configuration
+        evidence_outputs: [baseline_profile_export, compliance_report]
+
+  - practice_id: CM.L2-3.4.2
+    capability: endpoint_management
+    pattern_id: EPM-004
+    pattern_name: Security Configuration Enforcement
+    actions:
+      - id: EPM-004-01
+        action: Configure security settings per CIS Benchmark or DISA STIG for each platform
+        action_type: configuration
+        evidence_outputs: [security_baseline_config_export, stig_compliance_report]
+
+  - practice_id: CM.L2-3.4.6
+    capability: endpoint_management
+    pattern_id: EPM-005
+    pattern_name: Least Functionality
+    actions:
+      - id: EPM-005-01
+        action: Configure systems to provide only essential capabilities, disable unnecessary services
+        action_type: configuration
+        evidence_outputs: [service_disable_config, enabled_services_list]
+
+  - practice_id: CM.L2-3.4.7
+    capability: endpoint_management
+    pattern_id: EPM-006
+    pattern_name: Nonessential Function Restriction
+    actions:
+      - id: EPM-006-01
+        action: Configure application control policies to restrict unauthorized programs and functions
+        action_type: configuration
+        evidence_outputs: [application_control_config, blocked_application_list]
+
+  - practice_id: CM.L2-3.4.8
+    capability: endpoint_management
+    pattern_id: EPM-007
+    pattern_name: Deny-by-Exception Software Policy
+    actions:
+      - id: EPM-007-01
+        action: Configure application allowlisting with deny-by-default policy
+        action_type: configuration
+        evidence_outputs: [allowlist_policy_config, exception_approval_records]
+
+  - practice_id: CM.L2-3.4.9
+    capability: endpoint_management
+    pattern_id: EPM-008
+    pattern_name: User-Installed Software Control
+    actions:
+      - id: EPM-008-01
+        action: Configure endpoint management to control and monitor user-installed software
+        action_type: configuration
+        evidence_outputs: [software_installation_policy, installed_software_inventory]
+
+  - practice_id: CM.L3-3.4.1e
+    capability: endpoint_management
+    pattern_id: EPM-009
+    pattern_name: Authoritative Configuration Repository
+    actions:
+      - id: EPM-009-01
+        action: Establish authoritative configuration repository with version control
+        action_type: configuration
+        evidence_outputs: [config_repository_evidence, version_history]
+
+  - practice_id: CM.L3-3.4.2e
+    capability: endpoint_management
+    pattern_id: EPM-010
+    pattern_name: Automated Misconfiguration Detection
+    actions:
+      - id: EPM-010-01
+        action: Configure automated scanning to detect configuration drift from baselines
+        action_type: monitoring
+        evidence_outputs: [drift_detection_config, misconfiguration_alert_rules]
+
+  - practice_id: CM.L3-3.4.3e
+    capability: endpoint_management
+    pattern_id: EPM-011
+    pattern_name: Automated Asset Discovery
+    actions:
+      - id: EPM-011-01
+        action: Configure automated discovery and inventory management for all network-connected assets
+        action_type: monitoring
+        evidence_outputs: [discovery_tool_config, asset_inventory_export]
+
+  # =============================================================================
+  # CONFIGURATION & CHANGE MANAGEMENT (CCM)
+  # =============================================================================
+
+  - practice_id: CM.L2-3.4.3
+    capability: configuration_change_management
+    pattern_id: CCM-001
+    pattern_name: Configuration Change Control
+    actions:
+      - id: CCM-001-01
+        action: Define change management process with request, review, approve, and implement stages
+        action_type: process
+        evidence_outputs: [change_management_procedure, change_request_template]
+      - id: CCM-001-02
+        action: Configure change tracking system to log all configuration changes
+        action_type: configuration
+        evidence_outputs: [change_tracking_config, change_log_export]
+
+  - practice_id: CM.L2-3.4.4
+    capability: configuration_change_management
+    pattern_id: CCM-002
+    pattern_name: Security Impact Analysis
+    actions:
+      - id: CCM-002-01
+        action: Establish security impact analysis as required step before implementing changes
+        action_type: process
+        evidence_outputs: [impact_analysis_template, completed_analysis_records]
+
+  - practice_id: CM.L2-3.4.5
+    capability: configuration_change_management
+    pattern_id: CCM-003
+    pattern_name: Change Access Restrictions
+    actions:
+      - id: CCM-003-01
+        action: Configure access controls limiting who can make configuration changes
+        action_type: configuration
+        evidence_outputs: [change_permission_config, admin_role_assignments]
+
+  # =============================================================================
+  # SECURITY MONITORING & LOGGING (SML)
+  # =============================================================================
+
+  - practice_id: AU.L2-3.3.1
+    capability: security_monitoring_logging
+    pattern_id: SML-001
+    pattern_name: Audit Event Logging
+    actions:
+      - id: SML-001-01
+        action: Define audit events to be logged (logons, access, changes, failures, privilege use)
+        action_type: policy
+        evidence_outputs: [audit_event_policy]
+      - id: SML-001-02
+        action: Configure audit logging on all in-scope systems and services
+        action_type: configuration
+        evidence_outputs: [audit_logging_config, log_source_inventory]
+      - id: SML-001-03
+        action: Configure centralized log collection and retention
+        action_type: configuration
+        evidence_outputs: [siem_config, log_retention_policy_config]
+
+  - practice_id: AU.L2-3.3.2
+    capability: security_monitoring_logging
+    pattern_id: SML-002
+    pattern_name: User Action Accountability
+    actions:
+      - id: SML-002-01
+        action: Configure logging to trace individual user actions to specific accounts
+        action_type: configuration
+        evidence_outputs: [user_attribution_config, audit_trail_sample]
+
+  - practice_id: AU.L2-3.3.3
+    capability: security_monitoring_logging
+    pattern_id: SML-003
+    pattern_name: Audit Event Review
+    actions:
+      - id: SML-003-01
+        action: Establish scheduled audit log review process with documented findings
+        action_type: process
+        evidence_outputs: [log_review_schedule, review_findings_records]
+
+  - practice_id: AU.L2-3.3.4
+    capability: security_monitoring_logging
+    pattern_id: SML-004
+    pattern_name: Audit Failure Alerting
+    actions:
+      - id: SML-004-01
+        action: Configure alerts for audit logging process failures
+        action_type: monitoring
+        evidence_outputs: [audit_failure_alert_config, alert_notification_evidence]
+
+  - practice_id: AU.L2-3.3.5
+    capability: security_monitoring_logging
+    pattern_id: SML-005
+    pattern_name: Audit Record Correlation
+    actions:
+      - id: SML-005-01
+        action: Configure SIEM correlation rules to link related events across systems
+        action_type: configuration
+        evidence_outputs: [correlation_rule_config, correlation_sample_output]
+
+  - practice_id: AU.L2-3.3.6
+    capability: security_monitoring_logging
+    pattern_id: SML-006
+    pattern_name: Audit Reduction and Reporting
+    actions:
+      - id: SML-006-01
+        action: Configure audit record reduction, analysis, and report generation capabilities
+        action_type: configuration
+        evidence_outputs: [reporting_dashboard_config, sample_audit_report]
+
+  - practice_id: AU.L2-3.3.7
+    capability: security_monitoring_logging
+    pattern_id: SML-007
+    pattern_name: Time Synchronization
+    actions:
+      - id: SML-007-01
+        action: Configure all systems to synchronize clocks to authoritative time source (NTP)
+        action_type: configuration
+        evidence_outputs: [ntp_config, time_sync_verification]
+
+  - practice_id: AU.L2-3.3.8
+    capability: security_monitoring_logging
+    pattern_id: SML-008
+    pattern_name: Audit Information Protection
+    actions:
+      - id: SML-008-01
+        action: Configure access controls protecting audit logs from unauthorized access or modification
+        action_type: configuration
+        evidence_outputs: [log_protection_config, log_access_permissions]
+
+  - practice_id: AU.L2-3.3.9
+    capability: security_monitoring_logging
+    pattern_id: SML-009
+    pattern_name: Audit Management Restriction
+    actions:
+      - id: SML-009-01
+        action: Configure audit management functions accessible only to authorized security personnel
+        action_type: configuration
+        evidence_outputs: [audit_admin_role_config, audit_management_access_list]
+
+  - practice_id: SI.L2-3.14.6
+    capability: security_monitoring_logging
+    pattern_id: SML-010
+    pattern_name: System Monitoring
+    actions:
+      - id: SML-010-01
+        action: Configure system monitoring to detect attacks, unauthorized access, and anomalies
+        action_type: monitoring
+        evidence_outputs: [monitoring_config, detection_rule_set, alert_samples]
+
+  - practice_id: SI.L2-3.14.7
+    capability: security_monitoring_logging
+    pattern_id: SML-011
+    pattern_name: Unauthorized Use Detection
+    actions:
+      - id: SML-011-01
+        action: Configure detection rules for unauthorized system use patterns
+        action_type: monitoring
+        evidence_outputs: [unauthorized_use_detection_rules, detection_sample_output]
+
+  - practice_id: SI.L3-3.14.2e
+    capability: security_monitoring_logging
+    pattern_id: SML-012
+    pattern_name: Enhanced Continuous Monitoring
+    actions:
+      - id: SML-012-01
+        action: Configure continuous monitoring with automated analysis and alerting
+        action_type: monitoring
+        evidence_outputs: [continuous_monitoring_config, automated_analysis_evidence]
+
+  - practice_id: SI.L3-3.14.5e
+    capability: security_monitoring_logging
+    pattern_id: SML-013
+    pattern_name: Persistent Storage Audit
+    actions:
+      - id: SML-013-01
+        action: Configure periodic scans of persistent storage for unauthorized CUI
+        action_type: monitoring
+        evidence_outputs: [storage_scan_config, scan_results_report]
+
+  # =============================================================================
+  # VULNERABILITY & PATCH MANAGEMENT (VPM)
+  # =============================================================================
+
+  - practice_id: SI.L1-3.14.1
+    capability: vulnerability_patch_management
+    pattern_id: VPM-001
+    pattern_name: Basic Flaw Remediation
+    actions:
+      - id: VPM-001-01
+        action: Configure automated patch deployment for operating systems and applications
+        action_type: configuration
+        evidence_outputs: [patch_deployment_config, patch_compliance_report]
+
+  - practice_id: SI.L1-3.14.2
+    capability: vulnerability_patch_management
+    pattern_id: VPM-002
+    pattern_name: Basic Malware Protection
+    actions:
+      - id: VPM-002-01
+        action: Deploy and configure anti-malware on all in-scope endpoints and servers
+        action_type: configuration
+        evidence_outputs: [antimalware_deployment_config, protection_coverage_report]
+
+  - practice_id: SI.L1-3.14.4
+    capability: vulnerability_patch_management
+    pattern_id: VPM-003
+    pattern_name: Malware Signature Updates
+    actions:
+      - id: VPM-003-01
+        action: Configure automatic malware signature and definition updates
+        action_type: configuration
+        evidence_outputs: [auto_update_config, signature_currency_report]
+
+  - practice_id: SI.L1-3.14.5
+    capability: vulnerability_patch_management
+    pattern_id: VPM-004
+    pattern_name: System Scanning
+    actions:
+      - id: VPM-004-01
+        action: Configure periodic and real-time scanning for malicious code
+        action_type: configuration
+        evidence_outputs: [scan_schedule_config, real_time_protection_config]
+
+  - practice_id: SI.L2-3.14.1
+    capability: vulnerability_patch_management
+    pattern_id: VPM-005
+    pattern_name: Flaw Identification and Remediation
+    actions:
+      - id: VPM-005-01
+        action: Define patch management policy with timelines by severity
+        action_type: policy
+        evidence_outputs: [patch_management_policy]
+      - id: VPM-005-02
+        action: Configure vulnerability scanning and patch tracking
+        action_type: configuration
+        evidence_outputs: [vuln_scan_config, patch_tracking_dashboard]
+      - id: VPM-005-03
+        action: Establish remediation workflow with escalation procedures
+        action_type: process
+        evidence_outputs: [remediation_workflow, escalation_procedure]
+
+  - practice_id: SI.L2-3.14.2
+    capability: vulnerability_patch_management
+    pattern_id: VPM-006
+    pattern_name: Advanced Malware Protection
+    actions:
+      - id: VPM-006-01
+        action: Configure advanced malware protection at system entry and exit points
+        action_type: configuration
+        evidence_outputs: [advanced_protection_config, entry_point_coverage_report]
+
+  - practice_id: SI.L2-3.14.3
+    capability: vulnerability_patch_management
+    pattern_id: VPM-007
+    pattern_name: Security Advisory Monitoring
+    actions:
+      - id: VPM-007-01
+        action: Configure monitoring of security advisory feeds and vulnerability databases
+        action_type: monitoring
+        evidence_outputs: [advisory_feed_config, advisory_review_records]
+
+  - practice_id: SI.L2-3.14.4
+    capability: vulnerability_patch_management
+    pattern_id: VPM-008
+    pattern_name: Malware Protection Maintenance
+    actions:
+      - id: VPM-008-01
+        action: Configure and verify automatic update of malware protection mechanisms
+        action_type: configuration
+        evidence_outputs: [update_mechanism_config, update_compliance_report]
+
+  - practice_id: SI.L2-3.14.5
+    capability: vulnerability_patch_management
+    pattern_id: VPM-009
+    pattern_name: Periodic and Real-Time Scanning
+    actions:
+      - id: VPM-009-01
+        action: Configure scheduled full-system scans and real-time file access scanning
+        action_type: configuration
+        evidence_outputs: [scan_schedule_config, real_time_scan_config, scan_results]
+
+  - practice_id: RA.L2-3.11.2
+    capability: vulnerability_patch_management
+    pattern_id: VPM-010
+    pattern_name: Vulnerability Scanning
+    actions:
+      - id: VPM-010-01
+        action: Configure regular vulnerability scanning of all in-scope systems
+        action_type: configuration
+        evidence_outputs: [vuln_scanner_config, scan_schedule, scan_results_report]
+
+  - practice_id: RA.L2-3.11.3
+    capability: vulnerability_patch_management
+    pattern_id: VPM-011
+    pattern_name: Vulnerability Remediation
+    actions:
+      - id: VPM-011-01
+        action: Remediate identified vulnerabilities according to risk-based prioritization
+        action_type: process
+        evidence_outputs: [remediation_tracking_report, vulnerability_closure_evidence]
+
+  - practice_id: SI.L3-3.14.1e
+    capability: vulnerability_patch_management
+    pattern_id: VPM-012
+    pattern_name: Software Integrity Verification
+    actions:
+      - id: VPM-012-01
+        action: Configure integrity verification for security-critical software
+        action_type: configuration
+        evidence_outputs: [integrity_check_config, verification_logs]
+
+  - practice_id: SI.L3-3.14.3e
+    capability: vulnerability_patch_management
+    pattern_id: VPM-013
+    pattern_name: Component Verification
+    actions:
+      - id: VPM-013-01
+        action: Ensure systems use only verified and authorized components
+        action_type: configuration
+        evidence_outputs: [component_verification_config, authorized_component_list]
+
+  - practice_id: SI.L3-3.14.4e
+    capability: vulnerability_patch_management
+    pattern_id: VPM-014
+    pattern_name: System Refresh
+    actions:
+      - id: VPM-014-01
+        action: Establish periodic refresh of systems to known-good states
+        action_type: process
+        evidence_outputs: [refresh_schedule, refresh_procedure, refresh_logs]
+
+  - practice_id: SI.L3-3.14.6e
+    capability: vulnerability_patch_management
+    pattern_id: VPM-015
+    pattern_name: Threat Indicator Response
+    actions:
+      - id: VPM-015-01
+        action: Configure automated response to threat indicators from intelligence feeds
+        action_type: monitoring
+        evidence_outputs: [threat_feed_config, automated_response_rules]
+
+  - practice_id: SI.L3-3.14.7e
+    capability: vulnerability_patch_management
+    pattern_id: VPM-016
+    pattern_name: Security Function Verification
+    actions:
+      - id: VPM-016-01
+        action: Configure periodic verification of security function correctness
+        action_type: assessment
+        evidence_outputs: [function_verification_config, verification_results]
+
+  - practice_id: RA.L3-3.11.1e
+    capability: vulnerability_patch_management
+    pattern_id: VPM-017
+    pattern_name: Threat Intelligence Integration
+    actions:
+      - id: VPM-017-01
+        action: Configure threat intelligence feed integration into security monitoring
+        action_type: configuration
+        evidence_outputs: [threat_intel_feed_config, intel_integration_evidence]
+
+  - practice_id: RA.L3-3.11.2e
+    capability: vulnerability_patch_management
+    pattern_id: VPM-018
+    pattern_name: Threat Hunting
+    actions:
+      - id: VPM-018-01
+        action: Establish threat hunting program with defined hunting hypotheses and procedures
+        action_type: process
+        evidence_outputs: [hunting_program_document, hunting_activity_logs]
+
+  - practice_id: RA.L3-3.11.3e
+    capability: vulnerability_patch_management
+    pattern_id: VPM-019
+    pattern_name: Advanced Security Analytics
+    actions:
+      - id: VPM-019-01
+        action: Configure advanced analytics and automation for threat detection
+        action_type: configuration
+        evidence_outputs: [analytics_platform_config, automation_playbook_inventory]
+
+  - practice_id: RA.L3-3.11.5e
+    capability: vulnerability_patch_management
+    pattern_id: VPM-020
+    pattern_name: Security Effectiveness Assessment
+    actions:
+      - id: VPM-020-01
+        action: Conduct periodic assessment of security solution effectiveness
+        action_type: assessment
+        evidence_outputs: [effectiveness_assessment_report, improvement_recommendations]
+
+  # =============================================================================
+  # INCIDENT RESPONSE (IRP)
+  # =============================================================================
+
+  - practice_id: IR.L2-3.6.1
+    capability: incident_response
+    pattern_id: IRP-001
+    pattern_name: Incident Response Planning
+    actions:
+      - id: IRP-001-01
+        action: Develop incident response plan defining roles, procedures, escalation paths, and communication
+        action_type: policy
+        evidence_outputs: [incident_response_plan]
+      - id: IRP-001-02
+        action: Configure incident tracking and management system
+        action_type: configuration
+        evidence_outputs: [incident_management_system_config]
+
+  - practice_id: IR.L2-3.6.2
+    capability: incident_response
+    pattern_id: IRP-002
+    pattern_name: Incident Tracking and Reporting
+    actions:
+      - id: IRP-002-01
+        action: Establish incident tracking workflow with classification, documentation, and reporting
+        action_type: process
+        evidence_outputs: [incident_tracking_procedure, incident_report_template, sample_incident_records]
+
+  - practice_id: IR.L2-3.6.3
+    capability: incident_response
+    pattern_id: IRP-003
+    pattern_name: Incident Response Testing
+    actions:
+      - id: IRP-003-01
+        action: Conduct periodic incident response exercises (tabletop or functional)
+        action_type: assessment
+        evidence_outputs: [exercise_plan, exercise_after_action_report, lessons_learned]
+
+  - practice_id: IR.L3-3.6.1e
+    capability: incident_response
+    pattern_id: IRP-004
+    pattern_name: Security Operations Center
+    actions:
+      - id: IRP-004-01
+        action: Establish SOC with 24/7 monitoring capability, staffing plan, and escalation procedures
+        action_type: process
+        evidence_outputs: [soc_charter, staffing_plan, escalation_matrix]
+
+  - practice_id: IR.L3-3.6.2e
+    capability: incident_response
+    pattern_id: IRP-005
+    pattern_name: Cyber Incident Response Team
+    actions:
+      - id: IRP-005-01
+        action: Establish dedicated CIRT with trained members and defined response playbooks
+        action_type: process
+        evidence_outputs: [cirt_charter, team_roster, response_playbooks]
+
+  # =============================================================================
+  # PHYSICAL & ENVIRONMENTAL SECURITY (PES)
+  # =============================================================================
+
+  - practice_id: PE.L1-3.10.1
+    capability: physical_security
+    pattern_id: PES-001
+    pattern_name: Physical Access Limitation
+    actions:
+      - id: PES-001-01
+        action: Implement physical access controls (badge readers, locks) at facility entry points
+        action_type: configuration
+        evidence_outputs: [physical_access_control_config, entry_point_inventory]
+
+  - practice_id: PE.L1-3.10.3
+    capability: physical_security
+    pattern_id: PES-002
+    pattern_name: Visitor Escort
+    actions:
+      - id: PES-002-01
+        action: Define visitor management procedures including escort requirements and sign-in/out
+        action_type: process
+        evidence_outputs: [visitor_management_procedure, visitor_log_sample]
+
+  - practice_id: PE.L1-3.10.4
+    capability: physical_security
+    pattern_id: PES-003
+    pattern_name: Physical Access Logging
+    actions:
+      - id: PES-003-01
+        action: Configure physical access logging at all controlled entry points
+        action_type: configuration
+        evidence_outputs: [access_log_system_config, access_log_sample]
+
+  - practice_id: PE.L1-3.10.5
+    capability: physical_security
+    pattern_id: PES-004
+    pattern_name: Physical Access Device Management
+    actions:
+      - id: PES-004-01
+        action: Establish process to manage physical access devices (keys, badges, combinations)
+        action_type: process
+        evidence_outputs: [access_device_inventory, device_issuance_records]
+
+  - practice_id: PE.L2-3.10.1
+    capability: physical_security
+    pattern_id: PES-005
+    pattern_name: Organizational System Physical Access
+    actions:
+      - id: PES-005-01
+        action: Configure physical access restrictions specific to areas containing organizational systems
+        action_type: configuration
+        evidence_outputs: [system_area_access_config, authorized_personnel_list]
+
+  - practice_id: PE.L2-3.10.2
+    capability: physical_security
+    pattern_id: PES-006
+    pattern_name: Facility Protection and Monitoring
+    actions:
+      - id: PES-006-01
+        action: Implement facility monitoring (cameras, sensors) for areas with organizational systems
+        action_type: configuration
+        evidence_outputs: [monitoring_system_config, camera_coverage_map]
+
+  - practice_id: PE.L2-3.10.3
+    capability: physical_security
+    pattern_id: PES-007
+    pattern_name: Visitor Escort and Monitoring
+    actions:
+      - id: PES-007-01
+        action: Configure visitor badge system with escort tracking
+        action_type: process
+        evidence_outputs: [visitor_badge_procedure, escort_log_sample]
+
+  - practice_id: PE.L2-3.10.4
+    capability: physical_security
+    pattern_id: PES-008
+    pattern_name: Physical Access Audit Trail
+    actions:
+      - id: PES-008-01
+        action: Configure physical access audit system with retention meeting requirements
+        action_type: configuration
+        evidence_outputs: [audit_trail_config, retention_policy_evidence]
+
+  - practice_id: PE.L2-3.10.5
+    capability: physical_security
+    pattern_id: PES-009
+    pattern_name: Physical Access Device Control
+    actions:
+      - id: PES-009-01
+        action: Configure centralized physical access device management with revocation capability
+        action_type: configuration
+        evidence_outputs: [device_management_system_config, revocation_procedure]
+
+  - practice_id: PE.L2-3.10.6
+    capability: physical_security
+    pattern_id: PES-010
+    pattern_name: Alternate Work Site Safeguards
+    actions:
+      - id: PES-010-01
+        action: Define security requirements for alternate work sites (home offices, remote locations)
+        action_type: policy
+        evidence_outputs: [alternate_site_security_policy]
+      - id: PES-010-02
+        action: Configure endpoint controls for remote work devices
+        action_type: configuration
+        evidence_outputs: [remote_device_security_config, remote_compliance_report]
+
+  # =============================================================================
+  # MEDIA & ASSET PROTECTION (MAP)
+  # =============================================================================
+
+  - practice_id: MP.L1-3.8.3
+    capability: media_asset_protection
+    pattern_id: MAP-001
+    pattern_name: Basic Media Disposal
+    actions:
+      - id: MAP-001-01
+        action: Define media sanitization and disposal procedures
+        action_type: policy
+        evidence_outputs: [media_disposal_policy]
+      - id: MAP-001-02
+        action: Implement approved media destruction methods for CUI media
+        action_type: process
+        evidence_outputs: [destruction_records, disposal_certificate_samples]
+
+  - practice_id: MP.L2-3.8.1
+    capability: media_asset_protection
+    pattern_id: MAP-002
+    pattern_name: Media Protection
+    actions:
+      - id: MAP-002-01
+        action: Implement physical and logical protections for media containing CUI
+        action_type: configuration
+        evidence_outputs: [media_protection_controls, secure_storage_evidence]
+
+  - practice_id: MP.L2-3.8.2
+    capability: media_asset_protection
+    pattern_id: MAP-003
+    pattern_name: Media Access Limitation
+    actions:
+      - id: MAP-003-01
+        action: Configure access controls limiting who can access CUI media
+        action_type: configuration
+        evidence_outputs: [media_access_control_config, authorized_media_handlers_list]
+
+  - practice_id: MP.L2-3.8.3
+    capability: media_asset_protection
+    pattern_id: MAP-004
+    pattern_name: Media Sanitization
+    actions:
+      - id: MAP-004-01
+        action: Configure media sanitization procedures per NIST 800-88 before disposal or reuse
+        action_type: process
+        evidence_outputs: [sanitization_procedure, sanitization_records]
+
+  - practice_id: MP.L2-3.8.4
+    capability: media_asset_protection
+    pattern_id: MAP-005
+    pattern_name: Media Marking
+    actions:
+      - id: MAP-005-01
+        action: Define and apply CUI marking requirements to all physical and digital media
+        action_type: process
+        evidence_outputs: [media_marking_procedure, marking_examples]
+
+  - practice_id: MP.L2-3.8.5
+    capability: media_asset_protection
+    pattern_id: MAP-006
+    pattern_name: Media Transport Protection
+    actions:
+      - id: MAP-006-01
+        action: Implement controls for media transport including tamper-evident packaging and tracking
+        action_type: process
+        evidence_outputs: [transport_procedure, chain_of_custody_records]
+
+  - practice_id: MP.L2-3.8.7
+    capability: media_asset_protection
+    pattern_id: MAP-007
+    pattern_name: Removable Media Control
+    actions:
+      - id: MAP-007-01
+        action: Configure endpoint policies controlling use of removable media
+        action_type: configuration
+        evidence_outputs: [removable_media_policy_config, media_usage_logs]
+
+  - practice_id: MP.L2-3.8.8
+    capability: media_asset_protection
+    pattern_id: MAP-008
+    pattern_name: Portable Storage Prohibition
+    actions:
+      - id: MAP-008-01
+        action: Configure systems to block unauthorized portable storage devices
+        action_type: configuration
+        evidence_outputs: [usb_block_config, exception_approval_records]
+
+  - practice_id: MP.L2-3.8.9
+    capability: media_asset_protection
+    pattern_id: MAP-009
+    pattern_name: Backup Confidentiality
+    actions:
+      - id: MAP-009-01
+        action: Configure backup encryption and access controls protecting CUI in backups
+        action_type: configuration
+        evidence_outputs: [backup_encryption_config, backup_access_control_config]
+
+  # =============================================================================
+  # PERSONNEL SECURITY & TRAINING (PST)
+  # =============================================================================
+
+  - practice_id: PS.L2-3.9.1
+    capability: personnel_security_training
+    pattern_id: PST-001
+    pattern_name: Personnel Screening
+    actions:
+      - id: PST-001-01
+        action: Define screening requirements for personnel with access to CUI systems
+        action_type: policy
+        evidence_outputs: [screening_policy, screening_criteria]
+      - id: PST-001-02
+        action: Implement screening process for new hires and transfers before granting access
+        action_type: process
+        evidence_outputs: [screening_records, screening_completion_tracking]
+
+  - practice_id: PS.L2-3.9.2
+    capability: personnel_security_training
+    pattern_id: PST-002
+    pattern_name: Personnel Transfer and Termination
+    actions:
+      - id: PST-002-01
+        action: Define access revocation procedures for personnel transfers, reassignments, and termination
+        action_type: policy
+        evidence_outputs: [termination_procedure, access_revocation_checklist]
+      - id: PST-002-02
+        action: Configure automated access removal tied to HR separation events
+        action_type: configuration
+        evidence_outputs: [automated_deprovisioning_config, termination_audit_logs]
+
+  - practice_id: PS.L3-3.9.1e
+    capability: personnel_security_training
+    pattern_id: PST-003
+    pattern_name: Enhanced Personnel Screening
+    actions:
+      - id: PST-003-01
+        action: Implement enhanced screening for personnel in sensitive roles
+        action_type: process
+        evidence_outputs: [enhanced_screening_procedure, sensitive_role_inventory]
+
+  - practice_id: PS.L3-3.9.2e
+    capability: personnel_security_training
+    pattern_id: PST-004
+    pattern_name: Adverse Action Protection
+    actions:
+      - id: PST-004-01
+        action: Implement protective measures when adverse personnel actions are anticipated
+        action_type: process
+        evidence_outputs: [adverse_action_procedure, protective_measure_evidence]
+
+  - practice_id: AT.L2-3.2.1
+    capability: personnel_security_training
+    pattern_id: PST-005
+    pattern_name: Security Awareness Training
+    actions:
+      - id: PST-005-01
+        action: Develop and deliver security awareness training for all users
+        action_type: training
+        evidence_outputs: [training_materials, training_completion_records]
+      - id: PST-005-02
+        action: Configure annual training schedule with completion tracking
+        action_type: process
+        evidence_outputs: [training_schedule, completion_dashboard]
+
+  - practice_id: AT.L2-3.2.2
+    capability: personnel_security_training
+    pattern_id: PST-006
+    pattern_name: Role-Based Security Training
+    actions:
+      - id: PST-006-01
+        action: Develop role-specific security training for users with specialized responsibilities
+        action_type: training
+        evidence_outputs: [role_training_curriculum, role_training_records]
+
+  - practice_id: AT.L2-3.2.3
+    capability: personnel_security_training
+    pattern_id: PST-007
+    pattern_name: Insider Threat Awareness
+    actions:
+      - id: PST-007-01
+        action: Include insider threat recognition and reporting in awareness training
+        action_type: training
+        evidence_outputs: [insider_threat_training_materials, training_records]
+
+  - practice_id: AT.L3-3.2.1e
+    capability: personnel_security_training
+    pattern_id: PST-008
+    pattern_name: Advanced Threat Awareness
+    actions:
+      - id: PST-008-01
+        action: Deliver advanced threat awareness training including APT techniques and social engineering
+        action_type: training
+        evidence_outputs: [advanced_training_materials, training_records]
+
+  - practice_id: AT.L3-3.2.2e
+    capability: personnel_security_training
+    pattern_id: PST-009
+    pattern_name: Practical Security Exercises
+    actions:
+      - id: PST-009-01
+        action: Conduct practical exercises (phishing simulations, scenario walkthroughs) in training
+        action_type: training
+        evidence_outputs: [exercise_plan, exercise_results, phishing_simulation_report]
+
+  # =============================================================================
+  # RISK ASSESSMENT & COMPLIANCE (RAC)
+  # =============================================================================
+
+  - practice_id: RA.L2-3.11.1
+    capability: risk_assessment_compliance
+    pattern_id: RAC-001
+    pattern_name: Risk Assessment
+    actions:
+      - id: RAC-001-01
+        action: Conduct periodic risk assessment identifying threats, vulnerabilities, and impacts
+        action_type: assessment
+        evidence_outputs: [risk_assessment_report, risk_register]
+      - id: RAC-001-02
+        action: Establish risk assessment schedule and review process
+        action_type: process
+        evidence_outputs: [risk_assessment_schedule, review_records]
+
+  - practice_id: RA.L3-3.11.4e
+    capability: risk_assessment_compliance
+    pattern_id: RAC-002
+    pattern_name: Threat Profile Documentation
+    actions:
+      - id: RAC-002-01
+        action: Document organizational threat profile in system security plan
+        action_type: policy
+        evidence_outputs: [threat_profile_document, ssp_threat_section]
+
+  - practice_id: RA.L3-3.11.6e
+    capability: risk_assessment_compliance
+    pattern_id: RAC-003
+    pattern_name: Supply Chain Risk Assessment
+    actions:
+      - id: RAC-003-01
+        action: Assess supply chain risks for critical system components and services
+        action_type: assessment
+        evidence_outputs: [supply_chain_risk_assessment, vendor_risk_register]
+
+  - practice_id: RA.L3-3.11.7e
+    capability: risk_assessment_compliance
+    pattern_id: RAC-004
+    pattern_name: Supply Chain Risk Management Plan
+    actions:
+      - id: RAC-004-01
+        action: Develop supply chain risk management plan with mitigation strategies
+        action_type: policy
+        evidence_outputs: [scrm_plan, mitigation_strategy_document]
+
+  - practice_id: CA.L2-3.12.1
+    capability: risk_assessment_compliance
+    pattern_id: RAC-005
+    pattern_name: Security Control Assessment
+    actions:
+      - id: RAC-005-01
+        action: Conduct periodic assessment of security control effectiveness
+        action_type: assessment
+        evidence_outputs: [security_assessment_report, control_effectiveness_findings]
+
+  - practice_id: CA.L2-3.12.2
+    capability: risk_assessment_compliance
+    pattern_id: RAC-006
+    pattern_name: Plan of Action and Milestones
+    actions:
+      - id: RAC-006-01
+        action: Develop and maintain POA&M tracking identified weaknesses and remediation timelines
+        action_type: process
+        evidence_outputs: [poam_document, remediation_progress_tracking]
+
+  - practice_id: CA.L2-3.12.3
+    capability: risk_assessment_compliance
+    pattern_id: RAC-007
+    pattern_name: Continuous Monitoring Program
+    actions:
+      - id: RAC-007-01
+        action: Establish continuous monitoring strategy with defined metrics and reporting cadence
+        action_type: monitoring
+        evidence_outputs: [continuous_monitoring_plan, monitoring_metrics_report]
+
+  - practice_id: CA.L2-3.12.4
+    capability: risk_assessment_compliance
+    pattern_id: RAC-008
+    pattern_name: System Security Plan
+    actions:
+      - id: RAC-008-01
+        action: Develop comprehensive SSP documenting system boundaries, controls, and implementation
+        action_type: policy
+        evidence_outputs: [system_security_plan]
+      - id: RAC-008-02
+        action: Establish SSP review and update cycle
+        action_type: process
+        evidence_outputs: [ssp_review_schedule, ssp_change_records]
+
+  - practice_id: CA.L3-3.12.1e
+    capability: risk_assessment_compliance
+    pattern_id: RAC-009
+    pattern_name: Penetration Testing
+    actions:
+      - id: RAC-009-01
+        action: Conduct periodic penetration testing per defined scope and rules of engagement
+        action_type: assessment
+        evidence_outputs: [pentest_report, rules_of_engagement, remediation_plan]
+
+  # =============================================================================
+  # MAINTENANCE OPERATIONS (MNT)
+  # =============================================================================
+
+  - practice_id: MA.L2-3.7.1
+    capability: maintenance_operations
+    pattern_id: MNT-001
+    pattern_name: Controlled System Maintenance
+    actions:
+      - id: MNT-001-01
+        action: Define maintenance procedures including scheduling, approval, and documentation
+        action_type: process
+        evidence_outputs: [maintenance_procedure, maintenance_schedule, maintenance_records]
+
+  - practice_id: MA.L2-3.7.2
+    capability: maintenance_operations
+    pattern_id: MNT-002
+    pattern_name: Maintenance Tool Control
+    actions:
+      - id: MNT-002-01
+        action: Establish controls for maintenance tools brought into the facility
+        action_type: process
+        evidence_outputs: [tool_authorization_procedure, approved_tool_list]
+
+  - practice_id: MA.L2-3.7.3
+    capability: maintenance_operations
+    pattern_id: MNT-003
+    pattern_name: Equipment Sanitization
+    actions:
+      - id: MNT-003-01
+        action: Sanitize equipment containing CUI before off-site maintenance
+        action_type: process
+        evidence_outputs: [sanitization_procedure, sanitization_records]
+
+  - practice_id: MA.L2-3.7.4
+    capability: maintenance_operations
+    pattern_id: MNT-004
+    pattern_name: Maintenance Media Inspection
+    actions:
+      - id: MNT-004-01
+        action: Inspect media containing diagnostic programs for malicious code before use
+        action_type: process
+        evidence_outputs: [media_inspection_procedure, inspection_records]
+
+  - practice_id: MA.L2-3.7.5
+    capability: maintenance_operations
+    pattern_id: MNT-005
+    pattern_name: Nonlocal Maintenance Authentication
+    actions:
+      - id: MNT-005-01
+        action: Configure MFA and encryption for all nonlocal maintenance sessions
+        action_type: configuration
+        evidence_outputs: [remote_maintenance_auth_config, session_encryption_config]
+
+  - practice_id: MA.L2-3.7.6
+    capability: maintenance_operations
+    pattern_id: MNT-006
+    pattern_name: Maintenance Personnel Supervision
+    actions:
+      - id: MNT-006-01
+        action: Establish procedures for supervising maintenance by non-cleared personnel
+        action_type: process
+        evidence_outputs: [supervision_procedure, supervision_records]
+
+  # =============================================================================
+  # FOUNDATION & GOVERNANCE (FGV)
+  # =============================================================================
+
+  - practice_id: FOUNDATION
+    capability: foundation_governance
+    pattern_id: FGV-001
+    pattern_name: Assessment Foundation
+    actions:
+      - id: FGV-001-01
+        action: Define assessment boundary including all CUI assets, security protection assets, and ESPs
+        action_type: policy
+        evidence_outputs: [boundary_definition_document, asset_inventory]
+      - id: FGV-001-02
+        action: Document CUI/FCI data flows including storage, processing, and transmission
+        action_type: policy
+        evidence_outputs: [data_flow_diagram]
+      - id: FGV-001-03
+        action: Confirm System Security Plan exists and is current
+        action_type: assessment
+        evidence_outputs: [ssp_existence_verification, ssp_currency_check]
+
+  - practice_id: SC.L3-3.13.2e
+    capability: foundation_governance
+    pattern_id: FGV-002
+    pattern_name: Security-Driven System Changes
+    actions:
+      - id: FGV-002-01
+        action: Implement system architecture changes to disrupt known attack patterns
+        action_type: configuration
+        evidence_outputs: [architecture_change_records, attack_pattern_analysis]

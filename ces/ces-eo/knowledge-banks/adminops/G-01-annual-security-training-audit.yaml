@@ -1,0 +1,92 @@
+controlId: "AT.L2-3.2.1"
+relatedControlIds:
+  - "AT.L2-3.2.2"
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: G-01
+useCaseTitle: "Annual Security Training Audit"
+domain: Personnel Security
+priority: P2 High
+trigger: 'SCHEDULE: Annual training compliance cycle (fiscal year or calendar year boundary)'
+sodTier: Tier 2 (Config Manager)
+entraRolesRequired:
+- User Administrator
+- Compliance Administrator
+approvalRequired: false
+services:
+- name: Entra ID -- user directory, security groups, Conditional Access policies
+  purpose: ''
+- name: LMS
+  purpose: vendor-agnostic) -- training completion data source
+- name: Power Automate or Azure Logic Apps -- HRIS-to-Entra sync automation
+  purpose: ''
+- name: Azure Immutable Blob Storage -- evidence artifact retention
+  purpose: ''
+- name: SharePoint Online -- optional intermediate staging for CSV uploads
+  purpose: ''
+configurationSteps:
+  portalPath: //entra.microsoft.us) > Groups > All groups.
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes User.Read.All
+  - cmdlet: Get-MgUser
+    parameters:
+    - -MgUser
+    - -Filter
+    - -Property
+    - -All
+    - -Csv
+  - cmdlet: Get-MgGroup
+    parameters:
+    - -MgGroup
+    - -Filter
+    - -noncompliant
+    - -MgGroupMember
+    - -GroupId
+  - cmdlet: Get-MgGroupMember
+    parameters:
+    - -MgGroupMember
+    - -GroupId
+    - -All
+    - -MgGroupMemberByRef
+    - -GroupId
+  - cmdlet: Remove-MgGroupMemberByRef
+    parameters:
+    - -MgGroupMemberByRef
+    - -GroupId
+    - -DirectoryObjectId
+    - -compliant
+    - -MgGroupMemberByRef
+  - cmdlet: New-MgGroupMemberByRef
+    parameters:
+    - -MgGroupMemberByRef
+    - -GroupId
+    - -BodyParameter
+    - -Object
+    - -Date
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/users?$filter=accountEnabled
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-g-personnel/G-01/{year}/{month}/
+  format: CSV (training roster), CSV (non-compliant user list), JSON (CA policy snapshot)
+  filenamePattern: G-01_AnnualTrainingAudit_{YYYYMMDD}_{HHmmss}_{Context}.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://flow.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |-
+    All Entra ID and Conditional Access features used in this use case are fully available in GCC High. The LMS is an external system; ensure that any LMS-to-tenant data flow does not traverse commercial cloud endpoints. If using Power Automate for the HRIS-to-Entra sync, the Power Automate environment must be provisioned in the GCC High tenant (Power Automate for GCC High uses `https://flow.microsoft.us`). Logic Apps in Azure Government (`https://portal.azure.us`) are the alternative if Power Automate is not licensed or available.
+
+    Viva Learning is `[UNCONFIRMED IN GCC HIGH -- verify in tenant]`.
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

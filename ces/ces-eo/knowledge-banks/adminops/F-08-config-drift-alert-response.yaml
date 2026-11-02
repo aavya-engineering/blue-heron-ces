@@ -1,0 +1,84 @@
+controlId: "CM.L2-3.4.3"
+relatedControlIds:
+  - "CM.L2-3.4.2"
+  - "CM.L2-3.4.5"
+  - "SI.L2-3.14.3"  # [VERIFY] mapping not yet confirmed
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: F-08
+useCaseTitle: "Config Drift Alert Response"
+domain: Security Operations
+priority: P4 Standard
+trigger: 'INCIDENT: Sentinel alert for configuration drift detected'
+sodTier: Tier 2 (per SoD model in front matter)
+entraRolesRequired:
+- Security Administrator
+- Compliance Administrator
+approvalRequired: true
+services:
+- name: Microsoft Sentinel -- analytics rules, incidents, entity investigation
+  purpose: ''
+- name: Entra ID Audit Logs -- configuration change events
+  purpose: ''
+- name: Intune -- device configuration change history
+  purpose: ''
+- name: Azure Activity Log -- Azure resource configuration changes
+  purpose: ''
+- name: ITSM -- change management ticket verification
+  purpose: ''
+- name: Azure Immutable Blob Storage -- evidence artifact storage
+  purpose: ''
+configurationSteps:
+  portalPath: //portal.azure.us > Microsoft Sentinel > Incidents.
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes AuditLog.Read.All, Policy.Read.All, Policy.ReadWrite.ConditionalAccess
+  - cmdlet: Get-MgAuditLogDirectoryAudit
+    parameters:
+    - -MgAuditLogDirectoryAudit
+    - -Filter
+    - -All
+    - -Object
+    - -Json
+  - cmdlet: Update-MgIdentityConditionalAccessPolicy
+    parameters:
+    - -MgIdentityConditionalAccessPolicy
+    - -ConditionalAccessPolicyId
+    - -State
+    - -MgIdentityConditionalAccessPolicy
+    - -ConditionalAccessPolicyId
+  - cmdlet: Get-MgIdentityConditionalAccessPolicy
+    parameters:
+    - -MgIdentityConditionalAccessPolicy
+    - -ConditionalAccessPolicyId
+    - -Json
+    - -Depth
+    - -File
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/auditLogs/directoryAudits?$filter=initiatedBy/user/userPrincipalName
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-f-security/F-08/2026/03/
+  format: CSV (investigation), JSON (reverted configuration)
+  filenamePattern: F-08_ConfigDrift_{YYYYMMDD}_{HHmmss}_Investigation.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |-
+    - Entra ID audit logs and the `directoryAudits` endpoint are fully available in GCC High at `graph.microsoft.us`. The schema is identical to commercial.
+    - Sentinel analytics rules for configuration drift detection use the same KQL syntax and `AuditLogs` table schema in GCC High.
+    - Azure Activity Log is available for Azure resource configuration drift detection via `portal.azure.us` > Monitor > Activity log. The schema is consistent with commercial Azure.
+    - Configuration reversion should follow the tenant's change management process. If an emergency reversion is required, document it as an emer
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

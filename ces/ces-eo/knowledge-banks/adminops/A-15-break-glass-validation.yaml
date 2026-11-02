@@ -1,0 +1,101 @@
+controlId: "AC.L2-3.1.7"
+relatedControlIds:
+  - "AC.L1-3.1.1"
+  - "AC.L2-3.1.5"
+  - "IR.L2-3.6.1"
+
+practiceStatement: "Limit system access to authorized users, processes acting on behalf of users, and devices."
+
+useCaseId: "A-15"
+useCaseTitle: "Break-Glass Validation"
+domain: "Identity & Access Management"
+priority: "P4 Standard"
+trigger: "SCHEDULE: Monthly (every 30 days)"
+
+sodTier: "Tier 3 -- Privileged Admin"
+entraRolesRequired:
+  - "Global Administrator (break-glass account itself)"
+
+approvalRequired: true
+
+services:
+  - name: "Entra ID"
+    purpose: "Break-glass account sign-in"
+  - name: "Microsoft Sentinel"
+    purpose: "Sign-in alert monitoring"
+  - name: "Conditional Access"
+    purpose: "Break-glass exclusion verification"
+  - name: "PIM"
+    purpose: "Break-glass accounts are permanently assigned, not PIM-eligible"
+
+configurationSteps:
+  portalPath: "https://entra.microsoft.us > Identity > Users"
+
+  powershellCmdlets:
+    - cmdlet: "Connect-MgGraph"
+      parameters:
+        - "-Environment USGov"
+        - "-Scopes AuditLog.Read.All,Policy.Read.All"
+    - cmdlet: "Get-MgIdentityConditionalAccessPolicy"
+      parameters:
+        - "-All"
+    - cmdlet: "Get-MgUser"
+      parameters:
+        - "-UserId"
+    - cmdlet: "Get-MgUserMemberOf"
+      parameters:
+        - "-UserId"
+    - cmdlet: "Get-MgAuditLogSignIn"
+      parameters:
+        - "-Filter"
+        - "-Top"
+
+  graphApiEndpoint: "GET https://graph.microsoft.us/v1.0/identity/conditionalAccess/policies"
+  graphApiPayloadExample: {}
+
+  requiredPermissions:
+    - "AuditLog.Read.All"
+    - "Policy.Read.All"
+
+evidenceArtifacts:
+  - type: "JSON"
+    retentionPeriod: "7 years"
+    storageLocation: "evidence-store/domain-a-identity/A-15/{year}/{month}/"
+    format: "Sign-in log entry, Sentinel alert ID, CA exclusion verification, observer attestation"
+    filenamePattern: "A-15_BreakGlassValidation_{YYYYMMDD}_{HHmmss}_Monthly.json"
+    hashAlgorithm: "SHA-256"
+
+gccHighSpecifics:
+  endpoints:
+    - "https://graph.microsoft.us"
+    - "https://entra.microsoft.us"
+    - "https://portal.azure.us"
+  complianceBoundary: "FedRAMP High + CMMC L2"
+  endpointValidation: "All endpoints use .microsoft.us or .usgovcloudapi.net domains"
+  notes: "Break-glass accounts must use {tenant}.onmicrosoft.us UPN suffix (not custom domains) to ensure authentication works even if custom domain DNS or federation fails. Break-glass accounts should NOT have mailbox assigned (no Exchange license) to prevent email-based attacks. Sentinel alerts use SignInLogs connector and KQL analytics rule. Credentials must be stored in physically secure offline locations, NOT Azure Key Vault (which depends on Entra ID, creating circular dependency). Break-glass accounts excluded from CA policies and PIM represent accepted risk mitigated by monitoring, infrequent use, and strong credential management."
+
+relatedPolicies:
+  - "AC-001 Access Control Policy"
+  - "IA-002 Identification and Authentication Policy"
+  - "IR-001 Incident Response Policy"
+
+odpValues:
+  - odpId: "AC.L2-3.1.1_ODP_01"
+    description: "Emergency access accounts"
+    value: "Two break-glass accounts with permanent Global Administrator assignment, excluded from all CA policies"
+    rationale: "Ensures administrative access during emergencies when all other access paths unavailable"
+    enforcementMechanism: "Monthly validation with Sentinel alert confirmation"
+
+dependencies:
+  hardDependencies:
+    - useCaseId: "A-07"
+      reason: "MFA policy must exclude break-glass group"
+    - useCaseId: "A-10"
+      reason: "Break-glass accounts are exception to PIM conversion"
+  softDependencies:
+    - useCaseId: "E-04"
+      reason: "Sentinel analytics rule for break-glass sign-in must exist"
+    - useCaseId: "H-02"
+      reason: "Break-glass may be used in compromised account containment if other admin accounts compromised"
+
+notes: "Tests emergency access accounts monthly to confirm they can successfully authenticate and perform administrative functions when all other access paths unavailable. Break-glass accounts are cloud-only with permanent Global Administrator assignment, excluded from all CA policies and PIM requirements. Each test sign-in must trigger Sentinel alert to confirm monitoring operational. Two-person validation required (one to execute, one to observe). Rotate password after each validation and store new password in secure offline storage."

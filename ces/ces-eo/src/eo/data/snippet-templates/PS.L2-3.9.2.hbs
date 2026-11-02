@@ -1,0 +1,47 @@
+## Control {{controlId}}: Ensure CUI Systems Are Protected During and After Personnel Actions (Terminations and Transfers)
+
+**Implementation Status:** {{status}}
+
+This organization protects CUI during personnel actions within the {{tenantName}} M365 GCC High tenant through account lifecycle management and offboarding procedures documented in "Personnel Action Security Policy v1.0" maintained by {{variables.humanResourcesManager}}.
+
+**Termination Procedures:**
+Upon personnel termination notification:
+- Entra ID account disabled within same business day (within 8 hours of HR notification)
+- Active sessions terminated via token revocation
+- MFA registration reset and authenticator devices deregistered
+- CUI group membership removed immediately
+- Mobile device selective wipe initiated via Intune (organizational data only)
+- Physical access badges recovered and deactivated
+- CUI materials (paper and digital) returned or securely destroyed
+- Exit interview conducted addressing CUI handling obligations and non-disclosure requirements
+
+**Transfer Procedures:**
+Upon personnel role transfer:
+- Previous role-based access revoked before new access provisioned (zero-overlap policy)
+- CUI group membership reviewed for continued need-to-know
+- PIM role assignments updated to reflect new position responsibilities
+- Access review completed by new supervisor within 5 business days
+
+{{#if userCount}}
+**Account Lifecycle:**
+{{userCount}} user accounts managed with automated lifecycle workflows supporting timely access changes upon personnel actions.
+{{/if}}
+
+**Operational Procedure:**
+- **Action:** Execute termination/transfer checklist within prescribed timelines; document all access changes
+- **Frequency:** Per personnel action event
+- **Responsible Party:** {{variables.humanResourcesManager}} (notification), {{variables.accessControlAdministrator}} (execution)
+- **Documentation:** Personnel Action Security Policy v1.0, Termination/Transfer Checklist Form PS-002
+
+**Review Frequency:** Quarterly audit of personnel action compliance by ISSO
+
+**Verification Method:** Examine termination/transfer checklists, account disable timestamps, token revocation records, CUI group membership changes, and device wipe confirmations.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** Review personnel action records per procedure PS-002. No automated evidence collection available for this procedural control. {{evidenceArtifactUrl}}
+{{/if}}

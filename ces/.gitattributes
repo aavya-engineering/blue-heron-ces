@@ -1,0 +1,8 @@
+# Shared reference data is byte-compared across repos (parity tests): keep LF on every checkout
+ces-shared/src/data/*.json text eol=lf
+
+# NB (EVC.1): the evidence-catalog data files are byte-exact copies whose SHA-256 is recorded in catalog-releases.json
+ces-planner/public/data/evidence-catalog/*.json -text
+
+# W5 cycle 3 (records): byte copies of the S1 operating records whose SHA-256 the test asserts against the catalog
+ces-eo/tests/fixtures/w5c3-records/* -text

@@ -1,0 +1,282 @@
+{
+  "schema_name": "CMMC_2.0_TechStack_Compliance_Mapping",
+  "version": "1.0",
+  "description": "Structured schema to map technology stacks (e.g. Microsoft 365 GCC High, AWS GovCloud) to CMMC 2.0 requirements (Levels 1\u20133), capture support types, POA&M details, and generate human-readable step-by-step implementation plans plus computer-executable directives (scripts, IaC, STIG-like configs). Includes vendor capabilities packages with per-control breakdowns.",
+  "entities": {
+    "TechStacks": {
+      "description": "Core details on technology stacks / vendor offerings used for CMMC compliance",
+      "fields": [
+        {
+          "name": "id",
+          "type": "integer",
+          "constraints": "primary_key, auto-increment",
+          "description": "Unique identifier for the stack"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "example": "Microsoft 365 Government G5 (GCC High)",
+          "description": "Full product/stack name"
+        },
+        {
+          "name": "vendor",
+          "type": "string",
+          "example": "Microsoft"
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "description": "Overview of the stack, FedRAMP/DoD status, and how it addresses CMMC levels"
+        },
+        {
+          "name": "fedramp_level",
+          "type": "string",
+          "example": "High",
+          "description": "FedRAMP authorization level (Moderate, High, etc.)"
+        }
+      ]
+    },
+    "CMMC_Requirements": {
+      "description": "Individual CMMC practices / controls from Levels 1, 2, and 3",
+      "fields": [
+        {
+          "name": "id",
+          "type": "integer",
+          "constraints": "primary_key"
+        },
+        {
+          "name": "level",
+          "type": "integer",
+          "values": [
+            1,
+            2,
+            3
+          ],
+          "description": "CMMC maturity level"
+        },
+        {
+          "name": "domain",
+          "type": "string",
+          "example": "Access Control"
+        },
+        {
+          "name": "practice_id",
+          "type": "string",
+          "example": "AC.L2-3.1.1"
+        },
+        {
+          "name": "description",
+          "type": "text"
+        },
+        {
+          "name": "nist_reference",
+          "type": "string",
+          "example": "800-171 Rev 2"
+        }
+      ]
+    },
+    "Mappings": {
+      "description": "Link between a stack and a CMMC requirement, including support assessment and POA&M info",
+      "fields": [
+        {
+          "name": "mapping_id",
+          "type": "integer",
+          "constraints": "primary_key"
+        },
+        {
+          "name": "stack_id",
+          "type": "integer",
+          "references": "TechStacks.id"
+        },
+        {
+          "name": "req_id",
+          "type": "integer",
+          "references": "CMMC_Requirements.id"
+        },
+        {
+          "name": "support_type",
+          "type": "string",
+          "enum": [
+            "Overt",
+            "Configurable",
+            "None",
+            "Inherited",
+            "Partial"
+          ]
+        },
+        {
+          "name": "maturity_applicability",
+          "type": "string",
+          "example": "Levels 1-3"
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "description": "Additional context, gaps, or vendor-specific commentary"
+        },
+        {
+          "name": "evidence_link",
+          "type": "string",
+          "format": "url"
+        },
+        {
+          "name": "poam_timeline",
+          "type": "string",
+          "example": "15 days initial setup; quarterly reviews"
+        },
+        {
+          "name": "responsibility",
+          "type": "string",
+          "example": "Customer configures; Vendor provides inheritance"
+        },
+        {
+          "name": "milestone_metrics",
+          "type": "string",
+          "example": "100% users with MFA; audit compliance >95%"
+        }
+      ]
+    },
+    "Implementation_Actions": {
+      "description": "Step-by-step actions (manual or automated) to achieve the mapped control",
+      "fields": [
+        {
+          "name": "action_id",
+          "type": "integer",
+          "constraints": "primary_key"
+        },
+        {
+          "name": "mapping_id",
+          "type": "integer",
+          "references": "Mappings.mapping_id"
+        },
+        {
+          "name": "action_type",
+          "type": "string",
+          "enum": [
+            "Manual",
+            "Automated",
+            "Hybrid"
+          ]
+        },
+        {
+          "name": "step_number",
+          "type": "integer"
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "description": "Detailed step for humans or script/code snippet for machines"
+        },
+        {
+          "name": "tool",
+          "type": "string",
+          "example": "Entra ID Admin Center"
+        },
+        {
+          "name": "vendor_howto_link",
+          "type": "string",
+          "format": "url"
+        },
+        {
+          "name": "dependencies",
+          "type": "text",
+          "example": "GCC High tenant active; E5 license"
+        },
+        {
+          "name": "output_artifact",
+          "type": "string",
+          "example": "Role assignment report; Script execution log"
+        }
+      ]
+    },
+    "Capabilities_Packages": {
+      "description": "Vendor-specific per-control capabilities breakdown (alternative flattened view)",
+      "fields": [
+        {
+          "name": "package_id",
+          "type": "integer",
+          "constraints": "primary_key"
+        },
+        {
+          "name": "stack_id",
+          "type": "integer",
+          "references": "TechStacks.id"
+        },
+        {
+          "name": "level",
+          "type": "integer",
+          "values": [
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "name": "controls",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "control_id": {
+                "type": "string"
+              },
+              "domain": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "support_type": {
+                "type": "string"
+              },
+              "products_features": {
+                "type": "string"
+              },
+              "customer_responsibilities": {
+                "type": "string"
+              },
+              "configurations_needed": {
+                "type": "string"
+              },
+              "notes": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "relationships": [
+    {
+      "from": "Mappings",
+      "to": "TechStacks",
+      "type": "many-to-one",
+      "via": "stack_id"
+    },
+    {
+      "from": "Mappings",
+      "to": "CMMC_Requirements",
+      "type": "many-to-one",
+      "via": "req_id"
+    },
+    {
+      "from": "Implementation_Actions",
+      "to": "Mappings",
+      "type": "many-to-one",
+      "via": "mapping_id"
+    },
+    {
+      "from": "Capabilities_Packages",
+      "to": "TechStacks",
+      "type": "many-to-one",
+      "via": "stack_id"
+    }
+  ],
+  "notes": [
+    "This schema supports both relational (SQL) and document (JSON/MongoDB) storage.",
+    "Capabilities_Packages entity is optional \u2014 used for flattened vendor-specific views (e.g. per-control capabilities packages).",
+    "Use Mappings + Implementation_Actions for detailed mission plan / POA&M generation.",
+    "Populate from official vendor Placemats, Customer Responsibility Matrices, and NIST mappings."
+  ]
+}

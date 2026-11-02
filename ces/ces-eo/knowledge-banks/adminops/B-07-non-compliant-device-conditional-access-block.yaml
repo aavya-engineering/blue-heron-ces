@@ -1,0 +1,86 @@
+controlId: "AC.L2-3.1.18"
+relatedControlIds:
+  - "AC.L1-3.1.1"
+  - "AC.L1-3.1.2"
+  - "CM.L2-3.4.1"
+practiceStatement: Limit system access to authorized users, processes acting on behalf of users, and devices.
+useCaseId: B-07
+useCaseTitle: "Non-Compliant Device CA Block"
+domain: Device & Endpoint Management
+priority: P4 Standard
+trigger: 'CHANGE: Compliance policy evaluation marks device non-compliant; SCHEDULE: Grace period expiration'
+sodTier: Tier 2 -- Config Manager
+entraRolesRequired:
+- Intune Administrator
+- Conditional Access Administrator (or Security Administrator)
+approvalRequired: true
+services:
+- name: Entra ID Conditional Access
+  purpose: device compliance grant control
+- name: Microsoft Intune
+  purpose: device compliance evaluation, grace period configuration
+- name: Entra ID
+  purpose: device registration, sign-in evaluation
+configurationSteps:
+  portalPath: https://intune.microsoft.us
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes Policy.ReadWrite.ConditionalAccess
+  - cmdlet: New-MgIdentityConditionalAccessPolicy
+    parameters:
+    - -MgIdentityConditionalAccessPolicy
+    - -BodyParameter
+    - -MgIdentityConditionalAccessPolicy
+    - -Filter
+    - -B07
+  - cmdlet: Get-MgIdentityConditionalAccessPolicy
+    parameters:
+    - -MgIdentityConditionalAccessPolicy
+    - -Filter
+    - -B07
+    - -RequireCompliantDevice
+    - -MgIdentityConditionalAccessPolicy
+  - cmdlet: Update-MgIdentityConditionalAccessPolicy
+    parameters:
+    - -MgIdentityConditionalAccessPolicy
+    - -ConditionalAccessPolicyId
+    - -State
+    - -MgDeviceManagementManagedDevice
+    - -Filter
+  - cmdlet: Get-MgDeviceManagementManagedDevice
+    parameters:
+    - -MgDeviceManagementManagedDevice
+    - -Filter
+    - -All
+    - -Output
+    - -compliant
+  graphApiEndpoint: POST https://graph.microsoft.us/v1.0/identity/conditionalAccess/policies
+  graphApiPayloadExample: {}
+  requiredPermissions:
+  - Policy.ReadWrite.ConditionalAccess
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-b-device/B-07/{year}/{month}/
+  format: JSON (CA policy export), CSV (non-compliant device impact assessment)
+  filenamePattern: B-07_CACompliantDevicePolicy_{YYYYMMDD}_{HHmmss}_PolicyExport.json
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: Conditional Access policies requiring compliant devices are fully supported in GCC High. The `Office365` application
+    ID in GCC High maps to the GCC High service endpoints; no endpoint override is needed. When evaluating compliance state
+    in CA, there may be a propagation delay of up to 5 minutes between Intune marking a device non-compliant and Entra ID
+    evaluating the updated compliance state during sign-in. Ensure break-glass accounts (A-15) are excluded from this policy
+    to prevent lockout. The `enabledForReportingButNotEnforced` (Report-only) state is available in GCC High for pre-enforcement
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

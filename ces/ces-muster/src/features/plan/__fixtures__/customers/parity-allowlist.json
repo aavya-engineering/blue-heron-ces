@@ -1,0 +1,782 @@
+{
+  "note": "MG-04 reviewed allow-list. Every Muster-vs-Planner-golden diff the parity suite tolerates is listed here with the backlog item (MG-xx), decision (D1) or intended difference that owns it, and the exact number of diffs it absorbs per fixture (both producers together). First matching entry in file order wins. The suite fails on any diff no entry absorbs, and on any entry whose absorbed count differs from its count, so when an MG item lands its counts drop and the entry must be shrunk or removed. Producers: 'session' = Muster end to end from the fixture session; 'chain' = Muster's vendored compile fed Planner's own inputs. Review the current numbers with `npm run fixtures:generate -- --parity-report`.",
+  "entries": [
+    {
+      "id": "PH12-AC.L2-3.1.6-not-scoped-out",
+      "mg": "intended (PH-12, LOG-PH12-R2 STOP-1)",
+      "fixtures": "*",
+      "producer": "*",
+      "artifact": [
+        "manual-mission-plan",
+        "tenant-manifest"
+      ],
+      "path": [
+        "outputs/human_readable_mission_plan/disposition_summary/control_register/[control_id=AC.L2-3.1.6]/directive",
+        "outputs/human_readable_mission_plan/disposition_summary/control_register/[control_id=AC.L2-3.1.6]/scope_status",
+        "outputs/human_readable_mission_plan/control_directives/[control_id=AC.L2-3.1.6]/directive",
+        "outputs/human_readable_mission_plan/control_directives/[control_id=AC.L2-3.1.6]/justification",
+        "outputs/human_readable_mission_plan/control_directives/[control_id=AC.L2-3.1.6]/step_ids",
+        "outputs/human_readable_mission_plan/controls/[requirement_id=AC.L2-3.1.6]/scope_status",
+        "outputs/human_readable_mission_plan/controls/[requirement_id=AC.L2-3.1.6]/scope_justification",
+        "outputs/human_readable_mission_plan/controls/[requirement_id=AC.L2-3.1.6]/si_decision",
+        "outputs/human_readable_mission_plan/controls/[requirement_id=AC.L2-3.1.6]/stamper_action",
+        "outputs/human_readable_mission_plan/controls/[requirement_id=AC.L2-3.1.6]/task_ids",
+        "outputs/human_readable_mission_plan/controls/[requirement_id=AC.L2-3.1.6]/estimated_effort_hours",
+        "outputs/human_readable_mission_plan/controls/[requirement_id=AC.L2-3.1.6]/gap_classifications",
+        "outputs/human_readable_mission_plan/controls/[requirement_id=AC.L2-3.1.6]/readiness_status",
+        "outputs/human_readable_mission_plan/scope_exclusions/[requirement_id=AC.L2-3.1.6]",
+        "tenant_manifest/normative_controls/[control_id=AC.L2-3.1.6]",
+        "outputs/human_readable_mission_plan/steps/[id=step_task_AC.L2-3.1.6_<id>]",
+        "tenant_manifest/config_intents/[title=Non-Privileged Account Use (AC.L2-3.1.6)]",
+        "tenant_manifest/evidence_monitors/[signal=config_export for AC.L2-3.1.6]"
+      ],
+      "reason": "Intended (PH-12, LOG-PH12-R2 STOP-1, applied by the orchestrator in ces-muster src/features/gaps/gapCompiler.ts Rule 3): AC.L2-3.1.6 is \"use non-privileged accounts for non-security functions\", not portable storage (that is AC.L2-3.1.21), so the removable-media prohibition no longer scopes it out. Planner still does. Muster therefore plans it like any in-scope practice: an implement directive with its step id, scope_status in_scope, stamper_action Automated, no scope_exclusions / scope_justification / si_decision row, a new step_task_AC.L2-3.1.6, and its Tenant Manifest normative control, config intent and evidence monitor. Every diff this entry takes is keyed to AC.L2-3.1.6. Permanent unless Planner adopts the same rule.",
+      "count": {
+        "a": 36,
+        "c": 36,
+        "d": 36
+      }
+    },
+    {
+      "id": "PH12-prohibition-normative-controls",
+      "mg": "intended (PH-12, LOG-PH12-INT item 4)",
+      "fixtures": "*",
+      "producer": "*",
+      "artifact": "tenant-manifest",
+      "kind": "extra",
+      "path": [
+        "tenant_manifest/normative_controls/[control_id=MP.L2-3.8.5]",
+        "tenant_manifest/normative_controls/[control_id=MP.L2-3.8.6]",
+        "tenant_manifest/normative_controls/[control_id=MP.L2-3.8.7]",
+        "tenant_manifest/normative_controls/[control_id=CM.L2-3.4.6]"
+      ],
+      "reason": "Intended (PH-12, LOG-PH12-INT item 4; manifestGenerator.ts buildProhibitionNormativeControls): a Met-By-Prohibition scope exclusion (gapCompiler buildScopeExclusions, kind prohibition, no RR validation needed) with no task now gets a Tenant Manifest normative control, rebuilt by annotateVerificationRows as one presence-only postcheck row per assessment objective, so Stamper has a postcheck for each of its objectives (V94). Planner emits no normative control for a scoped-out control. Both alignment validators exempt it from check 4. Permanent.",
+      "count": {
+        "a": 4,
+        "c": 8,
+        "d": 4
+      }
+    },
+    {
+      "id": "DEPTH-7-objective-postcheck-specs",
+      "mg": "intended (DEPTH-7, CONTRACT CHANGE)",
+      "fixtures": "*",
+      "producer": "*",
+      "artifact": [
+        "tenant-manifest",
+        "manual-mission-plan"
+      ],
+      "path": [
+        "tenant_manifest/normative_controls/*/verification",
+        "tenant_manifest/normative_controls/*/verification/**",
+        "outputs/human_readable_mission_plan/steps/*/how_to_verify",
+        "outputs/human_readable_mission_plan/steps/*/how_to_verify/**",
+        "outputs/human_readable_mission_plan/steps/*/manual_completion_criteria"
+      ],
+      "reason": "Intended (DEPTH-7, depth plan DEPTH-REPORT-AND-PLAN.md section 4, CONTRACT CHANGE): Muster rebuilds every practice row set of the TM verification[] as one postcheck spec per assessment objective from the ces-shared assessor approach KB (objective_id, assessment_methods, determination; method stays the control machine method or manual), keeps the W3 expected_value / presence_only values on the objective each names (this entry replaces W3-tm-verification-expected-values, whose paths it covers), and writes no row for a control id outside the 110 practices (phantom L2 twins, FOUNDATION, scre.OPV.*, btc_gate_*, cui_*). The human plan how_to_verify lists the same objectives (examine/interview/test), so manual_completion_criteria counts change with it; this entry is first in file order, so it also takes the criteria diffs EVC3, S5, MG-13 and MG-07 absorbed before (their counts shrank by the same numbers). Planner emits the three boilerplate rows. Permanent.",
+      "count": {
+        "a": 2038,
+        "b": 288,
+        "c": 1932,
+        "d": 2024
+      }
+    },
+    {
+      "id": "W5c3-directive-promotion",
+      "mg": "intended (W5c3, synthetic-customer directive type)",
+      "fixtures": [
+        "a",
+        "c",
+        "d"
+      ],
+      "producer": "*",
+      "artifact": "manual-mission-plan",
+      "path": [
+        "outputs/human_readable_mission_plan/control_directives/*/directive",
+        "outputs/human_readable_mission_plan/disposition_summary/control_register/*/directive",
+        "outputs/human_readable_mission_plan/disposition_summary/directive_counts/*",
+        "outputs/human_readable_mission_plan/controls/*/stamper_action"
+      ],
+      "kind": "changed",
+      "valuePattern": "^(manual|implement|Non-Stack|Automated|\\d+)$",
+      "reason": "W5c3: Muster promotes a Non-Stack control (directive manual) to implement when Stamper's registry has an entry with a set command that lists it (plan/derive/directivePromotion.ts over REGISTRY_FIX_PATHS), except the controls Stamper itself promotes to document-renderable. Planner keeps them manual. Per fixture and producer: IA.L2-3.5.10, MA.L2-3.7.1, MA.L2-3.7.2, RA.L2-3.11.3 in control_directives, control_register and controls[].stamper_action (12) plus the implement / manual directive_counts (2) = 14, both producers = 28. W5c5: plus IA.L2-3.5.8 (Stamper-renderable, promoted through the state-verified CM.L2-3.4.1.compliance-policy-windows; RENDERABLE_STATE_ENTRIES): 3 more per producer, both producers = 34. W5c7: plus AU.L2-3.3.7 (its first configuring entry, AU.L2-3.3.7.time-sync): 3 more per producer, both producers = 40. W7: plus PS.L2-3.9.2 (Stamper's verify-only entry PS.L2-3.9.2.leaver-workflow, added to REGISTRY_FIX_PATHS as tenant:PS.L2-3.9.2.leaver-workflow): 3 more per producer, both producers = 46. PH-12 (LOG-PH12-R2 STOP-1, AC.L2-3.1.6 no longer scoped out; reviewed in LOG-PH12-INT.md Round 2): +2 a, 2 c, 2 d: directive_counts: implement +1 and document-prohibition -1, one diff each per producer. PH-13 (LOG-PH13-UNIT.md Round 2; the fix-path extract regenerated from the PH-12 registry): plus MP.L2-3.8.7 (configured by AC.L2-3.1.21.block-storage, PH-12 R2 cross-credit; fixtures a and d) and CM.L2-3.4.8 (Stamper-renderable, promoted through the state-verified CM.L2-3.4.8.app-control, orchestrator decision; fixtures a, c and d): control_directives, control_register and controls[].stamper_action, 3 per control per producer. a and d +12 (60), c +6 (54). RA.L2-3.11.2 is not promoted (reviewed exception).",
+      "count": {
+        "a": 60,
+        "c": 54,
+        "d": 60
+      }
+    },
+    {
+      "id": "EVC3-catalog-evidence-3.1.1",
+      "mg": "EVC.3",
+      "fixtures": "*",
+      "producer": "*",
+      "artifact": [
+        "manual-mission-plan",
+        "tenant-manifest"
+      ],
+      "path": [
+        "outputs/human_readable_mission_plan/steps/[id=step_task_*-3.1.1_*]/expected_artifacts/**",
+        "outputs/human_readable_mission_plan/steps/[id=step_task_*-3.1.1_*]/what_to_do",
+        "outputs/human_readable_mission_plan/steps/[id=step_task_*-3.1.1_*]/manual_completion_criteria",
+        "tenant_manifest/normative_controls/[control_id=*-3.1.1]/evidence_artifacts/**"
+      ],
+      "reason": "EVC.3 (R-2): 3.1.1's evidence archetypes now come from the released evidence catalog (release 0: 11 EMX ids from 14 definitions) instead of the Store-era set, so its step expected_artifacts, what_to_do ([Evidence] lines), manual_completion_criteria and TM evidence_artifacts change. The Planner goldens predate EVC.3 (Planner made the same change but did not regenerate its goldens); remove this entry when they are regenerated.",
+      "count": {
+        "a": 92,
+        "b": 46,
+        "c": 92,
+        "d": 92
+      }
+    },
+    {
+      "id": "KB4-reference-titles",
+      "mg": "KB-4 (gap-closure plan G-KB; R-1)",
+      "fixtures": [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      "producer": "*",
+      "artifact": "manual-mission-plan",
+      "path": [
+        "outputs/human_readable_mission_plan/disposition_summary/control_register/*/title",
+        "outputs/human_readable_mission_plan/steps/*/requirement_context/title",
+        "outputs/human_readable_mission_plan/controls/*/title"
+      ],
+      "kind": "changed",
+      "reason": "KB-4: the vendored gap compiler takes each practice's title from ces-shared (assessor-approach.reference.json, which carries the NIST practice statement) instead of the Store row (R-1: Store titles are shifted to other practices). Control-register titles, controls[].title and every step's requirement_context.title change; the Planner goldens keep the Store titles. Text only: no step, control or directive is added or removed. Remove when Planner adopts the same join and regenerates its goldens.",
+      "count": {
+        "a": 688,
+        "b": 102,
+        "c": 674,
+        "d": 686
+      }
+    },
+    {
+      "id": "D1-cost-proposal-sow",
+      "mg": "D1",
+      "fixtures": "*",
+      "producer": "*",
+      "artifact": "manual-mission-plan",
+      "path": "outputs/cost_proposal_sow/**",
+      "reason": "Decision D1: pricing is out of scope for Muster. The MP's inline cost_proposal_sow block (line items, quantities, prices) is not a parity target. PH-12 (LOG-PH12-R2 STOP-1, AC.L2-3.1.6 no longer scoped out; reviewed in LOG-PH12-INT.md Round 2): +4 a, 2 c, 4 d: the MS-1 (fixture c chain: MS-2) line item gains the step_task_AC.L2-3.1.6 step: qty and extended_price +17 h, mapping steps and controls.",
+      "count": {
+        "a": 9,
+        "b": 4,
+        "c": 15,
+        "d": 9
+      }
+    },
+    {
+      "id": "D1-loe-fields",
+      "mg": "D1",
+      "fixtures": "*",
+      "producer": "*",
+      "artifact": "*",
+      "path": [
+        "**/estimated_effort_hours",
+        "**/effort_estimate/**"
+      ],
+      "reason": "Decision D1: LOE fields (estimated_effort_hours, effort_estimate.*) feed pricing only and are out of scope. They move with task priority, which differs for the reasons in the MG-08 and MG-07 entries.",
+      "count": {
+        "a": 352,
+        "c": 188,
+        "d": 414
+      }
+    },
+    {
+      "id": "S5-si-dependencies-carried",
+      "mg": "intended (section 5)",
+      "fixtures": "*",
+      "producer": "*",
+      "artifact": [
+        "si-baseline",
+        "manual-mission-plan"
+      ],
+      "path": [
+        "si_baseline/dependencies/*",
+        "inputs/si_baseline/si_baseline/dependencies/*"
+      ],
+      "kind": "extra",
+      "reason": "Planner defect Muster must not inherit (01-GAP-BACKLOG section 5): Planner's SI generator drops SIT-020/021/022 (infrastructure_model, license_tier, user_count); Muster carries them (siBaselineAdapter patch). Permanent; siEquivalence.test.ts holds the regression test.",
+      "count": {
+        "a": 12,
+        "b": 12,
+        "c": 12,
+        "d": 12
+      }
+    },
+    {
+      "id": "S5-mp-infrastructure-facts",
+      "mg": "intended (section 5)",
+      "fixtures": "*",
+      "producer": "*",
+      "artifact": "manual-mission-plan",
+      "path": [
+        "inputs/infrastructure_configuration/*",
+        "outputs/human_readable_mission_plan/disposition_summary/si_key_facts/infrastructure_model",
+        "outputs/human_readable_mission_plan/disposition_summary/si_key_facts/license_tier",
+        "outputs/human_readable_mission_plan/disposition_summary/si_key_facts/user_count",
+        "outputs/human_readable_mission_plan/license_tier_matrix/**",
+        "outputs/human_readable_mission_plan/m365_gap_advisory"
+      ],
+      "reason": "Section 5 defect: without SIT-020/021/022 in its SI, Planner's MP falls back to m365_azure / g5 / 50 users; Muster's MP states the customer's real model, tier and count. Permanent. PH-12 (LOG-PH12-R2 STOP-1, AC.L2-3.1.6 no longer scoped out; reviewed in LOG-PH12-INT.md Round 2): +2 a, 2 c, 2 d: coverage_summary counts one more control covered and one fewer scoped out, per producer.",
+      "count": {
+        "a": 6,
+        "b": 16,
+        "c": 18,
+        "d": 8
+      }
+    },
+    {
+      "id": "S5-chain-m365-alternative-text",
+      "mg": "intended (section 5)",
+      "fixtures": "*",
+      "producer": "chain",
+      "artifact": "manual-mission-plan",
+      "path": [
+        "outputs/human_readable_mission_plan/steps/*/what_to_do",
+        "outputs/human_readable_mission_plan/steps/*/manual_completion_criteria",
+        "outputs/human_readable_mission_plan/steps/*/gap_classifications",
+        "outputs/human_readable_mission_plan/controls/*/gap_classifications"
+      ],
+      "reason": "Section 5 defect, equal-inputs chain only: Planner plans these Azure-network controls for its fallback m365_azure model; Muster, knowing the customer is m365_only / m365_sentinel, plans the M365-native alternative (M365_ALTERNATIVES). Permanent.",
+      "count": {
+        "b": 6,
+        "c": 27,
+        "d": 6
+      }
+    },
+    {
+      "id": "S5-tm-intent-model",
+      "mg": "intended (section 5)",
+      "fixtures": "*",
+      "producer": "chain",
+      "artifact": "tenant-manifest",
+      "path": "ces/intent",
+      "reason": "Section 5 defect: the TM intent names the infrastructure model; Planner's is its fallback m365_azure, Muster's is the customer's model. Permanent.",
+      "count": {
+        "b": 1,
+        "c": 1,
+        "d": 1
+      }
+    },
+    {
+      "id": "S5-tm-intent-model-session",
+      "mg": "intended (section 5)",
+      "fixtures": [
+        "b",
+        "c"
+      ],
+      "producer": "session",
+      "artifact": "tenant-manifest",
+      "path": "ces/intent",
+      "reason": "Section 5 defect, fixtures (b) and (c) end to end: same as S5-tm-intent-model (m365_azure fallback vs the customer's m365_only). Permanent.",
+      "count": {
+        "b": 1,
+        "c": 1
+      }
+    },
+    {
+      "id": "S5-im-model",
+      "mg": "intended (section 5)",
+      "fixtures": [
+        "a"
+      ],
+      "producer": "*",
+      "artifact": "infrastructure-manifest",
+      "path": [
+        "ces/intent",
+        "infrastructure_manifest/identity/**",
+        "infrastructure_manifest/network/**",
+        "infrastructure_manifest/storage/**",
+        "infrastructure_manifest/diagnostics/**",
+        "infrastructure_manifest/security/**",
+        "infrastructure_manifest/automation/**",
+        "infrastructure_manifest/logging/**",
+        "infrastructure_manifest/stamper_variable_map/*",
+        "infrastructure_manifest/registry_coverage/*",
+        "infrastructure_manifest/provenance/**"
+      ],
+      "reason": "Section 5 defect: fixture (a) is m365_azure, but Planner's SI drops infrastructure_model so its IM generator falls back to Sentinel-only; Muster builds the full Azure IM the customer asked for. Permanent. CG-1 (2026-10-31): 186 -> 180, the default IM no longer carries the AzureFirewallSubnet, private endpoints and private DNS zones.",
+      "count": {
+        "a": 180
+      }
+    },
+    {
+      "id": "MG-05-im-model",
+      "mg": "MG-05",
+      "fixtures": [
+        "d"
+      ],
+      "producer": "session",
+      "artifact": [
+        "infrastructure-manifest",
+        "manual-mission-plan"
+      ],
+      "path": [
+        "ces/intent",
+        "infrastructure_manifest/identity/**",
+        "infrastructure_manifest/network/**",
+        "infrastructure_manifest/storage/**",
+        "infrastructure_manifest/diagnostics/**",
+        "infrastructure_manifest/security/**",
+        "infrastructure_manifest/automation/**",
+        "infrastructure_manifest/logging/**",
+        "infrastructure_manifest/stamper_variable_map/*",
+        "infrastructure_manifest/registry_coverage/*",
+        "infrastructure_manifest/provenance/**"
+      ],
+      "reason": "MG-05: SIT-020 derives m365_azure for any Sentinel/Azure stack tile; fixture (d) is m365_sentinel, so Muster pushes a full Azure IM the customer did not ask for. CG-1 (2026-10-31): 93 -> 90, the default IM no longer carries the AzureFirewallSubnet, private endpoints and private DNS zones.",
+      "count": {
+        "d": 90
+      }
+    },
+    {
+      "id": "S5-im-m365-only",
+      "mg": "intended (section 5)",
+      "fixtures": [
+        "c"
+      ],
+      "producer": "*",
+      "artifact": "infrastructure-manifest",
+      "path": "",
+      "kind": "missing",
+      "reason": "Section 5 defect: fixture (c) is m365_only, but Planner's SI drops infrastructure_model, so Planner emits a Sentinel-only IM; Muster correctly emits none (MG-05 Done-when for fixture (c)). Permanent.",
+      "count": {
+        "c": 2
+      }
+    },
+    {
+      "id": "W4MU1-im-contract-fields",
+      "mg": "intended (W4-MU1)",
+      "fixtures": "*",
+      "producer": "*",
+      "artifact": "infrastructure-manifest",
+      "path": [
+        "infrastructure_manifest/infrastructure_model",
+        "infrastructure_manifest/secret_references/**",
+        "infrastructure_manifest/provisioning_inputs/**"
+      ],
+      "reason": "Muster emits the IM in the ces-shared contract shape (W4-MU1, FC-MU-2): it adds infrastructure_model and provisioning/secret references that Planner's IM does not have. Permanent.",
+      "count": {
+        "a": 2,
+        "d": 2
+      }
+    },
+    {
+      "id": "FX11-tm-operator-values",
+      "mg": "intended (FX-11)",
+      "fixtures": [
+        "a",
+        "c",
+        "d"
+      ],
+      "producer": "session",
+      "artifact": "tenant-manifest",
+      "path": [
+        "tenant_manifest/tenant_identity/operatorUPN",
+        "tenant_manifest/tenant_identity/breakGlassUPN",
+        "tenant_manifest/tenant_identity/breakGlassUserId",
+        "tenant_manifest/tenant_identity/cuiGroupName",
+        "tenant_manifest/tenant_identity/wifiSsid",
+        "tenant_manifest/tenant_identity/securityEmail",
+        "tenant_manifest/tenant_identity/cisoEmail",
+        "tenant_manifest/tenant_identity/approverUPN",
+        "tenant_manifest/tenant_identity/adminUserName",
+        "tenant_manifest/tenant_identity/approvedIpRange",
+        "tenant_manifest/tenant_identity/touFileName",
+        "tenant_manifest/tenant_identity/touFileBase64",
+        "tenant_manifest/tenant_identity/subscriptionId",
+        "tenant_manifest/tenant_identity/baselineTemplateId",
+        "tenant_manifest/tenant_identity/complianceRoleId",
+        "tenant_manifest/tenant_identity/roleDefId",
+        "tenant_manifest/tenant_identity/operator_value_provenance"
+      ],
+      "kind": "extra",
+      "reason": "Intended (FX-11, MG-14): Muster's TM carries the operator values Stamper's commands need under the camelCase names its ManifestReader copies from tenant_identity verbatim, plus their provenance record (non-scalar, ignored by Stamper; read by the MG-15 push gate). Planner's TM has none. Unresolved values are left out (d: no operatorUPN or breakGlassUserId). W1 (synthetic customers): the further Stamper values Muster supplies ride the same block; on the fixtures only the two derived built-in role template ids (complianceRoleId, roleDefId) resolve (+2 each). W5c6: cisoEmail, the answered security mailbox again under Stamper's AZ-MON-001 name (+1 each). Permanent.",
+      "count": {
+        "a": 10,
+        "c": 10,
+        "d": 8
+      }
+    },
+    {
+      "id": "MG-03-bridged-posture-snapshot",
+      "mg": "MG-03",
+      "fixtures": "*",
+      "producer": "*",
+      "artifact": "manual-mission-plan",
+      "path": "inputs/readiness_posture/snapshot_id",
+      "reason": "MG-03 (two postures), chain producer only: the equal-inputs chain feeds the compile Planner's requirement results without a posture, so the MP embeds the bridged posture (snapshot_id 'muster-plan-mode'). The session producer now embeds the scoreFacts posture (2B integration), so it no longer differs here.",
+      "count": {
+        "a": 1,
+        "b": 1,
+        "c": 1,
+        "d": 1
+      }
+    },
+    {
+      "id": "MG-08-boundary-context",
+      "mg": "MG-08",
+      "fixtures": "*",
+      "producer": "chain",
+      "artifact": [
+        "manual-mission-plan",
+        "tenant-manifest"
+      ],
+      "path": [
+        "inputs/cui_boundary_ref",
+        "outputs/human_readable_mission_plan/boundary_context/**",
+        "tenant_manifest/boundary_zones/**"
+      ],
+      "reason": "MG-08 landed for the session producer (TM boundary_zones, MP boundary_context and cui_boundary_ref equal Planner's golden for a, c and d). The chain producer (buildPlanArtifacts fed Planner's SIT answers) passes no CUI answers and no resolveCuiBoundary, so its boundary is absent: 3 diffs per CUI fixture (cui_boundary_ref, boundary_context.cui_boundary, boundary_zones). Remove when the harness feeds Planner's CUI answers to the chain.",
+      "count": {
+        "a": 3,
+        "c": 3,
+        "d": 3
+      }
+    },
+    {
+      "id": "MG-08-chain-boundary-severity",
+      "mg": "MG-08",
+      "fixtures": "*",
+      "producer": "chain",
+      "artifact": [
+        "manual-mission-plan",
+        "tenant-manifest"
+      ],
+      "path": [
+        "outputs/human_readable_mission_plan/steps/*/priority",
+        "outputs/human_readable_mission_plan/milestones/**",
+        "tenant_manifest/evidence_monitors/*/cadence",
+        "tenant_manifest/drift_policies/**"
+      ],
+      "reason": "MG-08, equal-inputs chain: with a CUI boundary, compileGapSet's boundary pass downgrades out-of-boundary gap severity (HIGH->MEDIUM->LOW); Muster passes no boundary, so task priority, priority-phased milestones, monitor cadence and drift policies differ. Fixture (b) (no CUI) shows none of these. Session producer: fixed by MG-08 (the boundary now reaches compileGapSet); this entry covers the chain producer only, for the MG-08-boundary-context chain reason.",
+      "count": {
+        "a": 191,
+        "c": 112,
+        "d": 223
+      }
+    },
+    {
+      "id": "MG-13-b-l1-scope",
+      "mg": "MG-13",
+      "also": [
+        "MG-07"
+      ],
+      "fixtures": [
+        "b"
+      ],
+      "producer": "session",
+      "artifact": [
+        "manual-mission-plan",
+        "tenant-manifest"
+      ],
+      "path": [
+        "inputs/readiness_posture/**",
+        "outputs/human_readable_mission_plan/**",
+        "tenant_manifest/**"
+      ],
+      "reason": "MG-13, fixture (b), re-owned to MG-07: the plan is L1 (G-02 no_cui) and the posture is now the full cascade over the compiled SI with Planner's preamble. The remaining 15 diffs (DEPTH-7 took the 2 completion-criteria diffs) (MP posture summary, gap classifications, completion criteria, milestones) follow the fixture session's retired readiness answers (iam-/ep-/pol-… re-keyed onto RR activities), which override cascade results where Planner's wizard answered differently.",
+      "count": {
+        "b": 15
+      }
+    },
+    {
+      "id": "MG-07-posture",
+      "mg": "MG-07",
+      "also": [
+        "MG-01",
+        "MG-02",
+        "MG-03"
+      ],
+      "fixtures": "*",
+      "producer": "session",
+      "artifact": "readiness-posture",
+      "path": "**",
+      "reason": "MG-07 landed: the posture is the vendored bulk cascade (tech-ref index, scenario SI, the session's preamble snapshot) plus the scenario-selected interview answers; with Planner's preamble alone it equals the golden on a-d (readinessCoverage.test.ts). The remaining diffs are the fixture sessions' 25 retired readiness answers (re-keyed onto the RR activities they alias), which override the cascade where Planner's wizard answered differently, e.g. a: iam-005 'no' turns AC.L1-3.1.1 and PS.L2-3.9.2 from partial to not_met.",
+      "count": {
+        "a": 18,
+        "b": 4,
+        "c": 17,
+        "d": 8
+      }
+    },
+    {
+      "id": "MG-07-mp-posture",
+      "mg": "MG-07",
+      "also": [
+        "MG-03"
+      ],
+      "fixtures": "*",
+      "producer": "session",
+      "artifact": "manual-mission-plan",
+      "path": [
+        "inputs/readiness_posture/**",
+        "outputs/human_readable_mission_plan/controls/*/readiness_status",
+        "outputs/human_readable_mission_plan/scope_exclusion_warnings"
+      ],
+      "reason": "MG-07: the MP's embedded posture and per-control readiness status now come from scoreFacts over the compiled SI Baseline with the session's preamble (planCompileService, 2B integration), as Planner's do. What remains is the same answer-driven residue as MG-07-posture (the fixtures' retired readiness answers overriding cascade partials), carried into key findings, the status summary and the controls' readiness_status.",
+      "count": {
+        "a": 45,
+        "c": 28,
+        "d": 6
+      }
+    },
+    {
+      "id": "MG-07-downstream-plan",
+      "mg": "MG-07",
+      "also": [
+        "MG-08",
+        "MG-14",
+        "intended (section 5)"
+      ],
+      "fixtures": "*",
+      "producer": "session",
+      "artifact": [
+        "manual-mission-plan",
+        "tenant-manifest"
+      ],
+      "path": [
+        "outputs/human_readable_mission_plan/steps/**",
+        "outputs/human_readable_mission_plan/controls/**",
+        "outputs/human_readable_mission_plan/control_directives/**",
+        "outputs/human_readable_mission_plan/disposition_summary/**",
+        "outputs/human_readable_mission_plan/milestones/**",
+        "tenant_manifest/normative_controls/**",
+        "tenant_manifest/config_intents/**",
+        "tenant_manifest/evidence_monitors/**",
+        "tenant_manifest/drift_policies/**"
+      ],
+      "reason": "MG-07, end to end: the gap set follows the MP posture, so steps, controls, directives and TM intents differ only where MG-07-mp-posture's answer-driven requirement statuses differ (gap rationale and classifications, what_to_do, completion criteria; c also one milestone and one drift-policy scope). Mixed into the same subtrees: the boundary severity effect (MG-08, isolated in MG-08-chain-boundary-severity), TCP text that shares a field with posture text (MG-14) and the section-5 M365-alternative text. PH-12 (LOG-PH12-R2 STOP-1, AC.L2-3.1.6 no longer scoped out; reviewed in LOG-PH12-INT.md Round 2): +3 a, 1 c, 3 d: MS-1 exit_criteria counts one more medium-priority task, phase_tasks gains task_AC.L2-3.1.6, the drift policy scope lists AC.L2-3.1.6 (session producer).",
+      "count": {
+        "a": 14,
+        "c": 39,
+        "d": 5
+      }
+    },
+    {
+      "id": "W5c2-si-governance-owners",
+      "mg": "intended (W5c2, SC-5 side finding)",
+      "fixtures": [
+        "a"
+      ],
+      "producer": "session",
+      "artifact": [
+        "si-baseline",
+        "manual-mission-plan"
+      ],
+      "path": [
+        "si_baseline/governance/affirming_official",
+        "si_baseline/governance/change_control_owner",
+        "si_baseline/governance/audit_interface_owner",
+        "si_baseline/risk_acceptance/risk_acceptance_authority",
+        "inputs/si_baseline/si_baseline/governance/affirming_official",
+        "inputs/si_baseline/si_baseline/governance/change_control_owner",
+        "inputs/si_baseline/si_baseline/governance/audit_interface_owner",
+        "inputs/si_baseline/si_baseline/risk_acceptance/risk_acceptance_authority"
+      ],
+      "kind": "changed",
+      "reason": "W5c2: the pinned SI bank asks no governance owner, so Planner writes \"Not specified\". Muster derives them from the confirmed personnel answers (siBaselineAdapter.siGovernanceFromFacts): affirming official and risk acceptance authority = PI.PER.009 Authorizing Official, else PI.PER.002 System Owner; change control owner = PI.PER.003 Compliance Officer; audit interface owner = PI.PER.001 ISSO, else PI.PER.003. Fixture (a) answers PI.PER.001-003, so 4 fields in the SI Baseline and 4 in the MP's embedded copy.",
+      "count": {
+        "a": 8
+      }
+    },
+    {
+      "id": "W5c2-muster-policy-templates",
+      "mg": "intended (W5c2, SC-5 P10)",
+      "fixtures": [
+        "a"
+      ],
+      "producer": "session",
+      "artifact": "policy-documents",
+      "path": "[template_id=*]",
+      "kind": "extra",
+      "reason": "W5c2 (SC-5 P10): Muster renders two policy-set documents of its own after Planner's 20 (policyDocuments.ts MUSTER_POLICY_TEMPLATES, public/templates/muster-policies/): continuous_monitoring_plan and acceptable_use_policy. Planner has no such template, so its golden has no entry.",
+      "count": {
+        "a": 2
+      }
+    },
+    {
+      "id": "MG-16-policy-text",
+      "mg": "MG-16",
+      "fixtures": [
+        "a"
+      ],
+      "producer": "session",
+      "artifact": "policy-documents",
+      "path": "[template_id=*]/markdown",
+      "kind": "changed",
+      "reason": "MG-16: Muster renders all 20 documents through Planner's vendored chain; every document text differs from the golden by design, for four reviewed reasons: (1) governance dates are the plan date (W5: policies effective on approval; the fixture's frozen clock gives 2026-01-15, next review 2027-01-15), not an asked PI.GOV.001 (Planner: 2026-02-01) and no longer the Mission Plan's first milestone; (2) the organisation legal name is the engagement profile's organisation name (\"Simtenant Alpha Aerospace\"), not an asked PI.ORG.001; (3) personnel: Planner's parsePersonnel splits on '|' while its bank prompt asks for \"Name, Title, Email\", so Planner renders the whole comma string as the name; Muster passes the three-part answer in the '|' form (Planner defect, section-5 class), so names, titles and emails render separately; (4) the SSP, POA&M and risk-assessment report quote the posture counts, which differ by MG-07 (the session posture). (5) W4 banner (founder decision 2026-10-27): the SSP and POA&M carry a planning-draft banner under the title naming the EvidenceOps SSP / POA&M as the documents of record; Muster prepends it at render time (policyDocuments.ts withPlanningDraftBanner), the pinned templates are unchanged. (6) W5 SC-6: a document whose template names no approver (or, for the SSP and POA&M, no owner) ends with an Approval section naming the owner (default ISSM, the Compliance Officer here) and the approver (the System Owner here) with name, title, signature and date lines (policyDocuments.ts withApprovalBlock), and an SI governance owner left \"Not specified\" takes the approver (affirming official) or the ISSM (change control owner) (withOrganisationNames). Completeness is 100 on every document on both sides; the context completeness is 21/21 on both.",
+      "count": {
+        "a": 20
+      }
+    },
+    {
+      "id": "MG-11-control-assessment-posture",
+      "mg": "MG-11",
+      "also": [
+        "MG-07",
+        "MG-03"
+      ],
+      "fixtures": "*",
+      "producer": "session",
+      "artifact": "control-assessment-report",
+      "path": [
+        "controls/*/readiness_status",
+        "summary/met",
+        "summary/partial",
+        "summary/not_met",
+        "summary/unknown"
+      ],
+      "reason": "The control assessment report's readiness_status and its summary counts are the posture's statuses. Muster's report reads the session's one posture (MG-03), Planner's golden its wizard posture; they differ where MG-07-posture's requirement statuses differ (the fixtures' retired readiness answers override cascade partials). Derived golden (no report golden yet).",
+      "count": {
+        "a": 14,
+        "c": 14,
+        "d": 4
+      }
+    },
+    {
+      "id": "MG-18-tech-ref-posture",
+      "mg": "MG-18",
+      "also": [
+        "MG-07",
+        "MG-03"
+      ],
+      "fixtures": "*",
+      "producer": "session",
+      "artifact": "tech-ref-implementation-guide",
+      "path": [
+        "control_families/*/controls/*/status",
+        "posture_summary/*"
+      ],
+      "reason": "The tech-ref guide's per-control status and posture_summary are the posture's statuses (upper-cased). Same cause as MG-11-control-assessment-posture: the session's one posture vs Planner's wizard posture (MG-07). Derived golden (no report golden yet).",
+      "count": {
+        "a": 14,
+        "b": 3,
+        "c": 12,
+        "d": 4
+      }
+    },
+    {
+      "id": "MG-11-downstream-m365-only",
+      "mg": "MG-11",
+      "also": [
+        "intended (section 5)",
+        "MG-13"
+      ],
+      "fixtures": [
+        "b",
+        "c"
+      ],
+      "producer": "session",
+      "artifact": [
+        "traceability-report",
+        "control-assessment-report"
+      ],
+      "path": [
+        "summary/infrastructure_model",
+        "summary/total_tasks",
+        "domains/*/requirements/*/tasks/*/description",
+        "domains/*/requirements/*/tasks/*/gap_classifications",
+        "domains/*/requirements/*/tasks/*/what_to_do",
+        "controls/*/implementation_summary",
+        "controls/*/gap_classifications"
+      ],
+      "reason": "Fixtures b and c are m365_only. Muster's SI Baseline carries dependencies.infrastructure_model (S5-si-dependencies-carried); Planner's golden SI drops it, so Planner's generators fall back to m365_azure (the traceability summary) and Planner's task compile adds no M365-native alternative (manual_alternative class, gap-severity text: S5-chain-m365-alternative-text). b's one extra task count is the L1 scope (MG-13-b-l1-scope). Derived golden (no report golden yet).",
+      "count": {
+        "b": 12,
+        "c": 46
+      }
+    },
+    {
+      "id": "MG-12-artifact-refs",
+      "mg": "MG-12",
+      "fixtures": [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      "producer": "session",
+      "artifact": "manual-mission-plan",
+      "path": [
+        "inputs/si_baseline_ref",
+        "inputs/readiness_posture_ref",
+        "inputs/tcp_ref/schema_id",
+        "inputs/tcp_ref/artifact_id",
+        "inputs/tcp_ref/hash_sha256"
+      ],
+      "kind": "extra",
+      "reason": "MG-12 (persist-and-reference): Muster's MP references the SI Baseline, Readiness Posture and TCP it was compiled from by id and SHA-256, in the copied Planner MP schema's artifact_ref slots (inputs.si_baseline_ref, inputs.readiness_posture_ref) and as artifact_ref fields added to the generator's inputs.tcp_ref. Planner's golden carries none of them (Planner emits no references). Intended; b has no TCP (2 diffs), a/c/d 5 each. The chain producer runs buildPlanArtifacts only and carries no references.",
+      "count": {
+        "a": 5,
+        "b": 2,
+        "c": 5,
+        "d": 5
+      }
+    },
+    {
+      "id": "W7-MX2-cui-boundary-ref",
+      "mg": "MG-12",
+      "fixtures": [
+        "a",
+        "c",
+        "d"
+      ],
+      "producer": "session",
+      "artifact": "manual-mission-plan",
+      "path": [
+        "inputs/cui_boundary_ref/schema_id",
+        "inputs/cui_boundary_ref/artifact_id",
+        "inputs/cui_boundary_ref/hash_sha256"
+      ],
+      "kind": "extra",
+      "reason": "W7-MX2 (ces-shared 2.10.0, note 38): Muster's MP references the CUI Boundary it was compiled with by id and SHA-256, as fields added to the generator's inputs.cui_boundary_ref block (kept: artifact, version, generated_on, cui_bank_version), the sixth MG-12 hand-off kind. Planner's golden carries none of them. Intended; b builds no CUI Boundary (0 diffs), a/c/d 3 each. The chain producer runs buildPlanArtifacts only and carries no references.",
+      "count": {
+        "a": 3,
+        "c": 3,
+        "d": 3
+      }
+    },
+    {
+      "id": "CG-8-recurring-cost-notice",
+      "mg": "intended (CG-8, cost gate; founder ruling 2026-10-31)",
+      "fixtures": "*",
+      "producer": "session",
+      "artifact": "manual-mission-plan",
+      "path": "recurring_cost_notice",
+      "kind": "extra",
+      "reason": "CG-8: Muster writes the recurring-cost notice (recurring_cost_notice, CONTRACT CHANGE additive) into the Mission Plan at compile; Planner has no such field. One per fixture. Permanent.",
+      "count": {
+        "a": 1,
+        "b": 1,
+        "c": 1,
+        "d": 1
+      }
+    },
+    {
+      "id": "CG-1-law-retention",
+      "mg": "intended (CG-1, cost gate defaults off)",
+      "fixtures": [
+        "d"
+      ],
+      "producer": "chain",
+      "artifact": "infrastructure-manifest",
+      "path": [
+        "infrastructure_manifest/logging/*/properties/retention_days",
+        "infrastructure_manifest/provenance/*/value",
+        "infrastructure_manifest/provenance/*/source",
+        "infrastructure_manifest/provenance/*/rule"
+      ],
+      "kind": "changed",
+      "reason": "CG-1: the Log Analytics workspace keeps 90 days (the free window), separate from the WORM evidence days; Planner set the workspace retention to the evidence retention. Permanent.",
+      "count": {
+        "d": 4
+      }
+    }
+  ]
+}

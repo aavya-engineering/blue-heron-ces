@@ -1,0 +1,908 @@
+{
+  "family": "AU",
+  "family_name": "Audit and Accountability",
+  "practices": [
+    {
+      "id": "AU.L2-3.3.1",
+      "title": "Create and retain system audit logs and records to the extent needed to enable the monitoring, analysis, investigation, and reporting of unlawful or unauthorized system activity.",
+      "approach": {
+        "what_assessor_does": "The assessor reads the audit and accountability policy for two written decisions: which event types must be logged and what each record must contain, and how long records are kept. They then compare those decisions with what the tenant and the Azure resources actually log. They pull a sample of recent records from the unified audit log and the Log Analytics workspace and check that each one carries the defined fields, such as event, time, actor, source and outcome. They check the retention settings in Purview and Log Analytics against the written period and ask for an old record from near the end of that period. In interviews they ask the logging administrator how the event list was chosen and how a gap in logging would be noticed.",
+        "common_failure_modes": [
+          "The policy says logging is enabled but never lists the event types or the record content it needs.",
+          "Unified audit logging is off, or some workloads in scope (Exchange, SharePoint, Entra ID, Azure resources) send nothing.",
+          "Azure resources holding CUI have no diagnostic settings, so their activity never reaches the workspace.",
+          "The written retention period differs from the Purview or Log Analytics setting, or no period is written at all.",
+          "No record older than a few weeks can be produced, so retention cannot be shown in practice.",
+          "Sampled records lack a field the policy says they must carry."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AU.L2-3.3.1[a]",
+          "determination": "audit logs needed (i.e., event types to be logged) to enable the monitoring, analysis, investigation, and reporting of unlawful or unauthorized system",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Audit and accountability policy listing the event types to log",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/audit-accountability-policy.md (GateEvidence family AU). Should name the event types needed to monitor and investigate misuse, not only say that logging is on."
+            },
+            {
+              "artifact_type": "Diagnostic settings coverage report",
+              "ces_source": "ao_row",
+              "notes": "AdminOps E-03 Diagnostic Settings Coverage: per-resource check that diagnostic settings send to Log Analytics; registered against AU.L2-3.3.1 (evidence objectives [a] and [c])."
+            },
+            {
+              "artifact_type": "Logging administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how the list of logged event types was chosen and which threats or investigations it is meant to support."
+            }
+          ]
+        },
+        {
+          "id": "AU.L2-3.3.1[b]",
+          "determination": "the content of audit records needed to support monitoring, analysis, investigation, and reporting of unlawful or unauthorized system activity is defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Audit record content definition",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/audit-accountability-policy.md (GateEvidence family AU). Should state the fields each record must hold (what happened, when, where, source, outcome, who)."
+            },
+            {
+              "artifact_type": "Logging standard or SIEM data dictionary",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector when record content is defined outside the policy, for example in a Sentinel or SIEM standard."
+            },
+            {
+              "artifact_type": "Logging administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask which fields an investigator needs from a record and where that requirement is written."
+            }
+          ]
+        },
+        {
+          "id": "AU.L2-3.3.1[c]",
+          "determination": "audit records are created (generated)",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Unified audit log records",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AU.L2-3.3.1 (auditEventsEvaluator): PowerShell Search-UnifiedAuditLog. Checks for records in the last 30 days across Entra ID, Exchange and SharePoint."
+            },
+            {
+              "artifact_type": "Unified audit log health check",
+              "ces_source": "ao_row",
+              "notes": "AdminOps E-02 Unified Audit Log Health: confirms events are flowing, finds gaps and checks the Sentinel heartbeat; registered against AU.L2-3.3.1 (evidence objective [c])."
+            },
+            {
+              "artifact_type": "Audit ingestion enablement",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entries AU.L2-3.3.1.audit-enable (unified audit log ingestion in Exchange Online) and AZ-DIAG-001 through AZ-DIAG-008 (diagnostic settings to the Log Analytics workspace)."
+            },
+            {
+              "artifact_type": "Live record generation test",
+              "ces_source": "interview",
+              "notes": "With the logging administrator, perform a harmless admin action and find its record in the audit log search during the session."
+            }
+          ]
+        },
+        {
+          "id": "AU.L2-3.3.1[d]",
+          "determination": "audit records, once created, contain the defined content",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Sampled audit records with their fields",
+              "ces_source": "eo_store",
+              "notes": "EO collected records collect.unifiedAuditLog (collector C1a). The evaluator marks the practice not met when any record in the last 30 days lacks its event or time."
+            },
+            {
+              "artifact_type": "Privileged action audit",
+              "ces_source": "ao_row",
+              "notes": "AdminOps E-07 Privileged Action Audit: role changes correlated with PIM activations; registered against AU.L2-3.3.1 (evidence objectives [c] and [d])."
+            },
+            {
+              "artifact_type": "Logging administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask the administrator to open a sampled record and point to each field the policy requires."
+            }
+          ]
+        },
+        {
+          "id": "AU.L2-3.3.1[e]",
+          "determination": "retention requirements for audit records are defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Audit record retention requirement",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/audit-accountability-policy.md (GateEvidence family AU). Should state the retention period and the reason for it, including any contract or legal hold need."
+            },
+            {
+              "artifact_type": "Retention configuration",
+              "ces_source": "ao_row",
+              "notes": "AdminOps E-01 Audit Log Retention: configures and reads audit retention, WORM storage and Sentinel retention; registered against AU.L2-3.3.1 (evidence objectives [e] and [f])."
+            },
+            {
+              "artifact_type": "Logging administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask who set the retention period and how it was chosen."
+            }
+          ]
+        },
+        {
+          "id": "AU.L2-3.3.1[f]",
+          "determination": "audit records are retained as defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Audit retention policy and workspace retention",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entries AU.L2-3.3.1.audit-retention (12-month Purview audit retention for AAD, Exchange, SharePoint and OneDrive), AZ-LOG-001 (Log Analytics workspace, 365-day retention) and AZ-LOG-003 (WORM lock on the log storage account)."
+            },
+            {
+              "artifact_type": "Retention configuration",
+              "ces_source": "ao_row",
+              "notes": "AdminOps E-01 Audit Log Retention (registered against AU.L2-3.3.1, evidence objective [f]). Compare the configured days with the written period."
+            },
+            {
+              "artifact_type": "Retention test",
+              "ces_source": "interview",
+              "notes": "Ask the administrator to retrieve a record from near the end of the retention period during the session."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AU.L2-3.3.2",
+      "title": "Ensure that the actions of individual system users can be uniquely traced to those users so they can be held accountable for their actions.",
+      "approach": {
+        "what_assessor_does": "The assessor checks that the organization has written down which record fields tie an action to one person, normally the user principal name or object id, plus time and source. They pick a few recent actions, such as a sign-in, a role change and a file access, and follow each record back to a single named account. They look at whether shared or generic accounts exist and, if they do, how actions on them are tied to a person. In interviews they ask how the organization would show who made a given change last week. CES reads the Entra sign-in and directory audit logs and checks that every record names an actor.",
+        "common_failure_modes": [
+          "Shared admin or service accounts are used for interactive work, so actions cannot be tied to one person.",
+          "Records name only an application or an IP address for actions a person took.",
+          "The policy never says which fields identify the user, so the defined content cannot be checked.",
+          "Logs from some systems use local accounts that cannot be matched to directory identities."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AU.L2-3.3.2[a]",
+          "determination": "the content of the audit records needed to support the ability to uniquely trace users to their actions is defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "User traceability content definition",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/audit-accountability-policy.md (GateEvidence family AU). Should name the fields that tie a record to one user (for example user principal name or object id, time, source address)."
+            },
+            {
+              "artifact_type": "Shared and service account register",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Lists any shared or non-personal accounts and how their use is tied to a person."
+            },
+            {
+              "artifact_type": "Logging administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how the organization would show which person made a given change, and how shared accounts are handled."
+            }
+          ]
+        },
+        {
+          "id": "AU.L2-3.3.2[b]",
+          "determination": "audit records, once created, contain the defined content",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Sign-in and directory audit records",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AU.L2-3.3.2 (auditReviewEvaluator): Graph /auditLogs/signIns and /auditLogs/directoryAudits. A record in the last 30 days that names no actor makes the practice not met."
+            },
+            {
+              "artifact_type": "Collected sign-in and directory audit records",
+              "ces_source": "eo_store",
+              "notes": "EO collected records collect.signIns and collect.directoryAudits, kept for the assessor to sample."
+            },
+            {
+              "artifact_type": "Sign-in log export",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry AU.L2-3.3.2.signin-logs: evidence-only collection of 30 days of Entra sign-in and directory audit logs."
+            },
+            {
+              "artifact_type": "Trace test",
+              "ces_source": "interview",
+              "notes": "With the administrator, pick sampled actions and follow each record back to one named account."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AU.L2-3.3.3",
+      "title": "Review and update logged events.",
+      "approach": {
+        "what_assessor_does": "The assessor looks for a written process that says when the list of logged event types is reviewed, for example yearly and after an incident or a major change, and who does it. They ask for the record of the last review and then for what changed as a result: event types or analytics rules added, removed or tuned. They compare the dated review record with the change history of the logging configuration. CES reads Sentinel and Defender alerts for this practice, but alerts alone do not show a review; the review record has to be examined.",
+        "common_failure_modes": [
+          "No review frequency or trigger is written down.",
+          "A review is claimed but no dated record of it exists.",
+          "The review found gaps but the logging configuration or analytics rules never changed.",
+          "The event list has not changed since the system was first set up."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AU.L2-3.3.3[a]",
+          "determination": "a process for determining when to review logged events is defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Logged-event review process",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/audit-accountability-policy.md (GateEvidence family AU). Should say how often the event list is reviewed, what triggers an extra review, and who does it."
+            },
+            {
+              "artifact_type": "Logging administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask when the event list was last reviewed and what would trigger the next review."
+            }
+          ]
+        },
+        {
+          "id": "AU.L2-3.3.3[b]",
+          "determination": "event types being logged are reviewed in accordance with the defined review process",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Dated review record of logged event types",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: meeting notes, ticket or signed checklist showing the review took place on schedule."
+            },
+            {
+              "artifact_type": "Alert read for the review",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AU.L2-3.3.3 (sentinelWorkspaceEvaluator): Graph /security/alerts_v2. The evaluator returns not assessed: alerts do not show a review, so the record must be examined."
+            },
+            {
+              "artifact_type": "Reviewer interview",
+              "ces_source": "interview",
+              "notes": "Ask the person who did the last review what they looked at and what they decided."
+            }
+          ]
+        },
+        {
+          "id": "AU.L2-3.3.3[c]",
+          "determination": "event types being logged are updated based on the review",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Change record for logging configuration",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: change tickets dated after the review that add, remove or tune event types or analytics rules."
+            },
+            {
+              "artifact_type": "Sentinel connector and analytics rule configuration",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entries AU.L2-3.3.3.sentinel-connector (Office 365 data connector), AZ-SEN-001 (Sentinel onboarding) and AZ-SEN-007 (brute-force analytics rule). Compare the current setup with what the review decided."
+            },
+            {
+              "artifact_type": "Logging administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask which change came out of the last review and show it in the configuration."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AU.L2-3.3.4",
+      "title": "Alert in the event of an audit logging process failure.",
+      "approach": {
+        "what_assessor_does": "The assessor checks that the organization has written down which logging failures raise an alert, for example a connector that stops sending, an ingestion gap, or storage reaching its limit, and who receives the alert. They examine the alert rule and the action group it notifies and confirm the recipients are current people or a monitored mailbox. Testing means seeing an alert actually reach someone, either from a past failure or a controlled test. CES reads security alerts here, but alerts existing do not show a logging-failure rule; the rule and its recipients have to be examined.",
+        "common_failure_modes": [
+          "No alert exists for a logging failure; problems are found only when someone goes looking.",
+          "The action group sends to a former employee or an unmonitored mailbox.",
+          "The policy does not say which failures count, so the alert rules cannot be judged against it.",
+          "Alerts fire but nobody can show one was received or acted on."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AU.L2-3.3.4[a]",
+          "determination": "personnel or roles to be alerted in the event of an audit logging process failure are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Named alert recipients for logging failures",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/audit-accountability-policy.md (GateEvidence family AU). Should name the roles or people alerted when audit logging fails."
+            },
+            {
+              "artifact_type": "Action group configuration",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry AZ-MON-001: Azure Monitor action group sending CMMC alerts to the CISO address. Check the recipients are current."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask who receives a logging-failure alert today and who covers when they are away."
+            }
+          ]
+        },
+        {
+          "id": "AU.L2-3.3.4[b]",
+          "determination": "types of audit logging process failures for which alert will be generated are defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "List of logging failure types that raise an alert",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/audit-accountability-policy.md (GateEvidence family AU). Should list the failures that raise an alert, such as a stopped connector, an ingestion gap or a full log store."
+            },
+            {
+              "artifact_type": "Alert rule definitions",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: export of the Azure Monitor or Sentinel rules that fire on those failures."
+            },
+            {
+              "artifact_type": "Logging administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask which failure each alert rule covers and whether any failure type has no rule."
+            }
+          ]
+        },
+        {
+          "id": "AU.L2-3.3.4[c]",
+          "determination": "identified personnel or roles are alerted in the event of an audit logging process failure",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Alert read",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AU.L2-3.3.4 (alertGroupEvaluator): Graph /security/alerts_v2. The evaluator returns not assessed: alerts existing do not show a logging-failure rule or who it notifies."
+            },
+            {
+              "artifact_type": "Alert delivery record",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: a received alert from a past or test logging failure, with the date and recipient."
+            },
+            {
+              "artifact_type": "Alert test",
+              "ces_source": "interview",
+              "notes": "Ask the administrator to trigger or show a recent logging-failure alert and the recipient to confirm they got it."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AU.L2-3.3.5",
+      "title": "Correlate audit record review, analysis and reporting processes for investigation and response to indications of unlawful, unauthorized, suspicious or unusual activity.",
+      "approach": {
+        "what_assessor_does": "The assessor reads the procedure for reviewing and analyzing audit records and reporting what is found, and checks that it ties these steps together across sources rather than reviewing each log on its own. They look at how sign-in, email, endpoint and cloud records come together, normally in Sentinel or Defender incidents that group alerts from several sources. They sample recent incidents and ask the analyst how one was investigated and reported. CES reads security incidents and checks for recent ones that combine alerts from two or more detection sources.",
+        "common_failure_modes": [
+          "Each system's log is reviewed separately and nothing links them.",
+          "The procedure describes review but not how findings are reported or handed to incident response.",
+          "No incidents in recent months combine alerts from more than one source.",
+          "Analysts cannot show how a sampled incident was investigated or closed."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AU.L2-3.3.5[a]",
+          "determination": "audit record review, analysis, and reporting processes for investigation and response to indications of unlawful, unauthorized, suspicious, or unusual activity are defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Audit review, analysis and reporting procedure",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/audit-accountability-policy.md (GateEvidence family AU). Should describe how records are reviewed, analyzed and reported, and how findings feed incident response."
+            },
+            {
+              "artifact_type": "Security operations runbook",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector when the review steps are kept in a SOC or MSSP runbook."
+            },
+            {
+              "artifact_type": "Analyst interview",
+              "ces_source": "interview",
+              "notes": "Ask the analyst to walk through what happens from an alert to a report."
+            }
+          ]
+        },
+        {
+          "id": "AU.L2-3.3.5[b]",
+          "determination": "defined audit record review, analysis, and reporting processes are correlated",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Correlated security incidents",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AU.L2-3.3.5 (incidentCorrelationEvaluator): Graph /security/incidents. Looks for incidents from the last 90 days that combine alerts from two or more detection sources."
+            },
+            {
+              "artifact_type": "Collected security incidents",
+              "ces_source": "eo_store",
+              "notes": "EO collected records collect.securityIncidents (collector C6b), newest version of each incident, for the assessor to sample."
+            },
+            {
+              "artifact_type": "Audit search sample",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry AU.L2-3.3.5.audit-search: evidence-only unified audit log search over the last 7 days of ExchangeAdmin records."
+            },
+            {
+              "artifact_type": "Correlation test",
+              "ces_source": "interview",
+              "notes": "Pick a sampled incident and have the analyst show the records from each source that were linked."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AU.L2-3.3.6",
+      "title": "Provide audit record reduction and report generation to support on-demand analysis and reporting.",
+      "approach": {
+        "what_assessor_does": "The assessor asks the administrator to run a filtered search on demand, for example all actions by one user over a date range, and then produce a report from the result. They watch it done, check that the filter actually reduces the records to what was asked, and that the report can be saved or shared. They examine any saved queries or workbooks used for routine reporting. CES runs a date-bounded unified audit log search and keeps the result for on-demand analysis.",
+        "common_failure_modes": [
+          "Searching means scrolling raw logs; no filter or query capability is in use.",
+          "Only one person knows how to run a search, and they are not available.",
+          "Reports cannot be produced without exporting raw data and working on it by hand.",
+          "The search tool cannot reach the full retention period."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AU.L2-3.3.6[a]",
+          "determination": "an audit record reduction capability that supports on-demand analysis is provided",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Date-bounded audit log search",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AU.L2-3.3.6 (auditReductionEvaluator): PowerShell Search-UnifiedAuditLog with start and end dates over the last 30 days."
+            },
+            {
+              "artifact_type": "Compliance search for audit reduction",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry AU.L2-3.3.6.audit-reduction: creates a Compliance Search used to reduce audit records."
+            },
+            {
+              "artifact_type": "On-demand search test",
+              "ces_source": "interview",
+              "notes": "Ask the administrator to filter records for one user and date range during the session."
+            }
+          ]
+        },
+        {
+          "id": "AU.L2-3.3.6[b]",
+          "determination": "a report generation capability that supports on-demand reporting is provided",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Audit report sample",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry AU.L2-3.3.6.audit-report-evidence: runtime sample of Exchange admin audit records over 7 days."
+            },
+            {
+              "artifact_type": "Collected audit records for reporting",
+              "ces_source": "eo_store",
+              "notes": "EO collected records collect.unifiedAuditLog (collector C1a), kept so reports can be produced on demand."
+            },
+            {
+              "artifact_type": "Saved report or workbook",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: a Sentinel workbook, saved query or report used for routine audit reporting."
+            },
+            {
+              "artifact_type": "Report generation test",
+              "ces_source": "interview",
+              "notes": "Ask the administrator to turn the filtered search into a report and save it."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AU.L2-3.3.7",
+      "title": "Provide a system capability that compares and synchronizes internal system clocks with an authoritative source to generate time stamps for audit records.",
+      "approach": {
+        "what_assessor_does": "The assessor checks that audit records take their time stamps from system clocks, that an authoritative time source is named, and that devices are set to synchronize with it. Microsoft runs time synchronization for its cloud services, so the assessor focuses on endpoints and servers in scope. They examine the Intune policy that configures the Windows time client, confirm it names the authoritative source and is assigned to the in-scope devices, and on a sample device compare its clock and time configuration with the source. CES reads the Intune configuration and checks for an assigned policy that sets the NTP server.",
+        "common_failure_modes": [
+          "No authoritative time source is written down.",
+          "The time policy exists but is not assigned to any group, so it applies to no device.",
+          "Devices point to a time server different from the one the policy names.",
+          "Servers or network devices outside Intune keep their own clocks with no synchronization."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AU.L2-3.3.7[a]",
+          "determination": "internal system clocks are used to generate time stamps for audit records",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Audit record time stamps",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry AU.L2-3.3.7.time-source: Microsoft cloud services use platform-managed time; collects organization metadata with time stamps."
+            },
+            {
+              "artifact_type": "Sampled audit records",
+              "ces_source": "eo_store",
+              "notes": "EO collected records collect.unifiedAuditLog (collector C1a). Every record must carry its time."
+            },
+            {
+              "artifact_type": "Logging administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask which clock sets the time on audit records from cloud services, endpoints and servers."
+            }
+          ]
+        },
+        {
+          "id": "AU.L2-3.3.7[b]",
+          "determination": "an authoritative source with which to compare and synchronize internal system clocks is specified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Authoritative time source",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/audit-accountability-policy.md (GateEvidence family AU). Should name the authoritative time source the organization uses."
+            },
+            {
+              "artifact_type": "Time source answer",
+              "ces_source": "interview",
+              "notes": "Ask the administrator which source is authoritative and why. CES checks the configured server against the organization's answered time server."
+            }
+          ]
+        },
+        {
+          "id": "AU.L2-3.3.7[c]",
+          "determination": "internal system clocks used to generate time stamps for audit records are compared to and synchronized with the specified authoritative time source",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Time synchronization policy",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AU.L2-3.3.7 (timeSourceEvaluator): Graph /deviceManagement/configurationPolicies and /deviceManagement/deviceConfigurations. Met only when an assigned policy sets the NTP server to the authoritative source."
+            },
+            {
+              "artifact_type": "Intune time sync policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry AU.L2-3.3.7.time-sync: Intune settings-catalog policy CMMC-Time-Sync, NTP client enabled, hourly poll, assigned to the CUI group."
+            },
+            {
+              "artifact_type": "Device clock test",
+              "ces_source": "interview",
+              "notes": "On a sampled device, have the administrator show the configured time source and the clock offset from it."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AU.L2-3.3.8",
+      "title": "Protect audit information and audit logging tools from unauthorized access, modification, and deletion.",
+      "approach": {
+        "what_assessor_does": "The assessor checks who can read, change or delete audit records and the tools that manage them, and how that is enforced. They examine role assignments for audit and compliance roles in Entra and Purview, RBAC on the Log Analytics workspace and log storage account, resource locks, and any immutable (WORM) storage for logs. They ask a user without those roles to try to open the audit log, and they check that deleting or editing a record is blocked or itself logged. No tenant signal in CES covers this practice; it rests on role and configuration records, AdminOps checks and tests.",
+        "common_failure_modes": [
+          "Many accounts hold Compliance Administrator or workspace Contributor rights with no stated need.",
+          "Log storage has no immutability or delete lock, so an administrator could erase records.",
+          "Protection covers the logs but not the tools, such as Sentinel rules, diagnostic settings or retention policies.",
+          "Retention policies can be shortened by the same people whose actions are being logged.",
+          "Nobody can show what happens when someone tries to delete audit data."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AU.L2-3.3.8[a]",
+          "determination": "audit information is protected from unauthorized access",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Audit role assignments",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry AU.L2-3.3.8.audit-protect: reads Compliance Administrator role assignments in Entra. Control signal registry maps AU.L2-3.3.8 to manualGateEvaluator: no tenant signal covers this objective."
+            },
+            {
+              "artifact_type": "SIEM export validation",
+              "ces_source": "ao_row",
+              "notes": "AdminOps E-06 Log Export to SIEM Validation: checks data connectors and ingestion latency; registered against AU.L2-3.3.8 (evidence objective [a])."
+            },
+            {
+              "artifact_type": "Access test",
+              "ces_source": "interview",
+              "notes": "Have a user without audit roles try to open the audit log search; it should be refused."
+            }
+          ]
+        },
+        {
+          "id": "AU.L2-3.3.8[b]",
+          "determination": "audit information is protected from unauthorized modification",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Immutable log storage",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entries AZ-LOG-002 (log storage account) and AZ-LOG-003 (WORM lock on its evidence containers)."
+            },
+            {
+              "artifact_type": "Workspace and storage RBAC export",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: role assignments on the Log Analytics workspace and log storage account."
+            },
+            {
+              "artifact_type": "Logging administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how a change to a stored audit record would be prevented or detected."
+            }
+          ]
+        },
+        {
+          "id": "AU.L2-3.3.8[c]",
+          "determination": "audit information is protected from unauthorized deletion",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Retention policy and legal hold audit",
+              "ces_source": "ao_row",
+              "notes": "AdminOps D-07 Retention Policy & Legal Hold: reviews retention policies and litigation holds; registered against AU.L2-3.3.8 (evidence objective [c])."
+            },
+            {
+              "artifact_type": "Workspace delete lock",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry AZ-LOG-004: CanNotDelete lock on the Sentinel Log Analytics workspace."
+            },
+            {
+              "artifact_type": "Delete test",
+              "ces_source": "interview",
+              "notes": "Ask the administrator to show what happens when deletion of a log record or the workspace is attempted."
+            }
+          ]
+        },
+        {
+          "id": "AU.L2-3.3.8[d]",
+          "determination": "audit logging tools are protected from unauthorized access",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Audit tool role assignments",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry AU.L2-3.3.8.audit-protect (Compliance Administrator assignments). Compare the holders with the people approved to use audit tools."
+            },
+            {
+              "artifact_type": "Sentinel and Purview role export",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: who holds Sentinel, Log Analytics and Purview audit roles."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask who approves access to the audit tools and how often that access is reviewed."
+            }
+          ]
+        },
+        {
+          "id": "AU.L2-3.3.8[e]",
+          "determination": "audit logging tools are protected from unauthorized modification",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Change history for logging tools",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: Azure activity log or change records for diagnostic settings, Sentinel rules and retention policies."
+            },
+            {
+              "artifact_type": "Audit tool role assignments",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry AU.L2-3.3.8.audit-protect. Only the listed role holders should be able to change logging tools."
+            },
+            {
+              "artifact_type": "Logging administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how a change to a Sentinel rule or diagnostic setting is approved and recorded."
+            }
+          ]
+        },
+        {
+          "id": "AU.L2-3.3.8[f]",
+          "determination": "audit logging tools are protected from unauthorized deletion",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Resource locks on logging tools",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry AZ-LOG-004 (CanNotDelete lock on the Sentinel workspace). Check whether other logging resources carry locks too."
+            },
+            {
+              "artifact_type": "Lock and RBAC export",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: resource locks and delete rights on the workspace, storage account and automation account."
+            },
+            {
+              "artifact_type": "Delete test",
+              "ces_source": "interview",
+              "notes": "Ask the administrator to show that deleting the workspace or a data connector is blocked for ordinary administrators."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AU.L2-3.3.9",
+      "title": "Limit management of audit logging functionality to a subset of privileged users.",
+      "approach": {
+        "what_assessor_does": "The assessor looks for a written list of the privileged users allowed to manage audit logging, a smaller group than all administrators. They compare that list with who actually holds the roles that can change audit settings: Compliance Administrator and audit roles in Purview, Sentinel Contributor, and owner or contributor rights on the logging resources. They check that general IT administrators who are not on the list cannot change audit settings, and ask how the list is approved and reviewed. No tenant signal in CES covers this practice; the evidence is the role assignment records and interviews.",
+        "common_failure_modes": [
+          "No written subset exists; every Global Administrator can manage logging.",
+          "The list names people, but the tenant grants audit management roles to others as well.",
+          "Subscription owners can change diagnostic settings even though they are not on the list.",
+          "The list is never reviewed after staff or role changes."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AU.L2-3.3.9[a]",
+          "determination": "a subset of privileged users granted access to manage audit logging functionality is defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Approved list of audit logging managers",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/audit-accountability-policy.md (GateEvidence family AU). Should name the roles or people allowed to manage audit logging. Control signal registry maps AU.L2-3.3.9 to manualGateEvaluator: no tenant signal covers this objective."
+            },
+            {
+              "artifact_type": "Approval record for the list",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: signed or ticketed approval of the subset and its last review date."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask who decided the subset and how often it is reviewed."
+            }
+          ]
+        },
+        {
+          "id": "AU.L2-3.3.9[b]",
+          "determination": "management of audit logging functionality is limited to the defined subset of privileged users",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Audit role assignments",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry AU.L2-3.3.8.audit-protect (registered to AU.L2-3.3.8 and AU.L2-3.3.9): Compliance Administrator role assignments. Compare the holders with the approved list."
+            },
+            {
+              "artifact_type": "Logging resource RBAC export",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: Sentinel, Log Analytics and diagnostic settings rights on the subscription and workspace."
+            },
+            {
+              "artifact_type": "Restriction test",
+              "ces_source": "interview",
+              "notes": "Have an administrator who is not on the list try to change an audit setting; it should be refused."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

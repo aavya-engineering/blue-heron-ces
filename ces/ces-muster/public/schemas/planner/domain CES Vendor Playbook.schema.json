@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/ces-vendor-playbook.schema.json",
+  "title": "CES Vendor Playbook Schema",
+  "description": "Maps implementation pattern actions to vendor-specific services, admin portal paths, automation commands, and evidence collection. One playbook per vendor stack.",
+  "type": "object",
+  "required": ["ces", "playbook"],
+  "additionalProperties": false,
+  "properties": {
+    "ces": {
+      "$ref": "#/$defs/ces_meta"
+    },
+    "playbook": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/playbook_entry"
+      }
+    }
+  },
+  "$defs": {
+    "ces_meta": {
+      "type": "object",
+      "required": ["artifact", "vendor", "version", "generated_on"],
+      "additionalProperties": false,
+      "properties": {
+        "artifact": {
+          "type": "string",
+          "const": "vendor_playbook"
+        },
+        "vendor": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Vendor stack identifier (e.g. microsoft_365, aws_govcloud)"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "generated_on": {
+          "type": "string",
+          "format": "date"
+        },
+        "license_requirements": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Required vendor licenses or subscriptions for full playbook coverage"
+        }
+      }
+    },
+    "playbook_entry": {
+      "type": "object",
+      "required": ["action_id", "signal", "m365_service", "implementation", "evidence_commands"],
+      "additionalProperties": false,
+      "properties": {
+        "action_id": {
+          "type": "string",
+          "pattern": "^[A-Z]{2,4}-\\d{3}-\\d{2}$",
+          "description": "References an action ID from the implementation patterns"
+        },
+        "signal": {
+          "type": "string",
+          "enum": ["configure", "customize", "manual"],
+          "description": "How the selected stack supports this action: configure (service directly satisfies), customize (stack can meet with extra work), manual (solved outside the stack)"
+        },
+        "m365_service": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Primary M365/Azure service used for this action"
+        },
+        "implementation": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Human-readable implementation guidance specific to the vendor stack"
+        },
+        "portal_path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Admin portal navigation path (e.g. entra.microsoft.com > Protection > Conditional Access)"
+        },
+        "powershell": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "PowerShell or CLI commands for automation"
+        },
+        "graph_api": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Microsoft Graph API calls"
+        },
+        "evidence_commands": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Commands to collect and export evidence artifacts"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Caveats, prerequisites, or alternatives"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,46 @@
+## Control {{controlId}}: Establish and Enforce Security Configuration Settings for Information Technology Products
+
+**Implementation Status:** {{status}}
+
+This organization establishes and enforces security configuration settings within the {{tenantName}} M365 GCC High tenant through Intune device configuration profiles and compliance policies managed by {{variables.systemAdministrator}}.
+
+{{#if deviceConfigurationsActive}}
+**Security Configuration Enforcement:**
+{{deviceConfigurationsCount}} device configuration profiles enforce security settings on managed endpoints:
+{{#if configurations}}
+{{#each configurations}}
+- **{{displayName}}** ({{platformType}}){{#if description}} — {{description}}{{/if}}
+{{/each}}
+{{/if}}
+
+Configuration profiles enforce settings aligned with DISA STIGs and CIS benchmarks, including firewall rules, antivirus settings, BitLocker encryption, screen lock timeouts, and application restrictions.
+{{else}}
+Security configuration enforcement has not been confirmed through device configuration profiles.
+{{/if}}
+
+{{#if compliancePolicyActive}}
+**Compliance Monitoring:**
+Intune compliance policy "{{policyName}}" continuously evaluates endpoint configurations against required security settings:
+{{#if policies}}
+{{#each policies}}
+- **{{displayName}}**{{#if description}} — {{description}}{{/if}}
+{{/each}}
+{{/if}}
+
+Non-compliant devices are automatically blocked from accessing CUI resources via Conditional Access integration, enforcing remediation before access is restored.
+{{else}}
+Compliance policy enforcement has not been configured. Security configuration drift detection is not active.
+{{/if}}
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine Intune configuration profiles, compliance policy reports, non-compliance remediation logs, and STIG/CIS benchmark mapping documentation.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

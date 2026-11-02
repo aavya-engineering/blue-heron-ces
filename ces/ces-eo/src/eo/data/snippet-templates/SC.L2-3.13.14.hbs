@@ -1,0 +1,42 @@
+## Control {{controlId}}: Control and Monitor the Use of Voice over Internet Protocol (VoIP) Technologies
+
+**Implementation Status:** {{status}}
+
+This organization controls and monitors VoIP technologies within the {{tenantName}} M365 GCC High tenant through Microsoft Teams voice policies and cross-tenant communication restrictions documented in "Unified Communications Policy v1.0" maintained by {{variables.systemAdministrator}}.
+
+Microsoft Teams is the sole authorized VoIP platform for the CUI environment. All voice communications are encrypted using SRTP (Secure Real-Time Transport Protocol) with FIPS 140-2 validated cryptographic modules within the GCC High boundary.
+
+**Teams Voice Controls:**
+- External calling restricted to authorized domains and phone numbers per Teams calling policies
+- PSTN connectivity (if enabled) routed through Microsoft-managed GCC High infrastructure
+- Call recording and voicemail transcription governed by compliance retention policies
+- Guest access to Teams voice features restricted per external access settings
+
+{{#if crossTenantPolicyConfigured}}
+**Cross-Tenant Communication Restrictions:**
+Cross-tenant access policies restrict Teams federation and voice communications to explicitly authorized partner organizations, preventing unauthorized VoIP connections to untrusted tenants.
+{{/if}}
+
+{{#if conditionalAccessActive}}
+**Access Enforcement:**
+Conditional Access policies require compliant device and MFA authentication before accessing Teams voice features, ensuring only authorized users on trusted devices participate in VoIP communications.
+{{/if}}
+
+**Operational Procedure:**
+- **Action:** Review Teams voice policies, external access configurations, and cross-tenant calling restrictions
+- **Frequency:** Quarterly policy review, continuous monitoring via call quality dashboard
+- **Responsible Party:** {{variables.systemAdministrator}}
+- **Documentation:** Unified Communications Policy v1.0, Teams Voice Configuration Standard
+
+**Review Frequency:** Quarterly by ISSO
+
+**Verification Method:** Examine Teams voice policy configurations, external access settings, cross-tenant access policies, and call detail records.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** Review Teams admin center voice policy exports and cross-tenant access configurations. {{evidenceArtifactUrl}}
+{{/if}}

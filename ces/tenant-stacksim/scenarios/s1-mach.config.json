@@ -1,0 +1,14 @@
+{
+  "_edit_me": "Editable source for the synthetic customer S1 (s1-mach). The organisation and roster live in the customer file named by `customer` (generated there by gen-customer.mjs); this config only holds scenario knobs. Then: node scripts/build-customer-scenario.mjs s1-mach (regenerates scenarios/s1-mach.json). tests/integration/customer-scenarios.test.ts fails if the generated scenario drifts from this config + the customer file.",
+  "slug": "s1-mach",
+  "customer": "../../pkg/ces-muster-run/customers/s1-mach/customer.json",
+  "stance": "m365_azure",
+  "seedSets": ["customer-history"],
+  "description": "synthetic-customer S1 (FICTIONAL): a 45-person CNC machining subcontractor on GCC High G5, cloud-only. 53 accounts (45 staff, 4 separate admin, 2 break-glass, 2 service), 14 groups incl. the 18-member CUI enclave, 58 Intune devices (50 compliant), 9 enforced CA policies excluding break-glass, 3 DLP policies, the CUI label, an Azure Government landing zone, and a 90-day history (sign-ins, audits, alerts, incidents, risk, PIM, Secure Score 61 -> 72 %, 34 CVEs with 28 remediated). Built through the real resolver path; history dated from the day-floored anchor.",
+  "osVersions": { "windows": "10.0.22631.4317", "ios": "17.6.1" },
+  "devices": {
+    "noncompliant": ["S1-KIOSK-05", "S1-KIOSK-06", "S1-KIOSK-07", "S1-KIOSK-08", "S1-WS-039", "S1-WS-040", "S1-IOS-05", "S1-IOS-06"],
+    "unencrypted": ["S1-WS-039", "S1-WS-040"]
+  },
+  "licensing": { "skuId": "sim-sku-g5-gcchigh", "skuPartNumber": "SIM_M365_G5_GCCHIGH", "displayName": "Microsoft 365 G5 (GCC High)", "prepaidUnits": 50 }
+}

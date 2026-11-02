@@ -1,0 +1,25 @@
+{
+  "type": "ui-e2e",
+  "scenario_id": "s3-def-muster-ui-e2e",
+  "description": "FIN-35 EU-MU (V125, FLOW-7): the Muster console (the ces-muster SPA, FIN-32) on S3 (a fictional defence subcontractor), driven by FIN-32's spec ces-muster/e2e/flow7-muster-ui.spec.ts: sign in as a seeded operator, discovery through muster-api, answers typed from interview-answers.json, boundary, compile and push through muster-api on its own pipeline root. Twin (orchestrator ruling on LOG-FIN-32 S-B): the API compile with the UI run's own inputs; push set = E4. Never executed. Record: out/ui-e2e-muster.json.",
+  "surface": "muster",
+  "sim_scenario": "s3-def",
+  "stance": "m365_azure",
+  "twin": "s3-def-e2e",
+  "variants": [
+    {
+      "id": "kit",
+      "base_path": "/",
+      "requires_built": "dist/index.html"
+    }
+  ],
+  "steps": [
+    "signin",
+    "begin",
+    "discovery",
+    "interview",
+    "boundary",
+    "compile",
+    "push"
+  ]
+}

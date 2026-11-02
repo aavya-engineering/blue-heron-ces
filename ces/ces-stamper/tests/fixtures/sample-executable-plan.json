@@ -1,0 +1,210 @@
+{
+  "plan_id": "test-plan-001",
+  "target_level": "L2",
+  "tech_stack_id": 1,
+  "variables": {
+    "target_level": "L2",
+    "organization": "Test Organization",
+    "cloud_provider": "azure",
+    "identity_provider": "entra_id",
+    "region": "us-gov-virginia"
+  },
+  "prechecks": [
+    {
+      "id": "precheck_connectivity",
+      "description": "Verify connectivity to target environment",
+      "method": "api_query",
+      "expected": "All systems reachable",
+      "on_fail": "Abort execution - cannot reach target environment"
+    },
+    {
+      "id": "precheck_permissions",
+      "description": "Verify operator has sufficient permissions",
+      "method": "api_query",
+      "expected": "Admin permissions confirmed",
+      "on_fail": "Abort execution - insufficient permissions"
+    }
+  ],
+  "execution_graph": [
+    {
+      "id": "task_AC.L2-3.1.1",
+      "type": "configuration",
+      "priority": "p0",
+      "depends_on": [],
+      "action": {
+        "engine": "powershell",
+        "command": "Set-ConditionalAccessPolicy",
+        "args": {
+          "requirement_id": "AC.L2-3.1.1",
+          "powershell_commands": [
+            "Write-Output 'Configuring Conditional Access Policy for MFA'",
+            "Write-Output 'STAMPER_EXECUTION_SUCCESS'"
+          ]
+        }
+      },
+      "inputs": ["gap_AC.L2-3.1.1"],
+      "outputs": ["config_AC.L2-3.1.1"],
+      "controls": ["AC.L2-3.1.1"],
+      "idempotency": "safe",
+      "rollback": {
+        "strategy": "reverse_task",
+        "notes": "Remove conditional access policy if task fails"
+      },
+      "evidence_emit": [
+        {
+          "artifact_id": "config_export_AC.L2-3.1.1",
+          "artifact_type": "config_export",
+          "description": "Conditional Access policy configuration export",
+          "collector": "stamper",
+          "retention_days": 365,
+          "storage_location_ref": "evidence/test-plan-001/task_AC.L2-3.1.1"
+        }
+      ]
+    },
+    {
+      "id": "task_IA.L2-3.5.3",
+      "type": "configuration",
+      "priority": "p0",
+      "depends_on": ["task_AC.L2-3.1.1"],
+      "action": {
+        "engine": "powershell",
+        "command": "Set-MfaSettings",
+        "args": {
+          "requirement_id": "IA.L2-3.5.3",
+          "powershell_commands": [
+            "Write-Output 'Enforcing MFA for all users'",
+            "Write-Output 'STAMPER_EXECUTION_SUCCESS'"
+          ]
+        }
+      },
+      "inputs": ["config_AC.L2-3.1.1"],
+      "outputs": ["config_IA.L2-3.5.3"],
+      "controls": ["IA.L2-3.5.3"],
+      "idempotency": "best_effort",
+      "rollback": {
+        "strategy": "manual",
+        "notes": "Manual verification required to rollback MFA settings"
+      },
+      "evidence_emit": [
+        {
+          "artifact_id": "config_export_IA.L2-3.5.3",
+          "artifact_type": "config_export",
+          "description": "MFA enforcement configuration",
+          "collector": "stamper",
+          "retention_days": 365,
+          "storage_location_ref": "evidence/test-plan-001/task_IA.L2-3.5.3"
+        }
+      ]
+    },
+    {
+      "id": "task_policy_AC.L2-3.1.2",
+      "type": "policy",
+      "priority": "p1",
+      "depends_on": [],
+      "action": {
+        "engine": "manual_gate",
+        "command": "Generate Access Control Policy Document",
+        "args": {
+          "requirement_id": "AC.L2-3.1.2",
+          "what_to_do": [
+            "Create access control policy document",
+            "Define user access levels and roles",
+            "Specify authentication requirements",
+            "Document policy review and update procedures"
+          ],
+          "how_to_verify": [
+            "Policy document exists and is complete",
+            "Document is approved by management",
+            "Document is distributed to relevant personnel"
+          ]
+        }
+      },
+      "inputs": ["gap_AC.L2-3.1.2"],
+      "outputs": ["policy_AC.L2-3.1.2"],
+      "controls": ["AC.L2-3.1.2"],
+      "idempotency": "unsafe_requires_gate",
+      "rollback": {
+        "strategy": "none",
+        "notes": "Policy documents do not require rollback"
+      },
+      "evidence_emit": [
+        {
+          "artifact_id": "policy_doc_AC.L2-3.1.2",
+          "artifact_type": "policy",
+          "description": "Access Control Policy Document",
+          "collector": "admin",
+          "retention_days": 2190,
+          "storage_location_ref": "evidence/test-plan-001/task_policy_AC.L2-3.1.2"
+        }
+      ]
+    },
+    {
+      "id": "task_verify_AC.L2-3.1.1",
+      "type": "assessment",
+      "priority": "p1",
+      "depends_on": ["task_AC.L2-3.1.1", "task_IA.L2-3.5.3"],
+      "action": {
+        "engine": "cli",
+        "command": "echo",
+        "args": {
+          "requirement_id": "AC.L2-3.1.1",
+          "message": "Verification: Conditional Access and MFA configured successfully"
+        }
+      },
+      "inputs": ["config_AC.L2-3.1.1", "config_IA.L2-3.5.3"],
+      "outputs": ["verification_AC.L2-3.1.1"],
+      "controls": ["AC.L2-3.1.1", "IA.L2-3.5.3"],
+      "idempotency": "safe",
+      "rollback": {
+        "strategy": "none"
+      },
+      "evidence_emit": [
+        {
+          "artifact_id": "scan_report_AC.L2-3.1.1",
+          "artifact_type": "scan_report",
+          "description": "Verification scan results",
+          "collector": "stamper",
+          "retention_days": 365,
+          "storage_location_ref": "evidence/test-plan-001/task_verify_AC.L2-3.1.1"
+        }
+      ]
+    },
+    {
+      "id": "task_api_test",
+      "type": "evidence_collection",
+      "priority": "p2",
+      "depends_on": ["task_verify_AC.L2-3.1.1"],
+      "action": {
+        "engine": "api",
+        "command": "https://jsonplaceholder.typicode.com/posts/1",
+        "args": {
+          "requirement_id": "test_api",
+          "method": "GET"
+        }
+      },
+      "inputs": [],
+      "outputs": ["api_response_test"],
+      "controls": ["TEST.API"],
+      "idempotency": "safe",
+      "rollback": {
+        "strategy": "none"
+      }
+    }
+  ],
+  "postchecks": [
+    {
+      "id": "postcheck_tasks_completed",
+      "description": "Verify all tasks completed successfully",
+      "method": "api_query",
+      "expected": "All N tasks report success",
+      "on_fail": "Generate failure report with incomplete tasks"
+    },
+    {
+      "id": "postcheck_evidence_collected",
+      "description": "Verify evidence artifacts collected",
+      "method": "config_export",
+      "expected": "All expected artifacts present in evidence store",
+      "on_fail": "Flag missing evidence artifacts for manual collection"
+    }
+  ]
+}

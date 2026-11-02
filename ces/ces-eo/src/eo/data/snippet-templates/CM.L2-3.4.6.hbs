@@ -1,0 +1,41 @@
+## Control {{controlId}}: Employ the Principle of Least Functionality by Configuring Systems to Provide Only Essential Capabilities
+
+**Implementation Status:** {{status}}
+
+This organization employs least functionality within the {{tenantName}} M365 GCC High tenant through device configuration profiles restricting system capabilities and application protection policies limiting software execution, managed by {{variables.systemAdministrator}}.
+
+{{#if deviceConfigurationsActive}}
+**Endpoint Least Functionality:**
+{{deviceConfigurationsCount}} device configuration profiles restrict managed endpoints to essential capabilities:
+{{#if configurations}}
+{{#each configurations}}
+- **{{displayName}}** ({{platformType}}){{#if description}} — {{description}}{{/if}}
+{{/each}}
+{{/if}}
+
+Configuration profiles disable unnecessary services, protocols, and features:
+- Unnecessary Windows features and optional components disabled
+- USB storage and removable media restricted per data protection policies
+- Browser extensions limited to approved list
+- PowerShell constrained language mode enforced for standard users
+{{else}}
+Device configuration profiles for least functionality have not been established.
+{{/if}}
+
+{{#if appProtectionsActive}}
+**Application Restrictions:**
+{{appProtectionsCount}} application protection policies restrict app capabilities to essential functions, preventing data leakage through unauthorized application features.
+{{/if}}
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine device configuration profiles, disabled service lists, application restriction policies, and endpoint security baselines.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

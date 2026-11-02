@@ -1,0 +1,40 @@
+## Control {{controlId}}: Protect the Confidentiality of Backup CUI at Storage Locations
+
+**Implementation Status:** {{status}}
+
+This organization protects backup CUI at storage locations within the {{tenantName}} M365 GCC High tenant through encrypted cloud storage, access controls, and backup procedures documented in "Backup Protection Policy v1.0" maintained by {{variables.systemAdministrator}}.
+
+**Cloud Backup Protection:**
+M365 GCC High provides built-in backup and retention protections for CUI:
+- **Exchange Online:** Mailbox data backed up with 14-day retention (recoverable items), encrypted at rest with AES-256
+- **SharePoint Online / OneDrive:** Version history and recycle bin provide 93-day recovery; site-level backup with encryption
+- **Teams:** Chat and channel data retained per compliance retention policies
+
+{{#if bitLockerEnforced}}
+**Endpoint Backup Encryption:**
+{{deviceCount}} managed devices with BitLocker encryption ensure local backups are cryptographically protected. Recovery keys stored securely in Entra ID.
+{{/if}}
+
+{{#if dlpLabelsConfigured}}
+**Label-Protected Backups:**
+Sensitivity labels persist through backup and restore operations, maintaining CUI access restrictions on restored content.
+{{/if}}
+
+**Backup Access Controls:**
+- Backup storage access restricted to designated backup administrators via RBAC
+- Backup data inherits the same classification and access restrictions as source data
+- Backup restoration requires authorization from {{variables.systemAdministrator}}
+- Backup media stored in geographically separated Microsoft-managed datacenters within US sovereign boundary
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine M365 retention policies, backup encryption configurations, RBAC assignments for backup access, and backup restoration authorization records.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

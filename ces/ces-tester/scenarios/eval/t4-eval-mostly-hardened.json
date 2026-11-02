@@ -1,0 +1,79 @@
+{
+  "config_id": "eval-mostly-hardened",
+  "description": "T4 (docs/demo/EVAL-CONFIGS.md) — diligent shop, few real gaps. All 5 CMMC-named CA policies present (session-timeout, block-untrusted-locations, admin-MFA, mobile-device, remote-maintenance) plus a disabled user-5. Near-perfect reads near-perfect — and the negative controls (N1/N2) STILL read unknown even here.",
+  "stacksim_seed": {
+    "stance": "m365_azure",
+    "countOverrides": {
+      "caPolicies": 5
+    },
+    "steps": [
+      {
+        "kind": "uri",
+        "method": "PATCH",
+        "uri": "/v1.0/identity/conditionalAccess/policies/caPolicy-1",
+        "body": {
+          "displayName": "CMMC-SessionTimeout"
+        },
+        "note": "P1 AC.L2-3.1.11 -> met"
+      },
+      {
+        "kind": "uri",
+        "method": "PATCH",
+        "uri": "/v1.0/identity/conditionalAccess/policies/caPolicy-2",
+        "body": {
+          "displayName": "CMMC-BlockUntrustedLocations"
+        },
+        "note": "P2 AC.L2-3.1.14 / SC.L2-3.13.7 -> met"
+      },
+      {
+        "kind": "uri",
+        "method": "PATCH",
+        "uri": "/v1.0/identity/conditionalAccess/policies/caPolicy-3",
+        "body": {
+          "displayName": "CMMC-AdminMFA-PhishingResistant"
+        },
+        "note": "P3 AC.L2-3.1.15 -> met"
+      },
+      {
+        "kind": "uri",
+        "method": "PATCH",
+        "uri": "/v1.0/identity/conditionalAccess/policies/caPolicy-4",
+        "body": {
+          "displayName": "CMMC-MobileDeviceAccess"
+        },
+        "note": "P4 AC.L2-3.1.18 -> met"
+      },
+      {
+        "kind": "uri",
+        "method": "PATCH",
+        "uri": "/v1.0/identity/conditionalAccess/policies/caPolicy-5",
+        "body": {
+          "displayName": "CMMC-RemoteMaintenance-MFA"
+        },
+        "note": "P5 MA.L2-3.7.5 -> met"
+      },
+      {
+        "kind": "uri",
+        "method": "PATCH",
+        "uri": "/v1.0/users/user-5",
+        "body": {
+          "accountEnabled": false
+        },
+        "note": "P6 PS.L2-3.9.2 -> met"
+      }
+    ]
+  },
+  "expected_discovery": {
+    "AC.L2-3.1.11": "met",
+    "AC.L2-3.1.14": "met",
+    "SC.L2-3.13.7": "met",
+    "AC.L2-3.1.15": "met",
+    "MA.L2-3.7.5": "met",
+    "PS.L2-3.9.2": "met",
+    "IA.L2-3.5.5": "met",
+    "IA.L2-3.5.6": "met",
+    "AC.L1-3.1.20": "met",
+    "AC.L2-3.1.12": "unknown",
+    "IA.L2-3.5.4": "unknown"
+  }
+}

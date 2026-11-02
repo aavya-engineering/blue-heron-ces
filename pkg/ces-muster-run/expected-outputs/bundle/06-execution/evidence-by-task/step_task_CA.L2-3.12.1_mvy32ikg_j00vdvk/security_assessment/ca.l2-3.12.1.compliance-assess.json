@@ -1,0 +1,37 @@
+{
+  "rawResponse": "{\r\n    \"currentScore\":  62,\r\n    \"maxScore\":  100,\r\n    \"createdDateTime\":  \"2026-11-01T17:06:04.545Z\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "CA.L2-3.12.1.compliance-assess",
+    "label": "Compliance Assessment Evidence via Compliance Manager",
+    "engine": "mgraph",
+    "layer_hint": 8,
+    "sequence_hint": 0,
+    "idempotency": "evidence-only",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "CA.L2-3.12.1",
+      "CA.L2-3.12.3"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/security/secureScores?$top=1').value | Select-Object currentScore,maxScore,createdDateTime",
+    "set_command": "",
+    "evidence_commands": [
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/security/secureScores?$top=1').value | Select-Object currentScore,maxScore,createdDateTime | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "CA.L2-3.12.1",
+      "CA.L2-3.12.3"
+    ],
+    "timestamp": "2026-11-01T17:12:14.149Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Compliance Assessment Evidence via Compliance Manager",
+    "sha256Hash": "3847630b9d790f796ece176d2d0ef3dc78265037f03dd9e5cdb07f0a39f0ec15",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

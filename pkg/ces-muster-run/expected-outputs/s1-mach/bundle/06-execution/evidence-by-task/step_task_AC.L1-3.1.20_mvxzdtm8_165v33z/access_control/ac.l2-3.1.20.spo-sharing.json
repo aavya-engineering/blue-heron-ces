@@ -1,0 +1,50 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"settings\",\r\n    \"sharingCapability\":  \"disabled\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "AC.L2-3.1.20.spo-sharing",
+    "label": "Disable SharePoint External Sharing at Tenant Level",
+    "engine": "mgraph",
+    "layer_hint": 7,
+    "sequence_hint": 0,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "AC.L1-3.1.20"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Method GET -Uri 'https://graph.microsoft.us/beta/admin/sharepoint/settings').sharingCapability | ConvertTo-Json -Depth 10",
+    "set_command": "Invoke-MgGraphRequest -Method PATCH -Uri 'https://graph.microsoft.us/beta/admin/sharepoint/settings' -Body '{\"sharingCapability\":\"disabled\"}' -ContentType 'application/json'",
+    "evidence_commands": [
+      "Invoke-MgGraphRequest -Method GET -Uri 'https://graph.microsoft.us/beta/admin/sharepoint/settings' | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AC.L1-3.1.20"
+    ],
+    "timestamp": "2026-11-01T15:28:03.474Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "Invoke-MgGraphRequest -Method PATCH -Uri 'https://graph.microsoft.us/beta/admin/sharepoint/settings' -Body '{\"sharingCapability\":\"disabled\"}' -ContentType 'application/json'",
+    "sha256Hash": "7e32e0d8e74bb383b7468dd7a78d9dd6d2015dc6941e40f40805d6a6014b808b",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "\"disabled\"\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

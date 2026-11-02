@@ -1,0 +1,3 @@
+# Run 39 (2026-10-28): synthetic customer S1 (s1-mach), wave W3 proof (postchecks assert state; expected values in the TM)
+
+V55 green: 55 SET-path records, 54 state-asserting (all passed), 1 presence (group-create: simulator seed gap), gates 24; Stamper 110/110. One move: AC.L2-3.1.6 met -> not met because the admin-account check now matches exactly and S1 names its four separate admin accounts adm.<name>, not the CES convention admin-<stem>; filed as a W5 GAPS row (the check should accept any distinct privileged account, from the TM asset list). EO 83/4/0/23 SPRS 46 (was 84/3/23 SPRS 47); V43b pass-1 regression is that same move vs run 37. Baseline regenerated from this run; OUTSIDE UNCHANGED.

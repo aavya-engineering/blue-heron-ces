@@ -1,0 +1,50 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"CMMC-OutboundSpam-Rule\",\r\n    \"Identity\":  \"CMMC-OutboundSpam-Rule\",\r\n    \"Name\":  \"CMMC-OutboundSpam-Rule\",\r\n    \"HostedOutboundSpamFilterPolicy\":  \"CMMC-OutboundSpam\",\r\n    \"SenderDomainIs\":  \"s3-def.simtenant.onmicrosoft.us\",\r\n    \"State\":  \"Enabled\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "SC.L2-3.13.15.outbound-spam-rule",
+    "label": "Create Outbound Spam Filter Rule for Primary Domain",
+    "engine": "exchange",
+    "layer_hint": 5,
+    "sequence_hint": 24,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "SC.L2-3.13.15"
+    ],
+    "get_command": "Get-HostedOutboundSpamFilterRule | Where-Object { ($_.Name -eq 'CMMC-OutboundSpam-Rule') -or (($_.State -eq 'Enabled') -and ($_.HostedOutboundSpamFilterPolicy -eq '{outboundSpamPolicyName}') -and (@($_.SenderDomainIs) -contains '{primaryDomain}')) } | Sort-Object { $_.Name -ne 'CMMC-OutboundSpam-Rule' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
+    "set_command": "$ErrorActionPreference='Stop'; try { New-HostedOutboundSpamFilterRule -Name 'CMMC-OutboundSpam-Rule' -HostedOutboundSpamFilterPolicy '{outboundSpamPolicyName}' -SenderDomainIs '{primaryDomain}' } catch { if ($_.Exception.Message -match 'already has rule') { Set-HostedOutboundSpamFilterRule -Identity 'CMMC-OutboundSpam-Rule' -HostedOutboundSpamFilterPolicy '{outboundSpamPolicyName}' -SenderDomainIs '{primaryDomain}' } else { throw } }; Write-Output 'OK'",
+    "evidence_commands": [
+      "Get-HostedOutboundSpamFilterRule -Identity 'CMMC-OutboundSpam-Rule' | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SC.L2-3.13.15"
+    ],
+    "timestamp": "2026-11-01T06:55:59.597Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "$ErrorActionPreference='Stop'; try { New-HostedOutboundSpamFilterRule -Name 'CMMC-OutboundSpam-Rule' -HostedOutboundSpamFilterPolicy '{outboundSpamPolicyName}' -SenderDomainIs '{primaryDomain}' } catch { if ($_.Exception.Message -match 'already has rule') { Set-HostedOutboundSpamFilterRule -Identity 'CMMC-OutboundSpam-Rule' -HostedOutboundSpamFilterPolicy '{outboundSpamPolicyName}' -SenderDomainIs '{primaryDomain}' } else { throw } }; Write-Output 'OK'",
+    "sha256Hash": "32d44a3e4ba62f64c9aa1af4261ece0969cbaa67d7d5cb628921a7cb7ecbb7f5",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\r\n    \"id\":  \"CMMC-OutboundSpam-Rule\",\r\n    \"Identity\":  \"CMMC-OutboundSpam-Rule\",\r\n    \"Name\":  \"CMMC-OutboundSpam-Rule\",\r\n    \"HostedOutboundSpamFilterPolicy\":  \"CMMC-OutboundSpam\",\r\n    \"SenderDomainIs\":  \"s3-def.simtenant.onmicrosoft.us\",\r\n    \"State\":  \"Enabled\"\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

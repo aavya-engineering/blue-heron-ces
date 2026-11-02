@@ -1,0 +1,84 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"51510000-00b4-4000-8000-000000000003\",\r\n    \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n    \"displayName\":  \"S1-Block-Removable-Storage\",\r\n    \"description\":  \"Device restriction: block removable storage and USB on all managed Windows devices\",\r\n    \"version\":  1,\r\n    \"createdDateTime\":  \"2025-12-06T00:00:00.000Z\",\r\n    \"lastModifiedDateTime\":  \"2026-10-02T00:00:00.000Z\",\r\n    \"storageBlockRemovableStorage\":  true,\r\n    \"usbBlocked\":  true,\r\n    \"AdditionalProperties\":  {\r\n                                 \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n                                 \"storageBlockRemovableStorage\":  true,\r\n                                 \"usbBlocked\":  true\r\n                             },\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"51510000-00b4-4000-8000-000000000003_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ]\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Resource already exists — creation skipped (idempotent)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "existing equivalent 'S1-Block-Removable-Storage' verified by effect (3 conditions) (existing equivalent 'S1-Block-Removable-Storage' matched by effect)",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "existing equivalent 'S1-Block-Removable-Storage' verified by effect (3 conditions)"
+  },
+  "registryEntry": {
+    "entry_id": "AC.L2-3.1.21.block-storage",
+    "label": "Block Removable Storage via Intune Device Configuration",
+    "engine": "mgraph",
+    "layer_hint": 4,
+    "sequence_hint": 10,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "AC.L2-3.1.21"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations?$expand=assignments').value | Where-Object { ($_.displayName -eq 'CMMC-BlockRemovableStorage') -or ((@('#microsoft.graph.windows10GeneralConfiguration') -contains $_.'@odata.type') -and ($_.storageBlockRemovableStorage -eq $true) -and (@($_.assignments | Where-Object { $_ }).Count -gt 0)) } | Sort-Object { $_.displayName -ne 'CMMC-BlockRemovableStorage' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
+    "set_command": "$created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations' -Body (@{'@odata.type'='#microsoft.graph.windows10GeneralConfiguration';displayName='CMMC-BlockRemovableStorage';storageBlockRemovableStorage=$true} | ConvertTo-Json) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | ConvertTo-Json -Depth 10",
+    "evidence_commands": [
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object displayName -eq 'CMMC-BlockRemovableStorage' | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AC.L2-3.1.21"
+    ],
+    "timestamp": "2026-11-01T15:27:22.208Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "$created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations' -Body (@{'@odata.type'='#microsoft.graph.windows10GeneralConfiguration';displayName='CMMC-BlockRemovableStorage';storageBlockRemovableStorage=$true} | ConvertTo-Json) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | ConvertTo-Json -Depth 10",
+    "sha256Hash": "84e2e428d30c5dba058b3b33fd5adbc5ea90dc25e8428a95a28d7c24109975d1",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "{\r\n    \"id\":  \"51510000-00b4-4000-8000-000000000003\",\r\n    \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n    \"displayName\":  \"S1-Block-Removable-Storage\",\r\n    \"description\":  \"Device restriction: block removable storage and USB on all managed Windows devices\",\r\n    \"version\":  1,\r\n    \"createdDateTime\":  \"2025-12-06T00:00:00.000Z\",\r\n    \"lastModifiedDateTime\":  \"2026-10-02T00:00:00.000Z\",\r\n    \"storageBlockRemovableStorage\":  true,\r\n    \"usbBlocked\":  true,\r\n    \"AdditionalProperties\":  {\r\n                                 \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n                                 \"storageBlockRemovableStorage\":  true,\r\n                                 \"usbBlocked\":  true\r\n                             },\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"51510000-00b4-4000-8000-000000000003_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ]\r\n}\r\n",
+    "postcheckMode": "state",
+    "lookupMatch": {
+      "basis": "effect",
+      "object": "S1-Block-Removable-Storage",
+      "conditions": [
+        {
+          "path": "@odata.type",
+          "op": "in",
+          "expected": [
+            "#microsoft.graph.windows10GeneralConfiguration"
+          ],
+          "observed": "#microsoft.graph.windows10GeneralConfiguration",
+          "pass": true
+        },
+        {
+          "path": "$.storageBlockRemovableStorage",
+          "op": "equals",
+          "expected": true,
+          "observed": true,
+          "pass": true
+        },
+        {
+          "path": "$.assignments",
+          "op": "not_empty",
+          "observed": [
+            {
+              "id": "51510000-00b4-4000-8000-000000000003_group-1",
+              "target": {
+                "@odata.type": "#microsoft.graph.groupAssignmentTarget",
+                "groupId": "group-1"
+              }
+            }
+          ],
+          "pass": true
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,54 @@
+controlId: "AU.L2-3.3.8"
+relatedControlIds:
+  - "AU.L2-3.3.1"
+  - "AU.L2-3.3.6"  # [VERIFY] mapping not yet confirmed
+  - "SC.L2-3.13.6"  # [VERIFY] mapping not yet confirmed
+practiceStatement: Create and retain system audit logs and records to the extent needed to enable the monitoring, analysis,
+  investigation, and reporting of unlawful or unauthorized system activity.
+useCaseId: E-06
+useCaseTitle: "Log Export to SIEM Validation"
+domain: Audit & Logging
+priority: P4 Standard
+trigger: 'SCHEDULE: Weekly'
+sodTier: Tier 1
+entraRolesRequired:
+- Security Reader
+- Reports Reader
+approvalRequired: false
+services:
+- name: Microsoft Sentinel -- data connectors
+  purpose: Entra ID, Office 365, Microsoft Defender for Endpoint, Microsoft Defender for Cloud Apps, Microsoft Defender for
+    Identity, Azure Activity
+- name: Log Analytics workspace -- table-level ingestion metrics
+  purpose: ''
+- name: Azure Monitor -- workspace diagnostics
+  purpose: ''
+configurationSteps:
+  portalPath: //portal.azure.us > Microsoft Sentinel > select workspace > Data connectors.
+  powershellCmdlets: []
+  graphApiEndpoint: ''
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-e-audit/E-06/{year}/{month}/
+  format: JSON (connector inventory and status), CSV (ingestion latency report)
+  filenamePattern: E-06_SIEMExportValidation_{YYYYMMDD}_{HHmmss}_ConnectorStatus.json
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |-
+    - Data connector behavior in GCC High is functionally equivalent to commercial, but certain third-party connectors may have limited availability. Microsoft first-party connectors (Entra ID, Office 365, Defender suite, Azure Activity) are fully supported.
+    - Ingestion latency baselines differ in GCC High. Establish a GCC High-specific baseline over 30 days and use that as the threshold for anomaly detection rather than commercial SLA numbers.
+    - The Microsoft Defender for Cloud Apps connector in GCC High may require separate configuration. Verify connectivity status after initial setup, as the GC
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

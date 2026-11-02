@@ -1,0 +1,3 @@
+# Run 51 (2026-10-28): synthetic customer S1 (s1-mach), wave W5 cycle 4 proof (58 checks)
+
+58/58 against the run-49c baseline with no status change (EO 88/2/0/20 SPRS 61); Stamper 110/110 (S1's own assigned compliance policy verified by the new compliance entry; tightened lookups keep S1-CA01 / S1-CA02 / S1-CA06 and the three Intune equivalents); scorecard 9/10 within (SC-1 7/7, SC-2 10/11, SC-3a 233/248 = 94.0 %, SC-3b, SC-4 15.9 %, SC-5 0/0, SC-6 22/22 + 15/15, SC-7, SC-8b 0/39); GAPS 331 (was 416). OUTSIDE UNCHANGED. Only SC-8a (31/96 = 32.3 % unsure discovery answers, threshold 15 %) remains outside on S1.

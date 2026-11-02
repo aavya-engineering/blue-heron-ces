@@ -1,0 +1,58 @@
+{
+  "scenario_id": "clean-tenant-mfa-baseline",
+  "description": "M3 port of the M2 walking-skeleton scenario, with REDESIGNED expected_state: assert the MFA outcome the Muster->Stamper pipeline ACTUALLY produces (authenticationMethodConfigurations enabled), not the caPolicy-1 grantControls expectation inherited from the M1 seed-PATCH precedent that nothing in the pipeline writes (loop-board tick-7 finding). Flow-through MS-R10 (2026-09-27): the Mission Plan now comes from ces-muster's real generator (muster.plan_source), not the legacy ces-planner wizard; TCP.LIC.001 is a planner-wizard row with no Muster-generator input (licence tier falls to the generator default, G5).",
+  "target_level": "L2",
+  "lanes": ["sim"],
+  "stacksim_seed": {
+    "stance": "m365_azure",
+    "countOverrides": {},
+    "steps": []
+  },
+  "muster": {
+    "answer_map": {
+      "G-01": { "wizard": "sit", "answer_type": "enum", "value": "L2" },
+      "G-02": { "wizard": "sit", "answer_type": "enum", "value": "cui_present" },
+      "G-07": { "wizard": "sit", "answer_type": "enum", "value": "single_enclave" },
+      "TCP.LIC.001": { "wizard": "tcp", "answer_type": "single_select", "value": "Microsoft 365 G5" }
+    },
+    "plan_source": {
+      "kind": "muster-generator",
+      "ces_id": "ces-tester-clean-tenant-mfa-baseline",
+      "requirement_results": [
+        { "requirement_id": "IA.L2-3.5.3", "status": "not_met" }
+      ]
+    },
+    "mid_pipeline_assertions": [
+      {
+        "path": "outputs.human_readable_mission_plan.control_directives[?(@.control_id=='IA.L2-3.5.3')]",
+        "assert": "exists",
+        "array_path": "outputs.human_readable_mission_plan.control_directives",
+        "match_field": "control_id",
+        "match_value": "IA.L2-3.5.3"
+      }
+    ]
+  },
+  "stamper": { "execution_mode": "auto" },
+  "fault_injection": [],
+  "expected_state": {
+    "checks": [
+      {
+        "description": "MicrosoftAuthenticator auth-method config enabled (the pipeline's real MFA outcome)",
+        "request": { "kind": "uri", "method": "GET", "uri": "/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/MicrosoftAuthenticator" },
+        "path": "state",
+        "assert": "equals",
+        "value": "enabled",
+        "ledger_object_type": "authenticationMethodsPolicyConfigurations"
+      },
+      {
+        "description": "Fido2 auth-method config enabled",
+        "request": { "kind": "uri", "method": "GET", "uri": "/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/Fido2" },
+        "path": "state",
+        "assert": "equals",
+        "value": "enabled",
+        "ledger_object_type": "authenticationMethodsPolicyConfigurations"
+      }
+    ]
+  },
+  "expected_evidence": []
+}

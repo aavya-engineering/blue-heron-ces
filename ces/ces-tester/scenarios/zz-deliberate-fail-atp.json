@@ -1,0 +1,43 @@
+{
+  "scenario_id": "zz-deliberate-fail-atp",
+  "description": "DELIBERATE-FAIL scenario (M3 acceptance gate): asserts ATP is DISABLED when the pipeline actually enables it, proving the verifier fails honestly and populates diverged_commands from a real /ledger query. The zz- prefix keeps it last in run-all's sorted order. Its FAIL is expected; run-all exiting nonzero with this scenario present is correct behavior.",
+  "target_level": "L2",
+  "lanes": ["sim"],
+  "stacksim_seed": {
+    "stance": "m365_azure",
+    "countOverrides": {},
+    "steps": []
+  },
+  "muster": {
+    "answer_map": {
+      "G-01": { "wizard": "sit", "answer_type": "enum", "value": "L2" },
+      "G-02": { "wizard": "sit", "answer_type": "enum", "value": "cui_present" },
+      "G-07": { "wizard": "sit", "answer_type": "enum", "value": "single_enclave" },
+      "TCP.LIC.001": { "wizard": "tcp", "answer_type": "single_select", "value": "Microsoft 365 G5" }
+    },
+    "mid_pipeline_assertions": [
+      {
+        "path": "outputs.human_readable_mission_plan.control_directives[?(@.control_id=='IR.L2-3.6.1')]",
+        "assert": "exists",
+        "array_path": "outputs.human_readable_mission_plan.control_directives",
+        "match_field": "control_id",
+        "match_value": "IR.L2-3.6.1"
+      }
+    ]
+  },
+  "stamper": { "execution_mode": "auto" },
+  "fault_injection": [],
+  "expected_state": {
+    "checks": [
+      {
+        "description": "DELIBERATELY WRONG: asserts ATP disabled while the pipeline enables it",
+        "request": { "kind": "cmdlet", "cmdlet": "Get-AtpPolicyForO365" },
+        "path": "EnableATPForSPOTeamsODB",
+        "assert": "equals",
+        "value": false,
+        "ledger_object_type": "atpPolicyForO365"
+      }
+    ]
+  },
+  "expected_evidence": []
+}

@@ -1,0 +1,15 @@
+{
+  "type": "ui-e2e",
+  "scenario_id": "s1-mach-stamper-ui-e2e",
+  "description": "W8-UIT1 (UI-TRACK.md section 5): the Stamper UI use case on S1 (stacksim scenario s1-mach, a fictional 45-person machining subcontractor). The tester drives the Stamper console with Playwright, headed and paced with a step caption by default (the founder's Watchable rule; --headless only on request), recording a video and a trace: tenant (select, connect), translate (config paths, assess, translate), approve (Incremental mode, every pending gate approved in the console), execute (target Tenant, to a terminal state), ledger (the console's resource ledger, plus the sim ledger snapshot), evidence (the console's evidence scan). Inputs are the headless twin's (scenarios/muster/s1-mach-e2e.json through mx-e2e.ps1): the pushed MP, TM and IM in <WS>/pl (all three filled into the console's Config card), a fresh ephemeral sim tenant record, no plan-variable seed. The sim is reset to s1-mach before each variant; order legacy (/), then SPA (/app/, only when the SPA is built). Outcome, strict equality with the twin: (a) the executable plan projection without variables, (b) the Stamper failed set, (c) the mutated sim ledger rows (UI execute window vs the twin's E6 window). Record: <WS>/out/ui-e2e-stamper.json (verify V73).",
+  "surface": "stamper",
+  "sim_scenario": "s1-mach",
+  "stance": "m365_azure",
+  "twin": "s1-mach-e2e",
+  "variants": [
+    { "id": "legacy", "base_path": "/" },
+    { "id": "spa", "base_path": "/app/", "requires_built": "public/app/screens-ready.json" }
+  ],
+  "steps": ["tenant", "translate", "approve", "execute", "ledger", "evidence"],
+  "execute_mode": "incremental"
+}

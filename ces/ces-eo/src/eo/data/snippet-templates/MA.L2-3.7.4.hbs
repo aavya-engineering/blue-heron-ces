@@ -1,0 +1,41 @@
+## Control {{controlId}}: Check Media Containing Diagnostic and Test Programs for Malicious Code Before Use
+
+**Implementation Status:** {{status}}
+
+This organization checks maintenance media for malicious code within the {{tenantName}} M365 GCC High tenant through Microsoft Defender for Endpoint scanning and device compliance policies managed by {{variables.systemAdministrator}}.
+
+{{#if conditionalAccessActive}}
+**Access Control for Maintenance Sessions:**
+{{caPoliciesTotalCount}} Conditional Access policies require MFA and compliant device status for non-local maintenance sessions:
+{{#each policies}}
+- **{{displayName}}** ({{state}}): Requires {{#each grantControls.builtInControls}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+{{/each}}
+
+Remote maintenance sessions are authenticated via MFA, encrypted via TLS 1.2+, and automatically terminated when maintenance is complete through session timeout controls.
+{{else}}
+Conditional Access enforcement for maintenance sessions has not been configured.
+{{/if}}
+
+**Malicious Code Detection:**
+- Microsoft Defender for Endpoint provides real-time scanning of all media connected to managed devices
+- Diagnostic tools downloaded from external sources are scanned before execution
+- PowerShell scripts used for maintenance must be signed with approved certificates
+- Removable media containing maintenance tools scanned automatically upon connection
+
+{{#if compliancePolicyActive}}
+**Compliance Enforcement:**
+Device compliance policy "{{policyName}}" requires active antivirus protection and real-time scanning, ensuring maintenance media is checked before use on CUI systems.
+{{/if}}
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine Defender for Endpoint scan logs, maintenance media inspection records, script signing policies, and compliance policy configurations.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

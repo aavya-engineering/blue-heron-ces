@@ -1,0 +1,38 @@
+## Control {{controlId}}: Track, Review, Approve/Disapprove, and Log Changes to Organizational Systems
+
+**Implementation Status:** {{status}}
+
+This organization tracks, reviews, and logs changes to organizational systems within the {{tenantName}} M365 GCC High tenant through change management procedures documented in "Configuration Change Control Policy v1.0" maintained by {{variables.systemAdministrator}}.
+
+All changes to the CUI environment follow a formal change management process:
+
+**Change Control Process:**
+- **Request:** Change requests submitted via ticketing system with description, risk assessment, and rollback plan
+- **Review:** Changes reviewed by Change Advisory Board (CAB) for security impact prior to approval
+- **Approval:** Changes require written approval from {{variables.systemAdministrator}} and ISSO for security-relevant modifications
+- **Implementation:** Approved changes implemented during designated maintenance windows
+- **Logging:** All changes logged in Entra ID directory audit logs and Intune configuration change history
+
+{{#if directoryAuditsAvailable}}
+**Audit Trail:**
+Entra ID directory audit logs capture {{directoryAuditsCount}} administrative actions including configuration changes, role assignments, and policy modifications with actor identity, timestamp, and action details.
+{{/if}}
+
+**Operational Procedure:**
+- **Action:** Change requests reviewed weekly by CAB; emergency changes require post-implementation review within 48 hours
+- **Frequency:** Weekly CAB meetings, continuous audit logging
+- **Responsible Party:** {{variables.systemAdministrator}}
+- **Documentation:** Configuration Change Control Policy v1.0, Change Request Form CM-003
+
+**Review Frequency:** Monthly change log review by ISSO
+
+**Verification Method:** Examine change management records, CAB meeting minutes, Entra ID audit logs, and Intune configuration change history.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** Review change management records per procedure CM-003. {{evidenceArtifactUrl}}
+{{/if}}

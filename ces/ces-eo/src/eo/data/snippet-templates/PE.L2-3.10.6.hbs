@@ -1,0 +1,46 @@
+## Control {{controlId}}: Enforce Safeguarding Measures for CUI at Alternate Work Sites
+
+**Implementation Status:** {{status}}
+
+This organization enforces CUI safeguarding at alternate work sites for the {{tenantName}} M365 GCC High tenant through telework security policies, Conditional Access enforcement, and device compliance requirements documented in "Alternate Work Site Policy v1.0" maintained by {{variables.systemAdministrator}}.
+
+{{#if conditionalAccessActive}}
+**Technical Safeguards:**
+{{caPoliciesTotalCount}} Conditional Access policies enforce security requirements for remote CUI access:
+{{#each policies}}
+- **{{displayName}}** ({{state}}): Requires {{#each grantControls.builtInControls}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+{{/each}}
+
+Remote access requires compliant device, MFA authentication, and approved network location before CUI access is granted.
+{{/if}}
+
+**Alternate Work Site Requirements:**
+- CUI materials (digital and paper) stored in locked containers when not in active use
+- CUI displayed on screens in private areas only; screen privacy filters required in shared spaces
+- CUI conversations conducted in private areas; speakerphone use prohibited in shared spaces
+- Printing of CUI at alternate sites prohibited unless secure printing infrastructure is available
+- VPN required for all CUI system access from alternate locations
+
+**Personnel Responsibilities:**
+- Telework agreement signed by all personnel accessing CUI from alternate sites
+- Annual acknowledgment of alternate work site safeguarding requirements
+- Incident reporting for any CUI spillage or unauthorized exposure at alternate locations
+
+**Operational Procedure:**
+- **Action:** Annual review of telework agreements; spot-check compliance during security assessments
+- **Frequency:** Annual agreement renewal, continuous technical enforcement
+- **Responsible Party:** {{variables.systemAdministrator}}
+- **Documentation:** Alternate Work Site Policy v1.0, Telework Agreement Form PE-006
+
+**Review Frequency:** Annually by ISSO
+
+**Verification Method:** Examine telework agreements, Conditional Access policy configurations, device compliance reports, and alternate site security acknowledgments.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** Review telework agreements per procedure PE-006. {{evidenceArtifactUrl}}
+{{/if}}

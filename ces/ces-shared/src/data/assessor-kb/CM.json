@@ -1,0 +1,1226 @@
+{
+  "family": "CM",
+  "family_name": "Configuration Management",
+  "practices": [
+    {
+      "id": "CM.L2-3.4.1",
+      "title": "Establish and maintain baseline configurations and inventories of organizational systems (including hardware, software, firmware, and documentation) throughout the respective system development life cycles.",
+      "approach": {
+        "what_assessor_does": "The assessor asks for the documented baseline for each kind of system in scope (workstations, servers, cloud tenant, network gear) and checks that it covers hardware, software, firmware and the documents that describe the system. They then ask for the system inventory and compare it, line by line for a sample, against what the management tools actually see, such as the devices enrolled in Intune. Interviews cover who owns the baseline and the inventory, how often each is reviewed, and what happens when a device is bought, rebuilt or retired. Testing means picking a few real devices and confirming they appear in the inventory and carry the baseline settings, and picking a few inventory rows and confirming the device still exists.",
+        "common_failure_modes": [
+          "The baseline is a vendor template that was never adapted or approved for this environment.",
+          "Firmware and system documentation are left out of both the baseline and the inventory.",
+          "The inventory is a spreadsheet that does not match the devices enrolled in the management tool.",
+          "There is no record of a review: the baseline and the inventory carry no dates, versions or owners.",
+          "Cloud services, virtual machines or network equipment that handle CUI are missing from the inventory."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "CM.L2-3.4.1[a]",
+          "determination": "a baseline configuration is established",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Stamper-rendered configuration management policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/configuration-management-policy.md (GateEvidence family CM). Should name the baseline for each system type and who approves it."
+            },
+            {
+              "artifact_type": "Deployed baseline configuration profiles",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry CM.L2-3.4.1 (securityBaselineEvaluator): Graph /deviceManagement/deviceConfigurations (with /deviceManagement/managedDevices), checked for BitLocker, Secure Boot and password settings."
+            },
+            {
+              "artifact_type": "Autopilot baseline provisioning",
+              "ces_source": "ao_row",
+              "notes": "AdminOps B-14 Autopilot Profile Provisioning (registered against CM.L2-3.4.1, objective [a]) and B-01 New Device Enrollment (objectives [a], [d]): new devices are built to the controlled baseline at enrollment."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask who approved the current baseline and where the approved version is kept."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.1[b]",
+          "determination": "the baseline configuration includes hardware, software, firmware, and documentation",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Baseline document listing hardware, software, firmware and documentation",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. The assessor checks that all four elements appear, including firmware versions and the documents that describe the system."
+            },
+            {
+              "artifact_type": "Deployed baseline configuration profiles",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry CM.L2-3.4.1 (securityBaselineEvaluator): Graph /deviceManagement/deviceConfigurations (with /deviceManagement/managedDevices), checked for BitLocker, Secure Boot and password settings. Covers the software settings part only; hardware, firmware and documentation come from the uploaded baseline document."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how firmware versions and system documents are captured in the baseline."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.1[c]",
+          "determination": "the baseline configuration is maintained (reviewed and updated) throughout the system development life cycle",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Baseline review and change history",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: version history, review dates and approvals of the baseline."
+            },
+            {
+              "artifact_type": "Autopilot profile review",
+              "ces_source": "ao_row",
+              "notes": "AdminOps B-12 Autopilot Profile Review (registered against CM.L2-3.4.1, objective [c]): finds stale profiles and checks they still match the baseline."
+            },
+            {
+              "artifact_type": "Conditional Access duplicate cleanup",
+              "ces_source": "ao_row",
+              "notes": "AdminOps A-20 Conditional Access Duplicate Policy Cleanup (registered against CM.L2-3.4.1 and CM.L2-3.4.2, objective [c] here): removes duplicate report-only or disabled policies so the tenant baseline stays clean."
+            },
+            {
+              "artifact_type": "Baseline owner interview",
+              "ces_source": "interview",
+              "notes": "Ask when the baseline was last reviewed and what triggered the last update."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.1[d]",
+          "determination": "a system inventory is established",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Managed device inventory",
+              "ces_source": "stack_signal",
+              "notes": "EO evidence router item signal:deviceSignals (compliance and managed devices), mapped to CM.L2-3.4.1 and CM.L2-3.4.2. Read from Graph /deviceManagement/managedDevices."
+            },
+            {
+              "artifact_type": "Device inventory by compliance status",
+              "ces_source": "ao_row",
+              "notes": "AdminOps B-02 Compliance Policy Gap Report (registered against CM.L2-3.4.1, objective [d]): device inventory pivoted by compliance policy state."
+            },
+            {
+              "artifact_type": "System inventory",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: the inventory the organization maintains, covering devices outside Intune as well."
+            },
+            {
+              "artifact_type": "Asset owner interview",
+              "ces_source": "interview",
+              "notes": "Ask who keeps the inventory and what it is built from."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.1[e]",
+          "determination": "the system inventory includes hardware, software, firmware, and documentation",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Hardware inventory reconciliation",
+              "ces_source": "ao_row",
+              "notes": "AdminOps B-10 Hardware Inventory Reconciliation (registered against CM.L2-3.4.1, objectives [d], [e], [f]): compares the Intune inventory with procurement records to find unenrolled devices."
+            },
+            {
+              "artifact_type": "System inventory with software, firmware and documentation columns",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. The assessor checks for software and firmware versions and links to system documents, not only device names."
+            },
+            {
+              "artifact_type": "Asset owner interview",
+              "ces_source": "interview",
+              "notes": "Ask how installed software and firmware versions get into the inventory."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.1[f]",
+          "determination": "the inventory is maintained (reviewed and updated) throughout the system development life cycle",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Inventory reconciliation results over time",
+              "ces_source": "ao_row",
+              "notes": "AdminOps B-10 Hardware Inventory Reconciliation (objective [f]): repeated runs show the inventory is reviewed and corrected."
+            },
+            {
+              "artifact_type": "Inventory review records",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: dated reviews and the additions and retirements they produced."
+            },
+            {
+              "artifact_type": "Stamper-rendered configuration management policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/configuration-management-policy.md (GateEvidence family CM). Should state how often the inventory is reviewed and who does it."
+            },
+            {
+              "artifact_type": "Asset owner interview",
+              "ces_source": "interview",
+              "notes": "Ask what happens to the inventory when a device is bought, reassigned or retired."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CM.L2-3.4.2",
+      "title": "Establish and enforce security configuration settings for information technology products employed in organizational systems.",
+      "approach": {
+        "what_assessor_does": "The assessor reads the security configuration settings the organization has chosen for each product in use (for example a CIS benchmark or Microsoft security baseline, with any documented deviations) and checks that those settings are part of the baseline from 3.4.1. They then look for proof the settings are pushed and kept in place, not just written down: deployed configuration profiles, compliance policies and drift reports. Interviews ask who approves a deviation from the chosen settings and how drift is caught. Testing means checking a sample device or the tenant itself for a handful of the documented settings and seeing whether the value matches.",
+        "common_failure_modes": [
+          "Settings are documented for Windows endpoints only; servers, the cloud tenant or network devices have none.",
+          "Configuration profiles exist but are assigned to no devices or only to a pilot group.",
+          "Deviations from the chosen benchmark are in place on devices but never written down or approved.",
+          "Nobody looks at drift or compliance reports, so devices that fell out of compliance stay that way."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "CM.L2-3.4.2[a]",
+          "determination": "security configuration settings for information technology products employed in the system are established and included in the baseline configuration",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Stamper-rendered configuration management policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/configuration-management-policy.md (GateEvidence family CM). Should name the benchmark or baseline chosen for each product and how deviations are approved."
+            },
+            {
+              "artifact_type": "Security configuration benchmark with documented deviations",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector, for products CES does not read (servers, network devices)."
+            },
+            {
+              "artifact_type": "Device compliance baseline",
+              "ces_source": "ao_row",
+              "notes": "AdminOps B-13 Device Compliance Baseline Enforcement (registered against CM.L2-3.4.2, objectives [a], [b]): creates the Windows compliance policy (BitLocker, Secure Boot, minimum OS). A-20 also maps to objective [a]."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask how the chosen settings were selected and who signs off a deviation."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.2[b]",
+          "determination": "security configuration settings for information technology products employed in the system are enforced",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Attack surface reduction rules in block mode",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry CM.L2-3.4.2 (asrRulesEvaluator): Graph /deviceManagement/deviceConfigurations and /deviceManagement/configurationPolicies, checking that the rules set by Stamper entry CM.L2-3.4.2.asr-rules are set to block."
+            },
+            {
+              "artifact_type": "Device compliance state",
+              "ces_source": "stack_signal",
+              "notes": "EO evidence router item signal:deviceSignals (compliance and managed devices), mapped to CM.L2-3.4.1 and CM.L2-3.4.2. Shows which managed devices meet the compliance policy."
+            },
+            {
+              "artifact_type": "Baseline drift report",
+              "ces_source": "ao_row",
+              "notes": "AdminOps B-04 Security Baseline Drift (registered against CM.L2-3.4.2, objective [b]): detects drift from Intune security baselines and redeploys."
+            },
+            {
+              "artifact_type": "Benchmark scan results",
+              "ces_source": "ao_row",
+              "notes": "AdminOps F-09 CIS Benchmark Hardening (registered against CM.L2-3.4.2, objective [b]): ScubaGear or CIS-CAT benchmark results."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how a device that falls out of compliance is found and fixed."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CM.L2-3.4.3",
+      "title": "Track, review, approve or disapprove and log changes to organizational systems.\nAssessment Objective:\n[a] changes to the system are tracked; \n[b] changes to the system are reviewed; \n[c] changes to the system are approved or disapproved; and \n[d] changes to the system are logged.",
+      "approach": {
+        "what_assessor_does": "The assessor looks for a change control process that covers the systems in scope and asks to see its records: a ticket or request for each change, a review of it, an approve or reject decision by someone with the authority to make it, and a log entry showing the change was made. They take a sample of real changes from the tenant audit log and trace each one back to an approved request, then take a sample of requests and trace each one forward to the logged change. Interviews ask administrators how they raise a change and what they do in an emergency. Unrecorded changes in the audit log are the usual finding.",
+        "common_failure_modes": [
+          "Changes appear in the tenant audit log with no matching request or approval.",
+          "The same administrator requests, approves and makes the change with no second review.",
+          "Rejected changes are not recorded, so there is no evidence that disapproval is possible.",
+          "Emergency changes are made and never reviewed or recorded afterwards.",
+          "The change log covers the ticketing system only and leaves out cloud or firewall changes."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "CM.L2-3.4.3[a]",
+          "determination": "changes to the system are tracked",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Change requests or tickets",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: the change register or ticket export for the assessment period."
+            },
+            {
+              "artifact_type": "Config drift alert response",
+              "ces_source": "ao_row",
+              "notes": "AdminOps F-08 Config Drift Alert Response (registered against CM.L2-3.4.3, objectives [a], [b]): investigates Sentinel drift alerts and reverts unauthorized changes."
+            },
+            {
+              "artifact_type": "Stamper-rendered configuration management policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/configuration-management-policy.md (GateEvidence family CM). Should describe how changes are requested and tracked."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how a change is raised and how its progress is followed."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.3[b]",
+          "determination": "changes to the system are reviewed",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Change review records",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: review notes or change board minutes. The registry evaluator for CM.L2-3.4.3 does not read reviews; they are records only."
+            },
+            {
+              "artifact_type": "Drift alert investigation",
+              "ces_source": "ao_row",
+              "notes": "AdminOps F-08 Config Drift Alert Response (objective [b]): each drift alert is investigated before being kept or reverted."
+            },
+            {
+              "artifact_type": "Change reviewer interview",
+              "ces_source": "interview",
+              "notes": "Ask who reviews changes and what they check before passing a change on."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.3[c]",
+          "determination": "changes to the system are approved or disapproved",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Approve and reject decisions",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: approval records showing who decided, including at least one rejected change. No tenant signal reads approvals."
+            },
+            {
+              "artifact_type": "Stamper-rendered configuration management policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/configuration-management-policy.md (GateEvidence family CM). Should name who may approve or reject each class of change."
+            },
+            {
+              "artifact_type": "Change approver interview",
+              "ces_source": "interview",
+              "notes": "Ask for an example of a change that was turned down and why."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.3[d]",
+          "determination": "changes to the system are logged",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Directory audit log",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry CM.L2-3.4.3 (changeTrackingEvaluator): Graph /auditLogs/directoryAudits, checking that each logged change has an activity, a time and an actor."
+            },
+            {
+              "artifact_type": "Change log for systems outside the tenant",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: firewall, server or network change logs. The assessor traces a sample of logged changes back to approved requests."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask where changes to systems outside Microsoft 365 are logged."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CM.L2-3.4.4",
+      "title": "Analyze the security impact of changes prior to implementation.\nAssessment Objective:\n[a] the security impact of changes to the system is analyzed prior to implementation.",
+      "approach": {
+        "what_assessor_does": "The assessor checks that changes are judged for their security effect before they go in, not after. They read the change procedure for a step that asks what the change does to security controls, and pick a sample of recent changes to see a written security impact analysis on each one, dated before the change was made. Interviews ask who performs the analysis, what they look at (affected controls, new access, new data flows, the SSP) and what happens when an impact is found. Testing means comparing the dates of the analysis with the date the change appears in the audit log.",
+        "common_failure_modes": [
+          "The change form has a security impact field that is always left blank or says \"none\".",
+          "The analysis is written after the change was already made.",
+          "The person doing the analysis has no security knowledge and no checklist to follow.",
+          "Changes that alter the system boundary or data flows never lead to an update of the SSP."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "CM.L2-3.4.4[a]",
+          "determination": "the security impact of changes to the system is analyzed prior to implementation",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Security impact analysis rendered from audit logs",
+              "ces_source": "eo_store",
+              "notes": "EO render directive EO_RENDER_SIA (Stamper EO_RENDER_DIRECTIVES for CM.L2-3.4.4, input entra_audit_logs) produces \"Security Impact Analysis Template - CM.L2-3.4.4.docx\". It is a template from logged changes; the analysis itself is the organization's."
+            },
+            {
+              "artifact_type": "Completed security impact analyses for sampled changes",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. The assessor compares each analysis date with the date the change appears in the audit log. The control signal registry has no entry for CM.L2-3.4.4: no tenant signal covers this objective."
+            },
+            {
+              "artifact_type": "Stamper-rendered configuration management policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/configuration-management-policy.md (GateEvidence family CM). Should require a security impact analysis before a change is approved."
+            },
+            {
+              "artifact_type": "Change analyst interview",
+              "ces_source": "interview",
+              "notes": "Ask who performs the analysis, what they look at, and what happens when a security impact is found."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CM.L2-3.4.5",
+      "title": "Define, document, approve and enforce physical and logical access restrictions associated with changes to organizational systems.",
+      "approach": {
+        "what_assessor_does": "The assessor checks two kinds of restriction on who can make changes. For physical changes they look for written rules on who may enter server rooms, network closets or equipment areas to change hardware, and proof those rules are approved and applied (badge lists, key logs, visitor logs). For logical changes they look for a written list of who holds administrative roles in the tenant and on systems, approval of that list, and proof that only those people hold the rights. Interviews ask how a person gets and loses change rights. Testing means comparing the approved list with the people who actually hold privileged roles today.",
+        "common_failure_modes": [
+          "Physical restrictions on changes are not written down; the server closet is open to anyone in the office.",
+          "The list of people allowed to make changes was never approved by anyone with authority.",
+          "More people hold Global Administrator or other privileged roles than the approved list allows.",
+          "Former staff or shared accounts still hold administrative rights."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "CM.L2-3.4.5[a]",
+          "determination": "physical access restrictions associated with changes to the system are defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Stamper-rendered configuration management policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/configuration-management-policy.md (GateEvidence family CM). Should define who may physically access equipment to make changes."
+            },
+            {
+              "artifact_type": "Facility security officer interview",
+              "ces_source": "interview",
+              "notes": "Ask which areas hold equipment that can be changed and who is allowed in. No tenant signal covers physical restrictions."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.5[b]",
+          "determination": "physical access restrictions associated with changes to the system are documented",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Physical access list for equipment areas",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: the written list of people allowed into server rooms and network closets."
+            },
+            {
+              "artifact_type": "Facility security officer interview",
+              "ces_source": "interview",
+              "notes": "Ask where the physical change restrictions are written and who keeps them current."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.5[c]",
+          "determination": "physical access restrictions associated with changes to the system are approved",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Approval of the physical access list",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: signed or dated approval by the person with authority."
+            },
+            {
+              "artifact_type": "Facility security officer interview",
+              "ces_source": "interview",
+              "notes": "Ask who approved the list and when it was last re-approved."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.5[d]",
+          "determination": "physical access restrictions associated with changes to the system are enforced",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Badge, key or visitor logs for equipment areas",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. The assessor compares the people who entered with the approved list."
+            },
+            {
+              "artifact_type": "Facility security officer interview",
+              "ces_source": "interview",
+              "notes": "Ask how entry is controlled and what happens when an unlisted person needs access. The assessor may try the door."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.5[e]",
+          "determination": "logical access restrictions associated with changes to the system are defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Stamper-rendered configuration management policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/configuration-management-policy.md (GateEvidence family CM). Should define which roles may make logical changes to systems and the tenant."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how administrative rights are requested and granted."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.5[f]",
+          "determination": "logical access restrictions associated with changes to the system are documented",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Privileged role list",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: the documented list of people and accounts allowed to make configuration changes."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask where the list of change rights is kept and how it is updated."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.5[g]",
+          "determination": "logical access restrictions associated with changes to the system are approved",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Approval of the privileged role list",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: approval record for the list and for recent additions."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask who approves a new administrator and how that is recorded."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.5[h]",
+          "determination": "logical access restrictions associated with changes to the system are enforced",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Privileged directory role holders",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry CM.L2-3.4.5 (configAccessRestrictEvaluator): Graph /roleManagement/directory/roleAssignments. The assessor compares the holders with the approved list."
+            },
+            {
+              "artifact_type": "Role reconciliation",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector when systems outside the tenant (servers, firewalls) hold their own administrator accounts."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how rights are removed when someone changes job or leaves."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CM.L2-3.4.6",
+      "title": "Employ the principle of least functionality by configuring organizational systems to provide only essential capabilities.",
+      "approach": {
+        "what_assessor_does": "The assessor asks the organization to show which capabilities each system needs to do its job, and then checks that the systems are set up to offer only those. They read the documented list of essential functions for each system role and compare it with the configuration profiles actually deployed. Interviews ask administrators how they decided what is essential and who approves turning a capability back on. Testing means checking a sample device for capabilities the list calls nonessential (consumer features, Bluetooth, unused roles) and seeing whether they are turned off.",
+        "common_failure_modes": [
+          "No list of essential capabilities exists, so there is nothing to configure against.",
+          "Devices are left at manufacturer or default settings with consumer features turned on.",
+          "Restrictions apply to some device groups but not to others that handle CUI."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "CM.L2-3.4.6[a]",
+          "determination": "essential system capabilities are defined based on the principle of least functionality",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Stamper-rendered configuration management policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/configuration-management-policy.md (GateEvidence family CM). Should state the least functionality principle and point to the list of essential capabilities."
+            },
+            {
+              "artifact_type": "Essential capabilities list by system role",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: what each type of system needs to do its job."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how the essential capabilities were decided and who approves adding one."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.6[b]",
+          "determination": "the system is configured to provide only the defined essential capabilities",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Device restriction profiles",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry CM.L2-3.4.6 (leastFunctionalityEvaluator): Graph /deviceManagement/deviceConfigurations, looking for Cortana, Game DVR, Bluetooth, the connected devices service or the consumer account sign-in assistant turned off."
+            },
+            {
+              "artifact_type": "Device configurations item",
+              "ces_source": "stack_signal",
+              "notes": "EO evidence router item signal:deviceConfigurations (Intune device configurations), mapped to CM.L2-3.4.6."
+            },
+            {
+              "artifact_type": "BYOD app control result",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper ByodVerdictAggregator rule for CM.L2-3.4.6: Conditional Access app control and blocking of non-browser clients on personal devices."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask which capabilities were turned off and how a sample device shows it."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CM.L2-3.4.7",
+      "title": "Restrict, disable or prevent the use of nonessential programs, functions, ports, protocols and services.",
+      "approach": {
+        "what_assessor_does": "The assessor works through five categories: programs, functions, ports, protocols and services. For each one they look for a written statement of what is essential and what is not, and a configuration that restricts, disables or blocks what is not. They read application control settings, firewall rules and service configurations, and ask administrators how each list was built and how exceptions are approved. Testing means checking a sample device or network segment: trying to run a program that should be blocked, scanning for open ports, and confirming that disabled services and protocols are really off.",
+        "common_failure_modes": [
+          "Programs are covered but ports, protocols and services have no defined list.",
+          "Firewall rules allow any traffic inbound or outbound with no written reason.",
+          "Legacy protocols such as SMBv1, Telnet or basic authentication are still enabled.",
+          "Application control runs in audit mode only and blocks nothing.",
+          "Exceptions are granted without a record of who approved them and why."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "CM.L2-3.4.7[a]",
+          "determination": "essential programs are defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Approved program list",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: the programs each system role needs."
+            },
+            {
+              "artifact_type": "CUI app allowlist",
+              "ces_source": "ao_row",
+              "notes": "AdminOps B-08 CUI App Allowlist/Blocklist (registered against CM.L2-3.4.7, objectives [a], [c]): WDAC, app protection policies and Defender web filtering for apps that touch CUI."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how the program list was built and who keeps it."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.7[b]",
+          "determination": "the use of nonessential programs is defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Stamper-rendered configuration management policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/configuration-management-policy.md (GateEvidence family CM). Should say how programs not on the essential list are handled."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask which programs are treated as nonessential and how that is decided."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.7[c]",
+          "determination": "the use of nonessential programs is restricted, disabled, or prevented as defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Application control settings",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry CM.L2-3.4.7 (applicationControlEvaluator): Graph /deviceManagement/deviceConfigurations, looking for enforced application control, blocked sideloading, Store-only installs or a blocked SmartScreen override. Covers programs only."
+            },
+            {
+              "artifact_type": "App allowlist and blocklist enforcement",
+              "ces_source": "ao_row",
+              "notes": "AdminOps B-08 CUI App Allowlist/Blocklist (objective [c])."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask to see a blocked program on a sample device; the assessor tries to run one."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.7[d]",
+          "determination": "essential functions are defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Essential functions list",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: the operating system and application features each system role needs."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask which system features users and services rely on."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.7[e]",
+          "determination": "the use of nonessential functions is defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Stamper-rendered configuration management policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/configuration-management-policy.md (GateEvidence family CM). Should say how features not on the essential list are handled."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask which features are treated as nonessential, such as macros, scripting hosts or remote assistance."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.7[f]",
+          "determination": "the use of nonessential functions is restricted, disabled, or prevented as defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Device restriction profiles for functions",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry CM.L2-3.4.7 reads Graph /deviceManagement/deviceConfigurations; its evaluator checks program settings, so feature restrictions are confirmed from the profile export or a sample device."
+            },
+            {
+              "artifact_type": "Function restriction settings export",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: group policy or Intune profile export for the features turned off."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask to show a disabled feature on a sample device."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.7[g]",
+          "determination": "essential ports are defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Essential ports list",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: ports each system and boundary device needs, with the reason."
+            },
+            {
+              "artifact_type": "Network administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how the port list was built and when it was last checked. No tenant signal covers ports."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.7[h]",
+          "determination": "the use of nonessential ports is defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Stamper-rendered configuration management policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/configuration-management-policy.md (GateEvidence family CM). Should say that ports not on the essential list are closed by default."
+            },
+            {
+              "artifact_type": "Network administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask which ports are considered nonessential and how exceptions are approved."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.7[i]",
+          "determination": "the use of nonessential ports is restricted, disabled, or prevented as defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Firewall rule set and port scan results",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. The assessor compares open ports found in a scan with the essential list."
+            },
+            {
+              "artifact_type": "Network administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask for a walk through of the firewall rules that allow inbound traffic."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.7[j]",
+          "determination": "essential protocols are defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Essential protocols list",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: protocols each system needs, for example TLS 1.2 or later and SMB version 3."
+            },
+            {
+              "artifact_type": "Network administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask which protocols are required and why. No tenant signal covers protocols."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.7[k]",
+          "determination": "the use of nonessential protocols is defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Stamper-rendered configuration management policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/configuration-management-policy.md (GateEvidence family CM). Should name the legacy or nonessential protocols that are not allowed."
+            },
+            {
+              "artifact_type": "Network administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask which protocols are treated as nonessential, such as SMBv1, Telnet or legacy authentication."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.7[l]",
+          "determination": "the use of nonessential protocols is restricted, disabled, or prevented as defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Protocol configuration evidence",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: settings or scan output showing legacy protocols are disabled."
+            },
+            {
+              "artifact_type": "Network administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how a legacy protocol would be detected if someone turned it back on."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.7[m]",
+          "determination": "essential services are defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Essential services list",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: operating system and network services each system role needs."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how the service list was decided. No tenant signal covers services."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.7[n]",
+          "determination": "the use of nonessential services is defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Stamper-rendered configuration management policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/configuration-management-policy.md (GateEvidence family CM). Should say how services not on the essential list are handled."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask which services are treated as nonessential, such as remote registry or print spooler on servers."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.7[o]",
+          "determination": "the use of nonessential services is restricted, disabled, or prevented as defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Service configuration export",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: service state from a sample of systems showing nonessential services disabled."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask to show the service state on a sample system."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CM.L2-3.4.8",
+      "title": "Apply deny-by-exception (blacklisting) policy to prevent the use of unauthorized software or deny-all, permit-by-exception (whitelisting) policy to allow the execution of authorized software.",
+      "approach": {
+        "what_assessor_does": "The assessor first reads the policy to see which approach the organization chose: deny by exception (a list of software that is blocked) or permit by exception (only listed software may run). They then read the list itself and check that it is specific and current. Testing is the core of this practice: they compare the software actually found on devices with the list, and on a sample device try to run something that the policy says should not run. Interviews ask who maintains the list and how a new program gets approved.",
+        "common_failure_modes": [
+          "The policy does not say which approach is used, or says one and the devices use the other.",
+          "The software list is missing, generic, or years out of date.",
+          "Software found on devices includes items the list says are blocked or does not allow.",
+          "Application control is configured but not assigned to the devices that handle CUI."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "CM.L2-3.4.8[a]",
+          "determination": "a policy specifying whether whitelisting or blacklisting is to be implemented is specified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Application control policy",
+              "ces_source": "eo_store",
+              "notes": "EO render directive EO_RENDER_DENY_BY_EXCEPTION_POLICY (Stamper EO_RENDER_DIRECTIVES for CM.L2-3.4.8, input intune_app_control_policies) produces \"Application Control Policy - CM.L2-3.4.8.docx\". The assessor checks that it states which approach is used."
+            },
+            {
+              "artifact_type": "Stamper-rendered configuration management policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/configuration-management-policy.md (GateEvidence family CM). Should state whether permit by exception or deny by exception applies."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask why that approach was chosen."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.8[b]",
+          "determination": "the software allowed to execute under whitelisting or denied use under blacklisting is specified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Allowed or blocked software list",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: the current list with its owner and last review date."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how a program is added to or removed from the list."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.8[c]",
+          "determination": "whitelisting to allow the execution of authorized software or blacklisting to prevent the use of unauthorized software is implemented as specified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Detected applications",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry CM.L2-3.4.8 (detectedAppsEvaluator): Graph /deviceManagement/detectedApps. The assessor compares software found on devices with the list."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask to show the policy blocking a program on a sample device; the assessor tries one that should not run."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CM.L2-3.4.9",
+      "title": "Control and monitor user-installed software.",
+      "approach": {
+        "what_assessor_does": "The assessor reads the policy on whether users may install software and, if so, what and how. They check that device settings carry out that policy, for example by removing local administrator rights, blocking sideloading or limiting installs to an approved company portal. They then look for monitoring: a report of the software installed on devices that someone reviews and acts on. Interviews ask users how they get a new program and ask administrators how they spot an unapproved install. Testing means trying to install an unapproved program on a sample device as a standard user.",
+        "common_failure_modes": [
+          "Users still have local administrator rights and can install anything.",
+          "The policy says installs are controlled but no device setting enforces it.",
+          "Installed software reports exist but nobody reviews them or follows up on findings."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "CM.L2-3.4.9[a]",
+          "determination": "a policy for controlling the installation of software by users is established",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Stamper-rendered configuration management policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/configuration-management-policy.md (GateEvidence family CM). Should state whether users may install software and through which channel."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask who approves software requests from users."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.9[b]",
+          "determination": "installation of software by users is controlled based on the established policy",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Install control settings",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry CM.L2-3.4.9 (installControlEvaluator): Graph /deviceManagement/deviceConfigurations, looking for blocked sideloading, blocked developer unlock or a blocked Store."
+            },
+            {
+              "artifact_type": "Local administrator rights evidence",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: proof standard users are not local administrators (for example an Intune account protection or LAPS export)."
+            },
+            {
+              "artifact_type": "User interview",
+              "ces_source": "interview",
+              "notes": "Ask a standard user how they get a new program; the assessor tries an unapproved install on a sample device."
+            }
+          ]
+        },
+        {
+          "id": "CM.L2-3.4.9[c]",
+          "determination": "installation of software by users is monitored",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Installed software report",
+              "ces_source": "stack_signal",
+              "notes": "Graph /deviceManagement/detectedApps, the same signal the registry reads for CM.L2-3.4.8. The assessor looks for unapproved software and what was done about it."
+            },
+            {
+              "artifact_type": "Software monitoring review records",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: dated reviews of installed software and follow-up actions."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how an unapproved install is spotted and what happens next."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

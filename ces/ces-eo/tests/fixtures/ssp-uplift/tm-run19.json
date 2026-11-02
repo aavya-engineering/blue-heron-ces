@@ -1,0 +1,213 @@
+{
+  "ces": {
+    "artifact": "tenant_manifest",
+    "version": "1.0.0",
+    "generated_on": "2026-10-27T19:01:06.529Z",
+    "intent": "Canonical tenant manifest defining RIGHT state for CMMC L2 (harden_existing, m365_azure)",
+    "cesId": "f1SJjyeyzeI4COtJwnyD1",
+    "inputs": {
+      "si_baseline_hash": "000000000000000000000000000000000000000000000000000000001166e359"
+    }
+  },
+  "tenant_manifest": {
+    "manifest_id": "manifest_mvr1wyg1_m5gtagh",
+    "tech_stack_id": 1,
+    "normative_controls": [],
+    "assets": [
+      {
+        "asset_id": "asset_mvr1wyg1_bd3t1ku",
+        "asset_type": "data_boundary",
+        "scope_category": "CUI",
+        "tags": [
+          "tcp",
+          "cui-sharepoint"
+        ],
+        "owner": "https://muster-partial.sharepoint.us/sites/CUI"
+      },
+      {
+        "asset_id": "asset_mvr1wyg1_pnn8bm9",
+        "asset_type": "data_boundary",
+        "scope_category": "CUI",
+        "tags": [
+          "tcp",
+          "cui-teams"
+        ],
+        "owner": "CUI Operations"
+      },
+      {
+        "asset_id": "asset_mvr1wyg1_laje5rs",
+        "asset_type": "data_boundary",
+        "scope_category": "CUI",
+        "tags": [
+          "tcp",
+          "cui-teams"
+        ],
+        "owner": "CMMC Compliance"
+      }
+    ],
+    "boundary_zones": {
+      "cui_boundary_version": "2026-10-27",
+      "definitions": [
+        {
+          "key": "cui_categories",
+          "value": [
+            "Controlled Technical Information (CTI)"
+          ],
+          "type": "list"
+        },
+        {
+          "key": "cui_classification_matrix",
+          "value": [
+            "Controlled Technical Information (CTI)"
+          ],
+          "type": "list"
+        },
+        {
+          "key": "cui_generation_mode",
+          "value": "Both",
+          "type": "string"
+        },
+        {
+          "key": "cui_generating_functions",
+          "value": [
+            "Engineering",
+            "Program Management"
+          ],
+          "type": "list"
+        },
+        {
+          "key": "cui_ingress_channels",
+          "value": [
+            "Encrypted email",
+            "Teams/SharePoint sharing"
+          ],
+          "type": "list"
+        },
+        {
+          "key": "cui_storage_locations",
+          "value": [
+            "SharePoint Online (GCC High)",
+            "OneDrive (GCC High)",
+            "Exchange mailboxes"
+          ],
+          "type": "list"
+        },
+        {
+          "key": "retention_model",
+          "value": "Standard retention schedule",
+          "type": "string"
+        },
+        {
+          "key": "cui_user_roles",
+          "value": [
+            "Engineers",
+            "Program Managers",
+            "IT Admins",
+            "Security Team"
+          ],
+          "type": "list"
+        },
+        {
+          "key": "cui_user_count",
+          "value": 0,
+          "type": "number"
+        },
+        {
+          "key": "tenant_separation",
+          "value": "Yes – fully isolated tenant",
+          "type": "string"
+        },
+        {
+          "key": "shared_identity",
+          "value": "No",
+          "type": "string"
+        },
+        {
+          "key": "admin_workstation_model",
+          "value": "Yes",
+          "type": "string"
+        },
+        {
+          "key": "devops_in_scope",
+          "value": "No",
+          "type": "string"
+        },
+        {
+          "key": "cui_repo_locations",
+          "value": [
+            "Azure DevOps (GCC High)"
+          ],
+          "type": "list"
+        },
+        {
+          "key": "email_forwarding_posture",
+          "value": "No",
+          "type": "string"
+        },
+        {
+          "key": "api_tokens_move_cui",
+          "value": "No",
+          "type": "string"
+        },
+        {
+          "key": "backup_model",
+          "value": "M365 native only",
+          "type": "string"
+        },
+        {
+          "key": "boundary_controls",
+          "value": "CUI workloads are isolated in a dedicated GCC High tenant.",
+          "type": "string"
+        },
+        {
+          "key": "boundary_enforcement_controls",
+          "value": [
+            "Conditional Access",
+            "Intune compliance enforcement",
+            "DLP policies",
+            "Sensitivity labels"
+          ],
+          "type": "list"
+        }
+      ]
+    },
+    "tenant_identity": {
+      "tenant_id": "",
+      "primary_domain": "",
+      "custom_domains": [],
+      "cloud_environment": "gcc_high",
+      "display_name": "Sim tenant muster-partial",
+      "primary_sku": "Microsoft 365 G5",
+      "license_count": 0,
+      "addon_skus": [
+        "IDENTITY_THREAT_PROTECTION",
+        "CLOUD_APP_SECURITY"
+      ],
+      "service_activations": {
+        "exchange_online": true,
+        "sharepoint_online": true,
+        "teams": true,
+        "intune": true,
+        "defender_for_endpoint": true,
+        "defender_for_office_365": true,
+        "defender_for_identity": true,
+        "purview_compliance": true,
+        "sentinel": true
+      },
+      "cuiGroupName": "CUI-Authorized-Users",
+      "wifiSsid": "MUSTER-DEFAULT-SSID",
+      "securityEmail": "unset-security-email@example.invalid",
+      "operator_value_provenance": {
+        "sim_only": true,
+        "values": {
+          "operatorUPN": "defaulted",
+          "breakGlassUPN": "defaulted",
+          "breakGlassUserId": "defaulted",
+          "cuiGroupName": "defaulted",
+          "wifiSsid": "defaulted",
+          "securityEmail": "defaulted"
+        }
+      }
+    }
+  }
+}

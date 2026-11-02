@@ -1,0 +1,109 @@
+{
+  "pass": true,
+  "scenario": "muster-partial",
+  "baseline": "summary.json",
+  "checks": [
+    {
+      "id": "V1",
+      "title": "All E-step exit codes are 0",
+      "pass": true,
+      "detail": "E1-E8 rc=0 (E2 raw exit -1073740791: libuv exit abort after ok:true, see log); E4 mode=api"
+    },
+    {
+      "id": "V2",
+      "title": "MP and TM parse with the ces-shared schemas",
+      "pass": true,
+      "detail": "MP ok; TM ok"
+    },
+    {
+      "id": "V3",
+      "title": "The MP has 110 control directives",
+      "pass": true,
+      "detail": "110 directives {\"implement\":75,\"manual\":28,\"validate\":7}"
+    },
+    {
+      "id": "V4",
+      "title": "Provenance: the plan came from discovery",
+      "pass": true,
+      "detail": "observations 331 (met 66, unknown 265) match discovery; auto_detected facts 25; MP posture {\"met\":7,\"partial\":0,\"not_met\":0,\"unknown\":24} = compiled results; no 1970 dates"
+    },
+    {
+      "id": "V5",
+      "title": "Stamper's picker regex matches all pushed files",
+      "pass": true,
+      "detail": "3 files; unmatched: none; IM present (expected)"
+    },
+    {
+      "id": "V6",
+      "title": "Translate exit 0; execute report exists; counts within baseline +/-2",
+      "pass": true,
+      "detail": "completed 110 (baseline 109), failed 0 (baseline 1), tolerance 2"
+    },
+    {
+      "id": "V7",
+      "title": "Only Stamper wrote to the sim ledger; discovery added zero writes",
+      "pass": true,
+      "detail": "651 entries; non-seed writes 51: during E6 (Stamper) 51, during E2 (discovery) 0, outside E6 0"
+    },
+    {
+      "id": "V8",
+      "title": "SSP sections, implementation count, TM and MP loaded",
+      "pass": true,
+      "detail": "all 14 sections; 110 implementations (baseline 110), status {\"met\":85,\"not_met\":9,\"not_assessed\":16} vs baseline {\"met\":84,\"not_met\":10,\"not_assessed\":16} (not asserted, K5); sources [\"Mission Plan\",\"Tenant Manifest\",\"Infrastructure Manifest\"]; DOCX 94744 bytes; POA&M ok; system name source: fallback (K4)"
+    },
+    {
+      "id": "V9",
+      "title": "The SSP's MP is the pushed MP",
+      "pass": true,
+      "detail": "EO loaded manual-mission-plan-muster-partial-2026-10-27T06-21-15-429Z.json; pushed manual-mission-plan-muster-partial-2026-10-27T06-21-15-429Z.json"
+    },
+    {
+      "id": "V10",
+      "title": "Nothing written outside the workspace (C:\\CES_Pipeline, ~/.ces, ~/.stamper)",
+      "pass": true,
+      "detail": "C:\\CES_Pipeline: 1811 files, unchanged; ~\\.ces: 5 files, unchanged; ~\\.stamper: 552 files, unchanged"
+    },
+    {
+      "id": "V11",
+      "title": "Unit-suite failures are a subset of known-failures.json",
+      "pass": true,
+      "detail": "4896 passed, 0 failed (0 known), 0 unexpected"
+    },
+    {
+      "id": "V14",
+      "title": "Three back-to-back EO assessments give identical counts",
+      "pass": true,
+      "detail": "3 runs identical: {\"controls_met\":85,\"controls_not_met\":9,\"controls_partial\":0,\"controls_not_assessed\":16,\"sprs_score\":44,\"liveAssessmentCount\":107}"
+    },
+    {
+      "id": "V15",
+      "title": "Stamper evidence in the tenant folder, one record per task, found by EO, failures recorded",
+      "pass": true,
+      "detail": "116 evidence files; 282 task folders; evidence_collected 149; EO filesFound 116; 0 failure records checked"
+    },
+    {
+      "id": "V16",
+      "title": "No leftover {name} placeholders reached the sim; inactive-account task disabled only stale users",
+      "pass": true,
+      "detail": "no placeholders stored or sent; disabled [\"user-2\",\"user-4\"] ⊆ stale [\"user-2\",\"user-4\"] of 5 users"
+    },
+    {
+      "id": "V21",
+      "title": "Question register present, every row names an output field, register test green",
+      "pass": true,
+      "detail": "80 rows, all with output fields; ces-muster suite green"
+    },
+    {
+      "id": "V22",
+      "title": "MG-04 parity suite green against the reviewed allow-list",
+      "pass": true,
+      "detail": "26 allow-list entries, all with owner and reason; ces-muster suite green"
+    },
+    {
+      "id": "V29",
+      "title": "Evidence catalog: release log hash matches, release 0 complete, loader tests green",
+      "pass": true,
+      "detail": "hash c254a6bf7f9d… matches the release log; 14 definitions, all with objective ids; loader and schema tests green"
+    }
+  ]
+}

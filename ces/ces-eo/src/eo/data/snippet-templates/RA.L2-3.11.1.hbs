@@ -1,0 +1,47 @@
+## Control {{controlId}}: Periodically Assess Risk to Organizational Operations, Assets, and Individuals
+
+**Implementation Status:** {{status}}
+
+This organization periodically assesses risk within the {{tenantName}} M365 GCC High tenant through Microsoft Secure Score monitoring, vulnerability assessments, and formal risk assessment procedures managed by {{variables.systemAdministrator}}.
+
+{{#if secureScoresAvailable}}
+**Microsoft Secure Score:**
+Current Secure Score: **{{currentScore}}** / {{maxScore}} ({{percentage}}%)
+
+Top security control recommendations:
+{{#if controlScores}}
+{{#each controlScores}}
+- **{{controlName}}** — Score: {{score}} / {{maxScore}}
+{{/each}}
+{{/if}}
+
+Secure Score provides continuous risk indicators that inform periodic risk assessments and prioritize security improvements.
+{{else}}
+Microsoft Secure Score is not available. Risk indicators rely on manual assessment processes.
+{{/if}}
+
+**Risk Assessment Program:**
+- **Methodology:** NIST SP 800-30 Rev 1 risk assessment methodology
+- **Scope:** All systems processing, storing, or transmitting CUI within the M365 GCC High boundary
+- **Frequency:** Annual comprehensive assessment; continuous monitoring via Secure Score and Defender
+- **Risk Register:** Identified risks documented with likelihood, impact, risk level, and mitigation plans
+- **Risk Tolerance:** Risks exceeding organizational tolerance require POA&M entries with remediation timelines
+
+**Operational Procedure:**
+- **Action:** Annual risk assessment with quarterly risk register review; continuous Secure Score monitoring
+- **Frequency:** Annual comprehensive, quarterly review, continuous monitoring
+- **Responsible Party:** {{variables.systemAdministrator}}
+- **Documentation:** Risk Assessment Report, Organizational Risk Register
+
+**Review Frequency:** Quarterly by ISSO
+
+**Verification Method:** Examine risk assessment reports, risk register, Secure Score trends, and POA&M entries for identified risks.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

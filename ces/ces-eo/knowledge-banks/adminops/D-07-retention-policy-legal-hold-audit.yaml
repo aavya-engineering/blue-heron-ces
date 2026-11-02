@@ -1,0 +1,65 @@
+controlId: "AU.L2-3.3.8"
+relatedControlIds:
+  - "AU.L2-3.3.1"
+  - "AU.L2-3.3.2"
+  - "MP.L1-3.8.3"
+  - "MP.L2-3.8.9"  # [VERIFY] mapping not yet confirmed
+practiceStatement: Create and retain system audit logs and records to the extent needed to enable the monitoring, analysis,
+  investigation, and reporting of unlawful or unauthorized system activity.
+useCaseId: D-07
+useCaseTitle: "Retention Policy & Legal Hold"
+domain: Data Protection & Information Management
+priority: P4 Standard
+trigger: 'SCHEDULE: Quarterly'
+sodTier: Tier 2 -- Config Manager
+entraRolesRequired:
+- Compliance Administrator
+approvalRequired: false
+services:
+- name: Microsoft Purview Compliance Portal
+  purpose: '`https://compliance.microsoft.us`'
+- name: Microsoft Purview Data Lifecycle Management
+  purpose: ''
+- name: Exchange Online
+  purpose: litigation hold, in-place hold
+- name: SharePoint Online
+  purpose: site-level retention
+- name: Microsoft Teams
+  purpose: channel message retention
+- name: Security & Compliance PowerShell
+  purpose: ''
+configurationSteps:
+  portalPath: //compliance.microsoft.us > **Data lifecycle management** > **Microsoft 365** > **Retention policies**.
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes RecordsManagement.Read.All
+  graphApiEndpoint: GET https://graph.microsoft.us/beta/security/informationProtection/retentionLabels
+  graphApiPayloadExample: {}
+  requiredPermissions:
+  - RecordsManagement.Read.All
+  - eDiscovery.Read.All
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-d-dataprotection/D-07/2026/03/
+  format: CSV (retention policy inventory, litigation hold inventory, orphaned holds), JSON (audit summary)
+  filenamePattern: D-07_RetentionAudit_{YYYYMMDD}_{HHmmss}_Quarterly.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://compliance.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |-
+    - Purview Data Lifecycle Management is fully available in GCC High via `https://compliance.microsoft.us`.
+    - Litigation hold via Exchange Online is fully supported. Use `Connect-ExchangeOnline -ExchangeEnvironmentName O365USGovGCCHigh`.
+    - eDiscovery Premium cases and holds function identically in GCC High. Hold creation and management use the same PowerShell cmdlets and Graph API endpoints with `.us` base URLs.
+    - Retention labels with regulatory record status are available in GCC High for content that must be immutable at the item level.
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

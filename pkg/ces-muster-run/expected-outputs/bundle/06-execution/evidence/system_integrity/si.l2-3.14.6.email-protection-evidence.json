@@ -1,0 +1,37 @@
+{
+  "rawResponse": "[\r\n    {\r\n        \"Name\":  \"Default\",\r\n        \"BulkThreshold\":  7,\r\n        \"SpamAction\":  \"MoveToJmf\",\r\n        \"HighConfidenceSpamAction\":  \"MoveToJmf\",\r\n        \"PhishSpamAction\":  null\r\n    },\r\n    {\r\n        \"Name\":  \"CMMC-AntiSpam\",\r\n        \"BulkThreshold\":  6,\r\n        \"SpamAction\":  \"MoveToJmf\",\r\n        \"HighConfidenceSpamAction\":  \"Quarantine\",\r\n        \"PhishSpamAction\":  \"Quarantine\"\r\n    }\r\n]\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "SI.L2-3.14.6.email-protection-evidence",
+    "label": "Defender for Office 365 / Exchange Online Protection Evidence",
+    "engine": "exchange",
+    "layer_hint": 7,
+    "sequence_hint": 55,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "SI.L2-3.14.6"
+    ],
+    "get_command": "Get-AntiPhishPolicy | Select-Object Name,Enabled,PhishThresholdLevel | ConvertTo-Json -Depth 5",
+    "set_command": "",
+    "evidence_commands": [
+      "Get-AntiPhishPolicy | Select-Object Name,Enabled,PhishThresholdLevel,EnableMailboxIntelligence,EnableSpoofIntelligence | ConvertTo-Json -Depth 10",
+      "Get-MalwareFilterPolicy | Select-Object Name,EnableFileFilter,ZapEnabled,EnableInternalSenderAdminNotifications | ConvertTo-Json -Depth 10",
+      "Get-HostedContentFilterPolicy | Select-Object Name,BulkThreshold,SpamAction,HighConfidenceSpamAction,PhishSpamAction | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SI.L2-3.14.6"
+    ],
+    "timestamp": "2026-11-01T17:12:06.064Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Defender for Office 365 / Exchange Online Protection Evidence",
+    "sha256Hash": "f637607b2852a72483d11268eef69e383a1efd3aa5406abbb6d42feef883605b",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

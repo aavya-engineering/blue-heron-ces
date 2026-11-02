@@ -1,0 +1,445 @@
+{
+  "family": "IR",
+  "family_name": "Incident Response",
+  "practices": [
+    {
+      "id": "IR.L2-3.6.1",
+      "title": "Establish an operational incident-handling capability for organizational systems that includes preparation, detection, analysis, containment, recovery, and user response activities.",
+      "approach": {
+        "what_assessor_does": "The assessor reads the incident response policy and plan to see that each phase is written down for this organization: how the team gets ready, how incidents are spotted, how they are analysed, how they are contained, how systems are brought back, and what ordinary users must do when something looks wrong. They check that named people hold the incident roles today and have the access and training to act. They then pick recent alerts and incidents from the security console and trace each one through the phases the plan describes, looking for an owner, a status change and a timestamp at each step. In interviews they ask the incident lead to walk through a recent case and ask a few users how they would report a suspected incident. Testing means following one real or exercise incident from detection to closure and confirming that what happened matches the plan.",
+        "common_failure_modes": [
+          "The plan is a template that names no people, tools or contact details for this organization.",
+          "Alerts sit in the console as new and unassigned for weeks, so detection exists but nobody analyses what it finds.",
+          "Containment steps such as disabling an account or isolating a device are written down, but nobody has the rights or an approval path to carry them out.",
+          "Recovery is left to the backup policy with no link to the incident process, so there is no record of how systems were restored and checked.",
+          "Users do not know how to report a suspected incident or whom to tell.",
+          "The people in incident roles have no training or exercise record tied to that role."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "IR.L2-3.6.1[a]",
+          "determination": "an operational incident-handling capability is established",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Incident response policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/incident-response-policy.md (GateEvidence family IR). The assessor checks that it assigns an owner for incident handling and states that the plan is in force."
+            },
+            {
+              "artifact_type": "Incident response plan",
+              "ces_source": "eo_store",
+              "notes": "EO PolicyStore, policy bases incident-response-policy and incident-response-plan (FAMILY_POLICY_BASES for IR in ces-eo OdpValueProvider), rendered by Muster and pushed to EO. Look for named roles, a current contact list and an approval date."
+            },
+            {
+              "artifact_type": "Alert and incident handling records",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry IR.L2-3.6.1 (incidentResponseEvaluator): Graph /security/alerts_v2 (required) and /security/incidents. The evaluator checks that every record carries a handling status and that new, unassigned items do not outlive the triage limit. An empty window is not assessed, not a failure."
+            },
+            {
+              "artifact_type": "Incident lead interview",
+              "ces_source": "interview",
+              "notes": "Ask who runs incident handling today and who backs them up, then have them walk through the last real or exercise incident from start to close."
+            }
+          ]
+        },
+        {
+          "id": "IR.L2-3.6.1[b]",
+          "determination": "the operational incident-handling capability includes preparation",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Preparation section of the incident response plan",
+              "ces_source": "eo_store",
+              "notes": "EO PolicyStore, policy bases incident-response-policy and incident-response-plan (FAMILY_POLICY_BASES for IR in ces-eo OdpValueProvider), rendered by Muster and pushed to EO. Should list the tools, accounts, escalation path and contact list the team keeps ready before an incident."
+            },
+            {
+              "artifact_type": "Incident team training records",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector as record kind training_completion tagged IR.L2-3.6.1 (ces-eo/data/examine-coverage-map.json). Shows that the people named in the plan were trained for their incident role."
+            },
+            {
+              "artifact_type": "Incident lead interview",
+              "ces_source": "interview",
+              "notes": "Ask what is ready before an incident and where it is kept. The assessor may check one escalation contact or one tool account on the spot to see that it still works."
+            }
+          ]
+        },
+        {
+          "id": "IR.L2-3.6.1[c]",
+          "determination": "the operational incident-handling capability includes detection",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Security alerts from detection sources",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry IR.L2-3.6.1 (incidentResponseEvaluator): Graph /security/alerts_v2 (required) and /security/incidents. Alerts in the window show that detection sources are producing findings the team can see."
+            },
+            {
+              "artifact_type": "Incident intake and triage record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps H-01 Security Incident Intake: Sentinel incident triage, classification and ticket creation; registered against IR.L2-3.6.1 (evidence_objectives [c] and [d])."
+            },
+            {
+              "artifact_type": "CUI exfiltration incident record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps D-03 DLP Incident - CUI Exfiltration: handles a suspected CUI exfiltration and escalates it to H-01 for incident response; registered against IR.L2-3.6.1 (evidence_objectives [c] and [e])."
+            },
+            {
+              "artifact_type": "Security operator interview",
+              "ces_source": "interview",
+              "notes": "Ask which alert sources feed the queue and how the team learns of a new alert outside working hours."
+            }
+          ]
+        },
+        {
+          "id": "IR.L2-3.6.1[d]",
+          "determination": "the operational incident-handling capability includes analysis",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Incident classification and severity record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps H-01 Security Incident Intake: records severity and classification (true positive, false positive, benign positive, undetermined) for each incident; registered against IR.L2-3.6.1."
+            },
+            {
+              "artifact_type": "Incident assignment and classification fields",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry IR.L2-3.6.1 (incidentResponseEvaluator): Graph /security/alerts_v2 (required) and /security/incidents. The evaluator counts an incident as handled when it has moved out of the new state, has an owner or a classification, and was updated after it was created."
+            },
+            {
+              "artifact_type": "Incident lead interview",
+              "ces_source": "interview",
+              "notes": "Ask how the team decides severity and whether an alert becomes an incident, then compare the answer with the classifications on sampled records."
+            }
+          ]
+        },
+        {
+          "id": "IR.L2-3.6.1[e]",
+          "determination": "the operational incident-handling capability includes containment",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Compromised account containment record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps H-02 Compromised Account Containment: revokes sessions, disables and resets the account under Tier 3 two-person approval; registered against IR.L2-3.6.1 (evidence_objectives [e])."
+            },
+            {
+              "artifact_type": "Device isolation record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps H-03 Malware/Ransomware Isolation: Defender for Endpoint device isolation with an investigation package; registered against IR.L2-3.6.1 (evidence_objectives [e])."
+            },
+            {
+              "artifact_type": "CUI exfiltration containment record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps D-03 DLP Incident - CUI Exfiltration: containment actions and eDiscovery hold for the subject user; registered against IR.L2-3.6.1."
+            },
+            {
+              "artifact_type": "Containment approver interview",
+              "ces_source": "interview",
+              "notes": "Ask who may approve containment and how quickly it can happen out of hours, then check the approvals on one sampled containment action."
+            }
+          ]
+        },
+        {
+          "id": "IR.L2-3.6.1[f]",
+          "determination": "the operational incident-handling capability includes recovery",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Recovery section of the incident response plan",
+              "ces_source": "eo_store",
+              "notes": "EO PolicyStore, policy bases incident-response-policy and incident-response-plan (FAMILY_POLICY_BASES for IR in ces-eo OdpValueProvider), rendered by Muster and pushed to EO. Should say how affected systems and accounts are restored and how the team confirms they are clean before return to service."
+            },
+            {
+              "artifact_type": "Incident recovery record",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector as record kind incident_tracking (ces-eo/data/examine-coverage-map.json). For a sampled incident it should show the restore steps and the check that the system works and is clean."
+            },
+            {
+              "artifact_type": "Incident closure status",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry IR.L2-3.6.1 (incidentResponseEvaluator): Graph /security/alerts_v2 (required) and /security/incidents. A resolved status with timestamps shows closure, but not that systems were restored and checked; the recovery record is still needed."
+            },
+            {
+              "artifact_type": "System owner interview",
+              "ces_source": "interview",
+              "notes": "Ask the owner of a system touched by a recent incident how it was brought back and who confirmed it was safe to use."
+            }
+          ]
+        },
+        {
+          "id": "IR.L2-3.6.1[g]",
+          "determination": "the operational incident-handling capability includes user response activities",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "User reporting section of the incident response plan",
+              "ces_source": "eo_store",
+              "notes": "EO PolicyStore, policy bases incident-response-policy and incident-response-plan (FAMILY_POLICY_BASES for IR in ces-eo OdpValueProvider), rendered by Muster and pushed to EO. Should tell ordinary users how to report a suspected incident, whom to tell and what not to do."
+            },
+            {
+              "artifact_type": "User reporting instructions shown to staff",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: the intranet page, poster or awareness material that tells users how to report a suspected incident."
+            },
+            {
+              "artifact_type": "Sampled user interviews",
+              "ces_source": "interview",
+              "notes": "Ask a few users how they would report a suspicious email or a lost laptop and whom they would tell; the answers should match the plan."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "IR.L2-3.6.2",
+      "title": "Track, document and report incidents to designated officials and/or authorities both internal and external to the organization.",
+      "approach": {
+        "what_assessor_does": "The assessor wants one place where incidents are logged, and for every recent incident a record from opening to closure: what happened, when, who handled it, what was done and who was told. They read the reporting section of the plan for the internal officials who must be told (for example the security lead and senior management) and the outside authorities (for a cyber incident affecting CUI under DFARS 252.204-7012, the DoD through the DIBNet portal within 72 hours of discovery), and check that names and contact routes are current. For sampled incidents they look for proof that the right people were notified on time, such as tickets, emails or a DIBNet report number, or a recorded decision that the incident was not reportable. CES has no tenant signal that decides this practice; it rests on records and interviews.",
+        "common_failure_modes": [
+          "Incidents are handled in chat or email with no record that ties the steps together.",
+          "Console alerts are closed with no note of what was found or done.",
+          "The plan says to report to the appropriate authorities without naming them or saying how to reach them.",
+          "No internal official is named, or the named person has left.",
+          "A CUI incident has neither a DIBNet report nor a recorded decision that it was not reportable.",
+          "Notifications were sent, but nothing shows when, so timeliness cannot be checked."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "IR.L2-3.6.2[a]",
+          "determination": "incidents are tracked",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Incident log or ticket export",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector as record kind incident_tracking (ces-eo/data/examine-coverage-map.json): every incident in the period with id, dates, owner and status."
+            },
+            {
+              "artifact_type": "Defender incident records",
+              "ces_source": "eo_store",
+              "notes": "EO collected records securityIncidents (collect.securityIncidents in ces-eo/data/examine-coverage-map.json), read from Graph /security/incidents for IR.L2-3.6.1. Registry key IR.L2-3.6.2 is manualGateEvaluator, so no tenant signal decides this objective; these records show what the console tracked."
+            },
+            {
+              "artifact_type": "Post-incident review package",
+              "ces_source": "ao_row",
+              "notes": "AdminOps H-06 Post-Incident Review Package: root cause, timeline and a POA&M entry for lessons learned; registered against IR.L2-3.6.2 (evidence_objectives [a] and [b])."
+            },
+            {
+              "artifact_type": "Incident lead interview",
+              "ces_source": "interview",
+              "notes": "Ask where incidents are logged. The assessor reconciles the log with the incidents seen in the console for the same period and asks about any that are missing."
+            }
+          ]
+        },
+        {
+          "id": "IR.L2-3.6.2[b]",
+          "determination": "incidents are documented",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Incident timeline and evidence preservation record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps H-04 Timeline & Evidence Preservation: eDiscovery hold, log exports and a SHA-256 hash manifest; registered against IR.L2-3.6.2 (evidence_objectives [b])."
+            },
+            {
+              "artifact_type": "Post-incident review package",
+              "ces_source": "ao_row",
+              "notes": "AdminOps H-06 Post-Incident Review Package: root cause analysis, timeline and lessons learned for a closed incident; registered against IR.L2-3.6.2."
+            },
+            {
+              "artifact_type": "Incident tracking record",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector as record kind incident_tracking. For a sampled incident it should hold what happened, when, what was affected, what was done and who handled it."
+            },
+            {
+              "artifact_type": "Incident handler interview",
+              "ces_source": "interview",
+              "notes": "Ask the handler of a sampled incident to explain the record and fill any gaps; gaps they cannot fill count against the record."
+            }
+          ]
+        },
+        {
+          "id": "IR.L2-3.6.2[c]",
+          "determination": "authorities to whom incidents are to be reported are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Reporting section of the incident response plan",
+              "ces_source": "eo_store",
+              "notes": "EO PolicyStore, policy bases incident-response-policy and incident-response-plan (FAMILY_POLICY_BASES for IR in ces-eo OdpValueProvider), rendered by Muster and pushed to EO. Should name the outside authorities, for CUI the DoD through the DIBNet portal, with the reporting window. The SSP parameter PI.ODP.012 incident_reporting_hours (recommended 72, ces-eo OdpValueProvider) should match."
+            },
+            {
+              "artifact_type": "Incident response policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/incident-response-policy.md (GateEvidence family IR). Should state the duty to report to outside authorities and point to the plan for contacts."
+            },
+            {
+              "artifact_type": "Incident lead interview",
+              "ces_source": "interview",
+              "notes": "Ask who outside the company must be told of a CUI incident, how and within what time. The lead should name the DIBNet portal and know that a DoD-approved medium assurance certificate is needed to file."
+            }
+          ]
+        },
+        {
+          "id": "IR.L2-3.6.2[d]",
+          "determination": "organizational officials to whom incidents are to be reported are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Internal notification list in the incident response plan",
+              "ces_source": "eo_store",
+              "notes": "EO PolicyStore, policy bases incident-response-policy and incident-response-plan (FAMILY_POLICY_BASES for IR in ces-eo OdpValueProvider), rendered by Muster and pushed to EO. Should name the internal officials to be told, by role and person, with how and when for each severity."
+            },
+            {
+              "artifact_type": "Incident response policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/incident-response-policy.md (GateEvidence family IR). Should name the official who owns incident reporting inside the organization."
+            },
+            {
+              "artifact_type": "Incident lead interview",
+              "ces_source": "interview",
+              "notes": "Ask whom inside the company they tell for a high-severity incident and check that each named person still holds that role."
+            }
+          ]
+        },
+        {
+          "id": "IR.L2-3.6.2[e]",
+          "determination": "identified authorities are notified of incidents",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Authority report records",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector with the incident_tracking record: the DIBNet report number and submission time for each reportable incident, or the recorded decision and reason that an incident was not reportable."
+            },
+            {
+              "artifact_type": "Incident lead interview",
+              "ces_source": "interview",
+              "notes": "For a sampled reportable incident, ask when it was discovered and when it was reported. The assessor compares the two times with the reporting window in the plan."
+            }
+          ]
+        },
+        {
+          "id": "IR.L2-3.6.2[f]",
+          "determination": "identified organizational officials are notified of incidents",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Internal notification records",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector with the incident_tracking record: tickets, emails or call notes showing which officials were told about each incident and when."
+            },
+            {
+              "artifact_type": "Notified official interview",
+              "ces_source": "interview",
+              "notes": "Ask one named official whether and when they were told about a sampled incident; the answer should match the notification record."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "IR.L2-3.6.3",
+      "title": "Test the organizational incident response capability.\nAssessment Objective:\n[a] the incident response capability is tested.",
+      "approach": {
+        "what_assessor_does": "The assessor reads the test plan and the record of the most recent exercise: the date, the scenario, who took part, what the exercise was meant to show and what it found. They check that the test happened within the period the policy sets, that it used the organization's own plan, roles and contact lists, and that findings led to changes in the plan or to tracked actions. They interview people who took part about what they did and what changed afterward. Testing means comparing the after-action items with the current plan and the open action list to see that they were acted on. CES has no tenant signal for this practice; it rests on the exercise record and interviews.",
+        "common_failure_modes": [
+          "No exercise has been run, or the last one is older than the cycle the policy states.",
+          "The record is only an attendance list, with no scenario, objectives or results.",
+          "The exercise used a generic scenario that never touched CUI or the organization's own systems.",
+          "Findings from the exercise were never fed back into the plan or tracked to closure.",
+          "People who hold key incident roles did not take part."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "IR.L2-3.6.3[a]",
+          "determination": "the incident response capability is tested",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Incident response test record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps H-05 IR Tabletop/Drill Evidence: annual exercise with attendee roster and after-action report; registered against IR.L2-3.6.3 (evidence_objectives [a]). Registry key IR.L2-3.6.3 is manualGateEvaluator, so no tenant signal covers this practice."
+            },
+            {
+              "artifact_type": "Exercise scenario, objectives and results",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector as record kind ir_test (ces-eo/data/examine-coverage-map.json): exercise date, scenario, objectives, which objectives were met and the after-action items."
+            },
+            {
+              "artifact_type": "Incident response policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/incident-response-policy.md (GateEvidence family IR). Should state how often the capability is tested and who owns the test."
+            },
+            {
+              "artifact_type": "Exercise participant interviews",
+              "ces_source": "interview",
+              "notes": "Ask two people who took part what they did in the exercise and what changed in the plan afterward. The assessor then checks the after-action items against the current plan and the open action list."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "rawResponse": "[\r\n    {\r\n        \"principalId\":  \"user-32\",\r\n        \"roleDefinitionId\":  \"194ae4cb-b126-40b2-bd5b-6091b380977d\",\r\n        \"directoryScopeId\":  \"/\",\r\n        \"scheduleInfo\":  {\r\n                             \"startDateTime\":  \"\\/Date(1771027200000)\\/\",\r\n                             \"expiration\":  {\r\n                                                \"type\":  \"afterDateTime\",\r\n                                                \"endDateTime\":  \"\\/Date(1802563200000)\\/\"\r\n                                            }\r\n                         },\r\n        \"status\":  \"Provisioned\"\r\n    },\r\n    {\r\n        \"principalId\":  \"user-32\",\r\n        \"roleDefinitionId\":  \"62e90394-69f5-4237-9190-012177145e10\",\r\n        \"directoryScopeId\":  \"/\",\r\n        \"scheduleInfo\":  {\r\n                             \"startDateTime\":  \"\\/Date(1777939200000)\\/\",\r\n                             \"expiration\":  {\r\n                                                \"type\":  \"afterDateTime\",\r\n                                                \"endDateTime\":  \"\\/Date(1809475200000)\\/\"\r\n                                            }\r\n                         },\r\n        \"status\":  \"Provisioned\"\r\n    }\r\n]\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "AZ-ID-005",
+    "label": "PIM Eligible Role Assignment for Operator",
+    "engine": "mgraph",
+    "layer_hint": 7,
+    "sequence_hint": 14,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "AC.L2-3.1.5",
+      "AC.L2-3.1.7"
+    ],
+    "get_command": "Get-MgRoleManagementDirectoryRoleEligibilitySchedule -All | Select-Object PrincipalId,RoleDefinitionId,Status",
+    "set_command": "",
+    "evidence_commands": [
+      "Get-MgRoleManagementDirectoryRoleEligibilitySchedule -All | Where-Object { $_.PrincipalId -eq '{operatorUserId}' } | Select-Object PrincipalId,RoleDefinitionId,DirectoryScopeId,ScheduleInfo,Status | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AC.L2-3.1.5",
+      "AC.L2-3.1.7"
+    ],
+    "timestamp": "2026-11-01T16:05:48.613Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] PIM Eligible Role Assignment for Operator",
+    "sha256Hash": "daeabd81b334e54ec3733e4594bdf6ca50e435ae1644d73971599ad8ab4fceaf",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

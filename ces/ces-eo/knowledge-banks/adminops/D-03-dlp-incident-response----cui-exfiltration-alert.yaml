@@ -1,0 +1,79 @@
+controlId: "IR.L2-3.6.1"
+relatedControlIds:
+  - "IR.L2-3.6.2"
+  - "MP.L1-3.8.3"
+  - "AU.L2-3.3.1"
+  - "AC.L1-3.1.1"
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: D-03
+useCaseTitle: "DLP Incident -- CUI Exfiltration"
+domain: Data Protection & Information Management
+priority: P1 Critical
+trigger: 'INCIDENT: DLP alert triggers containment workflow'
+sodTier: Tier 3 -- Privileged Admin
+entraRolesRequired:
+- Global Administrator (PIM-activated)
+- Compliance Administrator
+- eDiscovery Manager
+approvalRequired: true
+services:
+- name: Microsoft Purview Compliance Portal
+  purpose: '`https://compliance.microsoft.us`'
+- name: Microsoft Purview DLP Alerts
+  purpose: ''
+- name: Microsoft Purview eDiscovery
+  purpose: Premium
+- name: Microsoft Sentinel
+  purpose: '`https://portal.azure.us` > Sentinel'
+- name: Entra ID -- user containment
+  purpose: disable, revoke sessions
+- name: Exchange Online -- transport rule block, mailbox hold
+  purpose: ''
+- name: SharePoint Online -- site-level sharing lockdown
+  purpose: ''
+- name: Microsoft Defender for Endpoint -- endpoint isolation
+  purpose: if endpoint DLP match
+configurationSteps:
+  portalPath: '**Alert Triage:** //compliance.microsoft.us > **Data loss prevention** > **Alerts**. Identify the triggering
+    DLP alert. Record alert ID, affected user UPN, content type, destination, and timestamp.'
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes User.ReadWrite.All
+  - cmdlet: Update-MgUser
+    parameters:
+    - -MgUser
+    - -UserId
+    - -AccountEnabled
+    - -MgInvalidateUserRefreshToken
+    - -UserId
+  graphApiEndpoint: PATCH https://graph.microsoft.us/v1.0/users/{affectedUserId}
+  graphApiPayloadExample: {}
+  requiredPermissions:
+  - User.ReadWrite.All
+  - Directory.ReadWrite.All
+  - eDiscovery.ReadWrite.All
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-d-dataprotection/D-03/2026/03/
+  format: JSON (containment record with actions taken, affected user, case reference), CSV (DLP alert export)
+  filenamePattern: D-03_Containment_{YYYYMMDD}_{HHmmss}_{CaseName}.json
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://compliance.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |-
+    - eDiscovery Premium is fully available in GCC High. Case creation, custodian management, and hold placement all function via `https://compliance.microsoft.us`.
+    - Sentinel DLP data connector may require configuration of the Microsoft 365 Defender data connector in Sentinel (`https://portal.azure.us` > Sentinel > Data connectors). Verify the DLP alert signal is flowing into Sentinel incidents.
+    - The `Invoke-MgInvalidateUserRefreshToken` cmdlet functions identically in GCC High when connected with `-Environment USGov`.
+    - Exchange Online litigation hold uses `Connect-ExchangeOnline -ExchangeEnvir
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

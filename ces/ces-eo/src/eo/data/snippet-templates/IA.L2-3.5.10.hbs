@@ -1,0 +1,38 @@
+## Control {{controlId}}: Store and Transmit Only Cryptographically-Protected Passwords
+
+**Implementation Status:** {{status}}
+
+This organization stores and transmits only cryptographically-protected passwords within the {{tenantName}} M365 GCC High tenant through Entra ID password hashing, TLS-encrypted transmission, and CUI group access controls managed by {{variables.accessControlAdministrator}}.
+
+{{#if cuiGroupExists}}
+**CUI Account Management:**
+The "{{groupDisplayName}}" security group ({{memberCount}} members) defines the population of accounts authorized for CUI access. All accounts within this group use cryptographically protected credentials:
+- Passwords are hashed using industry-standard algorithms (bcrypt/PBKDF2) before storage in Entra ID
+- Password transmission occurs exclusively over TLS-encrypted channels (TLS 1.2+)
+- No plaintext passwords are stored in any M365 service, configuration file, or log
+{{else}}
+CUI access group has not been configured. Cryptographic password protection applies to all tenant accounts through Entra ID defaults.
+{{/if}}
+
+{{#if userCount}}
+**User Account Coverage:**
+{{userCount}} user accounts in the tenant directory use cryptographically protected credentials. Self-service password reset (SSPR) uses encrypted channels for password change operations.
+{{/if}}
+
+{{#if mfaEnabled}}
+**Additional Credential Protection:**
+MFA reduces reliance on passwords alone. {{authMethodsCount}} authentication methods provide cryptographic credential verification beyond password-based authentication.
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Examine Entra ID password hash configuration, TLS enforcement settings, SSPR configuration, and credential storage audit logs.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

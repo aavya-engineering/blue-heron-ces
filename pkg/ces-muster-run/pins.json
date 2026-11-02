@@ -1,0 +1,50 @@
+{
+  "about": "Pinned commits for the NB run (muster-run v2). bootstrap.ps1 / bootstrap.sh clone each repo into the nested layout and check out the pin as the named local branch (default main). BHD's changes are commits at the pins (branch bhd/nb), so there are no patches or overlay files. Run steps (mx-e2e.ps1, Phase 3): E1-E6, E8.5 (EC upload), E7, E8 (+ EO ledger and package), E8B (bundle.mjs), E8F (forced-failure run; needs the Stamper --force-fail flag, ces-mono 6e9e35e or later), E9. Until the bhd/nb branches are pushed to the org, a fresh clone from the org cannot reach the ces-muster pin: rerun against existing clones, or pass a mirror origin (bootstrap v2, -Origin).",
+  "org": "https://github.com/blue-heron-defense-CES",
+  "origin_default": "org",
+  "origin_note": "bootstrap -Origin (bootstrap.sh --origin) takes a git URL prefix or a local directory of <repo>.git bare mirrors; omitted, it is the org above. Until the bhd/nb push is approved, -Origin C:\\ces-nb\\mirror (made by nb-tools make-mirror.ps1) is the local proof path for V24.",
+  "repos": [
+    {
+      "repo": "ces-mono",
+      "dir": ".",
+      "sha": "265d907a3de95a21f612924a2b42f954c89a415f",
+      "branch": "bhd/nb",
+      "base": "02521532f29784dcc007d8de05c47c477d1f0dc3",
+      "commits": "EO FX-15/FX-12/P1.7/RF-25/RF-21 (614996b); Stamper FX-01..05 (a6e66e8); Stamper run-4 follow-ups (0a311fe, 202f565); Planner EVC.2 (8a601a4); Stamper pass 4 (450bff3); Planner MG-04 goldens (71f919e); EVC.1/EVC.6 (405c438); EVC.5; EVC.5 (2d59dd2); EVC.4 K4 (acab9ca); Planner EVC.3 (81dbc98); Stamper --force-fail (6e9e35e); residue cleanup (de20ac3); Stamper fixtures at HEAD"
+    },
+    {
+      "repo": "ces-tenant",
+      "dir": "ces-tenant",
+      "sha": "6f47180016beb7e90510841e490916a51d7d62cd",
+      "branch": "bhd/nb",
+      "base": "35bc2f2176a2ccff2614ead8e3df14addbc71eb0",
+      "commits": "paths.ts pipeline-root default (6f47180)"
+    },
+    {
+      "repo": "ces-muster",
+      "dir": "ces-muster",
+      "branch": "bhd/nb",
+      "sha": "9ae5bb77ccc66ca9a118ce6fa8ca4dd9f0049223",
+      "base": "29ee82812cd5315e41510718788f795d3b73c654",
+      "commits": "N-03 runner + mx:plan script; MG-01 mx-01-empty-read; MG-03 mx-02-real-posture; MG-05 mx-03-im-inference; RF-8 (K1) vendored ces-shared parity; EVC.2 re-vendor (bc809a7); MG-28 register (724a7c8); RF-47 + fixtures + MG-04 (7b62d7b); EVC.1 vendored (b528340); MG-21/23/24 (acb06b5); wave 2B (0aa037d) + integration; 2C-0 one posture; wave 2C (a8139a9, 1166e14); EVC.3 Muster (810f7de); wave 2D MG-12 (8fa06b4); residue sync + re-pin (984f867); headless readiness facts"
+    },
+    {
+      "repo": "ces-tester",
+      "dir": "ces-tester",
+      "sha": "d1959bf83272e89e79484da6263463529f54a632",
+      "branch": "bhd/nb",
+      "base": "62d1db55212e74be43bd17a1719779d0d3683dda",
+      "commits": "RF-22 (K3) dossier AS OF re-stamp; dossier parser test follow-up; Phase 4 muster-e2e harness; ao-coverage --out (725b88f); fresh-clone fixes + E6 evidence wipe; per-run wipe of the tenant folder and EC store"
+    },
+    {
+      "repo": "ces-stacksim",
+      "dir": "tenant-stacksim",
+      "sha": "b29917e7bd34023279b9ec121b28c6cc6fe05278",
+      "branch": "bhd/nb",
+      "base": "71c073ced03b84eb05f7a0d96a7a2744a07d5871",
+      "commits": "sim FX-07..10 (2941378); run-4 follow-up (0c8475e); run-5 follow-up (5df3cbe); IsValid on EXO policies (134b33f); scenario ids (cadfba6); coverage-ao --out (b29917e)"
+    }
+  ],
+  "patches": [],
+  "overlay": []
+}

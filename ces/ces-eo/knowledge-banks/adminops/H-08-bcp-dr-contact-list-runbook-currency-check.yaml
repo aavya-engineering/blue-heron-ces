@@ -1,0 +1,68 @@
+controlId: "MP.L2-3.8.9"
+relatedControlIds:
+  - "IR.L2-3.6.1"
+  - "IR.L2-3.6.2"
+  - "MA.L2-3.7.1"  # [VERIFY] mapping not yet confirmed
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: H-08
+useCaseTitle: "BCP/DR Contact List & Runbook"
+domain: Incident Response
+priority: P4 Standard
+trigger: 'SCHEDULE: Quarterly'
+sodTier: Tier 2 -- Config Manager
+entraRolesRequired:
+- Security Administrator
+- Compliance Administrator
+approvalRequired: false
+services:
+- name: SharePoint Online
+  purpose: GCC High -- `https://{tenant}-admin.sharepoint.us` for document storage
+- name: Microsoft Teams
+  purpose: GCC High -- for contact verification
+- name: Azure Portal
+  purpose: Azure Government -- `https://portal.azure.us` for region failover validation
+- name: Entra ID
+  purpose: '`https://entra.microsoft.us` -- for contact list verification against active directory'
+- name: Azure Traffic Manager or Azure Front Door
+  purpose: Azure Government -- for failover mechanism
+configurationSteps:
+  portalPath: //entra.microsoft.us > **Users** > search for each contact on the BCP/DR contact list
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes User.Read.All
+  - cmdlet: Get-MgUser
+    parameters:
+    - -MgUser
+    - -Filter
+    - -Property
+    - -ErrorAction
+    - -ne
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/users/{userId}?$select=displayName,userPrincipalName,accountEnabled,jobTitle,department,mobilePhone,businessPhones
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-h-incident/H-08/{year}/{month}/
+  format: JSON (all structured reports)
+  filenamePattern: H-08_ContactValidation_{YYYYMMDD}_{HHmmss}_Quarterly.json
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://management.usgovcloudapi.net
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: All endpoints validated during the runbook review must use GCC High URLs (`.microsoft.us` suffix). The Azure Government
+    portal at `https://portal.azure.us` and ARM endpoint at `https://management.usgovcloudapi.net` are used for region failover
+    validation. Azure Traffic Manager and Azure Front Door are both available in Azure Government for failover mechanisms.
+    When testing region failover, ensure that the secondary region resources are in an Azure Government region (USGov Virginia,
+    USGov Texas, USGov Arizona) and not in a commercial Azure region. The contact list validation uses the GCC High M
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

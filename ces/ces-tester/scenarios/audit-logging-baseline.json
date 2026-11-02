@@ -1,0 +1,43 @@
+{
+  "scenario_id": "audit-logging-baseline",
+  "description": "T1/PROTECT coverage for AU.L2-3.3.1 (system auditing): the pipeline enables the unified audit log via Set-AdminAuditLogConfig -UnifiedAuditLogIngestionEnabled $true (exchange-session set_command). Asserts the sim-persisted post-state through Get-AdminAuditLogConfig - the same named-cmdlet arg-state fidelity mechanism proven green by exo-protection-baseline (Get-TransportConfig / Get-AtpPolicyForO365). adminAuditLogConfig is confirmed a persisted mutate objectType in retained run ledgers. Raises T1 ASSERTED coverage beyond the prior 3 (3.5.3/3.14.2/3.13.1).",
+  "target_level": "L2",
+  "lanes": ["sim"],
+  "stacksim_seed": {
+    "stance": "m365_azure",
+    "countOverrides": {},
+    "steps": []
+  },
+  "muster": {
+    "answer_map": {
+      "G-01": { "wizard": "sit", "answer_type": "enum", "value": "L2" },
+      "G-02": { "wizard": "sit", "answer_type": "enum", "value": "cui_present" },
+      "G-07": { "wizard": "sit", "answer_type": "enum", "value": "single_enclave" },
+      "TCP.LIC.001": { "wizard": "tcp", "answer_type": "single_select", "value": "Microsoft 365 G5" }
+    },
+    "mid_pipeline_assertions": [
+      {
+        "path": "outputs.human_readable_mission_plan.control_directives[?(@.control_id=='AU.L2-3.3.1')]",
+        "assert": "exists",
+        "array_path": "outputs.human_readable_mission_plan.control_directives",
+        "match_field": "control_id",
+        "match_value": "AU.L2-3.3.1"
+      }
+    ]
+  },
+  "stamper": { "execution_mode": "auto" },
+  "fault_injection": [],
+  "expected_state": {
+    "checks": [
+      {
+        "description": "Unified audit log ingestion enabled (Set-AdminAuditLogConfig -UnifiedAuditLogIngestionEnabled $true)",
+        "request": { "kind": "cmdlet", "cmdlet": "Get-AdminAuditLogConfig" },
+        "path": "UnifiedAuditLogIngestionEnabled",
+        "assert": "equals",
+        "value": true,
+        "ledger_object_type": "adminAuditLogConfig"
+      }
+    ]
+  },
+  "expected_evidence": []
+}

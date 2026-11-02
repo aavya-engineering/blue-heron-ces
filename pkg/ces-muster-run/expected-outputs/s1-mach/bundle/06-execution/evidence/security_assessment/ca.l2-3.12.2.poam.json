@@ -1,0 +1,35 @@
+{
+  "rawResponse": "[\r\n    {\r\n        \"id\":  \"AdminMFAV2\",\r\n        \"title\":  \"Ensure multifactor authentication is enabled for all users in administrative roles\",\r\n        \"implementationStatus\":  \"implemented\",\r\n        \"score\":  null,\r\n        \"maxScore\":  10\r\n    },\r\n    {\r\n        \"id\":  \"MFARegistrationV2\",\r\n        \"title\":  \"Ensure all users can complete multifactor authentication\",\r\n        \"implementationStatus\":  \"implemented\",\r\n        \"score\":  null,\r\n        \"maxScore\":  9\r\n    },\r\n    {\r\n        \"id\":  \"BlockLegacyAuthentication\",\r\n        \"title\":  \"Enable policy to block legacy authentication\",\r\n        \"implementationStatus\":  \"implemented\",\r\n        \"score\":  null,\r\n        \"maxScore\":  8\r\n    },\r\n    {\r\n        \"id\":  \"PWAgePolicyNew\",\r\n        \"title\":  \"Set the password expiration policy to never expire\",\r\n        \"implementationStatus\":  \"implemented\",\r\n        \"score\":  null,\r\n        \"maxScore\":  8\r\n    },\r\n    {\r\n        \"id\":  \"mde_onboarding\",\r\n        \"title\":  \"Onboard devices to Defender for Endpoint\",\r\n        \"implementationStatus\":  \"implemented\",\r\n        \"score\":  null,\r\n        \"maxScore\":  7\r\n    },\r\n    {\r\n        \"id\":  \"mdo_safeattachments\",\r\n        \"title\":  \"Turn on Safe Attachments in block mode\",\r\n        \"implementationStatus\":  \"implemented\",\r\n        \"score\":  null,\r\n        \"maxScore\":  8\r\n    },\r\n    {\r\n        \"id\":  \"dlp_datalossprevention\",\r\n        \"title\":  \"Turn on data loss prevention policies\",\r\n        \"implementationStatus\":  \"implemented\",\r\n        \"score\":  null,\r\n        \"maxScore\":  5\r\n    },\r\n    {\r\n        \"id\":  \"mdo_safelinksforemail\",\r\n        \"title\":  \"Create Safe Links policies for email messages\",\r\n        \"implementationStatus\":  \"notImplemented\",\r\n        \"score\":  null,\r\n        \"maxScore\":  9\r\n    }\r\n]\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "CA.L2-3.12.2.poam",
+    "label": "Renderable: POA&M Improvement Actions Evidence via Compliance Manager",
+    "engine": "mgraph",
+    "layer_hint": 8,
+    "sequence_hint": 1,
+    "idempotency": "safe",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "CA.L2-3.12.2"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/security/secureScoreControlProfiles').value | Select-Object id,title,implementationStatus,score,maxScore",
+    "set_command": "",
+    "evidence_commands": [
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/security/secureScoreControlProfiles').value | Select-Object id,title,implementationStatus,score,maxScore | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "CA.L2-3.12.2"
+    ],
+    "timestamp": "2026-11-01T15:28:42.127Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Renderable: POA&M Improvement Actions Evidence via Compliance Manager",
+    "sha256Hash": "e7d67947e56cbf928bde2ac4997570a6465f5b06ab5a9de0483c8f914cba7da0",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

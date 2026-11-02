@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "schema_name": "CES TCP Tenant Config Profile",
+  "version": "1.0.0",
+  "type": "object",
+  "required": ["ces", "tenant_config"],
+  "properties": {
+    "ces": {
+      "type": "object",
+      "required": ["artifact", "version", "generated_on", "tcp_bank_version"],
+      "properties": {
+        "artifact": { "type": "string", "const": "tenant_config_profile" },
+        "version": { "type": "string" },
+        "generated_on": { "type": "string" },
+        "tcp_bank_version": { "type": "string" }
+      }
+    },
+    "tenant_config": {
+      "type": "object",
+      "required": ["identity", "licensing", "identity_architecture", "privileged_access", "group_architecture", "conditional_access", "device_management", "data_protection", "monitoring"],
+      "properties": {
+        "identity": {
+          "type": "object",
+          "required": ["tenant_id", "primary_domain", "cloud_environment", "display_name"],
+          "properties": {
+            "tenant_id": { "type": "string" },
+            "primary_domain": { "type": "string" },
+            "custom_domains": { "type": "array", "items": { "type": "string" } },
+            "cloud_environment": { "type": "string", "enum": ["commercial", "gcc", "gcc_high", "dod"] },
+            "display_name": { "type": "string" }
+          }
+        },
+        "licensing": {
+          "type": "object",
+          "required": ["primary_sku", "license_count"],
+          "properties": {
+            "primary_sku": { "type": "string" },
+            "license_count": { "type": "number", "minimum": 0 },
+            "addon_skus": { "type": "array", "items": { "type": "string" } },
+            "service_activations": { "type": "object", "additionalProperties": { "type": "boolean" } }
+          }
+        },
+        "identity_architecture": {
+          "type": "object",
+          "required": ["break_glass_accounts", "admin_naming_convention", "identity_provider"],
+          "properties": {
+            "break_glass_accounts": { "type": "array", "items": { "type": "string" } },
+            "admin_naming_convention": { "type": "string" },
+            "service_account_naming_convention": { "type": "string" },
+            "identity_provider": { "type": "string", "enum": ["entra_native", "hybrid_ad_connect", "hybrid_cloud_sync", "external_idp"] },
+            "directory_sync_enabled": { "type": "boolean" }
+          }
+        },
+        "privileged_access": {
+          "type": "object",
+          "required": ["global_admins", "pim_enabled", "break_glass_exclusion_group"],
+          "properties": {
+            "global_admins": { "type": "array", "items": { "type": "string" } },
+            "security_admins": { "type": "array", "items": { "type": "string" } },
+            "compliance_admins": { "type": "array", "items": { "type": "string" } },
+            "pim_enabled": { "type": "boolean" },
+            "break_glass_exclusion_group": { "type": "string" }
+          }
+        },
+        "group_architecture": {
+          "type": "object",
+          "required": ["security_group_convention", "key_groups", "group_strategy"],
+          "properties": {
+            "security_group_convention": { "type": "string" },
+            "key_groups": { "type": "object", "additionalProperties": { "type": "string" } },
+            "distribution_group_convention": { "type": "string" },
+            "group_strategy": { "type": "string", "enum": ["dynamic", "assigned", "mixed"] }
+          }
+        },
+        "conditional_access": {
+          "type": "object",
+          "required": ["ca_naming_convention", "existing_policy_count"],
+          "properties": {
+            "ca_naming_convention": { "type": "string" },
+            "named_locations": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name", "type", "value"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "type": { "type": "string", "enum": ["ip", "country"] },
+                  "value": { "type": "string" }
+                }
+              }
+            },
+            "existing_policy_count": { "type": "number", "minimum": 0 }
+          }
+        },
+        "device_management": {
+          "type": "object",
+          "required": ["enrollment_type", "device_naming_convention", "platforms_in_scope"],
+          "properties": {
+            "enrollment_type": { "type": "string", "enum": ["azure_ad_join", "hybrid_join", "enroll_only", "none"] },
+            "device_naming_convention": { "type": "string" },
+            "compliance_policy_convention": { "type": "string" },
+            "platforms_in_scope": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "data_protection": {
+          "type": "object",
+          "required": ["sensitivity_label_convention", "cui_sharepoint_sites", "dlp_policy_convention"],
+          "properties": {
+            "sensitivity_label_convention": { "type": "string" },
+            "cui_sharepoint_sites": { "type": "array", "items": { "type": "string" } },
+            "cui_teams_channels": { "type": "array", "items": { "type": "string" } },
+            "dlp_policy_convention": { "type": "string" }
+          }
+        },
+        "monitoring": {
+          "type": "object",
+          "required": ["sentinel_workspace_name", "sentinel_resource_group", "log_analytics_workspace_id", "data_connectors", "alert_rule_convention"],
+          "properties": {
+            "sentinel_workspace_name": { "type": "string" },
+            "sentinel_resource_group": { "type": "string" },
+            "log_analytics_workspace_id": { "type": "string" },
+            "data_connectors": { "type": "array", "items": { "type": "string" } },
+            "alert_rule_convention": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}

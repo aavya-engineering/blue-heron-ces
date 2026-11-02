@@ -1,0 +1,36 @@
+{
+  "rawResponse": "[\r\n    {\r\n        \"policyId\":  \"DirectoryRole_sim-tenant-s2-eng_52520000-009a-4000-8000-000000000001\",\r\n        \"roleDefinitionId\":  \"62e90394-69f5-4237-9190-012177145e10\",\r\n        \"scopeId\":  \"/\"\r\n    },\r\n    {\r\n        \"policyId\":  \"DirectoryRole_sim-tenant-s2-eng_52520000-009a-4000-8000-000000000002\",\r\n        \"roleDefinitionId\":  \"e8611ab8-c189-46e8-94e1-60213ab1f814\",\r\n        \"scopeId\":  \"/\"\r\n    },\r\n    {\r\n        \"policyId\":  \"DirectoryRole_sim-tenant-s2-eng_52520000-009a-4000-8000-000000000003\",\r\n        \"roleDefinitionId\":  \"194ae4cb-b126-40b2-bd5b-6091b380977d\",\r\n        \"scopeId\":  \"/\"\r\n    },\r\n    {\r\n        \"policyId\":  \"DirectoryRole_sim-tenant-s2-eng_52520000-009a-4000-8000-000000000004\",\r\n        \"roleDefinitionId\":  \"3a2c62db-5318-420d-8d74-23affee5d9d5\",\r\n        \"scopeId\":  \"/\"\r\n    },\r\n    {\r\n        \"policyId\":  \"DirectoryRole_sim-tenant-s2-eng_52520000-009a-4000-8000-000000000005\",\r\n        \"roleDefinitionId\":  \"29232cdf-9323-42fd-ade2-1d097af3e4de\",\r\n        \"scopeId\":  \"/\"\r\n    },\r\n    {\r\n        \"policyId\":  \"DirectoryRole_sim-tenant-s2-eng_52520000-009a-4000-8000-000000000006\",\r\n        \"roleDefinitionId\":  \"17315797-102d-40b4-93e0-432062caca18\",\r\n        \"scopeId\":  \"/\"\r\n    }\r\n]\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "CM.L2-3.4.5.access-restrict",
+    "label": "Access Restriction for Configuration Changes via Role Assignments",
+    "engine": "mgraph",
+    "layer_hint": 4,
+    "sequence_hint": 3,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "CM.L2-3.4.5"
+    ],
+    "get_command": "Get-MgDirectoryRole | Where-Object {$_.DisplayName -in @('Intune Administrator','Global Administrator','Cloud Device Administrator','Security Administrator')} | ForEach-Object { $role = $_; Get-MgDirectoryRoleMember -DirectoryRoleId $role.Id | Select-Object @{N='Role';E={$role.DisplayName}},Id,@{N='Type';E={$_.'@odata.type'}}} | ConvertTo-Json -Depth 5",
+    "set_command": "",
+    "evidence_commands": [
+      "Get-MgDirectoryRole | Where-Object {$_.DisplayName -in @('Intune Administrator','Global Administrator','Cloud Device Administrator','Security Administrator')} | ForEach-Object { $role = $_; Get-MgDirectoryRoleMember -DirectoryRoleId $role.Id | Select-Object @{N='Role';E={$role.DisplayName}},Id,@{N='Type';E={$_.'@odata.type'}}} | ConvertTo-Json -Depth 5",
+      "Get-MgPolicyRoleManagementPolicyAssignment -Filter \"scopeId eq '/' and scopeType eq 'DirectoryRole'\" | Select-Object PolicyId,RoleDefinitionId,ScopeId | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "CM.L2-3.4.5"
+    ],
+    "timestamp": "2026-11-01T16:05:02.819Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Access Restriction for Configuration Changes via Role Assignments",
+    "sha256Hash": "94a3a67d1545e5955e70202288914b8d92396c3ace2421b3e5e8d6225dd31296",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

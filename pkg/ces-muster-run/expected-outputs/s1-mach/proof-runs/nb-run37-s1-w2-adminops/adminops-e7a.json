@@ -1,0 +1,224 @@
+{
+  "schema": "ces-tester/adminops-e7a@1",
+  "tenant_slug": "s1-mach",
+  "tenant_id": "sim-tenant-s1-mach",
+  "requestor_upn": "adm.dorrel.nettlecombe@s1-mach.simtenant.onmicrosoft.us",
+  "approver_upn": null,
+  "env_keys": [
+    "CES_PIPELINE_ROOT",
+    "CES_TENANT_ROOT",
+    "STACKSIM_SERVER_URL",
+    "PSModulePath",
+    "CES_AO_SIM_ONLY",
+    "CES_AO_PRINCIPAL_SECRET"
+  ],
+  "adminops_since": "2026-10-28T14:31:57.858Z",
+  "sim_cert": {
+    "path": "out/ao/sim/s1-mach.pfx",
+    "thumbprint": "377F1A7CD75C8C511FBA540F46954C1523F518AD"
+  },
+  "started": "2026-10-28T14:37:37.482Z",
+  "ended": "2026-10-28T14:37:42.781Z",
+  "registry_resources": {
+    "approver_upn": "tm:approverUPN (answered)",
+    "breakglass_upn": "tm:breakGlassUPN (discovered)",
+    "global_admin_role_def_id": "tm:roleDefId (derived)",
+    "offboard_upn": "discovered (GET /v1.0/users: accountEnabled true and employeeLeaveDateTime in the past (oldest first))",
+    "operator_upn": "tm:operatorUPN (discovered)"
+  },
+  "write_ops": 1,
+  "ops": [
+    {
+      "op": "A-11",
+      "tier": "T2",
+      "kind": "read",
+      "params": [],
+      "calls": [
+        {
+          "call": "dry_run",
+          "argv": [
+            "exec",
+            "A-11",
+            "--tenant",
+            "s1-mach",
+            "--requestor",
+            "adm.dorrel.nettlecombe@s1-mach.simtenant.onmicrosoft.us",
+            "--json"
+          ],
+          "rc": 0,
+          "ok": true,
+          "success": true,
+          "outcome": "dry_run",
+          "mode": "dry_run",
+          "verdict": "NOT_APPLICABLE",
+          "evidence_row_id": "A-11:eecb3d18-96d5-46eb-8415-f073aa0c15fd",
+          "evidence_sha256": "56227a09b2b94f0edd41681776a7549c4299c081a2c2403c43593a7fc3f41a4b",
+          "evidence_persisted": true
+        },
+        {
+          "call": "apply",
+          "argv": [
+            "exec",
+            "A-11",
+            "--tenant",
+            "s1-mach",
+            "--requestor",
+            "adm.dorrel.nettlecombe@s1-mach.simtenant.onmicrosoft.us",
+            "--apply",
+            "--json"
+          ],
+          "rc": 0,
+          "ok": true,
+          "success": true,
+          "outcome": "automated_success",
+          "mode": "live",
+          "verdict": "SAT",
+          "evidence_row_id": "A-11:e856448f-73b2-4da4-aa85-afe02ecb7176",
+          "evidence_sha256": "56227a09b2b94f0edd41681776a7549c4299c081a2c2403c43593a7fc3f41a4b",
+          "evidence_persisted": true
+        }
+      ],
+      "ok": true
+    },
+    {
+      "op": "A-02",
+      "tier": "T2",
+      "kind": "write",
+      "params": [
+        {
+          "name": "upn",
+          "from": "resources.offboard_upn",
+          "value": "merrin.hollinmere@s1-mach.simtenant.onmicrosoft.us",
+          "provenance": "discovered (GET /v1.0/users: accountEnabled true and employeeLeaveDateTime in the past (oldest first))"
+        }
+      ],
+      "calls": [
+        {
+          "call": "dry_run",
+          "argv": [
+            "exec",
+            "A-02",
+            "--tenant",
+            "s1-mach",
+            "--requestor",
+            "adm.dorrel.nettlecombe@s1-mach.simtenant.onmicrosoft.us",
+            "--param",
+            "upn=merrin.hollinmere@s1-mach.simtenant.onmicrosoft.us",
+            "--json"
+          ],
+          "rc": 0,
+          "ok": true,
+          "success": true,
+          "outcome": "dry_run",
+          "mode": "dry_run",
+          "verdict": "NOT_APPLICABLE",
+          "evidence_row_id": "A-02:e845811c-b0b7-4906-ac29-bfcbbf11e810",
+          "evidence_sha256": "aa23f34e3a5f8aaa24601935a2e35d877e32edcfb0f1c155b4347215db59d8dd",
+          "evidence_persisted": true
+        },
+        {
+          "call": "apply",
+          "argv": [
+            "exec",
+            "A-02",
+            "--tenant",
+            "s1-mach",
+            "--requestor",
+            "adm.dorrel.nettlecombe@s1-mach.simtenant.onmicrosoft.us",
+            "--apply",
+            "--param",
+            "upn=merrin.hollinmere@s1-mach.simtenant.onmicrosoft.us",
+            "--json"
+          ],
+          "rc": 0,
+          "ok": true,
+          "success": true,
+          "outcome": "automated_success",
+          "mode": "live",
+          "verdict": "SAT",
+          "evidence_row_id": "A-02:a7b35fdd-09eb-415e-a468-795cb26a7bbd",
+          "evidence_sha256": "29c8ef722435a34f684c38d5a21de10bbf2e8a6d81976b19e0a49c03dd56fa3a",
+          "evidence_persisted": true,
+          "state_changed": true
+        }
+      ],
+      "ok": true,
+      "confirm": {
+        "check": {
+          "description": "AdminOps A-02: the leaver's account is disabled",
+          "request": {
+            "kind": "uri",
+            "method": "GET",
+            "uri": "/v1.0/users"
+          },
+          "select": {
+            "field": "userPrincipalName",
+            "equals": "merrin.hollinmere@s1-mach.simtenant.onmicrosoft.us"
+          },
+          "path": "accountEnabled",
+          "assert": "equals",
+          "value": false,
+          "ledger_object_type": "users"
+        },
+        "pass": true,
+        "actual": "false"
+      }
+    },
+    {
+      "op": "A-09",
+      "tier": "T2",
+      "kind": "read",
+      "params": [],
+      "calls": [
+        {
+          "call": "dry_run",
+          "argv": [
+            "exec",
+            "A-09",
+            "--tenant",
+            "s1-mach",
+            "--requestor",
+            "adm.dorrel.nettlecombe@s1-mach.simtenant.onmicrosoft.us",
+            "--json"
+          ],
+          "rc": 0,
+          "ok": true,
+          "success": true,
+          "outcome": "dry_run",
+          "mode": "dry_run",
+          "verdict": "NOT_APPLICABLE",
+          "evidence_row_id": "A-09:71f5464a-0a6a-4a87-a637-fba387a3855e",
+          "evidence_sha256": "bed9c7e7b338bdcd784f91588b5766d8a24e5acbcd29ce3b787b8c0b59ab3df9",
+          "evidence_persisted": true
+        },
+        {
+          "call": "apply",
+          "argv": [
+            "exec",
+            "A-09",
+            "--tenant",
+            "s1-mach",
+            "--requestor",
+            "adm.dorrel.nettlecombe@s1-mach.simtenant.onmicrosoft.us",
+            "--apply",
+            "--json"
+          ],
+          "rc": 0,
+          "ok": true,
+          "success": true,
+          "outcome": "automated_success",
+          "mode": "live",
+          "verdict": "SAT",
+          "evidence_row_id": "A-09:b9794984-2b83-44ed-be92-34dcd524a175",
+          "evidence_sha256": "bed9c7e7b338bdcd784f91588b5766d8a24e5acbcd29ce3b787b8c0b59ab3df9",
+          "evidence_persisted": true
+        }
+      ],
+      "ok": true
+    }
+  ],
+  "expected_improvements": [],
+  "allowed_reverts": [],
+  "drift_injections": 0,
+  "ok": true
+}

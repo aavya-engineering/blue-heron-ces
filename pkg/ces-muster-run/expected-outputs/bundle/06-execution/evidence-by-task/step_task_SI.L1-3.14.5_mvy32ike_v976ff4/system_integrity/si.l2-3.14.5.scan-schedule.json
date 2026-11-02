@@ -1,0 +1,36 @@
+{
+  "rawResponse": "[\r\n    {\r\n        \"deviceName\":  \"Sim Managed Device 1\",\r\n        \"OperatingSystem\":  null,\r\n        \"SignatureVersion\":  null,\r\n        \"SignatureOverdue\":  null\r\n    },\r\n    {\r\n        \"deviceName\":  \"Sim Managed Device 2\",\r\n        \"OperatingSystem\":  null,\r\n        \"SignatureVersion\":  null,\r\n        \"SignatureOverdue\":  null\r\n    },\r\n    {\r\n        \"deviceName\":  \"Sim Managed Device 3\",\r\n        \"OperatingSystem\":  null,\r\n        \"SignatureVersion\":  null,\r\n        \"SignatureOverdue\":  null\r\n    },\r\n    {\r\n        \"deviceName\":  \"Sim Managed Device 4\",\r\n        \"OperatingSystem\":  null,\r\n        \"SignatureVersion\":  null,\r\n        \"SignatureOverdue\":  null\r\n    }\r\n]\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "SI.L2-3.14.5.scan-schedule",
+    "label": "Scheduled Malware Scan Configuration via Intune",
+    "engine": "mgraph",
+    "layer_hint": 4,
+    "sequence_hint": 8,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "SI.L1-3.14.5"
+    ],
+    "get_command": "Get-MgDeviceManagementDeviceConfiguration -All | Where-Object {$_.DisplayName -like '*defender*' -or $_.DisplayName -like '*antivirus*' -or $_.DisplayName -like '*malware*'} | Select-Object DisplayName,Id,LastModifiedDateTime | ConvertTo-Json -Depth 5",
+    "set_command": "",
+    "evidence_commands": [
+      "Get-MgDeviceManagementDeviceConfiguration -All | Where-Object {$_.DisplayName -like '*defender*' -or $_.DisplayName -like '*antivirus*' -or $_.DisplayName -like '*malware*'} | Select-Object DisplayName,Id,LastModifiedDateTime | ConvertTo-Json -Depth 5",
+      "Get-MgDeviceManagementManagedDevice -All -ExpandProperty windowsProtectionState | Select-Object DeviceName,OperatingSystem,@{N='SignatureVersion';E={$_.windowsProtectionState.signatureVersion}},@{N='SignatureOverdue';E={$_.windowsProtectionState.signatureUpdateOverdue}} | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SI.L1-3.14.5"
+    ],
+    "timestamp": "2026-11-01T17:10:55.732Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Scheduled Malware Scan Configuration via Intune",
+    "sha256Hash": "0f16e98a13ba4ff2ab9ac8899343eda0fd914bdcd749e00e0e4f4fbe0d0fce79",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

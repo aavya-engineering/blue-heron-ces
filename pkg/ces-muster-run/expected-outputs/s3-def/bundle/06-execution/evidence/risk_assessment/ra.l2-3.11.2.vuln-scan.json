@@ -1,0 +1,36 @@
+{
+  "rawResponse": "[\r\n    {\r\n        \"id\":  \"alert-s3-1\",\r\n        \"providerAlertId\":  \"s3-microsoftDefenderForEndpoint-0001\",\r\n        \"title\":  \"Suspicious PowerShell command line\",\r\n        \"severity\":  \"high\",\r\n        \"status\":  \"new\",\r\n        \"serviceSource\":  \"microsoftDefenderForEndpoint\",\r\n        \"detectionSource\":  \"microsoftDefenderForEndpoint\",\r\n        \"category\":  \"Execution\",\r\n        \"classification\":  null,\r\n        \"determination\":  null,\r\n        \"incidentId\":  \"incident-s3-1\",\r\n        \"assignedTo\":  null,\r\n        \"description\":  \"Suspicious PowerShell command line (fictional history record)\",\r\n        \"createdDateTime\":  \"2026-10-11T21:50:00.000Z\",\r\n        \"firstActivityDateTime\":  \"2026-10-11T21:40:00.000Z\",\r\n        \"lastActivityDateTime\":  \"2026-10-11T21:50:00.000Z\",\r\n        \"lastUpdateDateTime\":  \"2026-10-11T21:50:00.000Z\",\r\n        \"resolvedDateTime\":  null,\r\n        \"mitreTechniques\":  [\r\n                                \"T1059.001\"\r\n                            ],\r\n        \"tenantId\":  \"sim-tenant-s3-def\",\r\n        \"evidence\":  [\r\n                         {\r\n                             \"@odata.type\":  \"#microsoft.graph.security.deviceEvidence\",\r\n                             \"roles\":  [\r\n                                           \"impacted\"\r\n                                       ],\r\n                             \"mdeDeviceId\":  \"managedDevice-7\",\r\n                             \"deviceDnsName\":  \"S3-WS-007\"\r\n                         }\r\n                     ],\r\n        \"comments\":  [\r\n\r\n                     ]\r\n    },\r\n    {\r\n        \"id\":  \"alert-s3-2\",\r\n        \"providerAlertId\":  \"s3-azureAdIdentityProtection-0002\",\r\n        \"title\":  \"Unfamiliar sign-in properties\",\r\n        \"severity\":  \"medium\",\r\n        \"status\":  \"new\",\r\n        \"serviceSource\":  \"azureAdIdentityProtection\",\r\n        \"detectionSource\":  \"azureAdIdentityProtection\",\r\n        \"category\":  \"InitialAccess\",\r\n        \"classification\":  null,\r\n        \"determination\":  null,\r\n        \"incidentId\":  \"incident-s3-2\",\r\n        \"assignedTo\":  null,\r\n        \"description\":  \"Unfamiliar sign-in properties (fictional history record)\",\r\n        \"createdDateTime\":  \"2026-10-11T17:10:00.000Z\",\r\n        \"firstActivityDateTime\":  \"2026-10-11T17:00:00.000Z\",\r\n        \"lastActivityDateTime\":  \"2026-10-11T17:10:00.000Z\",\r\n        \"lastUpdateDateTime\":  \"2026-10-11T17:10:00.000Z\",\r\n        \"resolvedDateTime\":  null,\r\n        \"mitreTechniques\":  [\r\n                                \"T1078\"\r\n                            ],\r\n        \"tenantId\":  \"sim-tenant-s3-def\",\r\n        \"evidence\":  [\r\n                         {\r\n                             \"@odata.type\":  \"#microsoft.graph.security.userEvidence\",\r\n                             \"roles\":  [\r\n                                           \"impacted\"\r\n                                       ],\r\n                             \"userAccount\":  {\r\n                                                 \"accountName\":  \"tolvar.embryshaw\",\r\n                                                 \"azureAdUserId\":  \"user-29\",\r\n                                                 \"displayName\":  \"Tolvar Embryshaw\",\r\n                                                 \"userPrincipalName\":  \"tolvar.embryshaw@s3-def.simtenant.onmicrosoft.us\"\r\n                                             }\r\n                         }\r\n                     ],\r\n        \"comments\":  [\r\n\r\n                     ]\r\n    }\r\n]\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "RA.L2-3.11.2.vuln-scan",
+    "label": "Renderable: Vulnerability Scan Results Evidence via Defender",
+    "engine": "mgraph",
+    "layer_hint": 8,
+    "sequence_hint": 7,
+    "idempotency": "safe",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "RA.L2-3.11.2"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/security/secureScores?$top=1').value | Select-Object activeUserCount,currentScore,maxScore,createdDateTime",
+    "set_command": "",
+    "evidence_commands": [
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/security/secureScores?$top=1').value | ConvertTo-Json -Depth 5",
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/security/alerts_v2?$top=50&$orderby=createdDateTime desc').value | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "RA.L2-3.11.2"
+    ],
+    "timestamp": "2026-11-01T06:58:46.120Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Renderable: Vulnerability Scan Results Evidence via Defender",
+    "sha256Hash": "e615683a7f03daf078bfda6b35802be457add01b5be743802d306d00c32726fc",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

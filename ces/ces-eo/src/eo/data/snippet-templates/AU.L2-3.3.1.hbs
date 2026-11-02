@@ -1,0 +1,53 @@
+## Control {{controlId}}: Create and Retain System Audit Logs and Records
+
+**Implementation Status:** {{status}}
+
+This organization creates and retains system audit logs within the {{tenantName}} M365 GCC High tenant through Entra ID sign-in logs, directory audit logs, and Exchange Online mailbox auditing managed by {{variables.systemAdministrator}}.
+
+{{#if signInLogsAvailable}}
+**Sign-In Audit Logs:**
+{{signInLogsCount}} sign-in events captured with {{retentionDays}}-day retention:
+{{#if logs}}
+{{#each logs}}
+- **{{userPrincipalName}}** — App: {{appDisplayName}} — Status: {{status}} — {{createdDateTime}}
+{{/each}}
+{{/if}}
+
+Sign-in logs capture all authentication events including user principal name, application accessed, IP address, device compliance status, Conditional Access policy results, and MFA verification details.
+{{else}}
+Sign-in log creation has not been confirmed. Authentication event auditing is not verified.
+{{/if}}
+
+{{#if directoryAuditsAvailable}}
+**Directory Audit Logs:**
+{{directoryAuditsCount}} administrative actions recorded:
+{{#if audits}}
+{{#each audits}}
+- **{{activityDisplayName}}** by {{actorUserPrincipalName}} — Result: {{result}} — {{activityDateTime}}
+{{/each}}
+{{/if}}
+
+Directory audits capture configuration changes, role assignments, group membership modifications, and policy updates with full actor attribution.
+{{else}}
+Directory audit log creation has not been confirmed.
+{{/if}}
+
+{{#if mailboxAuditEnabled}}
+**Mailbox Auditing:**
+Exchange Online mailbox auditing is enabled. Default audit operations captured for: {{#each defaultAuditSet}}{{this}}{{#unless @last}}, {{/unless}}{{/each}} actions. {{#if auditBypassEnabled}}Warning: Audit bypass is enabled for some mailboxes.{{/if}}
+{{else}}
+Mailbox auditing has not been confirmed.
+{{/if}}
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine sign-in log entries, directory audit records, mailbox audit configuration, and retention policy settings.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

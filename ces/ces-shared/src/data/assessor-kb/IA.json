@@ -1,0 +1,903 @@
+{
+  "family": "IA",
+  "family_name": "Identification and Authentication",
+  "practices": [
+    {
+      "id": "IA.L1-3.5.1",
+      "title": "Identify information system users, processes acting on behalf of users or devices.",
+      "approach": {
+        "what_assessor_does": "The assessor reads the identification and authentication policy and asks for three lists: people with accounts, non-person identities (service accounts, application registrations, managed identities) and devices that reach the system. They match the account list against the current staff and contractor roster and look for accounts nobody owns or several people use. For non-person identities they want a purpose and a named owner for each. For devices they compare the hardware inventory with the devices registered or enrolled in the tenant. Testing means taking a few recent sign-ins and tracing each one to a single person or identity and a known device.",
+        "common_failure_modes": [
+          "Shared or generic logins (front desk, shop floor, a team mailbox used to sign in) that several people use.",
+          "Scripts and integrations run under a person's own account instead of a dedicated identity.",
+          "Service accounts and application registrations have no recorded purpose or owner.",
+          "Devices that reach CUI are not registered or enrolled, so they cannot be told apart.",
+          "Accounts remain for people who no longer appear on the staff or contractor roster."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "IA.L1-3.5.1[a]",
+          "determination": "system users are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Directory account list with unique identifiers",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry IA.L1-3.5.1 (userDeviceIdentifyEvaluator): Graph /users. The evaluator checks every account has an id and a unique user principal name, and reports names that look like shared logins; a shared-looking account that is primary user of several managed devices is a finding."
+            },
+            {
+              "artifact_type": "New user provisioning record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps A-01 New User Provisioning: creates each account with its groups, licences and Conditional Access targeting; registered against IA.L1-3.5.1 (objective [a])."
+            },
+            {
+              "artifact_type": "Legacy authentication sign-in check",
+              "ces_source": "ao_row",
+              "notes": "AdminOps F-04 Legacy Auth Block Validation: checks the blocking policy and the sign-in logs for zero legacy sign-ins; registered against IA.L1-3.5.1 (objective [a])."
+            },
+            {
+              "artifact_type": "Staff and contractor roster",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. The assessor matches it to the directory to find accounts with no person behind them, or one person with several ordinary accounts."
+            },
+            {
+              "artifact_type": "Identification and authentication policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/identification-authentication-policy.md (GateEvidence family IA). Should require one account per person and forbid shared logins, or list the approved exceptions."
+            },
+            {
+              "artifact_type": "Identity administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how accounts are requested, named and tied to one person, and whether any shared logins exist and why."
+            }
+          ]
+        },
+        {
+          "id": "IA.L1-3.5.1[b]",
+          "determination": "processes acting on behalf of users are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Managed identity adoption report",
+              "ces_source": "ao_row",
+              "notes": "AdminOps C-07 Managed Identity Adoption: works out the share of workloads using managed identities and lists candidates still on secrets or user accounts; registered against IA.L1-3.5.1 (objective [b])."
+            },
+            {
+              "artifact_type": "Service account and application inventory",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: each non-person identity with its purpose and owner. The registry reads for IA.L1-3.5.1 (/users, /devices, /deviceManagement/managedDevices) do not list service principals or app registrations, so CES has no tenant signal for processes beyond service accounts that are user objects."
+            },
+            {
+              "artifact_type": "Identification and authentication policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/identification-authentication-policy.md (GateEvidence family IA). Should say how processes acting for users are given their own identities and who owns them."
+            },
+            {
+              "artifact_type": "Identity administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask which scripts, scheduled tasks and integrations run under a person's account rather than a dedicated identity."
+            }
+          ]
+        },
+        {
+          "id": "IA.L1-3.5.1[c]",
+          "determination": "devices accessing the system are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Registered and managed device list",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry IA.L1-3.5.1 (userDeviceIdentifyEvaluator): Graph /devices and /deviceManagement/managedDevices. The evaluator checks each device read carries an identifier; with no device read it does not decide."
+            },
+            {
+              "artifact_type": "Hardware asset inventory",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. The assessor compares it with the registered and managed device lists to find machines that reach the system unregistered."
+            },
+            {
+              "artifact_type": "Identification and authentication policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/identification-authentication-policy.md (GateEvidence family IA). Should require devices to be registered or enrolled before they reach CUI."
+            },
+            {
+              "artifact_type": "Endpoint administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how a new laptop is registered before first use and what happens to personal or visitor devices."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "IA.L1-3.5.2",
+      "title": "Authenticate (or verify) the identities of those users, processes, or devices, as a prerequisite to allowing access to organizational information systems.",
+      "approach": {
+        "what_assessor_does": "The assessor checks that nothing reaches the system without first proving who or what it is. They read the policy and the tenant's authentication methods and sign-in rules for users, look at how service accounts and applications authenticate (secrets, certificates, managed identities), and ask how a device proves itself before it is trusted. They interview the identity administrator about any path that skips authentication, such as anonymous sharing links, kiosk sessions or legacy protocols. Testing means trying to reach a protected resource without signing in, and reading sign-in logs for user, application and device sign-ins.",
+        "common_failure_modes": [
+          "Anonymous or \"anyone with the link\" sharing gives access to CUI without any sign-in.",
+          "Applications and service accounts use shared or hard-coded secrets that several systems know.",
+          "Devices are trusted by network location alone, with no device identity check.",
+          "Legacy protocols still allow sign-in that bypasses the modern authentication rules.",
+          "The policy names the methods but the tenant has a different set enabled."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "IA.L1-3.5.2[a]",
+          "determination": "the identity of each user is authenticated or verified as a prerequisite to system access",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Authentication methods policy",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry IA.L1-3.5.2 (authTransactionEvaluator): Graph /policies/authenticationMethodsPolicy. The evaluator checks that at least one authentication method is enabled; it does not show that every access path requires sign-in."
+            },
+            {
+              "artifact_type": "Identification and authentication policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/identification-authentication-policy.md (GateEvidence family IA). Should state that every user authenticates before access and name the allowed methods."
+            },
+            {
+              "artifact_type": "Sign-in log sample",
+              "ces_source": "ec_upload",
+              "notes": "Exported sign-in log entries uploaded through the Evidence Collector, used to confirm sampled users authenticated before reaching CUI resources."
+            },
+            {
+              "artifact_type": "Identity administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask whether any resource is reachable without sign-in, such as anonymous sharing links, kiosks or legacy protocols."
+            }
+          ]
+        },
+        {
+          "id": "IA.L1-3.5.2[b]",
+          "determination": "the identity of each process acting on behalf of a user is authenticated or verified as a prerequisite to system access",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Application and service account credential list",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: how each service account and application authenticates (certificate, secret, managed identity). The registry read for IA.L1-3.5.2 covers only the user authentication methods policy, so CES has no tenant signal for process authentication."
+            },
+            {
+              "artifact_type": "Identification and authentication policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/identification-authentication-policy.md (GateEvidence family IA). Should state how processes acting for users authenticate and how their credentials are protected."
+            },
+            {
+              "artifact_type": "Application owner interview",
+              "ces_source": "interview",
+              "notes": "Ask each sampled integration owner how the process proves its identity and who holds its credential."
+            }
+          ]
+        },
+        {
+          "id": "IA.L1-3.5.2[c]",
+          "determination": "the identity of each device accessing or connecting to the system is authenticated or verified as a prerequisite to system access",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Device-based access rules",
+              "ces_source": "ec_upload",
+              "notes": "Conditional Access or network access settings requiring a compliant or registered device, exported and uploaded through the Evidence Collector. The registry read for IA.L1-3.5.2 does not carry device authentication, so CES has no tenant signal for this objective."
+            },
+            {
+              "artifact_type": "Identification and authentication policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/identification-authentication-policy.md (GateEvidence family IA). Should state how a device proves its identity before it connects (registration, certificate, compliance check)."
+            },
+            {
+              "artifact_type": "Endpoint administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask what stops an unknown device from connecting to the network or to cloud resources, and try it with an unregistered device if one is available."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "IA.L2-3.5.3",
+      "title": "Use multi-factor authentication for local and network access to privileged accounts and for network access to non-privileged accounts.",
+      "approach": {
+        "what_assessor_does": "The assessor first asks for the list of privileged accounts and compares it with the people who actually hold administrator roles in the tenant and on local machines. They then read the sign-in rules (Conditional Access) to see that every privileged and every ordinary account must use a second factor for network access, and look at how administrators sign in locally to servers and workstations. They look at who is excluded from the rules and why, and at the per-user registration report for accounts with no second factor registered. Testing means signing in as a sampled privileged and a sampled ordinary user from outside and watching for the second-factor prompt, and checking local administrator sign-in on a sample machine.",
+        "common_failure_modes": [
+          "The privileged account list is missing local administrator accounts or accounts with roles assigned outside the main admin groups.",
+          "Conditional Access exclusions go beyond the documented break-glass accounts.",
+          "Some enabled accounts have no second factor registered, so the rule cannot apply to them.",
+          "Local sign-in to servers or workstations with an administrator account uses a password only.",
+          "Multifactor is required only from untrusted locations, so office network access skips it."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "IA.L2-3.5.3[a]",
+          "determination": "privileged accounts are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Privileged account list",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: every account with administrator rights in the tenant, on servers and on workstations, with its owner."
+            },
+            {
+              "artifact_type": "Directory accounts and MFA registration report",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry IA.L2-3.5.3 (mfaMethodsEvaluator): Graph /users and /reports/authenticationMethods/userRegistrationDetails, which flags administrator accounts. Compare the flagged accounts with the privileged account list."
+            },
+            {
+              "artifact_type": "Identification and authentication policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/identification-authentication-policy.md (GateEvidence family IA). Should define what counts as a privileged account, including local administrator accounts."
+            },
+            {
+              "artifact_type": "Identity administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how privileged roles are granted and how the list is kept current."
+            }
+          ]
+        },
+        {
+          "id": "IA.L2-3.5.3[b]",
+          "determination": "multifactor authentication is implemented for local access to privileged accounts",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Local administrator sign-in configuration",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: how local sign-in to servers and workstations with privileged accounts requires a second factor (for example Windows Hello for Business, smart card, or a privileged access tool). CES reads no tenant setting for local sign-in."
+            },
+            {
+              "artifact_type": "Identification and authentication policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/identification-authentication-policy.md (GateEvidence family IA). Should require multifactor authentication for local access with privileged accounts."
+            },
+            {
+              "artifact_type": "System administrator interview and demonstration",
+              "ces_source": "interview",
+              "notes": "Ask an administrator to sign in locally to a sampled server or workstation with a privileged account and show the second factor."
+            }
+          ]
+        },
+        {
+          "id": "IA.L2-3.5.3[c]",
+          "determination": "multifactor authentication is implemented for network access to privileged accounts",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Authentication methods and Conditional Access rules",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry IA.L2-3.5.3 (mfaMethodsEvaluator): Graph /policies/authenticationMethodsPolicy and /reports/authenticationMethods/userRegistrationDetails, with Conditional Access policies. The evaluator checks an MFA method is enabled, every enabled account has one registered, and an enabled policy requires MFA of all users, excusing only break-glass accounts."
+            },
+            {
+              "artifact_type": "Identity signal bundle",
+              "ces_source": "stack_signal",
+              "notes": "EO evidence router items signal:identitySignals and signal:authStrengthPolicies, both mapped to IA.L2-3.5.3."
+            },
+            {
+              "artifact_type": "MFA enrollment enforcement record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps A-07 MFA Enrollment Enforcement: enforces registration through Conditional Access and the authentication methods policy; registered against IA.L2-3.5.3 (objectives [c], [d])."
+            },
+            {
+              "artifact_type": "Weak method removal audit",
+              "ces_source": "ao_row",
+              "notes": "AdminOps A-08 MFA Method Audit -- Weak Removal: audits registered methods and removes SMS and voice; registered against IA.L2-3.5.3 (objectives [c], [d])."
+            },
+            {
+              "artifact_type": "Privileged user sign-in test",
+              "ces_source": "interview",
+              "notes": "Ask a sampled administrator to sign in to an admin portal from outside the office and show the second-factor prompt; check exclusions match the documented break-glass accounts."
+            }
+          ]
+        },
+        {
+          "id": "IA.L2-3.5.3[d]",
+          "determination": "multifactor authentication is implemented for network access to non-privileged accounts",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Authentication methods and Conditional Access rules",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry IA.L2-3.5.3 (mfaMethodsEvaluator): same reads as [c]. Enabled accounts with no method in the registration report are listed, since they cannot complete MFA whatever the policies require."
+            },
+            {
+              "artifact_type": "MFA enrollment enforcement record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps A-07 MFA Enrollment Enforcement; registered against IA.L2-3.5.3 (objective [d])."
+            },
+            {
+              "artifact_type": "Return-from-leave restore record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps A-06 LOA Return -- Restore: re-enables the account and forces MFA re-registration; registered against IA.L2-3.5.3 (objective [d])."
+            },
+            {
+              "artifact_type": "Identification and authentication policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/identification-authentication-policy.md (GateEvidence family IA). Should require multifactor authentication for network access by every account, not only administrators."
+            },
+            {
+              "artifact_type": "Ordinary user sign-in test",
+              "ces_source": "interview",
+              "notes": "Ask a sampled ordinary user to sign in to email or file storage from outside the office and show the second-factor prompt."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "IA.L2-3.5.4",
+      "title": "Employ replay-resistant authentication mechanisms for network access to privileged and non-privileged accounts.",
+      "approach": {
+        "what_assessor_does": "The assessor asks which authentication methods protect network sign-in and whether each one resists replay, meaning a captured sign-in cannot be used again (for example one-time codes, challenge-response, FIDO2 keys, certificates, Kerberos). They read the authentication strength definitions and the Conditional Access rules that require them, and check that they cover privileged and ordinary accounts. They interview the identity administrator about protocols that send reusable secrets, such as basic authentication to mail or older VPNs. Testing means confirming in sign-in logs that sampled accounts used a replay-resistant method, and that legacy protocols are refused.",
+        "common_failure_modes": [
+          "A phishing-resistant strength is defined but no enabled policy requires it.",
+          "The required strength still allows a weaker method, so users fall back to it.",
+          "Older VPN, mail or line-of-business protocols accept a plain password that can be replayed.",
+          "Only administrators are covered; ordinary accounts sign in with a reusable password."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "IA.L2-3.5.4[a]",
+          "determination": "replay-resistant authentication mechanisms are implemented for network account access to privileged and non-privileged accounts",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Authentication strength and Conditional Access rules",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry IA.L2-3.5.4 (authStrengthEvaluator): Graph /policies/authenticationStrengthPolicies and /identity/conditionalAccess/policies. The evaluator checks a strength allows only phishing-resistant methods and that an enabled policy requires it of the privileged roles or of all users."
+            },
+            {
+              "artifact_type": "Identification and authentication policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/identification-authentication-policy.md (GateEvidence family IA). Should name the replay-resistant methods required for network access by privileged and ordinary accounts."
+            },
+            {
+              "artifact_type": "Sign-in log sample showing methods used",
+              "ces_source": "ec_upload",
+              "notes": "Exported sign-in entries uploaded through the Evidence Collector, showing the method each sampled privileged and ordinary account used."
+            },
+            {
+              "artifact_type": "Identity administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask which protocols still accept a reusable password (older VPNs, mail clients, line-of-business apps) and how they are blocked."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "IA.L2-3.5.5",
+      "title": "Prevent the reuse of identifiers for a defined period.",
+      "approach": {
+        "what_assessor_does": "The assessor looks for a written period during which a retired identifier (a user name or account id) cannot be given to someone else, and for the procedure that enforces it. They compare deleted and disabled accounts with current accounts to see whether any user name was handed to a new person inside the period. They ask the identity administrator what happens when a new hire has the same name as a former employee. Testing means taking a few recently retired identifiers and checking that none is held by a newer account.",
+        "common_failure_modes": [
+          "No reuse period is written down anywhere.",
+          "A former employee's user name or mailbox was reassigned to a new hire inside the period.",
+          "The naming procedure has no rule for duplicate names, so reuse depends on who creates the account.",
+          "Deleted accounts are purged permanently with no record of the identifiers they held."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "IA.L2-3.5.5[a]",
+          "determination": "a period within which identifiers cannot be reused is defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Identification and authentication policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/identification-authentication-policy.md (GateEvidence family IA). Should state the period during which a retired identifier may not be assigned to anyone else."
+            },
+            {
+              "artifact_type": "Account naming and deprovisioning procedure",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Should give the reuse period and the rule for a new hire who shares a former employee's name."
+            },
+            {
+              "artifact_type": "Identity administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask what the reuse period is and where it is written; compare the answer with the policy."
+            }
+          ]
+        },
+        {
+          "id": "IA.L2-3.5.5[b]",
+          "determination": "reuse of identifiers is prevented within the defined period",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Deleted and current account comparison",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry IA.L2-3.5.5 (inactiveAccountsEvaluator, which despite its name tests identifier reuse): Graph /directory/deletedItems/microsoft.graph.user and enabled /users. A deleted user name given to a newer account inside the period, or a disabled and an enabled account sharing one, is a finding. Entra keeps deleted users for 30 days only, so older reuse is outside this read."
+            },
+            {
+              "artifact_type": "Retired identifier register",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector when the organization keeps its own record of retired user names beyond the 30-day recycle bin."
+            },
+            {
+              "artifact_type": "Identity administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask for a recent case of a new hire with a former employee's name and how the account was named."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "IA.L2-3.5.6",
+      "title": "Disable identifiers after a defined period of inactivity.",
+      "approach": {
+        "what_assessor_does": "The assessor reads the policy for the period of inactivity after which an account is disabled, then compares the last sign-in date of every enabled account with that period. They ask who runs the check, how often, and how service accounts and break-glass accounts are handled. Testing means sorting enabled accounts by last sign-in and confirming none is older than the defined period, or that any exception is documented and approved.",
+        "common_failure_modes": [
+          "The inactivity period is not defined, or differs between the policy and the procedure.",
+          "Enabled accounts have not signed in for longer than the defined period.",
+          "The check is run by hand, irregularly, with no record of when it last ran.",
+          "Service and shared accounts are left out of the check without a documented exception."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "IA.L2-3.5.6[a]",
+          "determination": "a period of inactivity after which an identifier is disabled is defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Identification and authentication policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/identification-authentication-policy.md (GateEvidence family IA). Should state the number of days of inactivity after which an account is disabled."
+            },
+            {
+              "artifact_type": "Account review procedure",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Should give the inactivity period, how often the check runs and how exceptions are approved."
+            },
+            {
+              "artifact_type": "Identity administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask what the inactivity period is and confirm it matches the policy. If none is defined, the CES evaluator applies a 90-day default."
+            }
+          ]
+        },
+        {
+          "id": "IA.L2-3.5.6[b]",
+          "determination": "identifiers are disabled after the defined period of inactivity",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Last sign-in for every enabled account",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry IA.L2-3.5.6 (accountDisableEvaluator): Graph /users filtered to enabled accounts, read with signInActivity. Enabled accounts inactive longer than the organization's value (default 90 days) are listed; without signInActivity the evaluator does not decide."
+            },
+            {
+              "artifact_type": "Inactive account review records",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: dated results of the last inactivity checks and the accounts disabled."
+            },
+            {
+              "artifact_type": "Identity administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask who runs the check, how service and break-glass accounts are treated, and when it last ran."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "IA.L2-3.5.7",
+      "title": "Enforce a minimum password complexity and change of characters when new passwords are created.",
+      "approach": {
+        "what_assessor_does": "The assessor reads the policy for the password rules: minimum length, composition, and how many characters must change when a new password is created. They then look at the settings that enforce those rules in the directory, on devices (compliance and configuration policies) and in any system with its own local passwords. They interview the identity administrator about where passwords still exist and which rules each place enforces. Testing means trying to set a password that breaks the rules and seeing it refused, and reconciling the policy value, the planned parameter and the tenant setting.",
+        "common_failure_modes": [
+          "The policy states a length or composition rule that no system setting enforces.",
+          "Device or local-account password settings are weaker than the directory's.",
+          "No rule for change of characters is written, or it is written but nothing can enforce it.",
+          "Systems with their own local passwords (network gear, line-of-business apps) are not covered.",
+          "The values in the policy, the plan and the tenant do not agree."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "IA.L2-3.5.7[a]",
+          "determination": "password complexity requirements are defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Identification and authentication policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/identification-authentication-policy.md (GateEvidence family IA). Should state minimum length and composition for every place passwords are used."
+            },
+            {
+              "artifact_type": "Planned password parameters",
+              "ces_source": "eo_store",
+              "notes": "EO reads the policy inputs profile (policy-inputs-profile-*, Planner PolicyInputsOutput) for the organization-defined parameters; min_password_length (PI.ODP.004, recommended 14) and max_password_age_days (PI.ODP.006) serve 3.5.7."
+            },
+            {
+              "artifact_type": "Password policy compliance record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps C-09 Password Policy Compliance: sets the banned password list, smart lockout and a 14-character minimum; registered against IA.L2-3.5.7 (objectives [a], [c])."
+            },
+            {
+              "artifact_type": "Identity administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask where passwords are still used and what rules apply in each place."
+            }
+          ]
+        },
+        {
+          "id": "IA.L2-3.5.7[b]",
+          "determination": "password change of character requirements are defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Identification and authentication policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/identification-authentication-policy.md (GateEvidence family IA). Should state how many characters must change when a new password is created."
+            },
+            {
+              "artifact_type": "Password procedure or system settings for change of characters",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. No tenant setting CES reads holds a change-of-character rule, so this rests on documents."
+            },
+            {
+              "artifact_type": "Identity administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask what the change-of-character rule is and which systems can enforce it."
+            }
+          ]
+        },
+        {
+          "id": "IA.L2-3.5.7[c]",
+          "determination": "minimum password complexity requirements as defined are enforced when new passwords are created",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Device password settings",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry IA.L2-3.5.7 (passwordComplexityEvaluator): Graph /policies/authenticationMethodsPolicy and /deviceManagement/deviceCompliancePolicies. The evaluator compares passwordMinimumLength on compliance and configuration policies with the organization's value (default 12); the authentication methods policy does not hold it."
+            },
+            {
+              "artifact_type": "Password policy compliance record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps C-09 Password Policy Compliance; registered against IA.L2-3.5.7 (objective [c])."
+            },
+            {
+              "artifact_type": "Password rule test",
+              "ces_source": "interview",
+              "notes": "Ask an administrator to set a too-short or too-simple password on a test account and a test device and show it refused; reconcile the policy, planned and tenant values."
+            }
+          ]
+        },
+        {
+          "id": "IA.L2-3.5.7[d]",
+          "determination": "minimum password change of character requirements as defined are enforced when new passwords are created",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "System settings enforcing change of characters",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector, for any system that can enforce the rule. CES reads no tenant setting for change of characters."
+            },
+            {
+              "artifact_type": "Identification and authentication policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/identification-authentication-policy.md (GateEvidence family IA). Should say which systems enforce the change-of-character rule."
+            },
+            {
+              "artifact_type": "Password change test",
+              "ces_source": "interview",
+              "notes": "Ask an administrator to change a test password by one character and show whether it is refused."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "IA.L2-3.5.8",
+      "title": "Prohibit password reuse for a specified number of generations.",
+      "approach": {
+        "what_assessor_does": "The assessor reads the policy for how many previous passwords a user may not reuse, then checks that the setting is enforced wherever passwords are kept: device compliance or configuration policies, local accounts, and any system outside the directory. They interview the administrator about how cloud accounts handle reuse. Testing means changing a test account's password back to a recent one and seeing it refused.",
+        "common_failure_modes": [
+          "The number of generations is not specified, or the policy and settings disagree.",
+          "The history setting is enforced on some devices or systems but not others.",
+          "Systems with local passwords have no history setting at all."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "IA.L2-3.5.8[a]",
+          "determination": "the number of generations during which a password cannot be reused is specified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Identification and authentication policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/identification-authentication-policy.md (GateEvidence family IA). Should state the number of previous passwords that may not be reused."
+            },
+            {
+              "artifact_type": "Planned password history parameter",
+              "ces_source": "eo_store",
+              "notes": "EO reads the policy inputs profile (policy-inputs-profile-*, Planner PolicyInputsOutput) for the organization-defined parameters; password_history_count (PI.ODP.005, recommended 24) serves 3.5.8."
+            },
+            {
+              "artifact_type": "Identity administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask what the history value is and confirm it matches the policy and the device settings."
+            }
+          ]
+        },
+        {
+          "id": "IA.L2-3.5.8[b]",
+          "determination": "reuse of passwords is prohibited during the specified number of generations",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Device password history settings",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry IA.L2-3.5.8 (passwordReuseEvaluator): Graph /policies/authenticationMethodsPolicy and /deviceManagement/deviceCompliancePolicies. The evaluator compares passwordPreviousPasswordBlockCount on compliance and configuration policies with the organization's value (default 24)."
+            },
+            {
+              "artifact_type": "Local and application password history settings",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector for systems outside the tenant that keep their own passwords."
+            },
+            {
+              "artifact_type": "Password reuse test",
+              "ces_source": "interview",
+              "notes": "Ask an administrator to reset a test account to a recent password and show it refused."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "IA.L2-3.5.9",
+      "title": "Allow temporary password use for system logons with an immediate change to a permanent password.\nAssessment Objective:\n[a] an immediate change to a permanent password is required when a temporary password is used for system logon.",
+      "approach": {
+        "what_assessor_does": "The assessor asks how temporary passwords are issued (new accounts, resets, help desk) and checks that each one forces a change to a permanent password at first sign-in. They read the reset procedure and the tenant settings for temporary access codes, and ask the help desk to walk through a reset. Testing means issuing a temporary password to a test account and confirming that the first sign-in demands a new password, and that the temporary one stops working.",
+        "common_failure_modes": [
+          "Temporary passwords issued by the help desk do not force a change at first sign-in.",
+          "Temporary access codes can be reused or last longer than the procedure allows.",
+          "The same starting password is given to every new account.",
+          "Systems outside the directory let users keep the temporary password."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "IA.L2-3.5.9[a]",
+          "determination": "an immediate change to a permanent password is required when a temporary password is used for system logon",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Temporary Access Pass settings",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry IA.L2-3.5.9 (temporaryPasswordEvaluator): Graph /policies/authenticationMethodsPolicy. When Temporary Access Pass is enabled the evaluator checks it is one-time use with a lifetime within the organization's value (default 480 minutes). When it is off, temporary passwords come from the user password profile, which no read carries."
+            },
+            {
+              "artifact_type": "Identification and authentication policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/identification-authentication-policy.md (GateEvidence family IA). Should require a change to a permanent password at first sign-in after any temporary password."
+            },
+            {
+              "artifact_type": "Password reset and onboarding procedure",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Should show the force-change option is always set when the help desk issues a password."
+            },
+            {
+              "artifact_type": "Help desk interview and reset test",
+              "ces_source": "interview",
+              "notes": "Ask the help desk to reset a test account; the first sign-in should demand a new password and the temporary one should then fail."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "IA.L2-3.5.10",
+      "title": "Store and transmit only cryptographically protected passwords.",
+      "approach": {
+        "what_assessor_does": "The assessor checks that passwords are never stored or sent in readable form. For storage they ask where passwords and secrets live (the directory, local accounts, application configuration, scripts, password managers) and how each is protected. For transmission they check that sign-in uses encrypted channels and that legacy protocols that send passwords in the clear are blocked. They interview administrators about service account and application secrets. Testing means looking for secrets in scripts or configuration files and confirming legacy authentication is refused.",
+        "common_failure_modes": [
+          "Service account passwords or application secrets are kept in scripts, spreadsheets or plain configuration files.",
+          "Legacy authentication is still allowed for some users or protocols.",
+          "Network devices or older applications accept passwords over unencrypted channels.",
+          "Application secrets never expire and are not rotated."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "IA.L2-3.5.10[a]",
+          "determination": "passwords are cryptographically protected in storage",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Application secret and certificate expiry scan",
+              "ces_source": "ao_row",
+              "notes": "AdminOps C-01 App Secret/Cert Expiry Alert: scans app registrations for expiring credentials; registered against IA.L2-3.5.10 (objective [a])."
+            },
+            {
+              "artifact_type": "Application secret rotation record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps C-02 App Secret Rotation: rotates application secrets into Key Vault; registered against IA.L2-3.5.10 (objective [a])."
+            },
+            {
+              "artifact_type": "Service account password rotation record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps C-06 Service Account Password Rotation: 90-day rotation with long passwords and a managed identity recommendation; registered against IA.L2-3.5.10 (objective [a])."
+            },
+            {
+              "artifact_type": "Identification and authentication policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/identification-authentication-policy.md (GateEvidence family IA). Should forbid storing passwords or secrets in readable form and name the approved vault."
+            },
+            {
+              "artifact_type": "Administrator interview and secret search",
+              "ces_source": "interview",
+              "notes": "Ask where service and application credentials are kept; look in a sample of scripts and configuration files for plain passwords."
+            }
+          ]
+        },
+        {
+          "id": "IA.L2-3.5.10[b]",
+          "determination": "passwords are cryptographically protected in transit",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Conditional Access rule that blocks basic sign-in protocols",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry IA.L2-3.5.10 (certBasedAuthEvaluator, which tests the legacy authentication block, not certificates): Graph /identity/conditionalAccess/policies and /policies/authenticationMethodsPolicy. An enabled policy must block legacy (basic) authentication for all users, since it sends the password in the clear."
+            },
+            {
+              "artifact_type": "Network device and application protocol settings",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector for systems outside the tenant: proof that sign-in uses encrypted channels only."
+            },
+            {
+              "artifact_type": "Network administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask which systems still accept passwords over unencrypted protocols and check a sample of sign-in logs for legacy clients."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "IA.L2-3.5.11",
+      "title": "Obscure feedback of authentication information.",
+      "approach": {
+        "what_assessor_does": "The assessor watches people sign in to the systems in scope and checks that passwords and codes are masked on screen and that error messages do not say which part was wrong. Most of this comes from the platform's sign-in pages, so the assessor also looks at any custom sign-in screen, local console, or line-of-business application the organization runs. CES does not test this in the tenant; it rests on observation and interview.",
+        "common_failure_modes": [
+          "A custom or line-of-business application shows the password as it is typed.",
+          "Error messages say whether the user name or the password was wrong.",
+          "Shared screens or kiosks show codes or passwords in clear view."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "IA.L2-3.5.11[a]",
+          "determination": "authentication information is obscured during the authentication process",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Conditional Access policies read",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry IA.L2-3.5.11 (sessionTerminationEvaluator): Graph /identity/conditionalAccess/policies. The evaluator does not test this objective; it reports it as inherited from the platform sign-in experience, per the customer responsibility matrix."
+            },
+            {
+              "artifact_type": "Customer responsibility matrix entry and custom sign-in screens",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: the provider's inheritance statement, plus screenshots of any custom or line-of-business sign-in screen."
+            },
+            {
+              "artifact_type": "Sign-in observation",
+              "ces_source": "interview",
+              "notes": "Watch a sampled user sign in to each system in scope; passwords and codes should be masked and errors should not say which part was wrong."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

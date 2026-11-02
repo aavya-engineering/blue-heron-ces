@@ -1,0 +1,53 @@
+controlId: "AU.L2-3.3.1"
+relatedControlIds:
+  - "SI.L2-3.14.6"
+  - "SI.L2-3.14.7"
+practiceStatement: Create and retain system audit logs and records to the extent needed to enable the monitoring, analysis,
+  investigation, and reporting of unlawful or unauthorized system activity.
+useCaseId: E-02
+useCaseTitle: "Unified Audit Log Health"
+domain: Audit & Logging
+priority: P4 Standard
+trigger: 'SCHEDULE: Daily'
+sodTier: Tier 1
+entraRolesRequired:
+- Security Reader
+- Reports Reader
+approvalRequired: false
+services:
+- name: Microsoft Purview Audit
+  purpose: Premium) -- UAL search and status
+- name: Microsoft Sentinel -- heartbeat analytics rule, Log Analytics workspace ingestion monitoring
+  purpose: ''
+- name: Azure Monitor -- Log Analytics workspace usage metrics
+  purpose: ''
+configurationSteps:
+  portalPath: //compliance.microsoft.us > Audit > Search. Set a 15-minute window for the current hour. Search with no filters.
+    Confirm results include records from at least Entra ID, Exchange, and SharePoint workloads.
+  powershellCmdlets: []
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/auditLogs/signIns?$top=1&$orderby=createdDateTime
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-e-audit/E-02/{year}/{month}/
+  format: JSON (KQL query results), CSV (UAL search sample)
+  filenamePattern: E-02_UALHealthCheck_{YYYYMMDD}_{HHmmss}_IngestionStatus.json
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |-
+    - Unified Audit Log in GCC High is enabled by default for M365 G5 tenants. However, confirm via `Get-AdminAuditLogConfig` as organizational policy changes can disable it.
+    - The `OfficeActivity` table in Sentinel ingests from the Office 365 data connector. In GCC High, this connector must be configured to point to the GCC High Office 365 instance (the data connector configuration in Sentinel automatically detects the cloud environment).
+    - Ingestion latency in GCC High may be slightly higher than commercial (typically 5-15 minutes vs. 2-10 minutes). Adjust the heartbeat detection threshold accor
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

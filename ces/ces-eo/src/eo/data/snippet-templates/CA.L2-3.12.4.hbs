@@ -1,0 +1,42 @@
+## Control {{controlId}}: Develop, Document, and Periodically Update System Security Plans
+
+**Implementation Status:** {{status}}
+
+This organization develops, documents, and maintains the System Security Plan within the {{tenantName}} M365 GCC High tenant through automated SSP generation, continuous monitoring, and periodic review documented in "SSP Maintenance Policy v1.0" maintained by {{variables.systemAdministrator}}.
+
+**SSP Content:**
+The System Security Plan describes:
+- **System Boundary:** M365 GCC High tenant ({{primaryDomain}}) including Exchange Online, SharePoint Online, Teams, Intune, Defender, and Entra ID
+- **Environment of Operation:** Microsoft Azure Government (GCC High) with FedRAMP High baseline inheritance
+- **Security Requirements:** Implementation status of all 110 CMMC Level 2 practices
+- **Interconnections:** Documented connections with external systems per CA.L2-3.12.2 and CA.L2-3.12.3
+
+{{#if secureScoresAvailable}}
+**SSP Metrics:**
+Current security posture: Secure Score **{{currentScore}}** / {{maxScore}} ({{percentage}}%) — referenced in SSP executive summary.
+{{/if}}
+
+**SSP Maintenance:**
+- **Update Triggers:** System changes, assessment findings, new CMMC guidance, organizational changes
+- **Annual Review:** Comprehensive SSP review and update at least annually
+- **Automated Generation:** Evidence Ops toolchain generates SSP control narratives from live assessment data
+- **Version Control:** SSP versions tracked with change history and approval signatures
+
+**Operational Procedure:**
+- **Action:** Annual SSP review and update; triggered updates upon significant changes; automated narrative generation
+- **Frequency:** Annual review, triggered updates as needed
+- **Responsible Party:** {{variables.systemAdministrator}}
+- **Documentation:** SSP Maintenance Policy v1.0, SSP Change Log
+
+**Review Frequency:** Annually by ISSO
+
+**Verification Method:** Examine current SSP document, revision history, change log, automated generation configuration, and annual review records.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

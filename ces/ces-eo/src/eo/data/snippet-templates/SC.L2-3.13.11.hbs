@@ -1,0 +1,45 @@
+## Control {{controlId}}: Employ FIPS-Validated Cryptography to Protect the Confidentiality of CUI at Rest
+
+**Implementation Status:** {{status}}
+
+This organization employs FIPS-validated cryptography to protect CUI at rest within the {{tenantName}} M365 GCC High tenant through BitLocker Drive Encryption on managed endpoints and Microsoft-managed encryption for cloud-stored data, administered by {{variables.systemAdministrator}}.
+
+{{#if bitLockerEnforced}}
+**Endpoint Encryption:**
+BitLocker Drive Encryption protects CUI at rest on {{deviceCount}} managed devices. Device compliance policies enforce full-disk encryption as a requirement for accessing organizational resources:
+{{#if devices}}
+{{#each devices}}
+- **{{displayName}}** ({{operatingSystem}}) — Compliant: {{#if isCompliant}}Yes{{else}}No{{/if}}
+{{/each}}
+{{/if}}
+{{else}}
+BitLocker encryption enforcement has not been confirmed across managed devices. Endpoint CUI-at-rest protection requires verification.
+{{/if}}
+
+{{#if compliancePolicyActive}}
+**Compliance Enforcement:**
+Intune compliance policy "{{policyName}}" requires BitLocker encryption on all managed endpoints. Non-compliant devices are blocked from accessing CUI resources via Conditional Access integration.
+{{#if policies}}
+{{#each policies}}
+- **{{displayName}}**{{#if description}} — {{description}}{{/if}}
+{{/each}}
+{{/if}}
+{{else}}
+Device compliance policies for encryption enforcement have not been configured.
+{{/if}}
+
+**Cloud Storage Encryption:**
+M365 GCC High encrypts all data at rest using AES-256 with FIPS 140-2 validated cryptographic modules. SharePoint Online, OneDrive for Business, and Exchange Online mailbox data are encrypted at the file and database levels.
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine BitLocker deployment status, Intune compliance policy configurations, device encryption reports, and Microsoft FIPS 140-2 validation certificates.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

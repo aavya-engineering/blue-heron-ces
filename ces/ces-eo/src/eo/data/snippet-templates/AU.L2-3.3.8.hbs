@@ -1,0 +1,43 @@
+## Control {{controlId}}: Protect Audit Information and Audit Logging Tools from Unauthorized Access, Modification, and Deletion
+
+**Implementation Status:** {{status}}
+
+This organization protects audit information within the {{tenantName}} M365 GCC High tenant through role-based access control restricting log management to authorized security personnel, managed by {{variables.systemAdministrator}}.
+
+{{#if roleAssignmentsConfigured}}
+**Access Restrictions:**
+Audit log access is restricted to {{roleAssignmentsCount}} privileged role assignments:
+{{#if assignments}}
+{{#each assignments}}
+- **{{principalDisplayName}}** — Role: {{roleDefinitionName}} (Scope: {{scope}})
+{{/each}}
+{{/if}}
+
+Only Security Administrator and Security Reader roles can view audit logs. Audit log deletion is not available to any tenant administrator — M365 audit data is immutable for its retention period.
+{{else}}
+Privileged role assignments for audit access have not been confirmed.
+{{/if}}
+
+**Audit Data Protection Controls:**
+- **Immutability:** M365 audit logs cannot be modified or deleted by tenant administrators during the retention period
+- **Encryption:** Audit data encrypted at rest (AES-256) and in transit (TLS 1.2+) within Microsoft-managed infrastructure
+- **Access Logging:** Access to audit logs is itself audited, creating a secondary audit trail
+- **Retention Enforcement:** Retention policies prevent premature deletion of audit records
+
+{{#if pimConfigured}}
+**Privileged Access to Audit Tools:**
+PIM requires just-in-time activation for roles with audit management access, ensuring audit tool access is time-bound and audited.
+{{/if}}
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine role assignments for audit access, audit log immutability settings, encryption configurations, and PIM activation logs for security administrator roles.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

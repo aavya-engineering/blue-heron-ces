@@ -1,0 +1,49 @@
+## Control {{controlId}}: Limit Management of Audit Logging Functionality to a Subset of Privileged Users
+
+**Implementation Status:** {{status}}
+
+This organization limits audit logging management within the {{tenantName}} M365 GCC High tenant to designated security administrators through role-based access control and PIM, managed by {{variables.systemAdministrator}}.
+
+{{#if roleAssignmentsConfigured}}
+**Audit Management Authorization:**
+Only the following privileged role holders can manage audit logging functionality:
+{{#if assignments}}
+{{#each assignments}}
+- **{{principalDisplayName}}** — Role: {{roleDefinitionName}} (Scope: {{scope}})
+{{/each}}
+{{/if}}
+
+Audit logging configuration (retention periods, audit categories, diagnostic settings) is restricted to Security Administrator and Compliance Administrator roles. Standard administrators cannot modify audit configurations.
+{{else}}
+Privileged role assignments for audit management have not been confirmed.
+{{/if}}
+
+{{#if pimConfigured}}
+**Just-in-Time Audit Management:**
+PIM enforces time-bound access for audit management roles:
+{{#if policies}}
+{{#each policies}}
+- **{{roleDisplayName}}** — Approval required: {{#if approvalRequired}}Yes{{else}}No{{/if}}, MFA required: {{#if mfaRequired}}Yes{{else}}No{{/if}}
+{{/each}}
+{{/if}}
+
+Administrators must activate security roles through PIM before modifying audit configurations, creating an approval chain and audit trail for every change to logging settings.
+{{else}}
+PIM has not been configured. Audit management access relies on static role assignments.
+{{/if}}
+
+**Separation of Duties:**
+Audit logging management roles are separated from operational administration roles, preventing administrators from disabling audit trails of their own activities.
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine role assignments for audit management, PIM activation logs, separation of duties documentation, and audit configuration change logs.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

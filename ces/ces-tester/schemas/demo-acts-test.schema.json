@@ -1,0 +1,168 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ces.local/schemas/demo-acts-test.schema.json",
+  "title": "demo:acts-test report",
+  "description": "The roll-up artifact written by `demo:acts-test` to runs/acts-test/<runId>/acts-report.json. Every finding carries a failureClass so an honest act-red is distinguishable from a harness defect.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "runId",
+    "startedAt",
+    "endedAt",
+    "tier",
+    "exitCode",
+    "docs",
+    "groups",
+    "findings"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "minimum": 1 },
+    "runId": { "type": "string", "minLength": 1 },
+    "startedAt": { "type": "string" },
+    "endedAt": { "type": "string" },
+    "tier": { "enum": ["docs-only", "quick", "full", "act"] },
+    "exitCode": { "type": "integer", "enum": [0, 1, 2] },
+    "docs": { "$ref": "#/definitions/docsReport" },
+    "groups": { "type": "array", "items": { "$ref": "#/definitions/actGroupReport" } },
+    "findings": { "type": "array", "items": { "$ref": "#/definitions/finding" } },
+    "pacing": { "$ref": "#/definitions/pacingReport" }
+  },
+  "definitions": {
+    "failureClass": {
+      "description": "act-red is an honest broken act; harness-defect is a broken harness and fails the tier floor on its own.",
+      "enum": ["act-red", "doc-drift", "pace", "environment", "harness-defect"]
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule", "severity", "failureClass", "subject", "message"],
+      "properties": {
+        "rule": { "type": "string", "minLength": 1 },
+        "severity": { "enum": ["fail", "warn"] },
+        "failureClass": { "$ref": "#/definitions/failureClass" },
+        "subject": { "type": "string" },
+        "message": { "type": "string" },
+        "line": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "docsReport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dossierPath",
+        "entryCount",
+        "failCount",
+        "warnCount",
+        "skipped",
+        "findings"
+      ],
+      "properties": {
+        "dossierPath": { "type": "string" },
+        "entryCount": { "type": "integer", "minimum": 0 },
+        "failCount": { "type": "integer", "minimum": 0 },
+        "warnCount": { "type": "integer", "minimum": 0 },
+        "skipped": { "type": "array", "items": { "type": "string" } },
+        "findings": { "type": "array", "items": { "$ref": "#/definitions/finding" } }
+      }
+    },
+    "checkResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "status", "detail"],
+      "properties": {
+        "id": { "type": "string" },
+        "status": { "enum": ["pass", "fail", "skipped"] },
+        "detail": { "type": "string" },
+        "evidence": {
+          "type": "object",
+          "additionalProperties": {
+            "type": ["string", "number", "boolean"]
+          }
+        }
+      }
+    },
+    "opMeasurement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["index", "opId", "mode", "ms", "status"],
+      "properties": {
+        "index": { "type": "integer", "minimum": 0 },
+        "opId": { "type": "string" },
+        "mode": { "type": "string" },
+        "ms": { "type": "number", "minimum": 0 },
+        "status": { "enum": ["done", "failed"] },
+        "error": { "type": "string" }
+      }
+    },
+    "actGroupReport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "groupId",
+        "status",
+        "opIds",
+        "expectedPorts",
+        "armedPorts",
+        "armMs",
+        "ops",
+        "artifacts",
+        "checks",
+        "findings",
+        "portsFreeAfter",
+        "log"
+      ],
+      "properties": {
+        "groupId": { "type": "string" },
+        "status": { "enum": ["pass", "failed", "skipped"] },
+        "opIds": { "type": "array", "items": { "type": "string" } },
+        "expectedPorts": { "type": "array", "items": { "type": "integer" } },
+        "armedPorts": { "type": "array", "items": { "type": "integer" } },
+        "armMs": { "type": ["number", "null"] },
+        "ops": { "type": "array", "items": { "$ref": "#/definitions/opMeasurement" } },
+        "artifacts": { "type": "array", "items": { "type": "string" } },
+        "checks": { "type": "array", "items": { "$ref": "#/definitions/checkResult" } },
+        "findings": { "type": "array", "items": { "$ref": "#/definitions/finding" } },
+        "portsFreeAfter": { "type": ["boolean", "null"] },
+        "log": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "pacingMeasurement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "opId",
+        "catalogMs",
+        "measuredMs",
+        "suggestMs",
+        "verdict",
+        "dossierClaimsMs",
+        "completed"
+      ],
+      "properties": {
+        "opId": { "type": "string" },
+        "catalogMs": { "type": "number" },
+        "measuredMs": { "type": ["number", "null"] },
+        "suggestMs": { "type": ["number", "null"] },
+        "verdict": { "enum": ["ok", "slow", "fast", "unmeasured"] },
+        "dossierClaimsMs": { "type": "array", "items": { "type": "number" } },
+        "completed": { "type": "boolean" }
+      }
+    },
+    "pacingReport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["measurements", "catalogDelta"],
+      "properties": {
+        "measurements": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/pacingMeasurement" }
+        },
+        "catalogDelta": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/pacingMeasurement" }
+        }
+      }
+    }
+  }
+}

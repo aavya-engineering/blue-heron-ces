@@ -1,0 +1,61 @@
+controlId: "SC.L1-3.13.1"
+relatedControlIds:
+  - "SC.L1-3.13.5"
+  - "SC.L2-3.13.6"
+  - "AC.L2-3.1.3"  # [VERIFY] mapping not yet confirmed
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: F-06
+useCaseTitle: "Resource Firewall/NSG Audit"
+domain: Security Operations
+priority: P4 Standard
+trigger: 'SCHEDULE: Quarterly'
+sodTier: Tier 1 (per SoD model in front matter)
+entraRolesRequired:
+- Security Reader
+- 'Reports Reader (Azure: Reader role on target subscriptions)'
+approvalRequired: false
+services:
+- name: Azure Portal
+  purpose: '`portal.azure.us`) -- Network Security Groups, Storage Accounts, Key Vaults, SQL Servers'
+- name: Azure Resource Graph -- programmatic resource firewall queries
+  purpose: ''
+- name: Azure CLI -- resource-specific firewall configuration retrieval
+  purpose: ''
+- name: Microsoft Sentinel -- Log Analytics for audit aggregation
+  purpose: ''
+- name: Azure Immutable Blob Storage -- evidence artifact storage
+  purpose: ''
+configurationSteps:
+  portalPath: //portal.azure.us > Network Security Groups. For each NSG, review inbound rules and confirm no rule has Source
+    = * and Action = Allow (deny-by-default).
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes Directory.Read.All
+  graphApiEndpoint: ''
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-f-security/F-06/2026/03/
+  format: CSV
+  filenamePattern: F-06_FirewallAudit_{YYYYMMDD}_{HHmmss}_Findings.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |-
+    - Azure Resource Graph queries and ARM REST API endpoints are fully available in Azure Government. Use `management.usgovcloudapi.net` as the base URL.
+    - NSG, Storage, Key Vault, and SQL Server firewall configurations behave identically in Azure Government and commercial Azure. No feature parity gaps.
+    - Private Endpoint availability may vary by Azure Government region for newer resource types. Verify Private Endpoint support for each resource type in your Azure Government region before mandating private-only access.
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

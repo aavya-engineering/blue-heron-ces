@@ -1,0 +1,43 @@
+## Control {{controlId}}: Limit Access to CUI on System Media to Authorized Users
+
+**Implementation Status:** {{status}}
+
+This organization limits access to CUI on system media within the {{tenantName}} M365 GCC High tenant through role-based access control, sensitivity labels, and device configuration restrictions managed by {{variables.accessControlAdministrator}}.
+
+{{#if dlpLabelsConfigured}}
+**Sensitivity-Based Access Control:**
+{{dlpLabelsCount}} sensitivity labels enforce access restrictions on CUI media:
+{{#each labels}}
+- **{{name}}**{{#if isActive}} (Active){{else}} (Inactive){{/if}} — Priority: {{priority}}
+{{/each}}
+
+Labels restrict access to authorized users only, preventing unauthorized viewing, copying, or forwarding of labeled content.
+{{else}}
+Sensitivity label access controls have not been configured.
+{{/if}}
+
+{{#if cuiGroupExists}}
+**CUI Authorization:**
+The "{{groupDisplayName}}" security group ({{memberCount}} members) defines the authorized population for CUI media access. Only group members can access CUI-labeled content.
+{{/if}}
+
+{{#if deviceConfigurationsActive}}
+**Removable Media Restrictions:**
+{{deviceConfigurationsCount}} device configuration policies restrict USB and removable media access:
+- USB storage blocked or restricted to read-only on managed endpoints
+- Removable media requires encryption before CUI transfer
+- External storage device access logged for audit purposes
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Examine sensitivity label access policies, CUI group membership, device USB restriction configurations, and removable media access logs.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

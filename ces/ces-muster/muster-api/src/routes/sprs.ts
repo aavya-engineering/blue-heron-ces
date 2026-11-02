@@ -1,0 +1,43 @@
+// SPDX-FileCopyrightText: Blue Heron Defense LLC and its licensors. All rights reserved.
+// SPDX-License-Identifier: LicenseRef-BHD-Proprietary
+// CONFIDENTIAL - TRADE SECRET. Unpublished work. Provided solely to perform work for Blue Heron Defense LLC at its direction.
+// Any other use, copying, disclosure, or reuse, in whole or in part, is prohibited.
+// Changes made to this file for Blue Heron Defense LLC are made on its behalf; it claims all rights in them.
+// Submitting a change to this repository means you accept TERMS.md.
+// Removing or altering this notice is prohibited (17 U.S.C. 1202). Ref: BHD-CES-MUSTER-2026A
+// See LICENSE and TERMS.md.
+
+import { Router } from 'express';
+import { z } from 'zod';
+import { bearerAuth } from '../middleware/auth.js';
+import { computeSprs } from '../services/sprsCalc.js';
+
+const requirementResultSchema = z.object({
+  requirement_id: z.string(),
+  status: z.string(),
+});
+
+const scoreBodySchema = z.object({
+  requirement_results: z.array(requirementResultSchema),
+});
+
+const router = Router();
+
+// POST /sprs/score — any authenticated role
+// Body: { requirement_results: Array<{ requirement_id: string; status: string }> }
+// Returns: { sprs: number; assessed_count: number; deductions: Array<{ requirement_id: string; weight: number }> }
+router.post('/score', bearerAuth, (req, res, next) => {
+  try {
+    const result = scoreBodySchema.safeParse(req.body);
+    if (!result.success) {
+      res.status(400).json({ error: result.error.flatten() });
+      return;
+    }
+    const sprsResult = computeSprs(result.data.requirement_results);
+    res.json(sprsResult);
+  } catch (err) {
+    next(err);
+  }
+});
+
+export default router;

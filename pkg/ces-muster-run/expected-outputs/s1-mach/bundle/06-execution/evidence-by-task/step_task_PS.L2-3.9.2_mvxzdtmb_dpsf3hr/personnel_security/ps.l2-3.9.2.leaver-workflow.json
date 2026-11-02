@@ -1,0 +1,63 @@
+{
+  "rawResponse": "",
+  "outcome": "failed_no_remediation",
+  "outcomeRationale": "SET/verification failed: PS.L2-3.9.2.leaver-workflow: verification failed on existing resource — Evidence validation failed",
+  "failureDiagnostics": {
+    "rootCause": "exit_code_0",
+    "failureCategory": "FATAL",
+    "remediationSteps": [
+      "Review command output and stderr for specific error details",
+      "Check M365 GCC High service health dashboard",
+      "Consult PowerShell module documentation for the failing command"
+    ],
+    "exitCode": 0,
+    "stderrTail": "",
+    "stdoutTail": "ount\":  0,\r\n    \"qualifyingLeaverWorkflowIds\":  [\r\n\r\n                                    ],\r\n    \"workflows\":  [\r\n                      {\r\n                          \"id\":  \"51510000-001f-4000-8000-000000000001\",\r\n                          \"displayName\":  \"S1 Joiner - prepare new staff account\",\r\n                          \"category\":  \"joiner\",\r\n                          \"isEnabled\":  true,\r\n                          \"isSchedulingEnabled\":  true,\r\n                          \"accountRemovalTask\":  false,\r\n                          \"tasks\":  [\r\n                                        {\r\n                                            \"taskDefinitionId\":  \"51510000-001d-4000-8000-000000000001\",\r\n                                            \"displayName\":  \"Generate Temporary Access Pass and send to manager\",\r\n                                            \"isEnabled\":  true\r\n                                        },\r\n                                        {\r\n                                            \"taskDefinitionId\":  \"51510000-001d-4000-8000-000000000002\",\r\n                                            \"displayName\":  \"Add user to groups\",\r\n                                            \"isEnabled\":  true\r\n                                        }\r\n                                    ]\r\n                      },\r\n                      {\r\n                          \"id\":  \"51510000-001f-4000-8000-000000000002\",\r\n                          \"displayName\":  \"S1 Mover - review group access on department change\",\r\n                          \"category\":  \"mover\",\r\n                          \"isEnabled\":  true,\r\n                          \"isSchedulingEnabled\":  true,\r\n                          \"accountRemovalTask\":  false,\r\n                          \"tasks\":  [\r\n                                        {\r\n                                            \"taskDefinitionId\":  \"51510000-001d-4000-8000-000000000003\",\r\n                                            \"displayName\":  \"Remove user from selected groups\",\r\n                                            \"isEnabled\":  true\r\n                                        },\r\n                                        {\r\n                                            \"taskDefinitionId\":  \"51510000-001d-4000-8000-000000000002\",\r\n                                            \"displayName\":  \"Add user to groups\",\r\n                                            \"isEnabled\":  true\r\n                                        }\r\n                                    ]\r\n                      },\r\n                      {\r\n                          \"id\":  \"51510000-001f-4000-8000-000000000003\",\r\n                          \"displayName\":  \"S1 Leaver - disable account and remove access\",\r\n                          \"category\":  \"leaver\",\r\n                          \"isEnabled\":  true,\r\n                          \"isSchedulingEnabled\":  false,\r\n                          \"accountRemovalTask\":  true,\r\n                          \"tasks\":  [\r\n                                        {\r\n                                            \"taskDefinitionId\":  \"1dfdfcc7-52fa-4c2e-bf3a-e3919cc12950\",\r\n                                            \"displayName\":  \"Disable user account\",\r\n                                            \"isEnabled\":  true\r\n                                        },\r\n                                        {\r\n                                            \"taskDefinitionId\":  \"51510000-001d-4000-8000-000000000004\",\r\n                                            \"displayName\":  \"Remove user from all groups\",\r\n                                            \"isEnabled\":  true\r\n                                        },\r\n                                        {\r\n                                            \"taskDefinitionId\":  \"51510000-001d-4000-8000-000000000005\",\r\n                                            \"displayName\":  \"Remove all licenses for user\",\r\n                                            \"isEnabled\":  true\r\n                                        }\r\n                                    ]\r\n                      }\r\n                  ]\r\n}\r\n"
+  },
+  "complianceVerdict": "NOT_SAT",
+  "verdictRationale": "Outcome 'failed_no_remediation' indicates compliance requirement is not yet satisfied",
+  "verificationResult": {
+    "passed": false,
+    "confidence": "FAILED",
+    "score": 25,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": false
+    },
+    "reason": "Evidence validation failed"
+  },
+  "registryEntry": {
+    "entry_id": "PS.L2-3.9.2.leaver-workflow",
+    "label": "Verify a scheduled leaver lifecycle workflow that disables or deletes the account",
+    "engine": "mgraph",
+    "layer_hint": 7,
+    "sequence_hint": 54,
+    "idempotency": "safe",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "PS.L2-3.9.2"
+    ],
+    "get_command": "& { $wf = @(@((Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/identityGovernance/lifecycleWorkflows/workflows?$expand=tasks').value) | Where-Object { $_ } | ForEach-Object { $w = $_; $t = @(@($w.tasks) | Where-Object { $_ }); [pscustomobject]@{ id = $w.id; displayName = $w.displayName; category = $w.category; isEnabled = $w.isEnabled; isSchedulingEnabled = $w.isSchedulingEnabled; accountRemovalTask = (@($t | Where-Object { (@('1dfdfcc7-52fa-4c2e-bf3a-e3919cc12950','8d18588d-9ad3-4c0f-99d0-ec215f0e3dff') -contains $_.taskDefinitionId) -or ([string]$_.displayName -match 'Disable user account|Delete user account') }).Count -gt 0); tasks = @($t | ForEach-Object { [pscustomobject]@{ taskDefinitionId = $_.taskDefinitionId; displayName = $_.displayName; isEnabled = $_.isEnabled } }) } }); $q = @($wf | Where-Object { $_.category -eq 'leaver' -and $_.isEnabled -eq $true -and $_.isSchedulingEnabled -eq $true -and $_.accountRemovalTask }); [pscustomobject]@{ displayName = 'CES lifecycle workflow inventory'; workflowCount = $wf.Count; qualifyingLeaverWorkflowCount = $q.Count; qualifyingLeaverWorkflowIds = @($q | ForEach-Object { $_.id }); workflows = $wf } } | Where-Object { ($_.displayName -eq 'CES lifecycle workflow inventory') -or (($null -ne $_.qualifyingLeaverWorkflowCount -and [double]$_.qualifyingLeaverWorkflowCount -ge 1)) } | Sort-Object { $_.displayName -ne 'CES lifecycle workflow inventory' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
+    "set_command": "",
+    "evidence_commands": []
+  },
+  "metadata": {
+    "controlIds": [
+      "PS.L2-3.9.2"
+    ],
+    "timestamp": "2026-11-01T15:28:30.153Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[verify-only: SET not sent]",
+    "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "{\r\n    \"displayName\":  \"CES lifecycle workflow inventory\",\r\n    \"workflowCount\":  3,\r\n    \"qualifyingLeaverWorkflowCount\":  0,\r\n    \"qualifyingLeaverWorkflowIds\":  [\r\n\r\n                                    ],\r\n    \"workflows\":  [\r\n                      {\r\n                          \"id\":  \"51510000-001f-4000-8000-000000000001\",\r\n                          \"displayName\":  \"S1 Joiner - prepare new staff account\",\r\n                          \"category\":  \"joiner\",\r\n                          \"isEnabled\":  true,\r\n                          \"isSchedulingEnabled\":  true,\r\n                          \"accountRemovalTask\":  false,\r\n                          \"tasks\":  [\r\n                                        {\r\n                                            \"taskDefinitionId\":  \"51510000-001d-4000-8000-000000000001\",\r\n                                            \"displayName\":  \"Generate Temporary Access Pass and send to manager\",\r\n                                            \"isEnabled\":  true\r\n                                        },\r\n                                        {\r\n                                            \"taskDefinitionId\":  \"51510000-001d-4000-8000-000000000002\",\r\n                                            \"displayName\":  \"Add user to groups\",\r\n                                            \"isEnabled\":  true\r\n                                        }\r\n                                    ]\r\n                      },\r\n                      {\r\n                          \"id\":  \"51510000-001f-4000-8000-000000000002\",\r\n                          \"displayName\":  \"S1 Mover - review group access on department change\",\r\n                          \"category\":  \"mover\",\r\n                          \"isEnabled\":  true,\r\n                          \"isSchedulingEnabled\":  true,\r\n                          \"accountRemovalTask\":  false,\r\n                          \"tasks\":  [\r\n                                        {\r\n                                            \"taskDefinitionId\":  \"51510000-001d-4000-8000-000000000003\",\r\n                                            \"displayName\":  \"Remove user from selected groups\",\r\n                                            \"isEnabled\":  true\r\n                                        },\r\n                                        {\r\n                                            \"taskDefinitionId\":  \"51510000-001d-4000-8000-000000000002\",\r\n                                            \"displayName\":  \"Add user to groups\",\r\n                                            \"isEnabled\":  true\r\n                                        }\r\n                                    ]\r\n                      },\r\n                      {\r\n                          \"id\":  \"51510000-001f-4000-8000-000000000003\",\r\n                          \"displayName\":  \"S1 Leaver - disable account and remove access\",\r\n                          \"category\":  \"leaver\",\r\n                          \"isEnabled\":  true,\r\n                          \"isSchedulingEnabled\":  false,\r\n                          \"accountRemovalTask\":  true,\r\n                          \"tasks\":  [\r\n                                        {\r\n                                            \"taskDefinitionId\":  \"1dfdfcc7-52fa-4c2e-bf3a-e3919cc12950\",\r\n                                            \"displayName\":  \"Disable user account\",\r\n                                            \"isEnabled\":  true\r\n                                        },\r\n                                        {\r\n                                            \"taskDefinitionId\":  \"51510000-001d-4000-8000-000000000004\",\r\n                                            \"displayName\":  \"Remove user from all groups\",\r\n                                            \"isEnabled\":  true\r\n                                        },\r\n                                        {\r\n                                            \"taskDefinitionId\":  \"51510000-001d-4000-8000-000000000005\",\r\n                                            \"displayName\":  \"Remove all licenses for user\",\r\n                                            \"isEnabled\":  true\r\n                                        }\r\n                                    ]\r\n                      }\r\n                  ]\r\n}\r\n",
+    "stateChanged": false,
+    "postcheckMode": "state",
+    "lookupMatch": {
+      "basis": "name",
+      "object": "CES lifecycle workflow inventory"
+    }
+  }
+}

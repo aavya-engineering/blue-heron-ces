@@ -1,0 +1,80 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"S3 Safe Links - all users\",\r\n    \"Identity\":  \"S3 Safe Links - all users\",\r\n    \"Name\":  \"S3 Safe Links - all users\",\r\n    \"IsDefault\":  false,\r\n    \"EnableSafeLinksForEmail\":  true,\r\n    \"EnableSafeLinksForTeams\":  true,\r\n    \"EnableSafeLinksForOffice\":  true,\r\n    \"ScanUrls\":  true,\r\n    \"EnableForInternalSenders\":  true,\r\n    \"DeliverMessageAfterScan\":  true,\r\n    \"DisableUrlRewrite\":  false,\r\n    \"TrackClicks\":  true,\r\n    \"AllowClickThrough\":  false,\r\n    \"EnableOrganizationBranding\":  false,\r\n    \"WhenCreated\":  \"2025-10-17T00:00:00.000Z\",\r\n    \"WhenChanged\":  \"2026-07-04T00:00:00.000Z\",\r\n    \"IsValid\":  true\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Resource already exists — creation skipped (idempotent)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "existing equivalent 'S3 Safe Links - all users' verified by effect (4 conditions) (existing equivalent 'S3 Safe Links - all users' matched by effect)",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "existing equivalent 'S3 Safe Links - all users' verified by effect (4 conditions)"
+  },
+  "registryEntry": {
+    "entry_id": "SI.L2-3.14.3.safe-links",
+    "label": "Create Safe Links Policy with URL Scanning",
+    "engine": "exchange",
+    "layer_hint": 7,
+    "sequence_hint": 19,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "SI.L2-3.14.3"
+    ],
+    "get_command": "Get-SafeLinksPolicy | Where-Object { ($_.Name -eq 'CMMC-SafeLinks') -or (($_.IsDefault -ne $true) -and ($_.EnableSafeLinksForEmail -eq $true) -and ($_.ScanUrls -eq $true) -and ($_.EnableForInternalSenders -eq $true)) } | Sort-Object { $_.Name -ne 'CMMC-SafeLinks' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
+    "set_command": "New-SafeLinksPolicy -Name 'CMMC-SafeLinks' -EnableSafeLinksForEmail $true -ScanUrls $true -EnableForInternalSenders $true -DeliverMessageAfterScan $true | Out-Null; Get-SafeLinksPolicy -Identity 'CMMC-SafeLinks' | Select-Object Name | ConvertTo-Json",
+    "evidence_commands": []
+  },
+  "metadata": {
+    "controlIds": [
+      "SI.L2-3.14.3"
+    ],
+    "timestamp": "2026-11-01T06:58:38.564Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "New-SafeLinksPolicy -Name 'CMMC-SafeLinks' -EnableSafeLinksForEmail $true -ScanUrls $true -EnableForInternalSenders $true -DeliverMessageAfterScan $true | Out-Null; Get-SafeLinksPolicy -Identity 'CMMC-SafeLinks' | Select-Object Name | ConvertTo-Json",
+    "sha256Hash": "9359dac4d7e8fcbb69a6a54bc4de4a3cda6f329d3d80c17e07578c1568a3e75c",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "{\r\n    \"id\":  \"S3 Safe Links - all users\",\r\n    \"Identity\":  \"S3 Safe Links - all users\",\r\n    \"Name\":  \"S3 Safe Links - all users\",\r\n    \"IsDefault\":  false,\r\n    \"EnableSafeLinksForEmail\":  true,\r\n    \"EnableSafeLinksForTeams\":  true,\r\n    \"EnableSafeLinksForOffice\":  true,\r\n    \"ScanUrls\":  true,\r\n    \"EnableForInternalSenders\":  true,\r\n    \"DeliverMessageAfterScan\":  true,\r\n    \"DisableUrlRewrite\":  false,\r\n    \"TrackClicks\":  true,\r\n    \"AllowClickThrough\":  false,\r\n    \"EnableOrganizationBranding\":  false,\r\n    \"WhenCreated\":  \"2025-10-17T00:00:00.000Z\",\r\n    \"WhenChanged\":  \"2026-07-04T00:00:00.000Z\",\r\n    \"IsValid\":  true\r\n}\r\n",
+    "postcheckMode": "state",
+    "lookupMatch": {
+      "basis": "effect",
+      "object": "S3 Safe Links - all users",
+      "conditions": [
+        {
+          "path": "$.IsDefault",
+          "op": "not_equals",
+          "expected": true,
+          "observed": false,
+          "pass": true
+        },
+        {
+          "path": "$.EnableSafeLinksForEmail",
+          "op": "equals",
+          "expected": true,
+          "observed": true,
+          "pass": true
+        },
+        {
+          "path": "$.ScanUrls",
+          "op": "equals",
+          "expected": true,
+          "observed": true,
+          "pass": true
+        },
+        {
+          "path": "$.EnableForInternalSenders",
+          "op": "equals",
+          "expected": true,
+          "observed": true,
+          "pass": true
+        }
+      ]
+    }
+  }
+}

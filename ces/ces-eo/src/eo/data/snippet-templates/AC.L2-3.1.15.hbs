@@ -1,0 +1,35 @@
+## Control {{controlId}}: Authorize Remote Execution of Privileged Commands
+
+**Implementation Status:** {{status}}
+
+This organization authorizes remote execution of privileged commands and remote access to security-relevant information within the {{tenantName}} M365 GCC High tenant. Remote privileged command execution is controlled through Azure AD Privileged Identity Management (PIM) with time-bound elevation, approval workflows, and Conditional Access policies that enforce additional authentication for administrative operations.
+
+{{#if pimConfigured}}
+Privileged Identity Management requires explicit authorization before any remote execution of privileged commands. Administrators must request role activation through PIM, providing business justification for each elevation request. Activations are time-bound (maximum 8 hours) and require approval from a designated approver. All privileged command executions during active PIM sessions are logged and correlated with the activation request for audit trail completeness.
+{{else}}
+PIM approval workflows for privileged command execution have not been configured. Remote privileged access relies on persistent role assignments pending PIM implementation.
+{{/if}}
+
+{{#if conditionalAccessActive}}
+Conditional Access policies enforce additional authentication requirements for remote privileged operations, including device compliance verification and phishing-resistant authentication methods across {{caPoliciesTotalCount}} configured policies.
+{{/if}}
+
+{{#if infraResources}}
+Supporting infrastructure:
+{{#each infraResources}}
+- {{resourceType}} "{{name}}"{{#if properties.retention_days}} (retention: {{properties.retention_days}} days){{/if}}
+{{/each}}
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Review PIM activation logs for remote privileged sessions, approval workflow records, Conditional Access policies for privileged operations, and audit logs for privileged command execution.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

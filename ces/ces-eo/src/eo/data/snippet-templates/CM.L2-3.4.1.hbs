@@ -1,0 +1,51 @@
+## Control {{controlId}}: Establish and Maintain Baseline Configurations and Inventories of Organizational Systems
+
+**Implementation Status:** {{status}}
+
+This organization establishes and maintains baseline configurations and system inventories within the {{tenantName}} M365 GCC High tenant through Microsoft Intune device configuration profiles and software inventory managed by {{variables.systemAdministrator}}.
+
+{{#if deviceConfigurationsActive}}
+**Baseline Configuration Profiles:**
+{{deviceConfigurationsCount}} device configuration profiles define security baselines for managed endpoints:
+{{#if configurations}}
+{{#each configurations}}
+- **{{displayName}}** ({{platformType}}){{#if description}} — {{description}}{{/if}} — Assigned to {{assignmentCount}} groups
+{{/each}}
+{{/if}}
+
+Configuration baselines are version-controlled through Intune and updated per change management procedures. Each profile enforces security settings (firewall, antivirus, encryption, password policy) aligned with DISA STIGs and CIS benchmarks.
+{{else}}
+Device configuration baselines have not been established. Endpoint security configuration management is not verified.
+{{/if}}
+
+{{#if detectedAppsMonitored}}
+**Software Inventory:**
+{{detectedAppsCount}} applications detected across the managed device fleet:
+{{#if apps}}
+{{#each apps}}
+- **{{displayName}}** v{{version}} — Publisher: {{publisher}} — Installed on {{deviceCount}} devices
+{{/each}}
+{{/if}}
+
+Software inventory is continuously updated through Intune agent reporting, providing real-time visibility into installed applications across all managed endpoints.
+{{else}}
+Software inventory tracking has not been confirmed through Intune application detection.
+{{/if}}
+
+{{#if bitLockerEnforced}}
+**Hardware Inventory:**
+{{deviceCount}} managed devices are inventoried with hardware details (model, serial number, OS version, compliance status) tracked through Intune device management.
+{{/if}}
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine Intune device configuration profiles, software inventory reports, hardware asset inventory, and baseline version history.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

@@ -1,0 +1,62 @@
+controlId: "SC.L2-3.13.8"
+relatedControlIds:
+  - "SC.L1-3.13.1"
+  - "MP.L2-3.8.1"
+  - "MP.L2-3.8.5"  # [VERIFY] mapping not yet confirmed
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: D-06
+useCaseTitle: "Email Encryption & Transport Rules"
+domain: Data Protection & Information Management
+priority: P3 Medium
+trigger: 'SCHEDULE: Monthly'
+sodTier: Tier 2 -- Config Manager
+entraRolesRequired:
+- Exchange Administrator
+- Compliance Administrator
+approvalRequired: false
+services:
+- name: Exchange Admin Center
+  purpose: '`https://admin.exchange.microsoft.us`'
+- name: Exchange Online PowerShell
+  purpose: ''
+- name: Microsoft Purview Compliance Portal
+  purpose: '`https://compliance.microsoft.us`) -- sensitivity label encryption settings'
+- name: Azure Information Protection
+  purpose: IRM integration
+- name: Office Message Encryption
+  purpose: OME) templates
+configurationSteps:
+  portalPath: //admin.exchange.microsoft.us > **Mail flow** > **Rules**.
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes InformationProtectionPolicy.Read
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/admin/exchange/transportRules
+  graphApiPayloadExample: {}
+  requiredPermissions:
+  - InformationProtectionPolicy.Read.All
+  - Exchange.ManageAsApp [VERIFY]
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-d-dataprotection/D-06/2026/03/
+  format: CSV (transport rule inventory), JSON (IRM config, OME config, audit report)
+  filenamePattern: D-06_EmailEncryption_{YYYYMMDD}_{HHmmss}_Monthly.json
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://admin.exchange.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |-
+    - Exchange Admin Center in GCC High uses `https://admin.exchange.microsoft.us`. `[VERIFY]` -- confirm the exact URL in your tenant, as some GCC High tenants may use a variant.
+    - `Connect-ExchangeOnline` must use `-ExchangeEnvironmentName O365USGovGCCHigh`.
+    - IRM/OME encryption in GCC High uses the Azure Government Azure Rights Management service. Verify `Get-IRMConfiguration` shows `AzureRMSLicensingEnabled: True`.
+    - OME templates in GCC High function identically to commercial. The `SocialIdSignIn` option (allowing Google/Yahoo authentication for external recipients) should be evaluated for CU
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

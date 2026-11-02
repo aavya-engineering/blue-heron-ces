@@ -1,0 +1,52 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"deviceConfiguration-9\",\r\n    \"createdDateTime\":  \"2026-11-01T16:06:05.437Z\",\r\n    \"@odata.type\":  \"#microsoft.graph.windowsUpdateForBusinessConfiguration\",\r\n    \"automaticUpdateMode\":  \"autoInstallAndRebootAtScheduledTime\",\r\n    \"qualityUpdatesDeferralPeriodInDays\":  0,\r\n    \"businessReadyUpdatesOnly\":  \"all\",\r\n    \"featureUpdatesDeferralPeriodInDays\":  14,\r\n    \"displayName\":  \"CMMC-UpdateRing-Standard\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceConfiguration-9_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ],\r\n    \"isAssigned\":  true\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Resource already exists — creation skipped (idempotent)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Already compliant — state unchanged, evidence confirms resource exists",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "Already compliant — state unchanged, evidence confirms resource exists"
+  },
+  "registryEntry": {
+    "entry_id": "RA.L2-3.11.3.vuln-remediation",
+    "label": "Verify the CMMC update ring (zero-day security update deferral)",
+    "engine": "mgraph",
+    "layer_hint": 2,
+    "sequence_hint": 5,
+    "idempotency": "safe",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "RA.L2-3.11.3"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations?$expand=assignments').value | Where-Object { ($_.displayName -eq 'CMMC-UpdateRing-Standard') -or ((@('#microsoft.graph.windowsUpdateForBusinessConfiguration') -contains $_.'@odata.type') -and ($null -ne $_.qualityUpdatesDeferralPeriodInDays -and [double]$_.qualityUpdatesDeferralPeriodInDays -ge 0) -and ($null -ne $_.qualityUpdatesDeferralPeriodInDays -and [double]$_.qualityUpdatesDeferralPeriodInDays -le 0) -and ($null -ne $_.featureUpdatesDeferralPeriodInDays -and [double]$_.featureUpdatesDeferralPeriodInDays -ge 0) -and ($null -ne $_.featureUpdatesDeferralPeriodInDays -and [double]$_.featureUpdatesDeferralPeriodInDays -le 14) -and (@('autoInstallAtMaintenanceTime','autoInstallAndRebootAtMaintenanceTime','autoInstallAndRebootAtScheduledTime','autoInstallAndRebootWithoutEndUserControl') -contains $_.automaticUpdateMode) -and (@($_.assignments | Where-Object { $_ }).Count -gt 0)) } | Sort-Object { $_.displayName -ne 'CMMC-UpdateRing-Standard' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
+    "set_command": "",
+    "evidence_commands": [
+      "Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations?$filter=displayName eq ''CMMC-Windows-Update-Policy''' | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "RA.L2-3.11.3"
+    ],
+    "timestamp": "2026-11-01T16:06:06.713Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[verify-only: SET not sent]",
+    "sha256Hash": "036fa991832542349a0c82c70ff64056e2586c7032d4d6ec79b4564b6a9eb89e",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "{\r\n    \"id\":  \"deviceConfiguration-9\",\r\n    \"createdDateTime\":  \"2026-11-01T16:06:05.437Z\",\r\n    \"@odata.type\":  \"#microsoft.graph.windowsUpdateForBusinessConfiguration\",\r\n    \"automaticUpdateMode\":  \"autoInstallAndRebootAtScheduledTime\",\r\n    \"qualityUpdatesDeferralPeriodInDays\":  0,\r\n    \"businessReadyUpdatesOnly\":  \"all\",\r\n    \"featureUpdatesDeferralPeriodInDays\":  14,\r\n    \"displayName\":  \"CMMC-UpdateRing-Standard\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceConfiguration-9_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ],\r\n    \"isAssigned\":  true\r\n}\r\n",
+    "postcheckMode": "state",
+    "lookupMatch": {
+      "basis": "name",
+      "object": "CMMC-UpdateRing-Standard"
+    }
+  }
+}

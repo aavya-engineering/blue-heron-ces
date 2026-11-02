@@ -1,0 +1,395 @@
+{
+  "ces": {
+    "artifact": "manual_mission_plan",
+    "version": "1.0.0",
+    "generated_on": "2026-03-07",
+    "intent": "Infra fixture for dry-run CI testing — 6 steps covering Azure GCC High CMMC L2 enclave provisioning"
+  },
+  "inputs": {
+    "si_baseline": {},
+    "readiness_posture": {
+      "snapshot_id": "snap-infra-001",
+      "as_of_date": "2026-03-07",
+      "control_status_summary": {
+        "level": "L2",
+        "met": 0,
+        "partial": 0,
+        "not_met": 6,
+        "unknown": 0
+      },
+      "key_findings": [
+        {
+          "id": "F-INFRA-001",
+          "control_id": "SC.L2-3.13.1",
+          "title": "No Azure enclave provisioned",
+          "status": "NOT_MET",
+          "severity": "high",
+          "evidence_gaps": ["No resource group exists"],
+          "recommended_actions": ["Run infra provisioning plan"]
+        }
+      ],
+      "constraints": {
+        "time": "5 days",
+        "budget": "$20,000",
+        "tooling": ["Azure Government subscription"],
+        "staffing": "1 engineer"
+      }
+    },
+    "authoritative_sources": {
+      "government": [
+        {
+          "id": "cmmc-model-v2",
+          "title": "CMMC Model v2.0",
+          "url": "https://dodcio.defense.gov/CMMC/",
+          "type": "government",
+          "version": "2.0"
+        }
+      ],
+      "nist": [
+        {
+          "id": "nist-800-171-r2",
+          "title": "NIST SP 800-171 Rev 2",
+          "url": "https://csrc.nist.gov/publications/detail/sp/800-171/rev-2/final",
+          "type": "nist",
+          "version": "Rev 2"
+        }
+      ]
+    },
+    "vendor_capability_packages": [
+      {
+        "tech_stack_id": 1,
+        "name": "Microsoft Azure Government",
+        "vendor": "Microsoft",
+        "fedramp_level": "High",
+        "package_ref": "azure-government-gcc-high"
+      }
+    ],
+    "assessor_knowledge": {
+      "assessor_approach_ref": "ces-assessor-approach-v1",
+      "assessor_evidence_matrix_ref": "ces-evidence-matrix-v1",
+      "design_for_assessment_rules": [
+        {
+          "id": "DFA-001",
+          "title": "Evidence must be machine-generated",
+          "rule": "Prefer automated evidence over screenshots",
+          "verification": "Check evidence collector field",
+          "sources": ["cmmc-assessment-guide-l2"]
+        }
+      ]
+    }
+  },
+  "outputs": {
+    "human_readable_mission_plan": {
+      "plan_id": "infra-gcch-l2-001",
+      "plan_mode": "build_new",
+      "target_level": "L2",
+      "milestones": [
+        {
+          "id": "MS-INFRA-1",
+          "name": "Azure Enclave Provisioned",
+          "objective": "All 6 infra provisioning steps completed",
+          "exit_criteria": [
+            "Resource group exists in usgovvirginia",
+            "Log Analytics Workspace active with 90-day retention",
+            "Key Vault deployed with soft-delete and purge protection",
+            "VNet and NSG configured with deny-all baseline",
+            "Sentinel onboarded with CMMC analytics rules",
+            "Diagnostic settings active on all resources"
+          ],
+          "target_date": "2026-03-14"
+        }
+      ],
+      "steps": [
+        {
+          "id": "INFRA-001",
+          "title": "Provision Azure Resource Group and Foundation Controls",
+          "task_type": "configuration",
+          "priority": "p0",
+          "control_coverage": [
+            {
+              "control_id": "SC.L2-3.13.1",
+              "support_type": "Configurable",
+              "gap_rationale": "No Azure resource group or subscription context established"
+            }
+          ],
+          "what_to_do": [
+            "Set Azure subscription context for GCC High tenant",
+            "Create Azure resource group in usgovvirginia",
+            "Assign CMMC L2 built-in policy initiative to subscription",
+            "Enable Microsoft Defender for Cloud P2 across all resource types"
+          ],
+          "how_to_verify": [
+            "Get-AzResourceGroup -Name {resourceGroup}",
+            "Get-AzPolicyAssignment -Name 'CMMC-L2-Initiative' -Scope '/subscriptions/{subscriptionId}'",
+            "Get-AzSecurityPricing | Select-Object Name,PricingTier"
+          ],
+          "vendor_help_refs": [
+            {
+              "vendor": "Microsoft",
+              "product": "Azure Government",
+              "title": "Azure Policy built-in initiative for CMMC L2"
+            }
+          ],
+          "expected_artifacts": [
+            {
+              "artifact_id": "ART-INFRA-RG-001",
+              "artifact_type": "config_export",
+              "description": "Resource group configuration export with tags and policy assignment",
+              "collector": "powershell",
+              "retention_days": 365,
+              "storage_location_ref": "evidence/infra/foundation/"
+            }
+          ],
+          "manual_completion_criteria": [
+            "Resource group exists in usgovvirginia",
+            "CMMC L2 policy initiative assigned at subscription scope",
+            "Defender for Cloud P2 enabled on all resource types"
+          ],
+          "dependencies": []
+        },
+        {
+          "id": "INFRA-002",
+          "title": "Deploy Log Analytics Workspace and Immutable Log Storage",
+          "task_type": "configuration",
+          "priority": "p0",
+          "control_coverage": [
+            {
+              "control_id": "AU.L2-3.3.1",
+              "support_type": "Configurable",
+              "gap_rationale": "No centralized logging workspace or immutable log storage exists"
+            }
+          ],
+          "what_to_do": [
+            "Create Log Analytics Workspace with 90-day retention in usgovvirginia",
+            "Create storage account with HTTPS-only, TLS 1.2 minimum, no public blob access",
+            "Configure immutability policy on logs container with 90-day lock"
+          ],
+          "how_to_verify": [
+            "Get-AzOperationalInsightsWorkspace -ResourceGroupName {resourceGroup} -Name 'law-{resourceGroup}-cmmc'",
+            "Get-AzStorageContainerImmutabilityPolicy -ResourceGroupName {resourceGroup} -StorageAccountName {storageAccountName} -ContainerName 'logs'"
+          ],
+          "vendor_help_refs": [
+            {
+              "vendor": "Microsoft",
+              "product": "Azure Monitor",
+              "title": "Log Analytics Workspace in Azure Government"
+            }
+          ],
+          "expected_artifacts": [
+            {
+              "artifact_id": "ART-INFRA-LAW-001",
+              "artifact_type": "config_export",
+              "description": "Log Analytics Workspace configuration with retention settings",
+              "collector": "powershell",
+              "retention_days": 365,
+              "storage_location_ref": "evidence/infra/logging/"
+            }
+          ],
+          "manual_completion_criteria": [
+            "Log Analytics Workspace active with 90-day retention",
+            "Storage account immutability policy locked for 90 days"
+          ],
+          "dependencies": ["INFRA-001"]
+        },
+        {
+          "id": "INFRA-003",
+          "title": "Deploy Key Vault with Encryption Key Management",
+          "task_type": "configuration",
+          "priority": "p0",
+          "control_coverage": [
+            {
+              "control_id": "SC.L2-3.13.10",
+              "support_type": "Configurable",
+              "gap_rationale": "No customer-managed key infrastructure for CUI encryption at rest"
+            }
+          ],
+          "what_to_do": [
+            "Create Azure Key Vault with soft-delete and purge protection enabled",
+            "Enable RBAC authorization model on the vault",
+            "Assign Key Vault Crypto Officer role to the automation service principal"
+          ],
+          "how_to_verify": [
+            "Get-AzKeyVault -ResourceGroupName {resourceGroup} -VaultName {keyVaultName} | Select-Object VaultName,EnableSoftDelete,EnablePurgeProtection,EnableRbacAuthorization"
+          ],
+          "vendor_help_refs": [
+            {
+              "vendor": "Microsoft",
+              "product": "Azure Key Vault",
+              "title": "Key Vault in Azure Government"
+            }
+          ],
+          "expected_artifacts": [
+            {
+              "artifact_id": "ART-INFRA-KV-001",
+              "artifact_type": "config_export",
+              "description": "Key Vault configuration export with soft-delete and purge-protection status",
+              "collector": "powershell",
+              "retention_days": 365,
+              "storage_location_ref": "evidence/infra/keyvault/"
+            }
+          ],
+          "manual_completion_criteria": [
+            "Key Vault deployed with soft-delete enabled",
+            "Key Vault deployed with purge protection enabled",
+            "RBAC authorization model active"
+          ],
+          "dependencies": ["INFRA-001"]
+        },
+        {
+          "id": "INFRA-004",
+          "title": "Deploy Virtual Network, NSG, Firewall, and Bastion",
+          "task_type": "configuration",
+          "priority": "p0",
+          "control_coverage": [
+            {
+              "control_id": "SC.L2-3.13.1",
+              "support_type": "Configurable",
+              "gap_rationale": "No network boundary controls or segmentation in place"
+            }
+          ],
+          "what_to_do": [
+            "Create VNet with /16 address space in usgovvirginia",
+            "Create management, workload, AzureBastionSubnet, and AzureFirewallSubnet subnets",
+            "Create NSG with deny-all inbound and deny-all outbound baseline rules",
+            "Allow inbound from AzureBastionSubnet on ports 22 and 3389",
+            "Associate NSG with workload subnet",
+            "Enable Network Watcher and NSG flow logs to storage account",
+            "Create Azure Firewall Premium with public IP",
+            "Create Azure Bastion Standard with public IP"
+          ],
+          "how_to_verify": [
+            "Get-AzVirtualNetwork -ResourceGroupName {resourceGroup} -Name {vnetName} | Select-Object Name,AddressSpace",
+            "Get-AzNetworkSecurityGroup -ResourceGroupName {resourceGroup} -Name 'nsg-workload-cmmc' | ConvertTo-Json -Depth 5",
+            "Get-AzFirewall -ResourceGroupName {resourceGroup} -Name 'fw-cmmc'",
+            "Get-AzBastion -ResourceGroupName {resourceGroup} -Name 'bastion-cmmc'"
+          ],
+          "vendor_help_refs": [
+            {
+              "vendor": "Microsoft",
+              "product": "Azure Virtual Network",
+              "title": "Network security in Azure Government"
+            }
+          ],
+          "expected_artifacts": [
+            {
+              "artifact_id": "ART-INFRA-NSG-001",
+              "artifact_type": "config_export",
+              "description": "Network Security Group rules export confirming deny-all baseline",
+              "collector": "powershell",
+              "retention_days": 365,
+              "storage_location_ref": "evidence/infra/network/"
+            }
+          ],
+          "manual_completion_criteria": [
+            "VNet created with /16 address space",
+            "NSG deny-all baseline rules active on workload subnet",
+            "Azure Firewall Premium deployed",
+            "Azure Bastion Standard deployed",
+            "NSG flow logs enabled to storage account"
+          ],
+          "dependencies": ["INFRA-002"]
+        },
+        {
+          "id": "INFRA-005",
+          "title": "Onboard Microsoft Sentinel and Configure CMMC Analytics Rules",
+          "task_type": "monitoring",
+          "priority": "p0",
+          "control_coverage": [
+            {
+              "control_id": "SI.L2-3.14.1",
+              "support_type": "Configurable",
+              "gap_rationale": "No SIEM or security analytics platform configured for threat detection"
+            }
+          ],
+          "what_to_do": [
+            "Onboard Microsoft Sentinel to the Log Analytics Workspace",
+            "Enable Azure Activity, Microsoft Defender for Cloud, and Azure Key Vault data connectors",
+            "Create Scheduled analytics rules for: privileged identity changes, malware detection, excessive failed logins, unauthorized resource deletion"
+          ],
+          "how_to_verify": [
+            "Get-AzSentinelOnboardingState -ResourceGroupName {resourceGroup} -WorkspaceName 'law-{resourceGroup}-cmmc' -Name 'default'",
+            "Get-AzSentinelAlertRule -ResourceGroupName {resourceGroup} -WorkspaceName 'law-{resourceGroup}-cmmc' | ConvertTo-Json"
+          ],
+          "vendor_help_refs": [
+            {
+              "vendor": "Microsoft",
+              "product": "Microsoft Sentinel",
+              "title": "Microsoft Sentinel in Azure Government"
+            }
+          ],
+          "expected_artifacts": [
+            {
+              "artifact_id": "ART-INFRA-SENT-001",
+              "artifact_type": "config_export",
+              "description": "Sentinel analytics rules export confirming CMMC alert rules are active",
+              "collector": "powershell",
+              "retention_days": 365,
+              "storage_location_ref": "evidence/infra/sentinel/"
+            }
+          ],
+          "manual_completion_criteria": [
+            "Sentinel onboarded to Log Analytics Workspace",
+            "Three data connectors enabled (Activity, Defender, KeyVault)",
+            "Four CMMC analytics rules active and enabled"
+          ],
+          "dependencies": ["INFRA-002"]
+        },
+        {
+          "id": "INFRA-006",
+          "title": "Configure Diagnostic Settings for All Enclave Resources",
+          "task_type": "monitoring",
+          "priority": "p1",
+          "control_coverage": [
+            {
+              "control_id": "AU.L2-3.3.2",
+              "support_type": "Configurable",
+              "gap_rationale": "No diagnostic settings routing resource logs to centralized Log Analytics Workspace"
+            }
+          ],
+          "what_to_do": [
+            "Set diagnostic settings on resource group activity log to Log Analytics Workspace",
+            "Set diagnostic settings on Key Vault to Log Analytics Workspace",
+            "Set diagnostic settings on NSG to Log Analytics Workspace",
+            "Set diagnostic settings on Storage Account to Log Analytics Workspace",
+            "Set diagnostic settings on Virtual Machine to Log Analytics Workspace"
+          ],
+          "how_to_verify": [
+            "Get-AzDiagnosticSetting -ResourceId '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}' -Name 'diag-rg-to-law'",
+            "Get-AzDiagnosticSetting -ResourceId (Get-AzKeyVault -ResourceGroupName {resourceGroup} -VaultName {keyVaultName}).ResourceId | ConvertTo-Json"
+          ],
+          "vendor_help_refs": [
+            {
+              "vendor": "Microsoft",
+              "product": "Azure Monitor",
+              "title": "Diagnostic settings in Azure Government"
+            }
+          ],
+          "expected_artifacts": [
+            {
+              "artifact_id": "ART-INFRA-DIAG-001",
+              "artifact_type": "log_export",
+              "description": "Diagnostic settings configuration export confirming all resources log to LAW",
+              "collector": "powershell",
+              "retention_days": 365,
+              "storage_location_ref": "evidence/infra/diagnostics/"
+            }
+          ],
+          "manual_completion_criteria": [
+            "Diagnostic settings active on resource group activity log",
+            "Diagnostic settings active on Key Vault",
+            "Diagnostic settings active on NSG",
+            "Diagnostic settings active on Storage Account",
+            "Diagnostic settings active on Virtual Machine"
+          ],
+          "dependencies": ["INFRA-005"]
+        }
+      ],
+      "assessor_alignment_notes": [
+        "All provisioning steps use Azure PowerShell Az module cmdlets against AzureUSGovernment environment",
+        "Evidence commands are machine-generated exports suitable for CMMC assessment",
+        "Dry-run CI mode validates command assembly without making Azure API calls"
+      ]
+    },
+    "cost_proposal_sow": {}
+  }
+}

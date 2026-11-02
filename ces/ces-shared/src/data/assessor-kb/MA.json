@@ -1,0 +1,374 @@
+{
+  "family": "MA",
+  "family_name": "Maintenance",
+  "practices": [
+    {
+      "id": "MA.L2-3.7.1",
+      "title": "Perform maintenance on organizational systems.\nAssessment Objective:\n[a] system maintenance is performed.",
+      "approach": {
+        "what_assessor_does": "The assessor reads the maintenance policy and the maintenance schedule to see which systems in the CUI scope get maintained, by whom and how often. They then pick a few recent maintenance events (patch windows, hardware repairs, vendor visits, firmware updates) and ask for the record of each one: date, system, what was done, who did it and who approved it. In interviews they ask the IT lead how maintenance is planned and recorded. Testing means tracing a sampled ticket to the system it names and confirming the work actually shows there. CES has no tenant signal for this practice; it rests on records and interviews.",
+        "common_failure_modes": [
+          "Maintenance happens but nothing records what was done, when or by whom.",
+          "The schedule covers servers but leaves out network gear, laptops or cloud-managed systems in scope.",
+          "Records exist only for vendor visits; routine in-house work is never written down.",
+          "The policy names a maintenance process that staff in interview do not follow.",
+          "Sampled tickets cannot be matched to any change on the system they name."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "MA.L2-3.7.1[a]",
+          "determination": "system maintenance is performed",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Maintenance policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/maintenance-policy.md (GateEvidence family MA). Should state which systems are maintained, the schedule and how each event is recorded."
+            },
+            {
+              "artifact_type": "Maintenance records or ticket export for the last 12 months",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. The assessor samples entries and checks date, system, work done, performer and approver."
+            },
+            {
+              "artifact_type": "IT lead interview",
+              "ces_source": "interview",
+              "notes": "Ask how maintenance is planned, who approves it and where the record is kept. Control signal registry maps MA.L2-3.7.1 to manualGateEvaluator: no tenant signal covers this objective."
+            },
+            {
+              "artifact_type": "Ticket-to-system trace",
+              "ces_source": "interview",
+              "notes": "Walk a sampled maintenance ticket with the administrator and show the matching change on the named system (update history, replaced part, firmware version)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MA.L2-3.7.2",
+      "title": "Provide controls on the tools, techniques, mechanisms, and personnel used to conduct system maintenance.",
+      "approach": {
+        "what_assessor_does": "The assessor wants to see that maintenance is done only with approved tools, by approved methods and by approved people. They read the maintenance policy and look for a list of allowed maintenance tools (remote support software, diagnostic utilities, admin consoles), the approved ways maintenance may be carried out, and a list of people and vendors allowed to do it. They compare the tools installed or used in practice against the list, and the people who did recent maintenance against the authorized list. Interviews cover how a new tool or a new vendor gets approved. CES has no tenant signal for this practice.",
+        "common_failure_modes": [
+          "No list of approved maintenance tools, so any remote support program can be used.",
+          "Vendor technicians appear in maintenance records but not on any authorized list.",
+          "Maintenance accounts are shared or never disabled after the vendor leaves.",
+          "Tools the policy forbids are found installed on in-scope machines.",
+          "Nobody can say how a new tool or vendor is approved before use."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "MA.L2-3.7.2[a]",
+          "determination": "tools used to conduct system maintenance are controlled",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Approved maintenance tool list",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Names each allowed tool, its version and who may use it."
+            },
+            {
+              "artifact_type": "Maintenance policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/maintenance-policy.md (GateEvidence family MA). Should say tools must be approved before use and how approval is given."
+            },
+            {
+              "artifact_type": "Administrator interview and tool spot-check",
+              "ces_source": "interview",
+              "notes": "Ask which tools are used for remote support and diagnostics, then compare what is installed on a sampled machine with the approved list. Control signal registry maps MA.L2-3.7.2 to manualGateEvaluator: no tenant signal covers this practice."
+            }
+          ]
+        },
+        {
+          "id": "MA.L2-3.7.2[b]",
+          "determination": "techniques used to conduct system maintenance are controlled",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Maintenance procedures",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Describes the approved ways to carry out maintenance (for example change approval first, work over the managed remote channel only)."
+            },
+            {
+              "artifact_type": "Maintenance policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/maintenance-policy.md (GateEvidence family MA). Should name the techniques allowed and those not allowed."
+            },
+            {
+              "artifact_type": "Administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask the administrator to describe how they carried out a recent maintenance job; the steps should match the written procedure."
+            }
+          ]
+        },
+        {
+          "id": "MA.L2-3.7.2[c]",
+          "determination": "mechanisms used to conduct system maintenance are controlled",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Maintenance access mechanism configuration",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: screenshots or exports showing how maintenance access is granted (remote support gateway, jump host, time-limited accounts)."
+            },
+            {
+              "artifact_type": "Maintenance policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/maintenance-policy.md (GateEvidence family MA). Should describe the mechanisms used to grant and limit maintenance access."
+            },
+            {
+              "artifact_type": "Administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how a maintenance session is started and ended and who can turn the mechanism on; try the path with a test account if one exists."
+            }
+          ]
+        },
+        {
+          "id": "MA.L2-3.7.2[d]",
+          "determination": "personnel used to conduct system maintenance are controlled",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Authorized maintenance personnel list",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Lists the staff and vendor technicians allowed to perform maintenance, with dates."
+            },
+            {
+              "artifact_type": "Maintenance policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/maintenance-policy.md (GateEvidence family MA). Should say who may perform maintenance and how that list is kept current."
+            },
+            {
+              "artifact_type": "IT lead interview and record comparison",
+              "ces_source": "interview",
+              "notes": "Compare the names in sampled maintenance records with the authorized list; ask how a vendor technician is approved and removed."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MA.L2-3.7.3",
+      "title": "Ensure equipment removed for off-site maintenance is sanitized of any CUI.\nAssessment Objective:\n[a] equipment to be removed from organizational spaces for off-site maintenance is sanitized of any CUI.",
+      "approach": {
+        "what_assessor_does": "The assessor asks what happens when a device or drive leaves the building for repair. They read the procedure for off-site maintenance and look for a step that removes or sanitizes CUI before the equipment goes, and a record for each item shipped out (what it was, how it was sanitized, who did it, when). They interview the person who ships equipment out and, if any items went out in the review period, sample those records. Where a device cannot be sanitized because it is broken, they look for what was done instead (drive removed and kept, or vendor agreement covering CUI). This practice is not in the CES control signal registry; it rests on records and interviews.",
+        "common_failure_modes": [
+          "Laptops go out for warranty repair with the drive still in and no sanitization step.",
+          "A sanitization step is written down but no record exists for items that actually left.",
+          "Broken devices that cannot be wiped are shipped anyway with nothing else done.",
+          "Staff who handle shipping do not know the procedure exists."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "MA.L2-3.7.3[a]",
+          "determination": "equipment to be removed from organizational spaces for off-site maintenance is sanitized of any CUI",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Off-site maintenance and sanitization procedure",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/maintenance-policy.md (GateEvidence family MA). Should require CUI to be sanitized or the storage removed before equipment leaves for repair."
+            },
+            {
+              "artifact_type": "Equipment release records with sanitization details",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: each item sent out, the sanitization method used, the person who did it and the date."
+            },
+            {
+              "artifact_type": "Interview with the person who ships equipment out",
+              "ces_source": "interview",
+              "notes": "Ask them to walk through the last repair shipment. MA.L2-3.7.3 has no entry in the control signal registry: no tenant signal covers this objective."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MA.L2-3.7.4",
+      "title": "Check media containing diagnostic and test programs for malicious code before the media are used in organizational systems.",
+      "approach": {
+        "what_assessor_does": "The assessor checks that diagnostic or test software brought in on media (vendor USB sticks, discs, downloaded tool kits) is scanned for malware before it touches a system that handles CUI. They read the policy for the scan requirement, look at the endpoint protection settings that scan removable drives and files on access, and ask a technician how they handle vendor media. Testing means plugging approved test media into a sampled machine, or showing the scan logs from a recent vendor visit.",
+        "common_failure_modes": [
+          "Endpoint protection does not scan removable drives, or real-time scanning is turned off.",
+          "Vendor technicians run tools from their own media with no scan step.",
+          "The scan setting exists in a policy that is not assigned to the in-scope devices.",
+          "Nobody can produce a scan log for media used in a recent maintenance event."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "MA.L2-3.7.4[a]",
+          "determination": "media containing diagnostic and test programs are checked for malicious code before being used in organizational systems that process, store, or transmit CUI",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Defender scan settings for removable drives and on-access scanning",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry MA.L2-3.7.4 (mediaCheckEvaluator): Graph /deviceManagement/deviceConfigurations, reading defenderScanRemovableDrivesDuringFullScan, defenderMonitorFileActivity and defenderRequireRealTimeMonitoring. The assessor still confirms the policy is assigned to in-scope devices."
+            },
+            {
+              "artifact_type": "Maintenance policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/maintenance-policy.md (GateEvidence family MA). Should require media with diagnostic or test programs to be scanned before use."
+            },
+            {
+              "artifact_type": "Scan logs from recent maintenance media",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: Defender scan results or detection history for media used in a sampled maintenance event."
+            },
+            {
+              "artifact_type": "Technician interview",
+              "ces_source": "interview",
+              "notes": "Ask how vendor or diagnostic media is checked before use and who does the check."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MA.L2-3.7.5",
+      "title": "Require multifactor authentication to establish non-local maintenance sessions via external network connections and terminate such connections when nonlocal maintenance is complete.",
+      "approach": {
+        "what_assessor_does": "The assessor looks at how outside administrators and vendors reach systems for maintenance over the internet, and checks two things: every such session needs multifactor authentication to start, and the session is ended when the work is done. They read the Conditional Access policies that cover remote and privileged access, sample a few recent remote maintenance sessions in the sign-in or remote tool logs, and ask how sessions are closed and vendor access turned off afterwards. Testing means trying to start a remote maintenance session without the second factor and checking that it fails.",
+        "common_failure_modes": [
+          "MFA is required for users but the remote support tool has its own login with no second factor.",
+          "The Conditional Access policy is in report-only mode or excludes the accounts vendors use.",
+          "Vendor remote access stays always on instead of being opened per job.",
+          "Remote sessions have no idle timeout and are not closed when the work ends.",
+          "No log shows when a remote maintenance session started and ended."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "MA.L2-3.7.5[a]",
+          "determination": "multifactor authentication is used to establish nonlocal maintenance sessions via external network connections",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Conditional Access policies requiring MFA for privileged access",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry MA.L2-3.7.5 (remoteMfaEvaluator): Graph /identity/conditionalAccess/policies; counts only enabled policies that require MFA or an authentication strength for privileged roles or all users. Report-only policies do not count."
+            },
+            {
+              "artifact_type": "Remote support tool authentication settings",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector when maintenance uses a tool outside Entra sign-in (vendor remote support software): screenshots showing MFA is enforced."
+            },
+            {
+              "artifact_type": "Maintenance policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/maintenance-policy.md (GateEvidence family MA). Should require MFA for any nonlocal maintenance session."
+            },
+            {
+              "artifact_type": "Administrator interview and sign-in test",
+              "ces_source": "interview",
+              "notes": "Ask how vendors connect for remote work; try a remote maintenance sign-in without the second factor and confirm it is refused."
+            }
+          ]
+        },
+        {
+          "id": "MA.L2-3.7.5[b]",
+          "determination": "nonlocal maintenance sessions established via external network connections are terminated when nonlocal maintenance is complete",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Remote session logs showing start and end times",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: remote support tool or gateway session history for sampled maintenance jobs. No CES tenant signal checks session termination."
+            },
+            {
+              "artifact_type": "Maintenance policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/maintenance-policy.md (GateEvidence family MA). Should require remote maintenance sessions to be closed, and vendor access turned off, when work ends."
+            },
+            {
+              "artifact_type": "Administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how a remote session is ended and how the assessor can tell it was; compare with the session log for a sampled job."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MA.L2-3.7.6",
+      "title": "Supervise the maintenance activities of personnel without required access authorization.\nAssessment Objective:\n[a] maintenance personnel without required access authorization are supervised during maintenance activities.",
+      "approach": {
+        "what_assessor_does": "The assessor asks who does maintenance without normally having access to CUI systems (outside technicians, cleaning of equipment rooms, copier service) and how they are watched while they work. They read the procedure that requires an escort or supervising staff member, look at visitor or maintenance logs that name both the technician and the supervisor, and interview the people who do the supervising. Where supervision is remote (a staff member watching a shared screen), they ask how the session is watched and recorded. This practice is not in the CES control signal registry.",
+        "common_failure_modes": [
+          "Outside technicians are left alone in server rooms or on admin consoles.",
+          "Logs show the technician but never name who supervised them.",
+          "Remote vendor sessions run unattended with nobody watching the screen.",
+          "Staff asked to supervise do not know what they are meant to watch for."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "MA.L2-3.7.6[a]",
+          "determination": "maintenance personnel without required access authorization are supervised during maintenance activities",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Maintenance personnel supervision procedure",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/maintenance-policy.md (GateEvidence family MA). Should require escort or supervision of maintenance staff who lack the needed access."
+            },
+            {
+              "artifact_type": "Visitor and maintenance logs naming technician and supervisor",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. The assessor samples entries and checks each names a supervising staff member."
+            },
+            {
+              "artifact_type": "Interview with supervising staff",
+              "ces_source": "interview",
+              "notes": "Ask a supervisor what they watched during a recent visit or remote session. MA.L2-3.7.6 has no entry in the control signal registry: no tenant signal covers this objective."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

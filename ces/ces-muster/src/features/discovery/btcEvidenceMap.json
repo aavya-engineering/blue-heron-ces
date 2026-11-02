@@ -1,0 +1,51 @@
+{
+  "schema": "muster-btc-evidence-map/1",
+  "note": "MG-09 (BTC-lite): which discovery registry reads are evidence for which BTC bank question (primed BTC Question Bank.yaml). Conservative: a read is listed only when its get_command returns the export or query the question's evidence_required validation names. `answer_on_verdict` is set only where the entry's verdict predicate (verdictPredicates.json) reads the very fact the question asks; otherwise the capture is evidence only and the answer stays open. A virtual question id (BTC.DEV.002.CA_ENFORCEMENT_PROOF) counts only for the runlist entry it substitutes.",
+  "entries": {
+    "CM.L2-3.4.5.access-restrict": {
+      "question": "BTC.ID.001",
+      "basis": "Lists the members of Global Administrator and the other admin directory roles (the Global Admin export)."
+    },
+    "AC.L2-3.1.7.pim-roles-permanent": {
+      "question": "BTC.ID.002",
+      "basis": "Lists permanent privileged role assignment schedules (PIM export)."
+    },
+    "AC.L2-3.1.7.pim-roles-eligible": {
+      "question": "BTC.ID.002",
+      "basis": "Lists eligible privileged role assignment schedules (PIM export)."
+    },
+    "SC.L2-3.13.16.data-at-rest": {
+      "question": "BTC.DEV.001",
+      "basis": "Lists the Intune managed devices (enrolled devices export)."
+    },
+    "AC.L2-3.1.18.byod-nonbrowser-signins": {
+      "question": "BTC.DEV.002",
+      "basis": "Queries non-browser sign-ins from the audit log (the unmanaged-device access query)."
+    },
+    "AC.L1-3.1.1.ca-policy-evidence": {
+      "question": "BTC.DEV.002.CA_ENFORCEMENT_PROOF",
+      "basis": "Exports the enabled Conditional Access policies (the CA policy export the proof needs)."
+    },
+    "SC.L1-3.13.1.conditional-access-boundary": {
+      "question": "BTC.DEV.002.CA_ENFORCEMENT_PROOF",
+      "basis": "Exports the enabled Conditional Access policies (the CA policy export the proof needs)."
+    },
+    "AU.L2-3.3.1.audit-enable": {
+      "question": "BTC.LOG.001",
+      "basis": "Reads UnifiedAuditLogIngestionEnabled (Unified Audit Log status query).",
+      "answer_on_verdict": { "met": "Yes", "not_met": "No" }
+    },
+    "AZ-LOG-001": {
+      "question": "BTC.LOG.002",
+      "basis": "Reads the Log Analytics workspace Sentinel runs on (workspace check)."
+    },
+    "AU.L2-3.3.1.audit-retention": {
+      "question": "BTC.LOG.003",
+      "basis": "Reads the Unified Audit Log retention policies (retention config export)."
+    },
+    "AZ-LOG-004": {
+      "question": "BTC.LOG.004",
+      "basis": "Reads the resource locks on the Log Analytics workspace (protection against log deletion)."
+    }
+  }
+}

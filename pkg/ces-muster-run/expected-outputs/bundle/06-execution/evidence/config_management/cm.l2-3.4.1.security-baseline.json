@@ -1,0 +1,50 @@
+{
+  "rawResponse": "{\r\n    \"displayName\":  \"CMMC-Win11-Baseline\",\r\n    \"description\":  \"\",\r\n    \"templateId\":  \"5ec0ba5e-0000-4000-8000-000000000001\",\r\n    \"id\":  \"a2813e62-392d-4896-a2a0-513d9d6a8d41\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "CM.L2-3.4.1.security-baseline",
+    "label": "Deploy Windows Security Baseline via Intune Template",
+    "engine": "mgraph",
+    "layer_hint": 7,
+    "sequence_hint": 11,
+    "idempotency": "get-then-set",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "CM.L2-3.4.1"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/beta/deviceManagement/intents').value | Where-Object displayName -eq 'CMMC-Win11-Baseline' | ConvertTo-Json -Depth 10",
+    "set_command": "Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/beta/deviceManagement/templates/{baselineTemplateId}/createInstance' -Body (@{displayName='CMMC-Win11-Baseline';assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json'",
+    "evidence_commands": [
+      "Get-MgDeviceManagementIntent -Filter \"displayName eq 'CMMC-Win11-Baseline'\" | Select-Object DisplayName,Description,TemplateId,Id | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "CM.L2-3.4.1"
+    ],
+    "timestamp": "2026-11-01T17:11:49.914Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/beta/deviceManagement/templates/{baselineTemplateId}/createInstance' -Body (@{displayName='CMMC-Win11-Baseline';assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json'",
+    "sha256Hash": "f4e8bfa6abe91e1ae19f93039e807302db6fc9cb6434f29e77aa0b525015dafa",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\r\n    \"id\":  \"a2813e62-392d-4896-a2a0-513d9d6a8d41\",\r\n    \"displayName\":  \"CMMC-Win11-Baseline\",\r\n    \"description\":  \"\",\r\n    \"templateId\":  \"5ec0ba5e-0000-4000-8000-000000000001\",\r\n    \"isAssigned\":  true,\r\n    \"isMigratingToConfigurationPolicy\":  false,\r\n    \"lastModifiedDateTime\":  \"2026-11-01T17:11:49.067Z\",\r\n    \"roleScopeTagIds\":  [\r\n                            \"0\"\r\n                        ]\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

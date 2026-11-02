@@ -1,0 +1,22 @@
+{
+  "type": "ui-e2e",
+  "scenario_id": "s1-mach-ao-ui-e2e",
+  "description": "FIN-35 EU-AO (V123): the AdminOps kit console (ces-ao/ui at /app/, FIN-30) on S1 (a fictional machining subcontractor). The twin is E7A (out/adminops-e7a.json): each of the scenario's adminops_ops, in order, through the console: open the command, pick the simulated tenant, parameters from the registry record, DRY RUN then APPLY; two-person approval off. The sim is reset and the store E7A started from (out/sim-store-e7a-pre.json) restored; AO runs on a private pipeline and tenant root. Watched by default (headed, paced, captioned, video and trace); --headless for unattended rounds. Record: out/ui-e2e-ao.json.",
+  "surface": "ao",
+  "sim_scenario": "s1-mach",
+  "stance": "m365_azure",
+  "twin": "s1-mach-e2e",
+  "variants": [
+    {
+      "id": "kit",
+      "base_path": "/app/",
+      "requires_built": "ui/dist/index.html"
+    }
+  ],
+  "steps": [
+    "open",
+    "tenant",
+    "ops",
+    "evidence"
+  ]
+}

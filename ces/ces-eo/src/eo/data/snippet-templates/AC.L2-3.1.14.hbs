@@ -1,0 +1,35 @@
+## Control {{controlId}}: Route Remote Access via Managed Control Points
+
+**Implementation Status:** {{status}}
+
+This organization routes remote access through managed access control points within the {{tenantName}} M365 GCC High tenant. All remote access sessions are routed through Azure AD authentication endpoints and Conditional Access policy enforcement points that serve as managed control points for access authorization, monitoring, and logging.
+
+{{#if namedLocationsConfigured}}
+{{namedLocationsCount}} named locations are defined as managed access control points in Azure AD. Remote access sessions are classified based on originating network location, with traffic from untrusted locations subject to enhanced authentication requirements and restricted access grants. Named locations include corporate VPN endpoints, trusted office networks, and approved partner locations, ensuring all remote access traverses managed control points.
+{{else}}
+Azure AD named locations have not been configured. Remote access routing relies on default Azure AD authentication endpoints pending named location and VPN gateway configuration.
+{{/if}}
+
+{{#if conditionalAccessActive}}
+Conditional Access policies enforce routing through managed control points by requiring location-based compliance. Sessions from unrecognized locations are blocked or require step-up authentication through {{caPoliciesTotalCount}} configured policies.
+{{/if}}
+
+{{#if infraResources}}
+Supporting infrastructure:
+{{#each infraResources}}
+- {{resourceType}} "{{name}}"{{#if properties.retention_days}} (retention: {{properties.retention_days}} days){{/if}}
+{{/each}}
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Review Azure AD named location configurations, Conditional Access location-based policies, VPN gateway settings, and sign-in logs showing access control point routing.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

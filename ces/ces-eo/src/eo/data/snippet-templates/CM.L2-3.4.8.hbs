@@ -1,0 +1,48 @@
+## Control {{controlId}}: Apply Deny-by-Exception (Blocklisting) or Deny-All, Permit-by-Exception (Allowlisting) to Prevent Unauthorized Software Execution
+
+**Implementation Status:** {{status}}
+
+This organization applies application control policies within the {{tenantName}} M365 GCC High tenant through Windows Defender Application Control (WDAC), Intune application protection policies, and software installation restrictions managed by {{variables.systemAdministrator}}.
+
+{{#if appProtectionsActive}}
+**Application Protection Policies:**
+{{appProtectionsCount}} application protection policies enforce software execution controls:
+- Managed applications restricted to approved list (permit-by-exception)
+- Unmanaged application data transfer blocked via DLP controls
+- Jailbreak/root detection prevents execution on compromised devices
+{{/if}}
+
+{{#if detectedAppsMonitored}}
+**Software Authorization Monitoring:**
+{{detectedAppsCount}} applications detected across the managed fleet are continuously monitored:
+{{#if apps}}
+{{#each apps}}
+- **{{displayName}}** v{{version}} — Publisher: {{publisher}} — Installed on {{deviceCount}} devices
+{{/each}}
+{{/if}}
+
+Applications not on the authorized software list are flagged for investigation and removal per the unauthorized software remediation procedure.
+{{else}}
+Application detection is not active. Software authorization monitoring is not verified.
+{{/if}}
+
+{{#if deviceConfigurationsActive}}
+**Endpoint Application Control:**
+WDAC policies deployed via {{deviceConfigurationsCount}} device configurations enforce:
+- Code integrity policies restricting execution to signed, authorized applications
+- Script enforcement preventing unauthorized PowerShell, VBScript, and batch file execution
+- Managed installer rules allowing only Intune-deployed applications
+{{/if}}
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine WDAC policy configurations, application protection policies, detected application reports, and unauthorized software remediation logs.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

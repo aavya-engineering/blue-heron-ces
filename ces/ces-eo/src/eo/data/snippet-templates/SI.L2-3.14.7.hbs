@@ -1,0 +1,41 @@
+## Control {{controlId}}: Identify Unauthorized Use of Organizational Systems
+
+**Implementation Status:** {{status}}
+
+This organization identifies unauthorized system use within the {{tenantName}} M365 GCC High tenant through Exchange Online Protection, anti-phishing policies, and spam filtering documented in "Email Protection Policy v1.0" maintained by {{variables.systemAdministrator}}.
+
+**Exchange Online Protection (EOP):**
+EOP provides multi-layered protection against spam, phishing, and malicious email content:
+- **Anti-Spam Filtering:** Inbound and outbound spam detection with quarantine for suspected spam
+- **Anti-Phishing Policies:** AI-driven phishing detection, impersonation protection for executives and domains, safety tips displayed to users
+- **Anti-Malware:** Real-time scanning of email attachments with zero-hour auto purge (ZAP) for retroactive threat removal
+- **Safe Attachments:** Sandbox detonation of suspicious attachments before delivery (Defender for Office 365)
+- **Safe Links:** URL rewriting and time-of-click verification for links in emails and documents
+
+{{#if detectedAppsMonitored}}
+**Unauthorized Software Detection:**
+{{detectedAppsCount}} applications detected across managed endpoints are monitored for unauthorized installations:
+{{#if apps}}
+{{#each apps}}
+- **{{displayName}}** v{{version}} — Publisher: {{publisher}} — {{deviceCount}} devices
+{{/each}}
+{{/if}}
+{{/if}}
+
+{{#if signInLogsAvailable}}
+**Unauthorized Access Detection:**
+Sign-in logs monitor for unauthorized access patterns including sign-ins from unusual locations, unfamiliar devices, and risky IP addresses.
+{{/if}}
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine EOP configurations, anti-phishing policy settings, Safe Attachments/Links configurations, detected application reports, and unauthorized access alerts.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

@@ -1,0 +1,42 @@
+## Control {{controlId}}: Employ Replay-Resistant Authentication Mechanisms for Network Access to Privileged and Non-Privileged Accounts
+
+**Implementation Status:** {{status}}
+
+This organization employs replay-resistant authentication mechanisms within the {{tenantName}} M365 GCC High tenant through FIDO2 security keys, time-based one-time passwords (TOTP), and certificate-based authentication managed by {{variables.accessControlAdministrator}}.
+
+{{#if mfaEnabled}}
+**Replay-Resistant Authentication Methods:**
+{{authMethodsCount}} authentication methods are configured, including replay-resistant mechanisms:
+{{#if authMethods}}
+{{#each authMethods}}
+- **{{displayName}}** ({{state}})
+{{/each}}
+{{/if}}
+
+Microsoft Entra ID authentication protocols use nonce-based challenge-response mechanisms that prevent replay attacks. OAuth 2.0 tokens include timestamps, audience restrictions, and single-use authorization codes. FIDO2 security keys and Windows Hello for Business use cryptographic challenge-response that is inherently replay-resistant.
+{{else}}
+Replay-resistant authentication methods have not been confirmed. Authentication mechanism configuration requires verification.
+{{/if}}
+
+{{#if conditionalAccessActive}}
+**Authentication Strength Enforcement:**
+Conditional Access policies enforce minimum authentication strength requirements:
+{{#each policies}}
+{{#if grantControls.authenticationStrength}}
+- **{{displayName}}**: Requires {{grantControls.authenticationStrength}} authentication strength (replay-resistant)
+{{/if}}
+{{/each}}
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Examine authentication method configurations for replay-resistant mechanisms, Conditional Access authentication strength requirements, and OAuth token configuration settings.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

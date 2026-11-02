@@ -1,0 +1,48 @@
+{
+  "fixture": "b",
+  "label": "no CUI (FCI only, L1 target), commercial M365, m365_only, no TCP",
+  "synthetic": true,
+  "note": "Synthetic customer: no real customer, person, domain or workstation identifiers. These are the answers Planner's wizards would hold (SIT, RRT preamble, TCP, CUI, policy inputs); ces-planner/scripts/generate-goldens.ts reads this file to produce planner-golden/.",
+  "org": "Simtenant Bravo Machining",
+  "planMode": "harden_existing",
+  "sit": {
+    "G-01": "L1",
+    "G-02": "no_cui",
+    "G-05": "self",
+    "G-06": {
+      "goal_type": "asap"
+    },
+    "G-07": "single_enclave",
+    "G-08": "cloud_only",
+    "S-11": 22,
+    "S-12": "email_first",
+    "S-13": "allowed_mdm",
+    "S-16": "l2_self_ready",
+    "S-20": "commercial_only",
+    "SIT-020": "m365_only",
+    "SIT-021": "business_premium",
+    "SIT-022": 22,
+    "SIT-024": 1,
+    "SIT-025": 0,
+    "S-24": "no_poam",
+    "S-25": "byod_and_company",
+    "S-26": "managed_wireless",
+    "S-27": "allowed_encrypted",
+    "S-28": "vpn_only",
+    "S-29": "no_nonlocal",
+    "S-30": "managed_endpoints"
+  },
+  "rrt": {
+    "preamble": {
+      "license_tier": "business_premium",
+      "security_archetype": "security_defaults_only",
+      "endpoint_management": "mixed",
+      "monitoring_siem": "basic_m365_audit",
+      "policy_doc_state": "nothing_written"
+    },
+    "actionOverrides": {}
+  },
+  "tcp": null,
+  "cui": null,
+  "policy": null
+}

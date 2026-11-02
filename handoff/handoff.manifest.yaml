@@ -1,0 +1,187 @@
+# CES build handoff manifest: the source of truth for what a contractor builds.
+# README.md, BUILD-ORDER.md and handoff.manifest.json are generated from this file by
+# scripts/handoff/gen.mjs; scripts/handoff/check.mjs fails when the code or the generated files drift.
+# Paths are relative to each repo root; the repos sit in the nested workspace layout
+# (ces-mono at the workspace root, the other repos in folders inside it; see README.md "Repositories").
+# Ports are the code defaults (what the server binds when started without flags).
+schemaVersion: 1
+release: { id: "ces-handoff-2026-11-01-ph13", cut: "2026-11-01", status: pinned }
+
+toolchain:
+  - name: node
+    version: "24.12.0"
+    why: "Node.js in use on the BHD build machine; all packages build and test with it. The pin file is .nvmrc at the ces-mono root."
+    check: "node --version"
+  - name: npm
+    version: "11.6.2"
+    why: "npm in use on the BHD build machine (bundled with Node 24.12.0); the lockfiles were written by it."
+    check: "npm --version"
+  - name: git
+    version: ">=2.52.0"
+    why: "Clones the five repos and checks out the manifest commits. This is the version on the BHD build machine; older 2.x releases are untested."
+    check: "git --version"
+  - name: windows-powershell
+    version: "5.1"
+    why: "Stamper, AO and the tenant session factory start powershell.exe to run tenant commands; the run scripts (bootstrap, identity scan) target Windows PowerShell 5.1."
+    check: 'powershell.exe -NoProfile -Command "(Get-Host).Version.ToString()"'
+  - name: Microsoft.Graph.Authentication
+    version: "2.35.1"
+    why: "PowerShell module pinned by ces-tenant for live Graph sessions (Import-Module -RequiredVersion). Live tenants only; the simulator does not need it. The pin list is ces-tenant/src/data/module-pins.json."
+    check: 'powershell.exe -NoProfile -Command "(Get-Module -ListAvailable Microsoft.Graph.Authentication).Version -join '', ''"'
+
+components:
+  - id: ces-tenant
+    repo: ces-tenant
+    path: "."
+    commit: "5be6e2bec232db91443e0350d7a3a6e3ba95c7d0"
+    kind: library
+    build: "npm ci && npm run build"
+    deps: []
+    ports:
+      - { port: 4690, service: "tenant service daemon (optional; npm run serve; bind address CES_TENANT_BIND, default all; network callers need CES_TENANT_AUTH_TOKEN)", bind: "0.0.0.0", configKey: "--port" }
+    test: "npm test"
+
+  - id: ces-shared
+    repo: ces-mono
+    path: ces-shared
+    commit: "43655a300e533392b2f21d1794479741eb531f9e"
+    kind: library
+    build: "npm ci && npm run build -w ces-shared"
+    deps: [ces-tenant]
+    ports: []
+    test: "npm test -w ces-shared"
+
+  - id: ces-stamper
+    repo: ces-mono
+    path: ces-stamper
+    commit: "43655a300e533392b2f21d1794479741eb531f9e"
+    kind: server
+    build: "npm run build -w ces-stamper"
+    deps: [ces-shared, ces-tenant]
+    ports:
+      - { port: 3000, service: "Stamper GUI and API (root script npm run stamper uses --port 5002)", bind: "0.0.0.0", configKey: "--port" }
+    test: "npm test -w ces-stamper"
+
+  - id: ces-eo
+    repo: ces-mono
+    path: ces-eo
+    commit: "43655a300e533392b2f21d1794479741eb531f9e"
+    kind: server
+    build: "npm run build -w ces-eo"
+    deps: [ces-shared, ces-tenant]
+    ports:
+      - { port: 4002, service: "EO server and console (bind address: CES_EO_BIND; root script npm run eo sets EO_PORT=5004)", bind: "0.0.0.0", configKey: EO_PORT }
+    test: "npm test -w ces-eo"
+
+  - id: ces-ao
+    repo: ces-mono
+    path: ces-ao
+    commit: "43655a300e533392b2f21d1794479741eb531f9e"
+    kind: server
+    build: "npm run build -w ces-ao"
+    deps: [ces-shared, ces-stamper, ces-tenant]
+    ports:
+      - { port: 3000, service: "AO GUI and API, including the leaver-flow routes /api/leaver/* (bind address: CES_AO_BIND; root script npm run ao uses --port 5003; the e2e run uses 3001)", bind: "0.0.0.0", configKey: "--port" }
+    test: "npm test -w ces-ao"
+
+  - id: ces-ec
+    repo: ces-mono
+    path: ces-ec
+    commit: "43655a300e533392b2f21d1794479741eb531f9e"
+    kind: server
+    build: "npm run build -w ces-ec"
+    deps: [ces-shared, ces-tenant]
+    ports:
+      - { port: 4001, service: "EC API (bind address: EC_HOST, default all)", bind: "0.0.0.0", configKey: EC_PORT }
+    test: "npm test -w ces-ec"
+
+  - id: ces-ui-kit
+    repo: ces-mono
+    path: ces-shared/ui/kit
+    commit: "43655a300e533392b2f21d1794479741eb531f9e"
+    kind: ui
+    build: "npm run build -w ces-ui-kit"
+    deps: [ces-shared]
+    ports: []
+    test: "npm test -w ces-ui-kit"
+
+  - id: ces-stamper-ui
+    repo: ces-mono
+    path: ces-stamper/ui
+    commit: "43655a300e533392b2f21d1794479741eb531f9e"
+    kind: ui
+    build: "npm run build -w ces-stamper-ui"
+    deps: [ces-ui-kit]
+    ports: []
+    test: "npm test -w ces-stamper-ui"
+
+  - id: ces-ao-ui
+    repo: ces-mono
+    path: ces-ao/ui
+    commit: "43655a300e533392b2f21d1794479741eb531f9e"
+    kind: ui
+    build: "npm run build -w ces-ao-ui"
+    deps: [ces-ui-kit]
+    ports: []
+    test: "npm test -w ces-ao-ui"
+
+  - id: ces-eo-ui
+    repo: ces-mono
+    path: ces-eo/ui
+    commit: "43655a300e533392b2f21d1794479741eb531f9e"
+    kind: ui
+    build: "npm run build -w ces-eo-ui"
+    deps: [ces-ui-kit]
+    ports: []
+    test: "npm test -w ces-eo-ui"
+
+  - id: tenant-stacksim
+    repo: tenant-stacksim
+    path: "."
+    commit: "bbe3cb3f1dad239a067c0cab64e2fc01dc70a143"
+    kind: simulator
+    build: "npm ci && npm run build"
+    deps: []
+    ports:
+      - { port: 4390, service: "simulated tenant query server (stacksim serve / up; every interface by default, --host names one address)", bind: "0.0.0.0", configKey: "--port" }
+    test: "npm test"
+
+  - id: ces-tester
+    repo: ces-tester
+    path: "."
+    commit: "3257ff68657859c573efb682ae10dc3aaf34f2f4"
+    kind: test-harness
+    build: "npm ci && npm run build"
+    deps: [ces-tenant]
+    ports: []
+    test: "npm test"
+
+  - id: ces-muster
+    repo: ces-muster
+    path: "."
+    commit: "8f5edb7b981564a406b322b7d8dfcdcb0fd28298"
+    kind: ui
+    build: "npm ci && npm run build"
+    deps: [ces-shared]
+    ports:
+      - { port: 5173, service: "Muster UI dev server (vite; npm run dev)", bind: "localhost", configKey: "vite --port" }
+    test: "npm test"
+
+  - id: muster-api
+    repo: ces-muster
+    path: muster-api
+    commit: "8f5edb7b981564a406b322b7d8dfcdcb0fd28298"
+    kind: server
+    build: "npm ci && npm run build"
+    cwd: ces-muster/muster-api
+    deps: [ces-shared, ces-tenant]
+    ports:
+      - { port: 4000, service: "muster-api (Muster's API server; the e2e run uses PORT=4011)", bind: "0.0.0.0", configKey: PORT }
+    test: "npm test"
+
+# Legend:
+#   Stamper = applies the mission plan to the tenant (ces-stamper). AO = AdminOps, runs approved admin
+#   commands (ces-ao). EO = EvidenceOps, evidence and assessment (ces-eo). EC = Evidence Collector, manual
+#   evidence intake (ces-ec). Muster = data collection, writes the plan (ces-muster, muster-api).
+#   configKey "--port" = a command-line flag, not an environment setting; "vite --port" = vite's flag.
+#   commit "HEAD-at-cut" = the repo head when the release is cut; status draft = commits may still move.

@@ -1,0 +1,53 @@
+{
+  "config_id": "eval-scope-boundary",
+  "description": "Config 3 (docs/demo/SIMSTACK-CONFIGS-SPEC.md §2.3) — the automation-reach case. Two CA gaps the plan CAN fix (P1 AC.L2-3.1.11 / P5 MA.L2-3.7.5 absent, sitting behind two decoy policies) plus a governance gap the plan structurally CANNOT touch: no cross-tenant access policy (P9 AC.L1-3.1.20). crossTenantAccessPolicy zeroed via countOverrides (t1-eval-bare proven) so P9 reads unknown for an ARCHITECTURAL reason — zero crossTenant mutate exists in the ONE plan (m7-run5), so it never flips. P2/P3 (AC.L2-3.1.14/SC.L2-3.13.7, AC.L2-3.1.15) stay unknown for a TRANSIENT reason (decoy-named, and the plan's create tasks are pinned-failing on the capture-cascade bug). user-5 disabled pins P6 (PS.L2-3.9.2) met on both the filter-honored and passthrough paths; default users/groups kept so P7 (IA.L2-3.5.5/6) reads met and the plan's P1/P5 captures (breakGlassUserId=user-2, cuiGroupId=group-1) resolve. The lesson: distinguish a permanent scope boundary (P9) from a transient tool bug (P2/P3).",
+  "stacksim_seed": {
+    "stance": "m365_azure",
+    "countOverrides": {
+      "caPolicies": 2,
+      "crossTenantAccessPolicy": 0
+    },
+    "steps": [
+      {
+        "kind": "uri",
+        "method": "PATCH",
+        "uri": "/v1.0/identity/conditionalAccess/policies/caPolicy-1",
+        "body": {
+          "displayName": "Legacy-MFA"
+        },
+        "note": "T5-proven decoy — some CA hygiene, not a CMMC-named policy; earns no P1-P5 credit"
+      },
+      {
+        "kind": "uri",
+        "method": "PATCH",
+        "uri": "/v1.0/identity/conditionalAccess/policies/caPolicy-2",
+        "body": {
+          "displayName": "Pilot-CA"
+        },
+        "note": "T5-proven decoy — not a CMMC-named policy"
+      },
+      {
+        "kind": "uri",
+        "method": "PATCH",
+        "uri": "/v1.0/users/user-5",
+        "body": {
+          "accountEnabled": false
+        },
+        "note": "P6 PS.L2-3.9.2 -> met (explicit, path-independent — holds on both the accountEnabled-eq filter-honored and passthrough paths)"
+      }
+    ]
+  },
+  "expected_discovery": {
+    "AC.L2-3.1.11": "unknown",
+    "AC.L2-3.1.14": "unknown",
+    "SC.L2-3.13.7": "unknown",
+    "AC.L2-3.1.15": "unknown",
+    "MA.L2-3.7.5": "unknown",
+    "PS.L2-3.9.2": "met",
+    "IA.L2-3.5.5": "met",
+    "IA.L2-3.5.6": "met",
+    "AC.L1-3.1.20": "unknown",
+    "AC.L2-3.1.12": "unknown",
+    "IA.L2-3.5.4": "unknown"
+  }
+}

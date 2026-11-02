@@ -1,0 +1,363 @@
+{
+  "type": "muster-e2e",
+  "scenario_id": "s3-def-e2e",
+  "description": "SIMULATED CUSTOMER (FICTIONAL): synthetic-customer W6. The MX run driven by ces-tester on the stacksim scenario s3-def (S3, DELIBERATELY DEFICIENT: a fictional 56-person defence cable-harness and electronics manufacturer on GCC High G3 + E5 Security, cloud-only, whose tenant grew without management; PLAN.md sections 2.1 and 2.1b, scoped by the W6 brief to 60 accounts). Every organisation, person, id and address is invented. Deficiencies seeded (customers/s3-def/deficiencies.json lists each one, who fixes it and the GAPS row expected): a former technician's admin account idle 140 days and 3 staff idle beyond 90 days, all enabled; a leaver still enabled; 33 accounts without MFA registration, Microsoft Authenticator and FIDO2 disabled; 2 customer MFA CA policies report-only, excluding nobody; no legacy-authentication block; 3 standing Global Administrators (the owner's licensed account, the ISSO's admin account, the emergency account) and no PIM; one unassigned Windows compliance policy; no DLP, no CUI label; the CUI site shared to anyone; 9 untracked critical CVEs; 2 Defender alerts new for 20 days; training missing; no Azure resource (stance m365_azure kept, PLAN section 2.2). Run with MX_STACKS=m365_e5_gcc,microsoft_intune (no Sentinel, no Azure tile; the harness passes the operator's environment through to E3). Steps as s1-mach-e2e.json, plus E6X: after Stamper's E6 disables the idle accounts (IA.L2-3.5.5.disable-inactive), E6X re-enables the stale admin account (user-59) through the simulator's /resolve (PATCH /v1.0/users/user-59 accountEnabled true), so EO's E7 passes see IA.L2-3.5.6 not_met; E7A then offboards that account through AdminOps A-02 (T2, confirming read; resources.offboard_upn, discovered at E5 as the enabled account with the oldest past employeeLeaveDateTime, which S3's stale admin carries), and E7B is expected to show exactly IA.L2-3.5.6 not_met -> met (V47). A-11 (stale-account read) and B-03 (patch-currency read) add Tier 4 evidence and move nothing. W7-TST: E7A also runs A-10 (standing-privilege elimination, T2: resources.standing_admin_upn / standing_admin_id discovered at E5, the enabled, licensed standing Global Administrator that is neither the break-glass account nor the operator, i.e. the owner's account; the confirming read is that principal's Provisioned PIM eligibility, because roleAssignments carry principalId only) and A-19 twice (break-glass CA exclusion, T3, approver resources.approver_upn different from the requestor; resources.breakglass_ca_policy_1 / _2 discovered at E5, the two customer CA policies whose excludeUsers lacks resources.breakglass_user_id; each confirming read checks that policy's excludeUsers includes resources.breakglass_user_id). This is S3-D04's fix (V64). AC.L2-3.1.5 stays not_met (the operator's admin account is still standing) and is not in expected_improvements; AC.L2-3.1.7 is added only after R1 observes it (FQ-5). ao_coverage.expected_total is 96 (the ces-ao registry gained A-21; A-21 is not run on S3). allowed_reverts lists users/user-59: Stamper's E6 disable and AO's E7A disable target the same object by design (PLAN section 2.1b), which the overlap rule (V48) otherwise refuses. scorecard_gate is off (report-only). S3 thresholds (PLAN section 1, S3 column; scripts/scorecard.mjs DEFAULT_THRESHOLDS.S3): SC-1 rows 1, 2 and 5 only; SC-3b 468/468; SC-4 <= 25 %; SC-5 and SC-6 not required; SC-7 exact; SC-8a <= 15 %; every section 2.1b deficiency appears in GAPS.md; V47 exact.",
+  "sim_scenario": "s3-def",
+  "stance": "m365_azure",
+  "force_fail_entry": "SC.L2-3.13.15.anti-spam",
+  "eo_assess_runs": 3,
+  "ec_upload": {
+    "controlIds": [
+      "AC.L1-3.1.1"
+    ],
+    "source": "manual_upload",
+    "filename": "acp.pdf",
+    "mediaType": "application/pdf",
+    "contentBase64": "JVBERi0xLjQK",
+    "submittedByRole": "compliance_officer",
+    "form_id": "access_control_policy",
+    "emx_ids": [
+      "EMX-IAM-004"
+    ]
+  },
+  "expected_facts": {
+    "RR-ACT-IA_L2_3_5_3": "no",
+    "RR-ACT-SI_L1_3_14_1": "yes",
+    "RR-ACT-SI_L2_3_14_2": "yes"
+  },
+  "expected_state": {
+    "checks": [
+      {
+        "description": "ATP enabled for SPO/Teams/ODB (Set-AtpPolicyForO365 -EnableATPForSPOTeamsODB $true)",
+        "request": {
+          "kind": "cmdlet",
+          "cmdlet": "Get-AtpPolicyForO365"
+        },
+        "path": "EnableATPForSPOTeamsODB",
+        "assert": "equals",
+        "value": true,
+        "ledger_object_type": "atpPolicyForO365"
+      },
+      {
+        "description": "Legacy TLS clients disallowed (Set-TransportConfig -AllowLegacyTLSClients $false)",
+        "request": {
+          "kind": "cmdlet",
+          "cmdlet": "Get-TransportConfig"
+        },
+        "path": "AllowLegacyTLSClients",
+        "assert": "equals",
+        "value": false,
+        "ledger_object_type": "transportConfig"
+      },
+      {
+        "description": "Unified audit log ingestion enabled (Set-AdminAuditLogConfig -UnifiedAuditLogIngestionEnabled $true)",
+        "request": {
+          "kind": "cmdlet",
+          "cmdlet": "Get-AdminAuditLogConfig"
+        },
+        "path": "UnifiedAuditLogIngestionEnabled",
+        "assert": "equals",
+        "value": true,
+        "ledger_object_type": "adminAuditLogConfig"
+      },
+      {
+        "description": "Teams external federation access disabled on the Global policy (the base seed has it enabled)",
+        "request": {
+          "kind": "cmdlet",
+          "cmdlet": "Get-CsExternalAccessPolicy"
+        },
+        "select": {
+          "field": "Identity",
+          "equals": "Global"
+        },
+        "path": "EnableFederationAccess",
+        "assert": "equals",
+        "value": false,
+        "ledger_object_type": "csExternalAccessPolicy"
+      },
+      {
+        "description": "Remote-maintenance MFA: S3's own report-only all-users MFA policy is left report-only (Stamper does not change it). Since PH-6 the MA.L2-3.7.5.remote-mfa lookup no longer admits a report-only policy, so Stamper creates its own CMMC-RemoteMaintenance-MFA policy with -State 'enabled' (LOG-PH6-REG.md task 2; R-F7 S3 E6 log)",
+        "request": {
+          "kind": "uri",
+          "method": "GET",
+          "uri": "/v1.0/identity/conditionalAccess/policies"
+        },
+        "select": {
+          "field": "displayName",
+          "equals": "S3-CA01 Require MFA - all users"
+        },
+        "path": "state",
+        "assert": "equals",
+        "value": "enabledForReportingButNotEnforced",
+        "ledger_object_type": "caPolicies"
+      },
+      {
+        "description": "MicrosoftAuthenticator auth-method config enabled (S3 seeds it disabled; Stamper's IA.L2-3.5.3.mfa-authenticator writes it)",
+        "request": {
+          "kind": "uri",
+          "method": "GET",
+          "uri": "/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/MicrosoftAuthenticator"
+        },
+        "path": "state",
+        "assert": "equals",
+        "value": "enabled",
+        "ledger_object_type": "authenticationMethodsPolicyConfigurations"
+      },
+      {
+        "description": "Fido2 auth-method config enabled (S3 seeds it disabled; Stamper's IA.L2-3.5.3.fido2-enable writes it)",
+        "request": {
+          "kind": "uri",
+          "method": "GET",
+          "uri": "/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/Fido2"
+        },
+        "path": "state",
+        "assert": "equals",
+        "value": "enabled",
+        "ledger_object_type": "authenticationMethodsPolicyConfigurations"
+      },
+      {
+        "description": "The stale admin account (user-59) ends disabled: Stamper's E6 disable, the E6X re-enable, then AdminOps A-02 at E7A",
+        "request": {
+          "kind": "uri",
+          "method": "GET",
+          "uri": "/v1.0/users"
+        },
+        "select": {
+          "field": "id",
+          "equals": "user-59"
+        },
+        "path": "accountEnabled",
+        "assert": "equals",
+        "value": false,
+        "ledger_object_type": "users"
+      }
+    ]
+  },
+  "expected_ledger": {
+    "build_window": {
+      "from": "E1",
+      "before": "E2"
+    },
+    "no_writes_during": [
+      "E2"
+    ],
+    "allowed_write_windows": [
+      "E6",
+      "E6X",
+      "E7A"
+    ],
+    "min_writes_during": {
+      "E6": 1,
+      "E6X": 1,
+      "E7A": 1
+    },
+    "mutated": [
+      {
+        "objectType": "caPolicies",
+        "objectId": "CMMC-SessionTimeout"
+      },
+      {
+        "objectType": "caPolicies",
+        "objectId": "CMMC-AdminMFA-PhishingResistant"
+      },
+      {
+        "objectType": "csExternalAccessPolicy"
+      },
+      {
+        "objectType": "atpPolicyForO365"
+      },
+      {
+        "objectType": "adminAuditLogConfig"
+      },
+      {
+        "objectType": "transportConfig"
+      },
+      {
+        "objectType": "authenticationMethodsPolicyConfigurations"
+      },
+      {
+        "objectType": "users",
+        "objectId": "user-59"
+      },
+      {
+        "objectType": "caPolicies",
+        "objectId": "CMMC-MFA-CompliantDevice"
+      },
+      {
+        "objectType": "roleEligibilityScheduleRequests"
+      },
+      {
+        "objectType": "roleAssignments"
+      },
+      {
+        "objectType": "caPolicies",
+        "objectId": "caPolicy-1"
+      },
+      {
+        "objectType": "caPolicies",
+        "objectId": "caPolicy-2"
+      }
+    ]
+  },
+  "ao_coverage": {
+    "enabled": true,
+    "expected_total": 96
+  },
+  "adminops_ops": [
+    {
+      "op": "A-11",
+      "tier": "T2",
+      "kind": "read",
+      "description": "Stale account detection (read, Tier 4). AO binds operatorUPN and breakGlassUPN from resources.operator_upn and resources.breakglass_upn (copied from the TM at E5; S3's break-glass UPN is an answered value, PLAN section 2.3)."
+    },
+    {
+      "op": "A-02",
+      "tier": "T2",
+      "kind": "write",
+      "description": "User offboarding (disable) of the stale admin account (user-59) that E6X re-enabled after Stamper's E6 disable (PLAN section 2.1b). resources.offboard_upn is discovered at E5 from the sim: the enabled account with the oldest past employeeLeaveDateTime, which is S3's stale admin (140 days; the staff leaver's date is 12 days).",
+      "params": {
+        "upn": "resources.offboard_upn"
+      },
+      "confirm": {
+        "description": "AdminOps A-02: the stale admin account is disabled",
+        "request": {
+          "kind": "uri",
+          "method": "GET",
+          "uri": "/v1.0/users"
+        },
+        "select": {
+          "field": "userPrincipalName",
+          "equals": "{resources.offboard_upn}"
+        },
+        "path": "accountEnabled",
+        "assert": "equals",
+        "value": false,
+        "ledger_object_type": "users"
+      }
+    },
+    {
+      "op": "B-03",
+      "tier": "T2",
+      "kind": "read",
+      "description": "OS patch currency audit (read, Tier 4): the device inventory behind the 9 untracked critical CVEs (PLAN section 2.1b). Detection proof only; RA.L2-3.11.3 / SI.L1-3.14.1 stay as EO decides them."
+    },
+    {
+      "op": "A-10",
+      "tier": "T2",
+      "kind": "write",
+      "description": "W7-TST: standing-privilege elimination (AC.L2-3.1.5): converts the owner's standing Global Administrator assignment to PIM-eligible. targetUPN has no AO source: the harness binds it from resources.standing_admin_upn (discovered at E5). globalAdminRoleDefId is AO-sourced (resources.global_admin_role_def_id, from the TM).",
+      "params": {
+        "targetUPN": "resources.standing_admin_upn"
+      },
+      "confirm": {
+        "description": "AdminOps A-10: the converted admin holds a Provisioned PIM eligibility",
+        "request": {
+          "kind": "uri",
+          "method": "GET",
+          "uri": "/v1.0/roleManagement/directory/roleEligibilitySchedules"
+        },
+        "select": {
+          "field": "principalId",
+          "equals": "{resources.standing_admin_id}"
+        },
+        "path": "status",
+        "assert": "equals",
+        "value": "Provisioned",
+        "ledger_object_type": "roleEligibilityScheduleRequests"
+      }
+    },
+    {
+      "op": "A-19",
+      "tier": "T3",
+      "kind": "write",
+      "description": "W7-TST: break-glass CA exclusion (S3-D04, AC.L2-3.1.7 resilience), run 1 of 2: excludes the emergency account from the customer CA policy resources.breakglass_ca_policy_1 (discovered at E5; a displayName, which A-19 matches on). policyDisplayName has no AO source: the harness binds it from the record. breakglassUPN is AO-sourced (resources.breakglass_upn). T3: dry run, then apply by the single operator (two-person approval is off by founder ruling 2026-10-31; with CES_TWO_PERSON_APPROVAL=1: request, approval by resources.approver_upn, apply).",
+      "params": {
+        "policyDisplayName": "resources.breakglass_ca_policy_1"
+      },
+      "confirm": {
+        "description": "AdminOps A-19 (1/2): the CA policy excludes the break-glass account",
+        "request": {
+          "kind": "uri",
+          "method": "GET",
+          "uri": "/v1.0/identity/conditionalAccess/policies"
+        },
+        "select": {
+          "field": "displayName",
+          "equals": "{resources.breakglass_ca_policy_1}"
+        },
+        "path": "conditions.users.excludeUsers",
+        "assert": "includes",
+        "value": "{resources.breakglass_user_id}",
+        "ledger_object_type": "caPolicies"
+      }
+    },
+    {
+      "op": "A-19",
+      "tier": "T3",
+      "kind": "write",
+      "description": "W7-TST: break-glass CA exclusion (S3-D04, AC.L2-3.1.7 resilience), run 2 of 2: excludes the emergency account from the customer CA policy resources.breakglass_ca_policy_2 (discovered at E5; a displayName, which A-19 matches on). policyDisplayName has no AO source: the harness binds it from the record. breakglassUPN is AO-sourced (resources.breakglass_upn). T3: dry run, then apply by the single operator (two-person approval is off by founder ruling 2026-10-31; with CES_TWO_PERSON_APPROVAL=1: request, approval by resources.approver_upn, apply).",
+      "params": {
+        "policyDisplayName": "resources.breakglass_ca_policy_2"
+      },
+      "confirm": {
+        "description": "AdminOps A-19 (2/2): the CA policy excludes the break-glass account",
+        "request": {
+          "kind": "uri",
+          "method": "GET",
+          "uri": "/v1.0/identity/conditionalAccess/policies"
+        },
+        "select": {
+          "field": "displayName",
+          "equals": "{resources.breakglass_ca_policy_2}"
+        },
+        "path": "conditions.users.excludeUsers",
+        "assert": "includes",
+        "value": "{resources.breakglass_user_id}",
+        "ledger_object_type": "caPolicies"
+      }
+    }
+  ],
+  "expected_improvements": [
+    {
+      "controlId": "IA.L2-3.5.6",
+      "op": "A-02",
+      "from": "not_met",
+      "to": "met",
+      "note": "PLAN section 2.1b stale admin: E7 sees the account E6X re-enabled (inactive 141 days); after A-02 no enabled account is inactive beyond 90 days (the 3 idle staff stay disabled from E6; the leaver signed in 13 days ago; the emergency account 45 days ago)"
+    },
+    {
+      "controlId": "AC.L2-3.1.7",
+      "op": "A-10",
+      "from": "not_met",
+      "to": "met",
+      "note": "W7 R1 (run 64) observed: A-10 converts the standing Global Administrator on a licensed normal account to a PIM eligibility, so the cycle-8 standing-role rule no longer fires at E7B (live read, not a Stamper record; FQ-5 unaffected)"
+    }
+  ],
+  "allowed_reverts": [
+    {
+      "objectType": "users",
+      "objectId": "user-59",
+      "controls": [],
+      "reason": "Deliberate overlap (PLAN section 2.1b): Stamper's E6 IA.L2-3.5.5.disable-inactive and AdminOps A-02 at E7A both write the stale admin account, with the E6X re-injection between them. E8F's Stamper re-run finds it already disabled and writes nothing; no control may regress because of it."
+    }
+  ],
+  "drift_injection": [
+    {
+      "description": "PLAN section 2.1b E6X: re-enable the stale admin account (user-59, idle 140 days) after Stamper's E6 disable-inactive, so EvidenceOps must catch it at E7 and AdminOps A-02 must remediate it at E7A",
+      "request": {
+        "kind": "uri",
+        "method": "PATCH",
+        "uri": "/v1.0/users/user-59",
+        "body": {
+          "accountEnabled": true
+        }
+      }
+    }
+  ],
+  "postcheck_thresholds": {
+    "gates_max": 25,
+    "presence_max": 2,
+    "_note": "S3 uses the V55 defaults (PLAN section 5 W3): a prediction until the first run; re-baselined by the founder after it. gates_max 24 -> 25: the founder, 2026-11-01 (PH-11 Q6); the extra gates are the three DEPTH-11 non-stack review gates AU.L2-3.3.4, MA.L2-3.7.2 and SC.L2-3.13.7. Founder, 2026-11-01 later: AU.L2-3.3.4 is configured and verified by the audit-logging alert policy (AU.L2-3.3.4.audit-config-alert), so it is no longer a gate; the expected count is 24, and the 25 ceiling is kept until a round observes it (then lower it)."
+  },
+  "scorecard_gate": false
+}

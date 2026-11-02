@@ -1,0 +1,3 @@
+# Run 52b (2026-10-28): synthetic customer S1 (s1-mach), wave W5 cycle 5 proof (58 checks)
+
+58/58 on the run-49c baseline with no status change (EO 88/2/0/20 SPRS 61); Stamper 110/110 (key vault kv-s1-mach-prod verified by the new SC.L2-3.13.10 entry; S1's Safe Links policy and rule verified; IA.L2-3.5.8 now an implement directive, 83 implement in all); scorecard 9/10 within (SC-3a 247/248 = 99.6 %, SC-4 15.9 %, SC-5 0/0, SC-6 22/22 + 15/15, SC-8b 0/39); SC-8a 21/96 = 21.9 % (threshold 15 %) remains the only open row; GAPS 308 (was 331); 18 organisation records uploaded. OUTSIDE UNCHANGED. Run 52 (first attempt) had failed only because the simulator's PowerShell modules were regenerated after the execute step; the cycle-3 failure diagnostics named the missing cmdlet.

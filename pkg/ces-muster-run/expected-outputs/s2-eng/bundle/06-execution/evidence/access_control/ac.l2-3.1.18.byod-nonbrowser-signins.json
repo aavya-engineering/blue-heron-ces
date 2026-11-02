@@ -1,0 +1,37 @@
+{
+  "rawResponse": "",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "AC.L2-3.1.18.byod-nonbrowser-signins",
+    "label": "BYOD Non-Browser Sign-In Failures (Runtime Sample)",
+    "engine": "mgraph",
+    "layer_hint": 4,
+    "sequence_hint": 21,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "AC.L2-3.1.18",
+      "AC.L2-3.1.19"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri \"https://graph.microsoft.us/v1.0/auditLogs/signIns?`$filter=clientAppUsed ne 'Browser' and conditionalAccessStatus eq 'failure'&`$top=10&`$orderby=createdDateTime desc\").value | Select-Object userPrincipalName,appDisplayName,clientAppUsed,conditionalAccessStatus,createdDateTime | ConvertTo-Json -Depth 5",
+    "set_command": "",
+    "evidence_commands": [
+      "(Invoke-MgGraphRequest -Uri \"https://graph.microsoft.us/v1.0/auditLogs/signIns?`$filter=clientAppUsed ne 'Browser' and conditionalAccessStatus eq 'failure'&`$top=10&`$orderby=createdDateTime desc\").value | Select-Object userPrincipalName,appDisplayName,clientAppUsed,conditionalAccessStatus,createdDateTime | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AC.L2-3.1.18",
+      "AC.L2-3.1.19"
+    ],
+    "timestamp": "2026-11-01T16:04:57.070Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] BYOD Non-Browser Sign-In Failures (Runtime Sample)",
+    "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

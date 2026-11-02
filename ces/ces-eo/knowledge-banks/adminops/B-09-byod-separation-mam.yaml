@@ -1,0 +1,79 @@
+controlId: "AC.L1-3.1.20"
+relatedControlIds:
+  - "AC.L1-3.1.1"
+  - "AC.L2-3.1.3"
+  - "MP.L2-3.8.1"
+  - "MP.L2-3.8.2"
+practiceStatement: Limit system access to authorized users, processes acting on behalf of users, and devices.
+useCaseId: B-09
+useCaseTitle: "BYOD Separation (MAM)"
+domain: Device & Endpoint Management
+priority: P4 Standard
+trigger: 'ONBOARDING: Personal device registered for work use; SCHEDULE: Quarterly MAM policy review'
+sodTier: Tier 2 -- Config Manager
+entraRolesRequired:
+- Intune Administrator
+approvalRequired: true
+services:
+- name: Microsoft Intune
+  purpose: App Protection Policies for iOS, Android, and Windows
+- name: Entra ID
+  purpose: app-based Conditional Access, device registration for MAM-only scenarios
+- name: Microsoft 365 mobile apps
+  purpose: Outlook, Teams, OneDrive, Office apps -- MAM-aware
+configurationSteps:
+  portalPath: https://intune.microsoft.us
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes DeviceManagementApps.ReadWrite.All
+  - cmdlet: New-MgDeviceAppManagementIoManagedAppProtection
+    parameters:
+    - -MgDeviceAppManagementIoManagedAppProtection
+    - -BodyParameter
+    - -MgDeviceAppManagementIoManagedAppProtection
+    - -All
+    - -Object
+  - cmdlet: Get-MgDeviceAppManagementIoManagedAppProtection
+    parameters:
+    - -MgDeviceAppManagementIoManagedAppProtection
+    - -All
+    - -Object
+    - -Table
+    - -AutoSize
+  - cmdlet: Get-MgDeviceAppManagementManagedAppRegistration
+    parameters:
+    - -MgDeviceAppManagementManagedAppRegistration
+    - -All
+    - -Object
+    - -Table
+    - -AutoSize
+  graphApiEndpoint: POST https://graph.microsoft.us/v1.0/deviceAppManagement/iosManagedAppProtections
+  graphApiPayloadExample: {}
+  requiredPermissions:
+  - DeviceManagementApps.ReadWrite.All
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-b-device/B-09/{year}/{month}/
+  format: JSON (MAM policy export), CSV (selective wipe test results), PDF (user confirmation of personal data preservation)
+  filenamePattern: B-09_MAMPolicy_{YYYYMMDD}_{HHmmss}_{Platform}.json
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: Intune App Protection Policies (MAM without enrollment) are fully supported in GCC High for iOS, Android, and Windows
+    platforms. Microsoft 365 mobile apps (Outlook, Teams, OneDrive, Office) in GCC High respect MAM policies identically to
+    commercial. The MAM SDK for custom LOB apps is available; verify SDK version compatibility with GCC High endpoints. Selective
+    wipe in GCC High operates identically to commercial. Note that some third-party apps may not be MAM-aware in GCC High;
+    only deploy MAM policies to apps confirmed as MAM-SDK-integrated. The conditional launch "jailbroken/rooted device" d
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

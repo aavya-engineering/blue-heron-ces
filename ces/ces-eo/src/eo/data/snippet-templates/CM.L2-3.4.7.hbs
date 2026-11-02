@@ -1,0 +1,41 @@
+## Control {{controlId}}: Restrict, Disable, or Prevent the Use of Nonessential Programs, Functions, Ports, Protocols, and Services
+
+**Implementation Status:** {{status}}
+
+This organization restricts nonessential programs, functions, and services within the {{tenantName}} M365 GCC High tenant through application control policies, detected application monitoring, and endpoint firewall configurations managed by {{variables.systemAdministrator}}.
+
+{{#if detectedAppsMonitored}}
+**Application Inventory and Control:**
+{{detectedAppsCount}} applications detected across managed endpoints are monitored for authorization status:
+{{#if apps}}
+{{#each apps}}
+- **{{displayName}}** v{{version}} — Publisher: {{publisher}} — Installed on {{deviceCount}} devices
+{{/each}}
+{{/if}}
+
+Unauthorized applications are flagged for removal. Windows Defender Application Control (WDAC) policies enforce application allowlisting, blocking execution of unapproved software.
+{{else}}
+Application detection and monitoring has not been confirmed. Software authorization enforcement is not verified.
+{{/if}}
+
+{{#if deviceConfigurationsActive}}
+**Port, Protocol, and Service Restrictions:**
+{{deviceConfigurationsCount}} device configuration profiles enforce:
+- Windows Firewall rules blocking unnecessary inbound/outbound ports
+- Disabled services: Print Spooler, Remote Registry, and other non-essential Windows services
+- Protocol restrictions: SMBv1 disabled, TLS 1.0/1.1 disabled, only TLS 1.2+ permitted
+- Bluetooth and Wi-Fi Direct disabled on endpoints processing CUI (where applicable)
+{{/if}}
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine WDAC policies, detected application reports, firewall configurations, disabled service lists, and protocol restriction settings.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

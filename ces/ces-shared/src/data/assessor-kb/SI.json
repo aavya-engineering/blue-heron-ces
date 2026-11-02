@@ -1,0 +1,662 @@
+{
+  "family": "SI",
+  "family_name": "System and Information Integrity",
+  "practices": [
+    {
+      "id": "SI.L1-3.14.1",
+      "title": "Identify, report and correct information and information system flaws in a timely manner.",
+      "approach": {
+        "what_assessor_does": "The assessor reads the flaw remediation procedure for three stated time frames: how soon flaws must be found, how soon they must be reported to the people who fix them, and how soon they must be fixed, usually by severity. They then take a sample of devices and recent vulnerabilities and compare the date each flaw was published or detected with the date it was reported and the date it was patched or mitigated. In interviews they ask the patch owner how new flaws reach them and what happens when a fix is late. Testing means tracing one recent critical vulnerability from detection to closure. CES's own tenant signal for this practice only confirms that device compliance policies exist; it does not show that the time frames were met, so timing rests on vulnerability records and tickets.",
+        "common_failure_modes": [
+          "The procedure says patches are applied 'promptly' or 'regularly' with no number of days.",
+          "Time frames exist for fixing flaws but nothing says how soon they must be found or reported.",
+          "Vulnerability scans cover workstations only; servers, network devices or cloud workloads are left out.",
+          "Sampled critical vulnerabilities stayed open past the stated deadline with no exception or POA&M entry.",
+          "Flaws are fixed but there is no dated record showing when they were reported to the fixer."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "SI.L1-3.14.1[a]",
+          "determination": "the time within which to identify system flaws is specified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "System integrity policy or flaw remediation procedure",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-integrity-policy.md (GateEvidence family SI). Should state how soon new flaws must be identified, for example the vulnerability scan cadence and how often vendor bulletins are checked."
+            },
+            {
+              "artifact_type": "Vulnerability assessment recency by device",
+              "ces_source": "eo_store",
+              "notes": "EO EvidenceStore collected source collect.tvmAssessmentRecency (advanced hunting DeviceTvmInfoGathering, last assessment per device). EO reads it for RA.L2-3.11.2 with a 7-day expectation; compare the assessment cadence with the identification time frame the policy states."
+            },
+            {
+              "artifact_type": "Patch owner interview",
+              "ces_source": "interview",
+              "notes": "Ask what the stated time to identify a flaw is, where it is written, and how it was chosen."
+            }
+          ]
+        },
+        {
+          "id": "SI.L1-3.14.1[b]",
+          "determination": "system flaws are identified within the specified time frame",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "OS patch currency audit",
+              "ces_source": "ao_row",
+              "notes": "AdminOps B-03 OS Patch Currency Audit: OS version inventory compared against the Microsoft Security Response Center release; registered against SI.L1-3.14.1 with evidence objective SI.L1-3.14.1[b]."
+            },
+            {
+              "artifact_type": "Defender vulnerability records",
+              "ces_source": "eo_store",
+              "notes": "EO EvidenceStore collected source collect.tvmVulnerabilities (advanced hunting DeviceTvmSoftwareVulnerabilities, each row stamped with the time it was observed). Compare first-observed dates with the vulnerability publish dates for a sample."
+            },
+            {
+              "artifact_type": "Device compliance policies and managed devices",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry SI.L1-3.14.1 (flawRemediationL1Evaluator): Graph /deviceManagement/deviceCompliancePolicies (required) and /deviceManagement/managedDevices. The evaluator only checks that compliance policies exist; it does not show flaws were found in time."
+            },
+            {
+              "artifact_type": "Trace of a recent critical vulnerability",
+              "ces_source": "interview",
+              "notes": "Pick a recent critical vulnerability that applied to the environment and ask the patch owner to show when it was first detected on each affected device."
+            }
+          ]
+        },
+        {
+          "id": "SI.L1-3.14.1[c]",
+          "determination": "the time within which to report system flaws is specified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "System integrity policy or flaw remediation procedure",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-integrity-policy.md (GateEvidence family SI). Should state who must be told about a newly found flaw and within how long."
+            },
+            {
+              "artifact_type": "Patch and vulnerability escalation procedure",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector when the reporting path lives in an IT procedure or ticketing runbook rather than the policy."
+            },
+            {
+              "artifact_type": "Patch owner interview",
+              "ces_source": "interview",
+              "notes": "Ask who receives reports of new flaws, how they arrive, and the stated time limit for the report."
+            }
+          ]
+        },
+        {
+          "id": "SI.L1-3.14.1[d]",
+          "determination": "system flaws are reported within the specified time frame",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Vulnerability tickets or change records with dates",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. For a sample of flaws, the ticket creation date against the detection date shows whether reporting met the time frame."
+            },
+            {
+              "artifact_type": "Defender vulnerability records",
+              "ces_source": "eo_store",
+              "notes": "EO EvidenceStore collected source collect.tvmVulnerabilities supplies the detection side of the comparison (observation time per device, CVE and software)."
+            },
+            {
+              "artifact_type": "Patch owner interview",
+              "ces_source": "interview",
+              "notes": "Ask the patch owner to walk through how the last critical flaw was reported to them and when."
+            }
+          ]
+        },
+        {
+          "id": "SI.L1-3.14.1[e]",
+          "determination": "the time within which to correct system flaws is specified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Patch timeline parameters in the SSP",
+              "ces_source": "eo_store",
+              "notes": "EO SSP organization-defined parameters PI.ODP.009 critical_patch_timeline_days (recommended 14) and PI.ODP.010 high_patch_timeline_days (recommended 30), both referencing 3.14.1 (ces-eo/src/eo/ssp/OdpValueProvider.ts). The values the contractor set should match the policy."
+            },
+            {
+              "artifact_type": "System integrity policy or flaw remediation procedure",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-integrity-policy.md (GateEvidence family SI). Should state the correction time frame by severity and how exceptions are approved."
+            },
+            {
+              "artifact_type": "Patch owner interview",
+              "ces_source": "interview",
+              "notes": "Ask the time frame for fixing a critical and a high flaw and what happens when it cannot be met."
+            }
+          ]
+        },
+        {
+          "id": "SI.L1-3.14.1[f]",
+          "determination": "system flaws are corrected within the specified time frame",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Defender vulnerability remediation status",
+              "ces_source": "eo_store",
+              "notes": "EO EvidenceStore collected source collect.tvmVulnerabilities. EO reads it for RA.L2-3.11.3 (vulnRemediationEvaluator: each CVE row remediated or tracked). For SI the assessor compares remediation dates of sampled CVEs with PI.ODP.009 and PI.ODP.010."
+            },
+            {
+              "artifact_type": "POA&M entries for late fixes",
+              "ces_source": "eo_store",
+              "notes": "EO PoamStore (ces-eo/src/eo/poam/PoamStore.ts). Flaws that missed the correction time frame should appear here with a planned fix date."
+            },
+            {
+              "artifact_type": "Patch deployment and update ring reports",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector (for example Intune Windows Update reports or server patch reports) showing install dates for sampled updates."
+            },
+            {
+              "artifact_type": "Trace of a recent critical vulnerability",
+              "ces_source": "interview",
+              "notes": "Ask the patch owner to show when the fix reached each affected device and whether any device was late."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SI.L1-3.14.2",
+      "title": "Provide protection from malicious code at appropriate locations within organizational information systems.",
+      "approach": {
+        "what_assessor_does": "The assessor reads the system integrity policy and the system description to find where malicious code protection is meant to run, typically endpoints, servers, email, and file storage or other entry and exit points. They then check that protection is turned on at each of those places: device antivirus settings, email attachment scanning and cloud file scanning. They interview the administrator about how a new device or service gets covered. Testing means dropping a harmless test file (such as the EICAR string) on a sampled device and through email and confirming it is caught. CES reads the Intune Defender antivirus settings for this practice; email and file-storage protection are not read by a CES tenant signal and need uploaded configuration.",
+        "common_failure_modes": [
+          "The locations that need protection were never written down, so coverage cannot be judged.",
+          "Antivirus is installed on workstations but servers, virtual machines or Macs are not covered.",
+          "Email attachments or cloud file storage are not scanned even though they are named entry points.",
+          "Real-time protection can be switched off by users, or cloud-delivered protection is disabled.",
+          "A test file placed on a sampled device is not detected or blocked."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "SI.L1-3.14.2[a]",
+          "determination": "designated locations for malicious code protection are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "System integrity policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-integrity-policy.md (GateEvidence family SI). Should list where malicious code protection must run (endpoints, servers, email, file storage, other entry and exit points)."
+            },
+            {
+              "artifact_type": "System description or network diagram showing protection points",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. The assessor checks every entry and exit point in the boundary has a named protection."
+            },
+            {
+              "artifact_type": "Security administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how the list of protected locations was decided and how a new device type or cloud service gets added."
+            }
+          ]
+        },
+        {
+          "id": "SI.L1-3.14.2[b]",
+          "determination": "protection from malicious code at designated locations is provided",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Defender antivirus device configuration",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry SI.L1-3.14.2 (malwareProtectionL1Evaluator): Graph /deviceManagement/deviceConfigurations. Checks real-time monitoring, file activity monitoring, cloud-delivered protection and a high cloud block level."
+            },
+            {
+              "artifact_type": "Managed device inventory and compliance",
+              "ces_source": "eo_store",
+              "notes": "EO EvidenceStore collected source collect.deviceCompliance (Graph /deviceManagement/managedDevices). Compare against the device list to find devices the antivirus configuration does not reach."
+            },
+            {
+              "artifact_type": "Email and file storage anti-malware settings",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector (for example Defender for Office 365 anti-malware and Safe Attachments policy exports). No CES tenant signal reads these settings."
+            },
+            {
+              "artifact_type": "Test file detection",
+              "ces_source": "interview",
+              "notes": "With the administrator, place a harmless test file (EICAR) on a sampled device and send one by email; both should be detected or blocked."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SI.L2-3.14.3",
+      "title": "Monitor system security alerts and advisories and take action in response.",
+      "approach": {
+        "what_assessor_does": "The assessor looks for a written procedure that names the sources of security alerts and advisories the organization follows (for example CISA alerts and the Known Exploited Vulnerabilities catalog, vendor bulletins such as Microsoft's monthly security updates, and the security console's own recommendations), who reviews them, how often, and what kinds of action follow. They examine evidence that the sources are actually received and read, and pick one or two recent advisories that applied to the organization to see what was done and when. In interviews they ask the reviewer how the last relevant advisory was handled. CES reads Microsoft Secure Score and its recommendations with dates; outside advisories such as CISA bulletins are not read by any CES signal and need uploaded records.",
+        "common_failure_modes": [
+          "No named sources of advisories; staff say they 'keep up with the news'.",
+          "Alerts arrive in a mailbox nobody owns or checks on a set schedule.",
+          "Response actions are not defined, so there is no way to tell whether the right thing was done.",
+          "A recent advisory that clearly applied was never assessed or acted on.",
+          "Actions were taken but nothing records which advisory prompted them or when."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "SI.L2-3.14.3[a]",
+          "determination": "response actions to system security alerts and advisories are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "System integrity policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-integrity-policy.md (GateEvidence family SI). Should name the advisory sources followed, who reviews them, how often, and the kinds of response expected."
+            },
+            {
+              "artifact_type": "Advisory handling procedure",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector when the response steps (assess, patch, configure, accept with approval) are kept in an operations procedure."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask what actions follow a relevant advisory and who decides. No AdminOps command is registered against SI.L2-3.14.3."
+            }
+          ]
+        },
+        {
+          "id": "SI.L2-3.14.3[b]",
+          "determination": "system security alerts and advisories are monitored",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Secure Score recommendations with dates",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry SI.L2-3.14.3 (safeLinksEvaluator, which despite its name reads Secure Score): Graph /security/secureScores, plus /security/alerts_v2 (required) and Exchange Get-SafeLinksPolicy. Met when the newest dated score lists a recommendation or a current control profile names one."
+            },
+            {
+              "artifact_type": "Advisory subscriptions",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: proof of subscription to outside sources such as CISA alerts and the Known Exploited Vulnerabilities catalog or vendor security bulletins. No CES signal reads these."
+            },
+            {
+              "artifact_type": "Advisory reviewer interview",
+              "ces_source": "interview",
+              "notes": "Ask the reviewer which sources they read, how often, and to show the most recent one they reviewed."
+            }
+          ]
+        },
+        {
+          "id": "SI.L2-3.14.3[c]",
+          "determination": "actions in response to system security alerts and advisories are taken",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Secure Score control profiles with status",
+              "ces_source": "eo_store",
+              "notes": "EO EvidenceStore collected sources collect.secureScores and collect.secureScoreControlProfiles (each profile stamped with the time observed and its implementationStatus). Shows whether console recommendations were acted on."
+            },
+            {
+              "artifact_type": "Tickets or change records citing an advisory",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Each record should name the advisory and the date of the action."
+            },
+            {
+              "artifact_type": "Trace of a recent advisory",
+              "ces_source": "interview",
+              "notes": "Pick a recent advisory that applied to the environment and ask the reviewer what was done, by whom and when."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SI.L1-3.14.4",
+      "title": "Update malicious code protection mechanisms when new releases are available.\t\nAssessment Objective:\n[a] malicious code protection mechanisms are updated when new releases are available.",
+      "approach": {
+        "what_assessor_does": "The assessor checks how antivirus engines and signature definitions are kept current: the update setting, how often it runs, and who watches for devices that stop updating. They examine the configured update interval and a device health report for a sample of devices, comparing each device's signature and engine version with the current release from the vendor. In interviews they ask the administrator how they would notice a device that has not updated. CES reads the Intune Defender signature update interval and expects it to be 24 hours or less unless the organization sets a different value.",
+        "common_failure_modes": [
+          "Updates are configured, but sampled devices show signature versions days or weeks old.",
+          "Devices not enrolled in Defender for Endpoint or Intune are never updated or checked.",
+          "No one reviews update health, so stale devices go unnoticed.",
+          "Engine or platform versions are left behind even though signature definitions update."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "SI.L1-3.14.4[a]",
+          "determination": "malicious code protection mechanisms are updated when new releases are available",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Defender signature update interval",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry SI.L1-3.14.4 (avUpdateEvaluator): Graph /deviceManagement/deviceConfigurations, field defenderSignatureUpdateIntervalInHours. Met when a configuration sets it to 24 hours or less (or the organization's own value)."
+            },
+            {
+              "artifact_type": "EDR coverage gap report",
+              "ces_source": "ao_row",
+              "notes": "AdminOps B-11 EDR Coverage Gap Detection: compares Intune and Defender for Endpoint inventories to find devices outside update and health reporting; registered against SI.L1-3.14.4 with evidence objective SI.L1-3.14.4[a]."
+            },
+            {
+              "artifact_type": "Device health report with signature and engine versions",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector (for example the Defender antivirus health report). Compare sampled devices with the current vendor release."
+            },
+            {
+              "artifact_type": "Security administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how a device that stops updating would be noticed and how quickly it is fixed."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SI.L1-3.14.5",
+      "title": "Perform periodic scans of the information system and real-time scans of files from external sources as files are downloaded, opened or executed.",
+      "approach": {
+        "what_assessor_does": "The assessor reads the policy for how often full or quick malware scans must run, then checks the configured scan schedule and the scan history on a sample of devices to see that scans actually ran at that frequency. They also check that files are scanned in real time when downloaded, opened or run, including files from email, the web and removable media. Testing means downloading or copying a harmless test file on a sampled device and confirming it is caught at that moment. CES reads the Intune Defender scan schedule, scan type and real-time monitoring settings; the configured schedule shows intent, so the assessor still asks for scan history to show the scans ran.",
+        "common_failure_modes": [
+          "The policy names no scan frequency, or the configured schedule does not match it.",
+          "Scheduled scans are set to user-defined, so users can skip or change them.",
+          "Scan history shows sampled devices with no completed scan in the stated period.",
+          "Real-time scanning is off for some devices or does not cover file activity.",
+          "Files from removable media or network shares are not scanned when opened."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "SI.L1-3.14.5[a]",
+          "determination": "the frequency for malicious code scans is defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "System integrity policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-integrity-policy.md (GateEvidence family SI). Should state how often full or quick malware scans run."
+            },
+            {
+              "artifact_type": "Defender scan schedule configuration",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry SI.L1-3.14.5 (scanScheduleEvaluator): Graph /deviceManagement/deviceConfigurations, fields defenderSystemScanSchedule, defenderScanType and defenderScheduledScanTime. A user-defined schedule does not count."
+            },
+            {
+              "artifact_type": "Security administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask the defined scan frequency and confirm it matches the configured schedule."
+            }
+          ]
+        },
+        {
+          "id": "SI.L1-3.14.5[b]",
+          "determination": "malicious code scans are performed with the defined frequency",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Scan history by device",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector (for example the Defender antivirus health report showing the last quick and full scan per device). The CES signal shows the schedule is set, not that scans ran."
+            },
+            {
+              "artifact_type": "Defender scan schedule configuration",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry SI.L1-3.14.5 (scanScheduleEvaluator): the configured schedule the scan history is compared against."
+            },
+            {
+              "artifact_type": "Sampled device check",
+              "ces_source": "interview",
+              "notes": "With the administrator, open the scan history on two or three sampled devices and confirm a scan completed in each stated period."
+            }
+          ]
+        },
+        {
+          "id": "SI.L1-3.14.5[c]",
+          "determination": "real-time malicious code scans of files from external sources as files are downloaded, opened, or executed are performed",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Defender real-time scanning configuration",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry SI.L1-3.14.5 (scanScheduleEvaluator): fields defenderRequireRealTimeMonitoring and defenderMonitorFileActivity on Graph /deviceManagement/deviceConfigurations."
+            },
+            {
+              "artifact_type": "Attack surface reduction rule audit",
+              "ces_source": "ao_row",
+              "notes": "AdminOps F-03 ASR Rule Audit: rule-by-rule coverage with Advanced Hunting metrics, including rules that block executable content from email and the web; registered against SI.L1-3.14.5 with evidence objective SI.L1-3.14.5[c]. Supports, but does not replace, real-time scanning settings."
+            },
+            {
+              "artifact_type": "Real-time scan test",
+              "ces_source": "interview",
+              "notes": "With the administrator, download a harmless test file (EICAR) and copy one from removable media on a sampled device; each should be caught when written or opened."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SI.L2-3.14.6",
+      "title": "Monitor organizational systems, including inbound and outbound communications traffic, to detect attacks and indicators of potential attacks.",
+      "approach": {
+        "what_assessor_does": "The assessor asks how the organization watches its systems for attacks: which tools raise alerts (for example Defender XDR, Entra ID Protection, Sentinel, firewalls), who reviews them, and how quickly. They check that monitoring covers both traffic coming in (email, web, remote access, inbound network flows) and traffic going out (outbound connections, data leaving by email or web), not only endpoints. They examine alert and incident records for a recent period and pick a few to trace from alert to triage. In interviews they ask the person on watch what they did with the last real alert. CES checks that the security alert, risk detection and Secure Score feeds were all read and healthy in the window; that shows the feeds operate, not that inbound and outbound traffic is covered, which rests on network and email logging.",
+        "common_failure_modes": [
+          "Alerts are generated but nobody is assigned to review them, or review happens only after an incident.",
+          "Monitoring covers endpoints only; network traffic in and out of the boundary is not logged or watched.",
+          "Outbound traffic is not monitored at all, so data leaving the system would go unseen.",
+          "A monitoring feed has been broken or disconnected for weeks without anyone noticing.",
+          "An outside monitoring provider is used but its scope and hand-off to the organization are not written down."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "SI.L2-3.14.6[a]",
+          "determination": "the system is monitored to detect attacks and indicators of potential attacks",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Monitoring feed health",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry SI.L2-3.14.6 (monitoringEvaluator): Graph /security/alerts_v2 (required), /security/secureScores and /identityProtection/riskDetections. Met only when all three feeds were read and healthy in the window; the EO evidence router lists this as item signal:securitySignals."
+            },
+            {
+              "artifact_type": "Security alert and incident records",
+              "ces_source": "eo_store",
+              "notes": "EO EvidenceStore collected sources collect.securityAlerts and collect.securityIncidents. The assessor samples alerts from a recent period and checks each was triaged."
+            },
+            {
+              "artifact_type": "Monitoring procedure and provider scope",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: who reviews alerts, how often, and the scope of any outside monitoring provider."
+            },
+            {
+              "artifact_type": "Analyst interview",
+              "ces_source": "interview",
+              "notes": "Ask the person on watch to show the last real alert they handled and what they did with it."
+            }
+          ]
+        },
+        {
+          "id": "SI.L2-3.14.6[b]",
+          "determination": "inbound communications traffic is monitored to detect attacks and indicators of potential attacks",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Network flow logging and analytics",
+              "ces_source": "ao_row",
+              "notes": "AdminOps F-14 VNet Flow Logs + Sentinel Flow Analytics: enables VNet flow logs with Traffic Analytics and a Sentinel scheduled rule over NTANetAnalytics for denied or anomalous flows; registered against SI.L2-3.14.6 with evidence objectives [a], [b] and [c]. Covers Azure network traffic only."
+            },
+            {
+              "artifact_type": "Inbound email and perimeter monitoring configuration",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector (for example email threat protection policies, firewall or remote access logging settings). No CES tenant signal reads inbound traffic monitoring directly."
+            },
+            {
+              "artifact_type": "Inbound alert trace",
+              "ces_source": "interview",
+              "notes": "Ask the analyst to show an alert raised by inbound traffic, such as a blocked phishing email or a denied inbound connection, and how it was reviewed."
+            }
+          ]
+        },
+        {
+          "id": "SI.L2-3.14.6[c]",
+          "determination": "outbound communications traffic is monitored to detect attacks and indicators of potential attacks",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Network flow logging and analytics",
+              "ces_source": "ao_row",
+              "notes": "AdminOps F-14 VNet Flow Logs + Sentinel Flow Analytics; registered against SI.L2-3.14.6 with evidence objective SI.L2-3.14.6[c]. Outbound Azure flows are logged and analysed; traffic leaving offices or devices needs other evidence."
+            },
+            {
+              "artifact_type": "Outbound traffic monitoring configuration",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector (for example firewall egress logging, endpoint network protection or outbound mail monitoring). No CES tenant signal reads outbound traffic monitoring directly."
+            },
+            {
+              "artifact_type": "Outbound alert trace",
+              "ces_source": "interview",
+              "notes": "Ask the analyst how a device sending data to an unknown destination would be noticed, and to show an example alert if one exists."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SI.L2-3.14.7",
+      "title": "Identify unauthorized use of organizational systems.",
+      "approach": {
+        "what_assessor_does": "The assessor first looks for a written statement of what authorized use is, such as an acceptable use policy or rules of behavior, so that unauthorized use has something to be measured against. They then ask how unauthorized use is spotted: risky sign-ins, unusual account activity, use outside approved locations or hours, and alerts for access being gained, kept or abused. They examine detection records for a recent period and pick a few to see that each one was looked at and given an outcome. In interviews they ask the reviewer what would make them treat activity as unauthorized and what they did with the last case. CES reads Entra ID Protection risk detections and security alerts in unauthorized-use categories and checks that each one carries a state and a time.",
+        "common_failure_modes": [
+          "There is no acceptable use policy or rules of behavior, so authorized use is never defined.",
+          "Risky sign-in and account alerts are produced but closed without review or left open.",
+          "Detection depends on users reporting problems rather than on any monitoring.",
+          "Service and shared accounts are excluded from monitoring.",
+          "Reviewers cannot explain what they treat as unauthorized use."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "SI.L2-3.14.7[a]",
+          "determination": "authorized use of the system is defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Acceptable use policy or rules of behavior",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Should define authorized use of the system clearly enough to tell when use is unauthorized."
+            },
+            {
+              "artifact_type": "System integrity policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-integrity-policy.md (GateEvidence family SI). Should point to the definition of authorized use and say what is monitored against it."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask where authorized use is defined and how users are told about it. No AdminOps command is registered against SI.L2-3.14.7."
+            }
+          ]
+        },
+        {
+          "id": "SI.L2-3.14.7[b]",
+          "determination": "unauthorized use of the system is identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Unauthorized-use detections with disposition",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry SI.L2-3.14.7 (alertsEvaluator): Graph /security/alerts_v2 (required), /identity/conditionalAccess/policies and /identityProtection/riskDetections. Reads risk detections and alerts in initial access, persistence, privilege escalation, credential access, lateral movement, collection and exfiltration categories; each must carry a state and a time."
+            },
+            {
+              "artifact_type": "Risk detections, alerts and sign-in records",
+              "ces_source": "eo_store",
+              "notes": "EO EvidenceStore collected sources collect.riskDetections, collect.securityAlerts and collect.signIns. The assessor picks a few detections and checks the outcome recorded for each."
+            },
+            {
+              "artifact_type": "Reviewer interview and detection trace",
+              "ces_source": "interview",
+              "notes": "Ask the reviewer what they treat as unauthorized use and to walk through the most recent detection from alert to outcome."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

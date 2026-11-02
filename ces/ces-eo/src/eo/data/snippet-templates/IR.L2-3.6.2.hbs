@@ -1,0 +1,38 @@
+## Control {{controlId}}: Track, Document, and Report Incidents to Designated Officials
+
+**Implementation Status:** {{status}}
+
+This organization tracks, documents, and reports security incidents within the {{tenantName}} M365 GCC High tenant through incident management procedures and regulatory reporting requirements managed by {{variables.systemAdministrator}}.
+
+{{#if securityAlertsActive}}
+**Incident Tracking:**
+{{securityAlertsCount}} security alerts are tracked through Microsoft Defender incident management:
+{{#if alerts}}
+{{#each alerts}}
+- **{{title}}** — Severity: {{severity}} — Status: {{status}} — Vendor: {{vendor}}
+{{/each}}
+{{/if}}
+
+Each incident is documented with: incident identifier, detection time, affected systems/users, severity classification, containment actions, root cause, and resolution.
+{{else}}
+Automated incident tracking has not been confirmed.
+{{/if}}
+
+**Reporting Requirements:**
+- **Internal Reporting:** Incidents reported to {{variables.systemAdministrator}} and ISSO within severity-based timeframes (Critical: 1 hour, High: 4 hours)
+- **DFARS 252.204-7012:** Cyber incidents affecting CUI reported to DoD Cyber Crime Center (DC3) within 72 hours via https://dibnet.dod.mil
+- **Evidence Preservation:** Forensic images and malicious software preserved for 90 days per DFARS requirements
+- **Subcontractor Notification:** Subcontractors notified of reporting requirements per contract flow-down provisions
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine incident tracking records, internal notification logs, DC3 reporting confirmation (if applicable), and evidence preservation records.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

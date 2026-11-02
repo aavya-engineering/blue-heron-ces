@@ -1,0 +1,76 @@
+{
+  "ces": {
+    "artifact": "tenant_manifest",
+    "version": "1.0.0",
+    "generated_on": "2026-09-27T16:21:19.895Z",
+    "intent": "Canonical tenant manifest defining RIGHT state for CMMC L2 (harden_existing, m365_azure)",
+    "cesId": "ft-x1-all-met",
+    "inputs": {
+      "si_baseline_hash": "000000000000000000000000000000000000000000000000000000004415e483"
+    }
+  },
+  "tenant_manifest": {
+    "manifest_id": "manifest_muk0zxcn_ovwwdnx",
+    "tech_stack_id": 1,
+    "normative_controls": [
+      {
+        "control_id": "general",
+        "required_state": "All CMMC controls implemented and verified",
+        "verification": [
+          {
+            "id": "chk_muk0zxcn_k2mhrst",
+            "description": "Verify overall compliance posture",
+            "method": "manual",
+            "expected": "All controls report compliant",
+            "on_fail": "Initiate gap remediation"
+          }
+        ],
+        "evidence_artifacts": []
+      }
+    ],
+    "assets": [],
+    "config_intents": [
+      {
+        "id": "ci_muk0zxcn_csk6oym",
+        "title": "General compliance configuration",
+        "control_ids": [
+          "general"
+        ],
+        "desired_config": {
+          "state": "compliant"
+        },
+        "source_of_truth": "platform_setting",
+        "query_method": "manual"
+      }
+    ],
+    "evidence_monitors": [
+      {
+        "id": "em_muk0zxco_8g7w9mr",
+        "control_ids": [
+          "general"
+        ],
+        "signal": "General compliance monitoring",
+        "collection_method": "manual",
+        "cadence": "weekly",
+        "retention_days": 365,
+        "on_drift": "Alert compliance team"
+      }
+    ],
+    "drift_policies": [
+      {
+        "id": "dp_muk0zxco_cibwb4y",
+        "scope": "All CMMC controls",
+        "severity": "medium",
+        "detection": [
+          "Weekly compliance scans",
+          "Monthly evidence reviews"
+        ],
+        "response_playbook": [
+          "Evaluate drift impact",
+          "Schedule remediation",
+          "Update documentation"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,124 @@
+# CES contracts between components: the version a producer writes and the rule readers follow.
+# source = "<path relative to the workspace root>:<line>" of the version constant (or, for an
+# unversioned contract, of the route or table definition). scripts/handoff/check.mjs reads that line
+# and fails when the version on it no longer matches.
+schemaVersion: 1
+contracts:
+  - id: mission-plan
+    kind: file
+    version: "1.0.0"
+    producer: muster-api
+    consumers: [ces-stamper, ces-eo, ces-ao, ces-muster]
+    source: "ces-shared/src/types/mission-plan.contract.ts:31"
+    compat: "Readers accept only the versions in SUPPORTED_PLAN_VERSIONS (today 1.0.0); an unknown ces.version fails validation. A breaking change bumps the major and adds the new version to the supported list."
+
+  - id: execution-results
+    kind: file
+    version: "1.1.0"
+    producer: ces-stamper
+    consumers: [ces-eo, ces-ec]
+    source: "ces-shared/src/types/execution-results.contract.ts:15"
+    compat: "Readers accept every version in SUPPORTED_EXECUTION_RESULTS_VERSIONS (1.0.0 and 1.1.0). New fields are optional, so N-1 files still parse."
+
+  - id: adminops-evidence
+    kind: file
+    version: "1.3.0"
+    producer: ces-ao
+    consumers: [ces-eo]
+    source: "ces-shared/src/types/adminops-evidence.contract.ts:15"
+    compat: "Readers accept 1.0.0 through 1.3.0 (SUPPORTED_ADMINOPS_EVIDENCE_VERSIONS). Additions are optional fields or new outcomes gated on the row's contractVersion."
+
+  - id: ec-api
+    kind: api
+    version: "1.0.0"
+    producer: ces-ec
+    consumers: [ces-eo]
+    source: "ces-shared/src/types/evidence-collector.contract.ts:26"
+    compat: "Shapes of EC's /api/health, /api/runs, /api/findings, /api/items and /api/ingest. Readers accept the versions in SUPPORTED_EC_CONTRACT_VERSIONS (today 1.0.0); items are strict, so an unknown key is rejected."
+
+  - id: request-principal
+    kind: api
+    version: "1.1.0"
+    producer: ces-shared
+    consumers: [ces-eo, ces-ao, ces-ec]
+    source: "ces-shared/src/http/requestPrincipal.ts:42"
+    compat: "Signed per-user principal token in the x-ces-principal header (HS256, Entra-style claims). Servers verify it locally; a breaking change to the claims bumps the major."
+
+  - id: interview-record
+    kind: file
+    version: "1"
+    producer: muster-api
+    consumers: [ces-eo]
+    source: "ces-shared/src/types/interview-record.types.ts:22"
+    compat: "Schema id ces-shared/interview-record@1. EO stores records append-only; the record id is a canonical hash, so the same answer sent twice is stored once. muster-api repeats the id locally (muster-api/src/services/interviewRecordService.ts:34); both must change together."
+
+  - id: muster-intake
+    kind: api
+    version: "1"
+    producer: ces-eo
+    consumers: [muster-api]
+    source: "ces-eo/src/eo/server/routers/intake-router.ts:37"
+    compat: "POST /api/intake/muster (bearer CES_EO_AUTH_TOKEN) takes Muster's push bundle and answers with receipt schema ces-eo/muster-intake-receipt@1. A breaking change to the receipt bumps the @ number."
+
+  - id: readiness-result
+    kind: file
+    version: "1.1.0"
+    producer: muster-api
+    consumers: [ces-muster, ces-tester]
+    source: "ces-muster/muster-api/src/services/discoveryEnvelope.ts:121"
+    compat: "schema_version readiness-result/1.1.0, validated against ces-muster/public/schemas/readiness-result.schema.json."
+
+  - id: cost-acks
+    kind: file
+    version: "1.0.0"
+    producer: ces-stamper
+    consumers: [ces-stamper]
+    source: "ces-shared/src/types/cost-gate.types.ts:102"
+    compat: "cost-acks.json (the operator's DP-1 opt-ins per recurring-cost entry) is schema_version cost-acks/1.0.0 exactly (z.literal); any other value fails."
+
+  - id: sprs-weights
+    kind: file
+    version: "2.0.0"
+    producer: ces-shared
+    consumers: [ces-stamper, ces-eo, ces-muster, muster-api]
+    source: "ces-shared/src/data/sprs-weights.json:3"
+    compat: "Stamper accepts any sprs-weights/2.x (ScopeExclusionValidator). A new major needs every consumer updated."
+
+  - id: leaver-escalation
+    kind: db
+    version: "1"
+    producer: ces-ao
+    consumers: [ces-eo]
+    source: "ces-ao/src/leaver/LeaverFlowService.ts:399"
+    compat: "PH-13 leaver flow: AO writes an unconfirmed or failed leaver flow as a ces-ao/leaver-escalation@1 record in its own ces.db collection adminops_leaver_escalations; EO's scheduler tick reads it (read only, ces-eo/src/eo/collect/leaverEscalations.ts) and records each once as a ces-eo/leaver-finding@1 finding with a notice. A breaking change to the fields EO reads bumps the @ number."
+
+  - id: ces-db
+    kind: db
+    version: "unversioned"
+    producer: ces-shared
+    consumers: [ces-stamper, ces-eo, ces-ao, ces-ec, muster-api]
+    source: "ces-shared/src/persistence/CesRepository.ts:154"
+    compat: "One SQLite file, {CES_PIPELINE_ROOT}/ces.db, table ces_records, created with CREATE TABLE IF NOT EXISTS. There is no migration number yet, so a column change needs a manual migration plan."
+
+  - id: tenant-service
+    kind: api
+    version: "unversioned"
+    producer: ces-tenant
+    consumers: [ces-tenant]
+    source: "ces-tenant/src/service/protocol.ts:42"
+    compat: "Optional local daemon (mode auth-state-only) on 127.0.0.1:4690, found through CES_TENANT_SERVICE_URL. Its only client is inside the ces-tenant library itself. No version field; the library and daemon ship from the same ces-tenant commit."
+
+  - id: stacksim-query
+    kind: api
+    version: "unversioned"
+    producer: tenant-stacksim
+    consumers: [ces-tester, ces-tenant, ces-eo, ces-ao, ces-stamper, muster-api]
+    source: "tenant-stacksim/src/http/QueryServer.ts:132"
+    compat: "The simulator's HTTP query server (default 127.0.0.1:4390). It mirrors the tenant endpoints the modules call; it has no version of its own and tracks the simulator commit."
+
+# Legend:
+#   Stamper, AO (AdminOps), EO (EvidenceOps), EC (Evidence Collector), Muster: the CES modules; README.md has the full list.
+#   DP-1 = the operator's plan-time opt-in for a recurring-cost entry (cost-acks.json); DP-2 = the run-time
+#   typed confirmation (ces-stamper/src/adapters/CostGateDp2.ts).
+#   "@1" / "/1.1.0" in a schema id = that schema's version. unversioned = no version constant in code yet.
+#   N-1 = the version before the current one.

@@ -1,0 +1,91 @@
+controlId: "IA.L2-3.5.3"
+relatedControlIds:
+  - "AC.L1-3.1.2"
+  - "IA.L2-3.5.7"
+  - "AC.L1-3.1.1"
+
+practiceStatement: "Limit system access to the types of transactions and functions that authorized users are permitted to execute."
+
+useCaseId: "A-08"
+useCaseTitle: "MFA Method Audit -- Weak Removal"
+domain: "Identity & Access Management"
+priority: "P4 Standard"
+trigger: "SCHEDULE: Quarterly or after A-07 policy update"
+
+sodTier: "Tier 2 -- Config Manager"
+entraRolesRequired:
+  - "Authentication Administrator"
+  - "Reports Reader"
+
+approvalRequired: false
+
+services:
+  - name: "Entra ID"
+    purpose: "Authentication Methods registration detail report"
+  - name: "Microsoft Graph PowerShell"
+    modules:
+      - "Microsoft.Graph.Reports"
+      - "Microsoft.Graph.Identity.SignIns"
+  - name: "Entra ID Authentication Methods"
+    purpose: "Per-user method management"
+
+configurationSteps:
+  portalPath: "https://entra.microsoft.us > Protection > Authentication methods > Activity > User registration details"
+
+  powershellCmdlets:
+    - cmdlet: "Connect-MgGraph"
+      parameters:
+        - "-Environment USGov"
+        - "-Scopes AuditLog.Read.All,UserAuthenticationMethod.ReadWrite.All,Reports.Read.All"
+    - cmdlet: "Get-MgReportAuthenticationMethodUserRegistrationDetail"
+      parameters:
+        - "-All"
+    - cmdlet: "Get-MgUserAuthenticationPhoneMethod"
+      parameters:
+        - "-UserId"
+    - cmdlet: "Remove-MgUserAuthenticationPhoneMethod"
+      parameters:
+        - "-UserId"
+        - "-PhoneAuthenticationMethodId"
+
+  graphApiEndpoint: "GET https://graph.microsoft.us/v1.0/reports/authenticationMethods/userRegistrationDetails"
+  graphApiPayloadExample: {}
+
+  requiredPermissions:
+    - "AuditLog.Read.All"
+    - "UserAuthenticationMethod.ReadWrite.All"
+    - "Reports.Read.All"
+
+evidenceArtifacts:
+  - type: "Azure AD Audit Logs"
+    retentionPeriod: "7 years"
+    storageLocation: "evidence-store/domain-a-identity/A-08/{year}/{month}/"
+    query: "Activity: Remove authentication method"
+  - type: "Stamper Execution Evidence"
+    hashAlgorithm: "SHA-256"
+    storageLocation: "evidence-store/domain-a-identity/A-08/{year}/{month}/"
+    format: "CSV (user list with weak methods identified), JSON (removal confirmations)"
+    filenamePattern: "A-08_WeakMFAAudit_{YYYYMMDD}_{HHmmss}_AllUsers.csv"
+
+gccHighSpecifics:
+  endpoints:
+    - "https://graph.microsoft.us"
+    - "https://entra.microsoft.us"
+  complianceBoundary: "FedRAMP High + CMMC L2"
+  endpointValidation: "All endpoints use .microsoft.us domains"
+  notes: "Users who lose all MFA methods will be prompted to register a new method at next sign-in, subject to A-07 CA policy. Authentication Methods Policy only allows phishing-resistant methods."
+
+relatedPolicies:
+  - "IA-002 Identification and Authentication Policy"
+
+odpValues: []
+
+dependencies:
+  hardDependencies:
+    - useCaseId: "A-07"
+      reason: "MFA policy and methods policy must exist so users have phishing-resistant methods available"
+  softDependencies:
+    - useCaseId: "E-09"
+      reason: "Audit report feeds C3PAO evidence package"
+
+notes: "Even after A-07 disables SMS and voice at tenant policy level, users who previously registered these methods may still have them listed. This audit ensures complete removal and forces migration to phishing-resistant methods."

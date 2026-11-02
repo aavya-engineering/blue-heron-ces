@@ -1,0 +1,43 @@
+{
+  "name": "cmmc-workspace",
+  "private": true,
+  "engines": {
+    "node": ">=24.12.0",
+    "npm": ">=11.6.2"
+  },
+  "workspaces": [
+    "ces-shared",
+    "ces-stamper",
+    "ces-eo",
+    "ces-ao",
+    "ces-ec",
+    "ces-shared/ui/kit",
+    "ces-stamper/ui",
+    "ces-ao/ui",
+    "ces-eo/ui"
+  ],
+  "scripts": {
+    "sync-ui-assets": "node scripts/sync-ui-assets.mjs",
+    "stamper": "npm run sync-ui-assets && npm run build -w ces-ui-kit && npm run build -w ces-stamper-ui && npm run gui -w ces-stamper -- --port 5002",
+    "ao": "npm run sync-ui-assets && npm run gui -w ces-ao -- --port 5003",
+    "eo": "npm run sync-ui-assets && cross-env EO_PORT=5004 npm run dev:eo -w ces-eo",
+    "muster": "npm run sync-ui-assets && cd ces-muster && npm run dev",
+    "ec": "npm run start -w ces-ec",
+    "test:ec": "npm test -w ces-ec",
+    "tester": "cd ces-tester && npm run build && node bin/ces-tester.mjs run-m2",
+    "build:shared": "npm run build -w ces-shared",
+    "build:stamper": "npm run build -w ces-stamper",
+    "build:ao": "npm run build -w ces-ao",
+    "build:eo": "npm run build -w ces-eo",
+    "build:ao-ui": "npm run build -w ces-ui-kit && npm run build -w ces-ao-ui",
+    "build:eo-ui": "npm run build -w ces-ui-kit && npm run build -w ces-eo-ui",
+    "build:core": "npm run build:shared && npm run build:stamper && npm run build:ao && npm run build:eo",
+    "migrate:artifacts": "node scripts/migrate-artifacts.mjs",
+    "pretest": "npm run build:shared && npm run build:stamper",
+    "test": "npm run test:shared && npm run test:stamper && npm run test:eo && npm run test:ao && npm run test:ec",
+    "test:shared": "npm test -w ces-shared",
+    "test:stamper": "npm test -w ces-stamper",
+    "test:eo": "npm test -w ces-eo",
+    "test:ao": "npm test -w ces-ao"
+  }
+}

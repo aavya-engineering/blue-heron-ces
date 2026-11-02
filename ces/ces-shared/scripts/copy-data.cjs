@@ -1,0 +1,21 @@
+// SPDX-FileCopyrightText: Blue Heron Defense LLC and its licensors. All rights reserved.
+// SPDX-License-Identifier: LicenseRef-BHD-Proprietary
+// CONFIDENTIAL - TRADE SECRET. Unpublished work. Provided solely to perform work for Blue Heron Defense LLC at its direction.
+// Any other use, copying, disclosure, or reuse, in whole or in part, is prohibited.
+// Changes made to this file for Blue Heron Defense LLC are made on its behalf; it claims all rights in them.
+// Submitting a change to this repository means you accept TERMS.md.
+// Removing or altering this notice is prohibited (17 U.S.C. 1202). Ref: BHD-CES-MONO-2026A
+// See LICENSE and TERMS.md.
+
+const fs = require('fs');
+const path = require('path');
+
+const src = path.join(__dirname, '..', 'src', 'data');
+const dst = path.join(__dirname, '..', 'dist', 'data');
+
+fs.mkdirSync(dst, { recursive: true });
+fs.readdirSync(src)
+  .filter(f => f.endsWith('.json'))
+  .forEach(f => fs.copyFileSync(path.join(src, f), path.join(dst, f)));
+
+console.log('Copied shared data JSON to dist/data/');

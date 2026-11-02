@@ -1,0 +1,115 @@
+controlId: "IA.L2-3.5.3"
+relatedControlIds:
+  - "AC.L1-3.1.1"
+  - "AC.L1-3.1.2"
+  - "SC.L2-3.13.8"
+
+practiceStatement: "Use multifactor authentication for local and network access to privileged accounts and for network access to non-privileged accounts."
+
+useCaseId: "A-07"
+useCaseTitle: "MFA Enrollment Enforcement"
+domain: "Identity & Access Management"
+priority: "P1 Critical"
+trigger: "ONBOARDING: Tenant baseline deployment or new CA policy rollout"
+
+sodTier: "Tier 2 -- Config Manager"
+entraRolesRequired:
+  - "Conditional Access Administrator"
+  - "Authentication Policy Administrator"
+
+approvalRequired: false
+
+services:
+  - name: "Entra ID Conditional Access"
+    purpose: "MFA enforcement policy"
+  - name: "Entra ID Authentication Methods Policy"
+    purpose: "Method configuration"
+  - name: "Entra ID Identity Protection"
+    purpose: "Risk-based MFA integration"
+  - name: "Microsoft Graph PowerShell"
+    modules:
+      - "Microsoft.Graph.Identity.SignIns"
+
+configurationSteps:
+  portalPath: "https://entra.microsoft.us > Protection > Conditional Access > Policies > New policy"
+
+  powershellCmdlets:
+    - cmdlet: "Connect-MgGraph"
+      parameters:
+        - "-Environment USGov"
+        - "-Scopes Policy.ReadWrite.ConditionalAccess,Policy.ReadWrite.AuthenticationMethod"
+    - cmdlet: "New-MgIdentityConditionalAccessPolicy"
+      parameters:
+        - "-BodyParameter"
+    - cmdlet: "Update-MgPolicyAuthenticationMethodPolicyAuthenticationMethodConfiguration"
+      parameters:
+        - "-AuthenticationMethodConfigurationId MicrosoftAuthenticator"
+        - "-BodyParameter"
+
+  graphApiEndpoint: "POST https://graph.microsoft.us/v1.0/identity/conditionalAccess/policies"
+  graphApiPayloadExample:
+    displayName: "CA-001: Require MFA for All Users"
+    state: "enabled"
+    conditions:
+      users:
+        includeUsers:
+          - "All"
+        excludeGroups:
+          - "{breakGlassGroupId}"
+      applications:
+        includeApplications:
+          - "All"
+    grantControls:
+      builtInControls:
+        - "mfa"
+      operator: "OR"
+    sessionControls:
+      signInFrequency:
+        value: 24
+        type: "hours"
+        isEnabled: true
+
+  requiredPermissions:
+    - "Policy.ReadWrite.ConditionalAccess"
+    - "Policy.ReadWrite.AuthenticationMethod"
+
+evidenceArtifacts:
+  - type: "Azure AD Audit Logs"
+    retentionPeriod: "7 years"
+    storageLocation: "evidence-store/domain-a-identity/A-07/{year}/{month}/"
+    query: "Activity: Create/Update Conditional Access policy"
+  - type: "Stamper Execution Evidence"
+    hashAlgorithm: "SHA-256"
+    storageLocation: "evidence-store/domain-a-identity/A-07/{year}/{month}/"
+    format: "JSON (CA policy export, Authentication Methods Policy export)"
+    filenamePattern: "A-07_MFAPolicy_{YYYYMMDD}_{HHmmss}_AllUsers.json"
+
+gccHighSpecifics:
+  endpoints:
+    - "https://graph.microsoft.us"
+    - "https://entra.microsoft.us"
+    - "https://mysignins.microsoft.us"
+  complianceBoundary: "FedRAMP High + CMMC L2"
+  endpointValidation: "All endpoints use .microsoft.us domains"
+  notes: "FIDO2 security keys are supported in GCC High. Microsoft Authenticator with number matching is available. Registration campaign feature available as of 2025."
+
+relatedPolicies:
+  - "AC-001 Access Control Policy"
+  - "IA-002 Identification and Authentication Policy"
+
+odpValues:
+  - odpId: "IA.L2-3.5.3_ODP_01"
+    description: "Acceptable multifactor authentication methods"
+    value: "Microsoft Authenticator with number matching, FIDO2 security keys, Windows Hello for Business"
+    rationale: "Phishing-resistant methods protect against credential theft attacks"
+    enforcementMechanism: "Authentication Methods Policy disables SMS, voice call, email OTP"
+
+dependencies:
+  hardDependencies: []
+  softDependencies:
+    - useCaseId: "A-17"
+      reason: "Admin accounts should be separated before enforcing MFA to avoid lockout"
+    - useCaseId: "A-15"
+      reason: "Break-glass accounts must be excluded"
+
+notes: "P1 Critical foundational control. Every other identity use case depends on this policy being in place. Policy requires MFA for all users across all cloud applications with 24-hour sign-in frequency."

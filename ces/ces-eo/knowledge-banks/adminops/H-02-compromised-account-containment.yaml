@@ -1,0 +1,73 @@
+controlId: "IR.L2-3.6.1"
+relatedControlIds:
+  - "IR.L2-3.6.2"
+  - "AC.L1-3.1.1"
+  - "AC.L1-3.1.2"
+  - "IA.L1-3.5.2"
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: H-02
+useCaseTitle: "Compromised Account Containment"
+domain: Incident Response
+priority: P1 Critical
+trigger: 'INCIDENT: Confirmed account compromise (escalated from A-16 or H-01)'
+sodTier: Tier 3 -- Privileged Admin
+entraRolesRequired:
+- Global Administrator (via PIM activation -- time-limited
+- maximum 8 hours)
+approvalRequired: true
+services:
+- name: Entra ID Privileged Identity Management
+  purpose: '`https://entra.microsoft.us`'
+- name: Entra ID Identity Protection
+  purpose: ''
+- name: Microsoft Graph API
+  purpose: '`https://graph.microsoft.us`'
+- name: Microsoft Sentinel
+  purpose: Azure Government
+- name: Microsoft Defender Portal
+  purpose: '`https://security.microsoft.us`'
+- name: Exchange Online
+  purpose: GCC High -- for mailbox actions
+- name: Azure Key Vault
+  purpose: Azure Government -- for evidence signing
+configurationSteps:
+  portalPath: //entra.microsoft.us > **Identity Governance** > **Privileged Identity Management**
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes User.ReadWrite.All
+  - cmdlet: Get-MgUser
+    parameters:
+    - -MgUser
+    - -Filter
+    - -in
+    - -MgUserSignInSession
+    - -UserId
+  graphApiEndpoint: POST https://graph.microsoft.us/v1.0/users/{userId}/revokeSignInSessions
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-h-incident/H-02/{year}/{month}/
+  format: JSON (containment record with all actions, timestamps, and administrator UPNs)
+  filenamePattern: H-02_Containment_{YYYYMMDD}_{HHmmss}_{CompromisedUserUPN}.json
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://entra.microsoft.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: All containment operations use GCC High endpoints exclusively. The `Revoke-MgUserSignInSession` cmdlet and the `/revokeSignInSessions`
+    Graph endpoint are fully supported in GCC High. PIM activation and approval workflows operate through `https://entra.microsoft.us`.
+    Exchange Online GCC High uses `Connect-ExchangeOnline -ExchangeEnvironmentName O365USGovGCCHigh` -- do not use the commercial
+    environment name. Entra ID Identity Protection risk APIs are available at `https://graph.microsoft.us/v1.0/identityProtection/riskyUsers`.
+    Security Copilot is NOT available in GCC High for automated investig
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

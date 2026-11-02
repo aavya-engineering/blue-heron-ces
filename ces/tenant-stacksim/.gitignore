@@ -1,0 +1,22 @@
+node_modules/
+dist/
+.stacksim/
+*.log
+
+# The monorepo root .gitignore has a blanket `coverage/` rule (the usual
+# nyc/jest test-coverage-report convention), which also matches this
+# package's own `src/coverage/` module directory and its committed
+# `coverage/inventory.json` + `coverage/coverage-report.json` deliverables
+# (G-STACKSIM-2 iteration 1) by directory name, not by location. Un-ignore
+# both explicitly - re-including the directory itself is required before
+# re-including anything inside it (git gitignore semantics).
+!/coverage/
+!/coverage/**
+!/src/coverage/
+!/src/coverage/**
+.claude/
+
+# Local-only planning capsules and session-private files (never push: public remote)
+collective-*.md
+# Editor workspace file (user-local, carries local paths) - never commit
+*.code-workspace

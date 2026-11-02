@@ -1,0 +1,61 @@
+{
+  "_fictional": "SIMULATED / FICTIONAL. Every organisation, person, id, address and resource in this file is invented for the CES simulator (synthetic-customer PLAN.md §2, B25). Authored from customers/s3-def/customer.json (gen-customer.mjs).",
+  "schema": "ces-synthetic-org-content/1",
+  "slug": "s3-def",
+  "simulation": {
+    "simulated": true,
+    "legalName": "Corvelline Defense Assemblies Inc. (FICTIONAL)",
+    "disclaimer": "This organisation is a simulated customer of the CES simulator, deficient by design. Its name, people, identifiers, addresses and tenant are invented; this document describes no real company and is not a compliance record."
+  },
+  "source": "customer.json (simulator seed config); fiction standing in for the founder content items A1-A5 on the simulator only, never a replacement for them (PLAN section 1 non-goals). S3 supplies only what PLAN section 2.1 lists for it: the name, the ids, the owner and the ISSO (no address block, facilities, system description, approvers or ODP values: the organisation has not written them down).",
+  "a_items": {
+    "A1": "archetype prior values for SI Baseline / TCP fields: stood in for by the SI and TCP answers in interview-answers.json and the profile block here",
+    "A2": "validation-checklist answers: not stood in for (they stay owed)",
+    "A3": "register justifications: not stood in for (rows stay \"to justify\")",
+    "A4": "archetype mappings with no practice: not stood in for",
+    "A5": "policy-set review clause: never from synthetic data (B26)"
+  },
+  "deficient_by_design": "S3 is the deficient customer (PLAN section 2.1b). customers/s3-def/deficiencies.json lists every deficiency, who fixes it (Stamper, AdminOps, the organisation, or finding only) and the GAPS row a run is expected to show.",
+  "profile": {
+    "org_name": "Corvelline Defense Assemblies Inc. (FICTIONAL)",
+    "short_name": "Corvelline Assemblies (FICTIONAL)",
+    "uei": "SIMX7Q3D9K5V",
+    "cage": "9S3D4",
+    "engagement_kind": "individual_contractor",
+    "covers_m365": "yes",
+    "on_prem_ot": "no",
+    "on_prem_identity": "no",
+    "employee_count": 56,
+    "has_ssp": "no",
+    "domain": "s3-def.simtenant.onmicrosoft.us",
+    "phone": "+1-555-0163",
+    "naics": [
+      "336419",
+      "334418"
+    ]
+  },
+  "roles": {
+    "owner": {
+      "person_id": "s3p-001",
+      "name": "Derwyn Arrowbrook",
+      "title": "President",
+      "upn": "derwyn.arrowbrook@s3-def.simtenant.onmicrosoft.us"
+    },
+    "isso": {
+      "person_id": "s3p-005",
+      "name": "Belmira Pennanmore",
+      "title": "IT and Security Lead (ISSO)",
+      "upn": "belmira.pennanmore@s3-def.simtenant.onmicrosoft.us"
+    }
+  },
+  "operator_values_without_register_row": {
+    "_note": "Answered keys (PLAN section 2.3) with no question-register row. S3 answers breakGlassUPN and breakGlassUserId (PLAN section 2.3: 'S3 answered'): discovery derives the break-glass account from CA exclusions x Global Administrators, and S3's emergency account sits in no CA exclusion, so discovery finds none and Muster takes these as the answered fallback (operatorValues.ts OPV_FALLBACK_VARS). breakGlassUserId is the simulator object id of emergency.access (user-60). adminUserName is a name stem (Stamper builds admin-<stem>@<tenant>); touFileBase64 is a minimal valid PDF; subscriptionId is the empty Azure Government subscription (no resources; the overrides gate needs all twelve keys). The other operator values come from register answers: wifiSsid TCP.MU.006, securityEmail / cisoEmail TCP.MU.007, approverUPN TCP.MU.001, cuiGroupName TCP.GA.002 (CUI-Authorized-Users).",
+    "breakGlassUPN": "emergency.access@s3-def.simtenant.onmicrosoft.us",
+    "breakGlassUserId": "user-60",
+    "adminUserName": "cesops",
+    "approvedIpRange": "192.0.2.0/26",
+    "touFileName": "s3-def-terms-of-use.pdf",
+    "touFileBase64": "JVBERi0xLjQKJSBzaW0tb25seSB0ZXJtcyBvZiB1c2UgcGxhY2Vob2xkZXIK",
+    "subscriptionId": "53530000-00a2-4000-8000-000000000001"
+  }
+}

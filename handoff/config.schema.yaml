@@ -1,0 +1,2003 @@
+# config.schema.yaml - every setting (environment variable) the CES code reads, one entry each.
+# Written by K2 (build-handoff kit agent 2; brief: AGENT-BRIEF-KIT.md) from a read of the code at the
+# Refreshed by H1 (handoff agent 1; brief: AGENT-BRIEF-HANDOFF2.md) on 2026-11-01 to the PH-13 code (branch fin/ph13).
+# commits in handoff.manifest.yaml. "source" is the primary reader, as path:line relative to the ces-mono
+# workspace root (nested repos ces-muster, ces-tester, tenant-stacksim, ces-tenant appear as their folders).
+# secret: true means the value never appears in this kit; see secrets.inventory.yaml.
+# owner: BHD = BHD holds or decides it; contractor = whoever builds and runs the kit; operator = chosen per CES install.
+# scope: dev = test harness and development only; sim = simulator runs; live = live tenants only; all = everywhere.
+# A description that starts "UNCLEAR:" records what the code showed where its meaning could not be settled.
+schemaVersion: 1
+settings:
+  - name: ACTIVE_TENANT_SLUG
+    component: [ces-eo]
+    required: false
+    default: "unset = EO uses TENANT_SLUG, the tenant config, or the last-used tenant"
+    allowed: "a tenant slug registered in the ces-tenant registry"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Picks the tenant EO starts on; when set, EO refuses to start unless that slug is in the tenant registry, and it is used only if TENANT_SLUG and the tenant config give no slug."
+    source: "ces-eo/src/eo/config/EoConfig.ts:183"
+  - name: ANTHROPIC_API_KEY
+    component: [muster-api]
+    required: false
+    default: "unset = AI paths off"
+    allowed: "a model-API key string"
+    secret: true
+    owner: BHD
+    scope: dev
+    description: "Model-API key for muster-api's AI paths; AI runs only when this is set AND MUSTER_LIVE_CLIENT_ID is empty AND MUSTER_AI_SIM_ONLY is exactly '1', so it is never used with live tenant access."
+    source: "ces-muster/muster-api/src/lib/claude.ts:34"
+  - name: AO_CMMC_STRICT
+    component: [ces-ao]
+    required: false
+    default: "unset = off for the CUI-boundary parameter check; the CMMC scope gate is strict regardless (CMMC_STRICT_DEFAULT = true)"
+    allowed: "'1' = strict; anything else = not strict (cannot turn the scope gate's built-in strict default off)"
+    secret: false
+    owner: operator
+    scope: all
+    description: "When exactly '1', makes AO's CUI-boundary parameter check strict (denies the ambiguous 'case-a' boundary values); AO's CMMC scope gate is already strict by default, so '1' only confirms it there."
+    source: "ces-ao/src/execution/ParameterMapper.ts:155"
+  - name: AO_LOG_REQUESTS
+    component: [ces-ao]
+    required: false
+    default: "unset = quiet request logging"
+    allowed: "'all' = log every request; anything else = quiet"
+    secret: false
+    owner: operator
+    scope: all
+    description: "When exactly 'all', AO's request logger logs every HTTP request instead of the quiet default; read once at start, so a change needs a restart."
+    source: "ces-ao/src/server/middleware/quietRequestLogger.ts:37"
+  - name: AO_MCP_ALLOW_APPLY
+    component: [ces-ao]
+    required: false
+    default: "unset = MCP calls are dry-run only"
+    allowed: "'1' = live writes allowed; anything else = dry-run only"
+    secret: false
+    owner: operator
+    scope: all
+    description: "When exactly '1', lets the AO MCP server (ces-adminops-mcp) run AdminOps commands for real (dryRun:false); otherwise every MCP execute is a dry-run preview."
+    source: "ces-ao/src/mcp/aoMcpTools.ts:104"
+  - name: API_BEARER_TOKEN
+    component: [ces-stamper]
+    required: false
+    default: "unset = no Authorization header added"
+    allowed: "a bearer token string"
+    secret: true
+    owner: operator
+    scope: all
+    description: "Bearer token Stamper's API adapter adds as the Authorization header on outgoing HTTP calls made by plan tasks, unless the task already sets one."
+    source: "ces-stamper/src/adapters/APIAdapter.ts:106"
+  - name: APP_ID
+    component: [ces-stamper]
+    required: false
+    default: "''"
+    allowed: "an Entra application (client) ID GUID"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Entra app (client) ID Stamper uses for certificate sign-in to the tenant, read from the environment or Stamper's .env file (dotenv)."
+    source: "ces-stamper/src/config/StamperConfig.ts:100"
+  - name: AZURE_AUTH_ENDPOINT
+    component: [ces-stamper]
+    required: false
+    default: "<stack login endpoint>/organizations (from the active stack provider)"
+    allowed: "an https URL"
+    secret: false
+    owner: operator
+    scope: live
+    description: "Overrides the Azure sign-in authority URL Stamper uses; by default it is derived from the active cloud stack's login endpoint plus '/organizations'."
+    source: "ces-stamper/src/config/StamperConfig.ts:108"
+  - name: CERT_PATH
+    component: [ces-stamper]
+    required: false
+    default: "''"
+    allowed: "a file path to the tenant certificate (.pfx)"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Path to the tenant certificate file Stamper uses for app sign-in, read from the environment or Stamper's .env file."
+    source: "ces-stamper/src/config/StamperConfig.ts:102"
+  - name: CERT_THUMBPRINT
+    component: [ces-stamper]
+    required: false
+    default: "''"
+    allowed: "a 40-hex-character certificate thumbprint"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Thumbprint of the tenant certificate Stamper signs in with (identifies the key in the Windows certificate store; not itself a secret), read from the environment or Stamper's .env file."
+    source: "ces-stamper/src/config/StamperConfig.ts:101"
+  - name: CES_AO_ALLOW_LIVE
+    component: [ces-ao]
+    required: false
+    default: "unset = live (non-sim) tenants refused"
+    allowed: "'1' = opt in to live; anything else = sim only"
+    secret: false
+    owner: operator
+    scope: live
+    description: "When exactly '1' (and CES_AO_SIM_ONLY is not '1'), lets AO run commands against a tenant record explicitly marked kind 'live'; otherwise AO refuses every non-sim tenant, dry-runs included."
+    source: "ces-ao/src/execution/SimOnlyRail.ts:59"
+  - name: CES_AO_AUTH_TOKEN
+    component: [ces-ao]
+    required: false
+    default: "unset = dev mode: loopback callers trusted, network callers refused"
+    allowed: "any non-empty string (generated: 43-char base64url)"
+    secret: true
+    owner: contractor
+    scope: all
+    description: "Bearer token every AO /api/* call must carry once set (health stays open); unset means loopback requests pass without a token and network requests get 401; read through secretEnv(): a DPAPI store value wins over the environment."
+    source: "ces-ao/src/server/AoServer.ts:176"
+  - name: CES_AO_BIND
+    component: [ces-ao]
+    required: false
+    default: "'all' (every interface)"
+    allowed: "'all' or one listen address (IP or hostname)"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Address AO's server listens on; unset or 'all' listens on every interface (tokens gate access), any other value binds that one address."
+    source: "ces-ao/src/server/AoServer.ts:38"
+  - name: CES_AO_DEV_PRINCIPAL_TENANT
+    component: [ces-ao]
+    required: false
+    default: "unset = the dev principal can decide no approvals"
+    allowed: "a tenant ID (GUID)"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "Tenant ID attached to AO's loopback dev principal (set by CES_AO_DEV_PRINCIPAL_UPN), so it may decide approvals for that tenant only; without it the dev principal is refused (fail closed)."
+    source: "ces-ao/src/server/principal.ts:88"
+  - name: CES_AO_DEV_PRINCIPAL_UPN
+    component: [ces-ao]
+    required: false
+    default: "unset = no dev principal"
+    allowed: "a user principal name (email form)"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "When set, AO accepts an unverified local dev principal with this UPN and the approver role (marked 'dev-unverified'), for development without signed principal tokens."
+    source: "ces-ao/src/server/principal.ts:48"
+  - name: CES_AO_E2E_OUT
+    component: [ces-ao-ui]
+    required: false
+    default: "C:/ces-nb/out/ui/ao/playwright"
+    allowed: "a directory path"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "Output folder for the AO console's Playwright end-to-end run (reports, traces, video)."
+    source: "ces-ao/ui/playwright.config.ts:22"
+  - name: CES_AO_E2E_PORT
+    component: [ces-ao-ui]
+    required: false
+    default: "5103"
+    allowed: "a TCP port number"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "Port the AO console's Playwright end-to-end run starts its own AO server on (kept off the simulator's 4390)."
+    source: "ces-ao/ui/playwright.config.ts:20"
+  - name: CES_AO_LEAVER_TENANTS
+    component: [ces-ao]
+    required: false
+    default: "unset = no leaver timer"
+    allowed: "comma-separated tenant slugs"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Tenants the leaver-flow timer scans for leavers and advances (reminders, escalations) every CES_AO_LEAVER_TICK_MIN minutes; the timer runs only when both settings are set. A scan reads the tenant."
+    source: "ces-ao/src/server/routes/leaver.routes.ts:230"
+  - name: CES_AO_LEAVER_TICK_MIN
+    component: [ces-ao]
+    required: false
+    default: "unset = off (no timer, no scan)"
+    allowed: "a positive number of minutes"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Interval of the optional leaver-flow timer (scan + tick for each tenant in CES_AO_LEAVER_TENANTS); without it, scans and ticks run only through POST /api/leaver/scan and /api/leaver/tick."
+    source: "ces-ao/src/server/routes/leaver.routes.ts:229"
+  - name: CES_AO_PORT
+    component: [ces-ao]
+    required: false
+    default: "the port AO listens on (AO fills it in at start); 3001 if neither is known"
+    allowed: "a TCP port number"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Port used only to build the default CES_AO_PUBLIC_URL for leaver confirm links; it does not choose the port AO listens on (that is the --port flag)."
+    source: "ces-ao/src/server/AoServer.ts:134"
+  - name: CES_AO_PRINCIPAL_AUDIENCE
+    component: [ces-ao, ces-eo]
+    required: false
+    default: "unset = audience not set or checked"
+    allowed: "any string"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Optional 'aud' claim EO writes into AO approver tokens and that AO and EO then require when verifying them."
+    source: "ces-ao/src/server/principal.ts:56"
+  - name: CES_AO_PRINCIPAL_ISSUER
+    component: [ces-ao, ces-eo]
+    required: false
+    default: "unset = issuer not set or checked"
+    allowed: "any string"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Optional 'iss' claim EO writes into AO approver tokens and that AO and EO then require when verifying them."
+    source: "ces-ao/src/server/principal.ts:55"
+  - name: CES_AO_PRINCIPAL_SECRET
+    component: [ces-ao, ces-eo]
+    required: false
+    default: "unset = AO accepts no signed principal tokens and EO cannot mint approver tokens (503)"
+    allowed: "string of at least 16 characters; must differ from CES_EO_OPERATOR_SECRET and CES_EC_PRINCIPAL_SECRET"
+    secret: true
+    owner: contractor
+    scope: all
+    description: "HS256 signing secret shared by EO (mints AO approver tokens) and AO (verifies the x-ces-principal token on approvals); read through secretEnv(): a DPAPI store value wins over the environment."
+    source: "ces-ao/src/server/principal.ts:47"
+  - name: CES_AO_PRINCIPAL_TOKEN
+    component: [ces-ao]
+    required: false
+    default: "unset = pass --principal-token instead"
+    allowed: "a signed approver token minted by EO"
+    secret: true
+    owner: operator
+    scope: all
+    description: "The approving person's own signed principal token, read by the 'ao approve' CLI (keeps it out of shell history); the approver recorded is the token's UPN and self-approval is refused."
+    source: "ces-ao/src/execution/VerifiedApprover.ts:35"
+  - name: CES_AO_PROBE_STORE
+    component: [ces-ao]
+    required: false
+    default: "Cert:\\CurrentUser\\My then Cert:\\LocalMachine\\My"
+    allowed: "a PowerShell certificate store path"
+    secret: false
+    owner: contractor
+    scope: all
+    description: "Internal: set by AO itself in the environment of its certificate-probe PowerShell child to name the store to search for the tenant certificate; not an operator setting."
+    source: "ces-ao/src/execution/AuthChain.ts:114"
+  - name: CES_AO_PROBE_THUMB
+    component: [ces-ao]
+    required: false
+    default: "set by AO per probe"
+    allowed: "a certificate thumbprint"
+    secret: false
+    owner: contractor
+    scope: all
+    description: "Internal: set by AO itself in the environment of its certificate-probe PowerShell child to pass the thumbprint being looked up; not an operator setting."
+    source: "ces-ao/src/execution/AuthChain.ts:113"
+  - name: CES_AO_PUBLIC_URL
+    component: [ces-ao]
+    required: false
+    default: "http://localhost:<CES_AO_PORT>"
+    allowed: "an http(s) base URL that tenant administrators can reach"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Base of the single-use confirm links that the leaver flow puts in each confirmation request to a tenant administrator (route /api/leaver/confirm/<flowId>); set it to AO's address as administrators see it."
+    source: "ces-ao/src/server/AoServer.ts:134"
+  - name: CES_AO_SIM_ONLY
+    component: [ces-ao]
+    required: false
+    default: "unset = no lockdown (live still needs CES_AO_ALLOW_LIVE=1)"
+    allowed: "'1' = lockdown; anything else = no lockdown"
+    secret: false
+    owner: contractor
+    scope: sim
+    description: "When exactly '1', AO refuses every non-sim tenant even if CES_AO_ALLOW_LIVE=1 (lockdown beats opt-in); the harness sets it on every AO it starts."
+    source: "ces-ao/src/execution/SimOnlyRail.ts:92"
+  - name: CES_AT_REST_OVERRIDE_FILE
+    component: [ces-shared]
+    required: false
+    default: "unset = no override record"
+    allowed: "a file path to a 'ces-at-rest-override' JSON record"
+    secret: false
+    owner: operator
+    scope: live
+    description: "Path to the operator's recorded acknowledgment that lets a release build start even though the at-rest encryption check (Azure encryption at host or BitLocker) cannot show the data volumes are encrypted."
+    source: "ces-shared/src/security/atRestCheck.ts:31"
+  - name: CES_BHD_NOTICE_MAILBOX
+    component: [ces-ao]
+    required: false
+    default: "unset = an opted-in done notice is recorded as undeliverable"
+    allowed: "one mailbox address (a BHD role mailbox, never a person)"
+    secret: false
+    owner: BHD
+    scope: all
+    description: "BHD role mailbox that receives a leaver-flow done notice, only for tenants whose leaver setting notifyBhdOnDone is on (customer opt-in, default off, set through PUT /api/leaver/settings); messages go to AO's simulated outbox and are not sent by CES."
+    source: "ces-ao/src/server/AoServer.ts:135"
+  - name: CES_CONFIG_PATH
+    component: [ces-shared]
+    required: false
+    default: "{CES_PIPELINE_ROOT}\\ces.config.json"
+    allowed: "a file path"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Explicit path to the CES config file (customer bindings); an absent file means an empty config, a malformed one throws."
+    source: "ces-shared/src/config/cesConfig.contract.ts:61"
+  - name: CES_COST_DP2_TIMEOUT_MS
+    component: [ces-stamper]
+    required: false
+    default: "600000 (10 minutes)"
+    allowed: "a positive number of milliseconds; anything else = default"
+    secret: false
+    owner: operator
+    scope: all
+    description: "How long Stamper's GUI cost gate waits for the operator's second confirmation (DP-2) on a recurring-cost step before giving up."
+    source: "ces-stamper/src/server/guiCostGate.ts:90"
+  - name: CES_COST_ESTIMATES_PATH
+    component: [ces-ao]
+    required: false
+    default: "ces-shared/src/data/cost-estimates.reference.json"
+    allowed: "a file path"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Overrides the location of the price file AO's cost gate reads to show the recurring cost of an operation."
+    source: "ces-ao/src/execution/CostGate.ts:37"
+  - name: CES_E9_EC_PORT
+    component: [ces-tester]
+    required: false
+    default: "4013"
+    allowed: "a TCP port number"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "Port for the second EC the tester's FIN-29 E9 scenario starts (set it when 4013 is in use)."
+    source: "ces-tester/src/flow/fin29-eo-muster.ts:313"
+  - name: CES_E9_EO_PORT
+    component: [ces-tester]
+    required: false
+    default: "4012"
+    allowed: "a TCP port number"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "Port for the second EO the tester's FIN-29 E9 scenario starts (set it when 4012 is in use)."
+    source: "ces-tester/src/flow/fin29-eo-muster.ts:67"
+  - name: CES_EC_AUTOSTART
+    component: [ces-shared, ces-stamper]
+    required: false
+    default: "unset = never start EC automatically"
+    allowed: "'1' = auto-start; anything else = off"
+    secret: false
+    owner: operator
+    scope: all
+    description: "When exactly '1', the shared EC launcher (used by Stamper at start) spawns the Evidence Collector if its health check fails; otherwise it only reports EC as down."
+    source: "ces-shared/src/launcher/EcLauncher.ts:126"
+  - name: CES_EC_CWD
+    component: [ces-shared]
+    required: false
+    default: "<caller's working directory>/../ces-ec"
+    allowed: "a directory path"
+    secret: false
+    owner: contractor
+    scope: all
+    description: "Working directory the shared EC launcher starts the Evidence Collector from when it auto-starts it."
+    source: "ces-shared/src/launcher/EcLauncher.ts:84"
+  - name: CES_EC_PRINCIPAL_AUDIENCE
+    component: [ces-ec, ces-eo]
+    required: false
+    default: "unset = audience not set or checked"
+    allowed: "any string"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Optional 'aud' claim EO writes into EC uploader tokens and that EC then requires when verifying them."
+    source: "ces-ec/src/config.ts:40"
+  - name: CES_EC_PRINCIPAL_ISSUER
+    component: [ces-ec, ces-eo]
+    required: false
+    default: "unset = issuer not set or checked"
+    allowed: "any string"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Optional 'iss' claim EO writes into EC uploader tokens and that EC then requires when verifying them."
+    source: "ces-ec/src/config.ts:39"
+  - name: CES_EC_PRINCIPAL_SECRET
+    component: [ces-ec, ces-eo]
+    required: false
+    default: "unset = EC accepts no uploader tokens and EO cannot mint them (503)"
+    allowed: "string of at least 16 characters; must differ from CES_AO_PRINCIPAL_SECRET and CES_EO_OPERATOR_SECRET"
+    secret: true
+    owner: contractor
+    scope: all
+    description: "HS256 signing secret shared by EO (mints uploader tokens) and EC (verifies the uploader's x-ces-principal token); read through secretEnv(): a DPAPI store value wins over the environment."
+    source: "ces-eo/src/eo/uploader-tokens/UploaderTokenIssuer.ts:109"
+  - name: CES_EC_SIM_ONLY
+    component: [ces-ec]
+    required: false
+    default: "on (sim only)"
+    allowed: "'0' = live tenants allowed; any other value or unset = sim only"
+    secret: false
+    owner: operator
+    scope: all
+    description: "EC's sim-only rail: on unless exactly '0', it refuses ingest for any tenant not marked kind 'sim' (fail closed); '0' also admits tenants marked kind 'live'."
+    source: "ces-ec/src/config.ts:34"
+  - name: CES_EO_ADMINOPS_SINCE
+    component: [ces-eo]
+    required: false
+    default: "unset = EO reads the whole AdminOps history"
+    allowed: "an ISO 8601 time"
+    secret: false
+    owner: contractor
+    scope: sim
+    description: "Simulator run window: EO's AdminOps evidence reader skips every AdminOps row timed before this ISO time; a real deployment leaves it unset (six-year retention)."
+    source: "ces-eo/src/eo/adminops/AdminOpsEvidenceReader.ts:65"
+  - name: CES_EO_APPROVER_TOKEN
+    component: [ces-eo]
+    required: false
+    default: "unset = pass --approver-token instead"
+    allowed: "a minted approver token"
+    secret: true
+    owner: operator
+    scope: all
+    description: "Approver token the 'eo' CLI review command sends to prove the reviewer when --approver-token is not given."
+    source: "ces-eo/src/cli/eo.ts:328"
+  - name: CES_EO_AUTH_TOKEN
+    component: [ces-eo, ces-tester, muster-api]
+    required: false
+    default: "unset = EO dev mode (loopback trusted, network refused); muster-api skips its EO calls"
+    allowed: "any non-empty string (generated: 43-char base64url)"
+    secret: true
+    owner: contractor
+    scope: all
+    description: "Bearer token for EO's /api/* routes: EO requires it once set, and the eo CLI, muster-api (with CES_EO_URL) and the tester send it; read through secretEnv() on EO: a DPAPI store value wins over the environment."
+    source: "ces-eo/src/eo/server/authMiddleware.ts:35"
+  - name: CES_EO_BIND
+    component: [ces-eo]
+    required: false
+    default: "unset = every interface"
+    allowed: "one listen address (IP or hostname); '0.0.0.0' or '::' = all"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Address EO listens on (unset = every interface, tokens gate access); EO also uses it to pick the address its scheduler calls itself on (127.0.0.1 when unset or a wildcard)."
+    source: "ces-eo/src/eo/index.ts:36"
+  - name: CES_EO_COLLECT_FIRST_TICK_SEC
+    component: [ces-eo]
+    required: false
+    default: "the assess interval (SIGNAL_CAPTURE_INTERVAL_HOURS, 24 h)"
+    allowed: "a number of seconds >= 0"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Delay in seconds before EO's collection scheduler first ticks; proof rounds set a short value to see a tick."
+    source: "ces-eo/src/eo/collect/collectionScheduler.ts:97"
+  - name: CES_EO_COLLECT_LIVE
+    component: [ces-eo]
+    required: false
+    default: "unset = only live tenants named in CES_EO_COLLECT_TENANTS (plus connected operator sessions)"
+    allowed: "'1' = collect every live tenant; anything else = allowlist only"
+    secret: false
+    owner: operator
+    scope: live
+    description: "When exactly '1', EO's scheduler collects from every registered live tenant; otherwise it collects sim tenants, live tenants on the allowlist, and tenants with a connected operator session."
+    source: "ces-eo/src/eo/server/EoServer.ts:317"
+  - name: CES_EO_COLLECT_TENANTS
+    component: [ces-eo]
+    required: false
+    default: "unset = all registered tenants (live ones still gated by CES_EO_COLLECT_LIVE)"
+    allowed: "comma-separated tenant slugs"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Comma-separated allowlist of tenant slugs EO's collection scheduler may collect from."
+    source: "ces-eo/src/eo/collect/collectionScheduler.ts:99"
+  - name: CES_EO_COLLECT_TICK_MIN
+    component: [ces-eo]
+    required: false
+    default: "15"
+    allowed: "a number of minutes >= 0 (floor 1 second)"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Minutes between EO collection-scheduler ticks after the first."
+    source: "ces-eo/src/eo/collect/collectionScheduler.ts:98"
+  - name: CES_EO_OPERATOR_AUDIENCE
+    component: [ces-eo]
+    required: false
+    default: "unset = audience not checked"
+    allowed: "any string"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "Optional 'aud' claim EO requires on dev HS256 operator tokens (those signed with CES_EO_OPERATOR_SECRET under CES_EO_OPERATOR_DEV_FALLBACK=1)."
+    source: "ces-eo/src/eo/approver-tokens/ApproverTokenIssuer.ts:131"
+  - name: CES_EO_OPERATOR_DEV_FALLBACK
+    component: [ces-eo]
+    required: false
+    default: "unset = off"
+    allowed: "'1' = on; anything else = off"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "When exactly '1' and neither Entra nor passkey operator sign-in is configured, EO accepts loopback operator tokens signed with CES_EO_OPERATOR_SECRET (marked dev-unverified); set together with Entra or passkeys it is refused (503)."
+    source: "ces-eo/src/eo/approver-tokens/ApproverTokenIssuer.ts:156"
+  - name: CES_EO_OPERATOR_ENTRA_AUDIENCE
+    component: [ces-eo]
+    required: false
+    default: "the value of CES_EO_OPERATOR_ENTRA_CLIENT_ID"
+    allowed: "token audience string (usually the app client id or api://<client id>)"
+    secret: false
+    owner: operator
+    scope: live
+    description: "Audience EO expects in an Entra operator sign-in token; only used when Entra operator sign-in is configured."
+    source: "ces-eo/src/eo/approver-tokens/EntraOperatorVerifier.ts:89"
+  - name: CES_EO_OPERATOR_ENTRA_AUTHORITY_HOST
+    component: [ces-eo]
+    required: false
+    default: "login.microsoftonline.com"
+    allowed: "bare host name matching /^[a-z0-9.-]+$/i (e.g. login.microsoftonline.us for GCC High); anything else refuses Entra sign-in"
+    secret: false
+    owner: operator
+    scope: live
+    description: "Entra sign-in host EO uses to build the token issuer and the JWKS (signing-key) URL for Entra operator sign-in."
+    source: "ces-eo/src/eo/approver-tokens/EntraOperatorVerifier.ts:87"
+  - name: CES_EO_OPERATOR_ENTRA_CLIENT_ID
+    component: [ces-eo]
+    required: false
+    default: "unset = Entra operator sign-in off"
+    allowed: "GUID (app registration client id); required together with CES_EO_OPERATOR_ENTRA_TENANT_ID and CES_EO_OPERATOR_ENTRA_GROUP_ID"
+    secret: false
+    owner: operator
+    scope: live
+    description: "Client id of the customer Entra app registration that EO accepts operator sign-in tokens for; setting any of the three Entra keys turns Entra operator sign-in on and the rest become mandatory."
+    source: "ces-eo/src/eo/approver-tokens/EntraOperatorVerifier.ts:80"
+  - name: CES_EO_OPERATOR_ENTRA_GROUP_ID
+    component: [ces-eo]
+    required: false
+    default: "unset = Entra operator sign-in off"
+    allowed: "GUID (Entra group object id); required together with the tenant and client id"
+    secret: false
+    owner: operator
+    scope: live
+    description: "Object id of the Entra group whose members EO treats as BHD operators allowed to mint approver tokens under Entra sign-in."
+    source: "ces-eo/src/eo/approver-tokens/EntraOperatorVerifier.ts:81"
+  - name: CES_EO_OPERATOR_ENTRA_ISSUER
+    component: [ces-eo]
+    required: false
+    default: "https://<authority host>/<tenant id>/v2.0"
+    allowed: "issuer URL string"
+    secret: false
+    owner: operator
+    scope: live
+    description: "Overrides the issuer EO requires in Entra operator sign-in tokens."
+    source: "ces-eo/src/eo/approver-tokens/EntraOperatorVerifier.ts:90"
+  - name: CES_EO_OPERATOR_ENTRA_TENANT_ID
+    component: [ces-eo]
+    required: false
+    default: "unset = Entra operator sign-in off"
+    allowed: "GUID (operator's Entra tenant id); required together with the client id and group id"
+    secret: false
+    owner: operator
+    scope: live
+    description: "Entra tenant whose sign-in tokens EO accepts for operators (the customer's tenant on live installs, per the customer-issued-account rule)."
+    source: "ces-eo/src/eo/approver-tokens/EntraOperatorVerifier.ts:79"
+  - name: CES_EO_OPERATOR_ISSUER
+    component: [ces-eo]
+    required: false
+    default: "unset = issuer not checked"
+    allowed: "string"
+    secret: false
+    owner: contractor
+    scope: sim
+    description: "Optional issuer claim required on dev-fallback HS256 operator tokens (only used when CES_EO_OPERATOR_DEV_FALLBACK=1 and no Entra or passkey config)."
+    source: "ces-eo/src/eo/approver-tokens/ApproverTokenIssuer.ts:130"
+  - name: CES_EO_OPERATOR_PASSKEY_ORIGIN
+    component: [ces-eo]
+    required: false
+    default: "unset = passkey operator sign-in off"
+    allowed: "URL with https:, or http://localhost; required when CES_EO_OPERATOR_PASSKEY_RP_ID is set"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Web origin of the EO console that passkey (WebAuthn) operator sign-in is bound to; setting either passkey key turns passkey sign-in on, and it cannot be combined with Entra sign-in or the dev fallback."
+    source: "ces-eo/src/eo/approver-tokens/PasskeyOperatorService.ts:98"
+  - name: CES_EO_OPERATOR_PASSKEY_RP_ID
+    component: [ces-eo]
+    required: false
+    default: "host name of CES_EO_OPERATOR_PASSKEY_ORIGIN"
+    allowed: "host name equal to the origin's host or a parent domain of it; never an IP address"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Passkey relying-party id (the domain the passkeys are registered to) for EO operator sign-in."
+    source: "ces-eo/src/eo/approver-tokens/PasskeyOperatorService.ts:109"
+  - name: CES_EO_OPERATOR_SECRET
+    component: [ces-eo]
+    required: false
+    default: "unset = dev operator fallback refuses (503)"
+    allowed: "at least 16 characters; must differ from CES_AO_PRINCIPAL_SECRET and CES_EC_PRINCIPAL_SECRET"
+    secret: true
+    owner: contractor
+    scope: sim
+    description: "HS256 shared secret EO uses to verify dev-only operator tokens when CES_EO_OPERATOR_DEV_FALLBACK=1 (principals are marked dev-unverified); read through secretEnv(): a DPAPI store value wins over the environment."
+    source: "ces-eo/src/eo/approver-tokens/ApproverTokenIssuer.ts:115"
+  - name: CES_EO_OPERATOR_SESSION_TTL_SECONDS
+    component: [ces-eo]
+    required: false
+    default: "900"
+    allowed: "whole number 1 to 900; anything else refuses passkey sign-in config"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Lifetime in seconds of an EO operator session created by passkey sign-in."
+    source: "ces-eo/src/eo/approver-tokens/PasskeyOperatorService.ts:117"
+  - name: CES_EO_ROOT
+    component: [tenant-stacksim]
+    required: false
+    default: ""
+    allowed: "absolute path to the ces-eo package"
+    secret: false
+    owner: contractor
+    scope: sim
+    description: "Path to the ces-eo package that the stacksim verify-doc command passes to its child runner script so it can import EO's real source; set by the command itself, not by a person."
+    source: "tenant-stacksim/src/cli/commands/verify-doc.ts:74"
+  - name: CES_EO_TENANT
+    component: [ces-eo]
+    required: false
+    default: "unset = no tenant pin"
+    allowed: "tenant slug"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Optional tenant pin on EO's bearer auth: when set, a request naming a different tenant (query tenant or body tenantSlug) is refused 403."
+    source: "ces-eo/src/eo/server/authMiddleware.ts:35"
+  - name: CES_EO_URL
+    component: [ces-eo, muster-api]
+    required: false
+    default: "EO CLI: http://127.0.0.1:4002; muster-api: unset = no push to EO"
+    allowed: "http(s) base URL of the EO server"
+    secret: false
+    owner: contractor
+    scope: all
+    description: "Base URL of the EvidenceOps server, used by the eo CLI and by muster-api to push plan intake and interview records to EO (muster-api skips the push unless both this and CES_EO_AUTH_TOKEN are set)."
+    source: "ces-muster/muster-api/src/routes/plan.ts:136"
+  - name: CES_EU_EO_E7B_STATE
+    component: [ces-tester]
+    required: false
+    default: "on"
+    allowed: "'0' = off; anything else = on"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "Test-harness switch: on unless exactly '0', the muster e2e run captures the E7B pipeline-root and EO state (ces.db backup plus store copies) so the watched EO run starts from it."
+    source: "ces-tester/src/flow/muster-e2e-run.ts:1692"
+  - name: CES_EU_EO_PROBE
+    component: [ces-tester]
+    required: false
+    default: "on"
+    allowed: "'0' = off; anything else = on"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "Test-harness switch: on unless exactly '0', the UI e2e run has EO assess each variant's own pipeline root after the ledger snapshot (skipped and recorded if port 4002 is held)."
+    source: "ces-tester/src/flow/ui-e2e-run.ts:332"
+  - name: CES_EUT_TENANT
+    component: []
+    required: false
+    default: "unset = run.ps1 prints usage and exits 0"
+    allowed: "tenant slug"
+    secret: false
+    owner: operator
+    scope: live
+    description: "Default tenant slug for the end-user tenant test suite runner (tenant-tests/run.ps1), used when -TenantSlug is not passed; never part of npm test."
+    source: "tenant-tests/run.ps1:16"
+  - name: CES_EVIDENCE_CATALOG_PATH
+    component: [ces-ec, ces-eo]
+    required: false
+    default: "<CES_PIPELINE_ROOT>\\evidence-catalog\\evidence-catalog-release-0.json, else the copy in ces-muster/src/features/plan/engine/data/evidence-catalog"
+    allowed: "file path"
+    secret: false
+    owner: contractor
+    scope: all
+    description: "Explicit path to the evidence catalog JSON that EC and EO load; when set it is the only candidate, otherwise the pipeline-root copy then the ces-muster source copy are tried."
+    source: "ces-ec/src/evidenceCatalog.ts:26"
+  - name: CES_FIN29_E0
+    component: [ces-tester]
+    required: false
+    default: "on"
+    allowed: "'0' = skip; anything else = run"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "Test-harness switch: exactly '0' skips the FIN-29 E0 leg (clean-g5 simulator profile check) of the Stamper proof flow."
+    source: "ces-tester/src/flow/fin29-stamper.ts:527"
+  - name: CES_FIN29_E8G_SCENARIOS
+    component: [ces-tester]
+    required: false
+    default: "s3-def"
+    allowed: "comma-separated scenario slugs"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "Test-harness list of scenarios on which the FIN-29 E8G leg (Stamper GUI leg) runs."
+    source: "ces-tester/src/flow/fin29-stamper.ts:994"
+  - name: CES_FIN29_E8R
+    component: [ces-tester]
+    required: false
+    default: "on"
+    allowed: "'0' = skip; anything else = run"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "Test-harness switch: exactly '0' skips the FIN-29 E8R leg (Stamper lifecycle commands on a private pipeline root)."
+    source: "ces-tester/src/flow/fin29-stamper.ts:747"
+  - name: CES_FIN29_E8T_SCENARIOS
+    component: [ces-tester]
+    required: false
+    default: "s2-eng"
+    allowed: "comma-separated scenario slugs"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "Test-harness list of scenarios on which the FIN-29 E8T leg (Stamper terminal leg in a pseudo-console) runs."
+    source: "ces-tester/src/flow/fin29-stamper.ts:887"
+  - name: CES_HELD_STANDING_GRANTS_ENABLED
+    component: [ces-stamper]
+    required: false
+    default: "off"
+    allowed: "'true' = on; anything else = off"
+    secret: false
+    owner: BHD
+    scope: all
+    description: "Releases the held standing grants: only when exactly 'true' do tenant bootstrap and the Stamper preflight check or grant SharePoint Sites.FullControl.All and the held directory roles (held pending a BHD decision; CES never sets it)."
+    source: "ces-stamper/src/server/routes/execute.routes.ts:2580"
+  - name: CES_LAUNCHED_BY
+    component: [ces-tester]
+    required: false
+    default: "unset = CLI run records itself"
+    allowed: "'center' = launched by the tester Command Center"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "Set to 'center' by the ces-tester Command Center on the child it launches so the CLI wrapper does not record a second run-index entry; not set by people."
+    source: "ces-tester/src/catalog/run-index.ts:93"
+  - name: CES_MODULE_SECRETS_PATH
+    component: [ces-shared]
+    required: false
+    default: "%ProgramData%\\CES\\secrets\\module-secrets.dpapi"
+    allowed: "file path"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Location of the DPAPI-protected module-secret store that every CES server loads at start (written by ces-shared/scripts/New-CesModuleSecrets.ps1)."
+    source: "ces-shared/src/secrets/moduleSecrets.ts:78"
+  - name: CES_MODULE_SECRETS_REQUIRED
+    component: [ces-shared]
+    required: false
+    default: "off (missing store = environment only)"
+    allowed: "'1' = refuse to start when the store is missing; anything else = allow"
+    secret: false
+    owner: operator
+    scope: all
+    description: "When exactly '1', a server refuses to start if the module-secret store file is missing instead of falling back to environment variables."
+    source: "ces-shared/src/secrets/moduleSecrets.ts:72"
+  - name: CES_MUSTER_ROOT
+    component: [muster-api]
+    required: false
+    default: "the ces-muster folder (three levels above muster-api's service file)"
+    allowed: "directory path"
+    secret: false
+    owner: contractor
+    scope: all
+    description: "Path to the ces-muster SPA root (holding scripts/mx and vite-node) that muster-api uses to run the plan compiler."
+    source: "ces-muster/muster-api/src/services/planCompileService.ts:104"
+  - name: CES_MUSTER_SECRETS_TOKEN
+    component: [ces-stamper]
+    required: false
+    default: "unset = request sent without Authorization"
+    allowed: "a muster-api bearer JWT"
+    secret: true
+    owner: contractor
+    scope: all
+    description: "Bearer token Stamper sends to muster-api's POST /api/plan/secrets/resolve to fetch one-time secret values such as the initial password; muster-api checks it as a session JWT signed with JWT_SECRET for an operator role, so it must be a minted muster-api JWT, not a random value; read through secretEnv(): a DPAPI store value wins over the environment."
+    source: "ces-stamper/src/core/SecretResolver.ts:132"
+  - name: CES_MUSTER_SECRETS_URL
+    component: [ces-stamper]
+    required: false
+    default: "unset = no secret references fetched"
+    allowed: "http(s) base URL of muster-api"
+    secret: false
+    owner: contractor
+    scope: all
+    description: "Base URL of muster-api from which the Stamper command line resolves a plan's one-time operator-held secret references; unset means nothing is fetched and tasks needing those secrets stop."
+    source: "ces-stamper/src/core/SecretResolver.ts:131"
+  - name: CES_NO_OPEN
+    component: [ces-ao, ces-stamper]
+    required: false
+    default: "browser opens"
+    allowed: "'1' = do not open a browser; anything else = open"
+    secret: false
+    owner: contractor
+    scope: all
+    description: "When exactly '1', the AO and Stamper GUI servers do not open a browser window on start."
+    source: "ces-ao/src/server/AoServer.ts:226"
+  - name: CES_NS3_EO_RECORDS
+    component: [ces-tester]
+    required: false
+    default: "on"
+    allowed: "'0' = off; anything else = on"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "Test-harness switch: on unless exactly '0', the muster e2e run posts the customer's NS-3 personnel, screening, training, risk and offboarding records to EO."
+    source: "ces-tester/src/flow/muster-e2e-run.ts:1536"
+  - name: CES_PFX_PASSWORD
+    component: [ces-shared]
+    required: false
+    default: ""
+    allowed: "set internally"
+    secret: true
+    owner: contractor
+    scope: all
+    description: "Carries the PFX import password from the Stamper certificate-import request into the PowerShell child's environment only (never its command line); set by CES itself and removed in the child before import."
+    source: "ces-shared/src/prereq/PrerequisiteChecker.ts:99"
+  - name: CES_PFX_PATH
+    component: [ces-shared]
+    required: false
+    default: ""
+    allowed: "set internally"
+    secret: false
+    owner: contractor
+    scope: all
+    description: "Carries the .pfx file path into the PowerShell child that imports the tenant certificate into Cert:\\CurrentUser\\My; set by CES itself."
+    source: "ces-shared/src/prereq/PrerequisiteChecker.ts:101"
+  - name: CES_PIPELINE_ROOT
+    component: [ces-ao-ui, ces-ec, ces-eo, ces-shared, ces-tenant, ces-tester]
+    required: false
+    default: "%LOCALAPPDATA%\\CES\\pipeline on Windows; <cwd>/<posix default> elsewhere"
+    allowed: "directory path"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Root folder for all CES runtime data (ces.db, each module's storage, Stamper plan-data, tenant registry, evidence catalog copy, EO validation reports)."
+    source: "ces-shared/src/storage/node.ts:30"
+  - name: CES_RELEASE_BUILD
+    component: [ces-shared, muster-api]
+    required: false
+    default: "off (developer build)"
+    allowed: "'1' = release build; anything else = developer build"
+    secret: false
+    owner: BHD
+    scope: all
+    description: "Interim release-build marker: when exactly '1', the at-rest encryption start-up check treats the install as a release, and muster-api caps the one-time initial password at a single read."
+    source: "ces-shared/src/security/atRestCheck.ts:79"
+  - name: CES_ROOT
+    component: [ces-tester]
+    required: false
+    default: "found by walking up from cwd to the folder holding ces-muster and ces-stamper"
+    allowed: "directory path"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "Overrides where ces-tester finds the CES workspace root (the folder containing ces-muster and ces-stamper)."
+    source: "ces-tester/src/flow/ces-root.ts:20"
+  - name: CES_RUN_ID
+    component: [ces-tester]
+    required: false
+    default: "cli-<epoch ms>"
+    allowed: "run id string"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "Run id the ces-tester Command Center hands to a launched child so the CLI reuses it in the run index instead of minting its own."
+    source: "ces-tester/src/catalog/run-index.ts:92"
+  - name: CES_SIM_PFX_OUT
+    component: [ces-tester]
+    required: false
+    default: "<out>/ao/sim/<slug>.pfx"
+    allowed: "set internally"
+    secret: false
+    owner: contractor
+    scope: sim
+    description: "Output path of the throwaway simulator certificate that ces-tester's AO step passes to its PowerShell child; set by the harness itself."
+    source: "ces-tester/src/flow/ao-step.ts:275"
+  - name: CES_SIM_PFX_PASSWORD
+    component: [ces-tester]
+    required: false
+    default: "random per run"
+    allowed: "set internally"
+    secret: true
+    owner: contractor
+    scope: sim
+    description: "Random per-run password for the throwaway simulator PFX, passed only in the PowerShell child's environment by ces-tester's AO step and then dropped."
+    source: "ces-tester/src/flow/ao-step.ts:276"
+  - name: CES_STAMPER_AUTH_TOKEN
+    component: [ces-stamper]
+    required: false
+    default: "unset = loopback-only dev mode (network requests refused)"
+    allowed: "bearer token string"
+    secret: true
+    owner: contractor
+    scope: all
+    description: "Bearer token the Stamper GUI server requires on API calls; read through secretEnv(): a DPAPI store value wins over the environment."
+    source: "ces-stamper/src/server/GuiServer.ts:336"
+  - name: CES_STAMPER_PLAN_DATA_ROOT
+    component: [ces-stamper]
+    required: false
+    default: "<Stamper repo root>\\plan-data"
+    allowed: "directory path"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "Points Stamper's dev plan-data folder (and the translate route's 'dev' tenant plans) at another root, used by test runs for a run-scoped folder."
+    source: "ces-stamper/src/config/paths.ts:37"
+  - name: CES_STAMPER_UI
+    component: [ces-stamper]
+    required: false
+    default: "legacy"
+    allowed: "'react' = React SPA; anything else = legacy console"
+    secret: false
+    owner: contractor
+    scope: all
+    description: "Selects which Stamper console the GUI server serves at / : 'react' for the React app, otherwise the legacy console (the SPA stays at /app/)."
+    source: "ces-stamper/src/server/routes/health.routes.ts:33"
+  - name: CES_STRICT_SECRETS
+    component: [ces-shared, ces-tenant]
+    required: false
+    default: "off"
+    allowed: "'1' or 'true' = on; anything else = off"
+    secret: false
+    owner: operator
+    scope: all
+    description: "When '1' or 'true', loading a tenant record refuses literal values in auth.cert_thumbprint and evidence_storage.account_key and requires env: references instead."
+    source: "ces-shared/src/config/TenantConfig.ts:266"
+  - name: CES_TENANT_AUTH_TOKEN
+    component: [ces-tenant]
+    required: false
+    default: "unset = dev mode: the tenant service daemon accepts loopback callers only, and clients send no token"
+    allowed: "any non-empty string (use 32 random bytes, base64url)"
+    secret: true
+    owner: contractor
+    scope: all
+    description: "Bearer token of the optional ces-tenant service daemon (npm run serve): the daemon requires it on /api/* and /status from network callers, and the ces-tenant client sends it when set; read from the process environment."
+    source: "ces-tenant/src/service/protocol.ts:44"
+  - name: CES_TENANT_BIND
+    component: [ces-tenant]
+    required: false
+    default: "'all' (every interface)"
+    allowed: "'all' or one listen address (IP or hostname)"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Address the optional ces-tenant service daemon listens on; unset or empty listens on every interface (CES_TENANT_AUTH_TOKEN gates network callers), any other value binds that one address."
+    source: "ces-tenant/src/service/server.ts:74"
+  - name: CES_TENANT_ROOT
+    component: [ces-ao-ui, ces-eo, ces-tenant, ces-tester]
+    required: false
+    default: "%USERPROFILE%\\.ces\\tenants"
+    allowed: "a folder path; records live at <root>\\sim\\<slug>.json and <root>\\live\\<slug>.json"
+    secret: false
+    owner: contractor
+    scope: all
+    description: "Overrides the root folder of the ces-tenant registry (sim and live tenant records kept in separate subfolders); EO resolves tenants through the same root, and the harness points it at a run-scoped folder so ephemeral sim tenants stay isolated."
+    source: "ces-tenant/src/impl/paths.ts:60"
+  - name: CES_TENANT_SERVICE_URL
+    component: [ces-tenant]
+    required: false
+    default: "http://127.0.0.1:4690"
+    allowed: "an http(s) base URL"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Base URL that ces-tenant clients use to reach the tenant service daemon (auth-state-only mode); unset means the loopback default on port 4690."
+    source: "ces-tenant/src/service/protocol.ts:41"
+  - name: CES_TWO_PERSON_APPROVAL
+    component: [ces-ao, ces-eo]
+    required: false
+    default: "unset = off"
+    allowed: "AO: '1' or 'true' (any case, trimmed) = on; EO UI flag: exactly '1' = on; anything else = off"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Re-enables two-person approval (the Tier 3 second approver, the live-L2 floor and the approver-token requirement in AO), which is off by default; read at call time so it can be toggled."
+    source: "ces-ao/src/execution/SodGate.ts:38"
+  - name: CES_UI_HEADLESS
+    component: [ces-ao-ui, ces-eo-ui]
+    required: false
+    default: "unset = headed (watched) run"
+    allowed: "exactly '1' = headless; anything else = headed"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "Makes the AO and EO UI Playwright end-to-end runs headless; by default they run headed, paced and captioned so they can be watched."
+    source: "ces-eo/ui/playwright.config.ts:18"
+  - name: CES_UI_OUTPUT_DIR
+    component: [ces-eo-ui]
+    required: false
+    default: "C:/ces-nb/out/ui/eo/playwright"
+    allowed: "a folder path"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "Output folder for the EO UI Playwright run's videos, traces and reports."
+    source: "ces-eo/ui/playwright.config.ts:22"
+  - name: CES_UI_SLOWMO
+    component: [ces-eo-ui]
+    required: false
+    default: "400 (ms) when headed, 0 when headless"
+    allowed: "a number of milliseconds; non-numeric falls back to the default"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "Pacing delay in milliseconds between actions in the EO UI Playwright run."
+    source: "ces-eo/ui/playwright.config.ts:19"
+  - name: CLAUDE_MODEL
+    component: [muster-api]
+    required: false
+    default: "claude-opus-4-8"
+    allowed: "an Anthropic model id"
+    secret: false
+    owner: BHD
+    scope: sim
+    description: "Anthropic model id used by muster-api's AI coach and adaptive-interview services, which only run when the AI gate allows (sim-only declared, no live access configured, key present)."
+    source: "ces-muster/muster-api/src/services/coachService.ts:42"
+  - name: CLIENT_NAME
+    component: [ces-stamper]
+    required: false
+    default: "a hard-coded customer display name (see source)"
+    allowed: "free text"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Customer display name that Stamper puts into its config and the execution context variable clientName (used in plan text and console output)."
+    source: "ces-stamper/src/config/StamperConfig.ts:241"
+  - name: COMPLIANCE_REPO_PATH
+    component: [ces-eo]
+    required: false
+    default: "./compliance-repo"
+    allowed: "a folder path (resolved against the EO working directory)"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Folder where EO's document renderers write generated policies, POA&M, reports and the risk-assessment store."
+    source: "ces-eo/src/eo/config/EoConfig.ts:294"
+  - name: COMPLIANCE_URI
+    component: [ces-stamper]
+    required: false
+    default: "the active stack provider's compliance endpoint"
+    allowed: "an https URI"
+    secret: false
+    owner: operator
+    scope: live
+    description: "Security and Compliance PowerShell connection URI that Stamper's IPPS adapter passes to Connect-IPPSSession when GCC High endpoints are on."
+    source: "ces-stamper/src/config/StamperConfig.ts:107"
+  - name: DATABASE_URL
+    component: [muster-api]
+    required: false
+    default: ""
+    allowed: "a postgres:// or postgresql:// URL"
+    secret: true
+    owner: operator
+    scope: dev
+    description: "Fallback source URL for the one-off engagementMigrate export command, which copies every table out of a legacy PostgreSQL database with psql into JSON files (the --url flag wins); no server reads it."
+    source: "ces-muster/muster-api/src/cli/engagementMigrate.ts:160"
+  - name: DEBUG_NARRATIVES
+    component: [ces-eo]
+    required: false
+    default: "unset = off"
+    allowed: "exactly 'true' = on; anything else = off"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "Makes EO's SSP generator log, per control, which narrative source it used (template engine, snippet resolver, mission plan or fallback)."
+    source: "ces-eo/src/eo/ssp/SspGenerator.ts:460"
+  - name: DRY_RUN
+    component: [ces-stamper]
+    required: false
+    default: "unset = live execution"
+    allowed: "exactly 'true' = dry run; anything else = off"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Puts Stamper in dry-run mode (no tenant changes, and TENANT_ID/APP_ID/CERT_THUMBPRINT are not required); the CLI also sets it itself for --dry-run, --dev and translate --execute."
+    source: "ces-stamper/src/config/StamperConfig.ts:114"
+  - name: EC_HOST
+    component: [ces-ec]
+    required: false
+    default: "'all' (every interface)"
+    allowed: "'all' or one listen address (IP or hostname)"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Address the Evidence Collector (EC) server listens on; unset or 'all' listens on every interface (the bearer token gates network callers), any other value binds that one address."
+    source: "ces-ec/src/config.ts:33"
+  - name: EC_INDEX_INTERVAL_MIN
+    component: [ces-ec]
+    required: false
+    default: "15"
+    allowed: "a positive number of minutes; invalid or non-positive falls back to 15"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Minutes between EC's scheduled evidence index passes (one pass also runs at start-up)."
+    source: "ces-ec/src/config.ts:37"
+  - name: EC_PORT
+    component: [ces-ec]
+    required: false
+    default: "4001"
+    allowed: "a positive integer below 65536; otherwise 4001"
+    secret: false
+    owner: operator
+    scope: all
+    description: "TCP port the Evidence Collector (EC) server listens on."
+    source: "ces-ec/src/config.ts:32"
+  - name: EC_STALE_DAYS
+    component: [ces-ec]
+    required: false
+    default: "90"
+    allowed: "a positive number of days; invalid falls back to 90"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Age in days after which EC's index pass flags an evidence item as stale."
+    source: "ces-ec/src/config.ts:36"
+  - name: EC_URL
+    component: [ces-eo]
+    required: false
+    default: "http://127.0.0.1:4001"
+    allowed: "an http(s) base URL"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Base URL EO uses to reach the standalone Evidence Collector service."
+    source: "ces-eo/src/eo/config/EoConfig.ts:297"
+  - name: ENABLE_ROLLBACK
+    component: [ces-stamper]
+    required: false
+    default: "on"
+    allowed: "exactly 'false' = off; anything else = on"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Lets Stamper's rollback handler undo completed tasks after a failure; on unless set to exactly 'false'."
+    source: "ces-stamper/src/config/StamperConfig.ts:115"
+  - name: ENABLE_SCHEDULED_SIGNAL_CAPTURE
+    component: [ces-eo]
+    required: false
+    default: "on"
+    allowed: "0, false, no or off (any case) = off; anything else = on"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Turns EO's scheduled compliance-signal capture on or off; it is on (daily) unless set to an off word."
+    source: "ces-eo/src/eo/config/EoConfig.ts:296"
+  - name: EO_PACKAGE_MAX_AGE_HOURS
+    component: [ces-eo]
+    required: false
+    default: "24"
+    allowed: "a positive number of hours; otherwise 24"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Oldest an SSP, POA&M or assessment snapshot may be, in hours, when EO builds an evidence package."
+    source: "ces-eo/src/eo/server/routers/evidence-router.ts:79"
+  - name: EO_PORT
+    component: [ces-eo]
+    required: false
+    default: "4002"
+    allowed: "a number (coerced)"
+    secret: false
+    owner: operator
+    scope: all
+    description: "TCP port the EO server listens on; the root npm script and the harness set it (5004 and per-run ports)."
+    source: "ces-eo/src/eo/config/EoConfig.ts:282"
+  - name: EO_URL
+    component: [ces-eo-ui]
+    required: false
+    default: "http://127.0.0.1:5004"
+    allowed: "an http(s) base URL"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "EO server URL that the EO UI Playwright end-to-end run drives."
+    source: "ces-eo/ui/playwright.config.ts:21"
+  - name: EO_VALIDATION_REPORT_DIR
+    component: [ces-eo]
+    required: false
+    default: "<CES_PIPELINE_ROOT>\\EvidenceOps\\validation, else <cwd>\\output\\validation"
+    allowed: "a folder path"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Folder where EO's SSP quality scorecard writes its pre-export validation reports."
+    source: "ces-eo/src/eo/ssp/SspQualityScorecard.ts:196"
+  - name: EVIDENCE_DIR
+    component: [ces-stamper]
+    required: false
+    default: "<STORAGE_ROOT>\\evidence (Stamper module storage)"
+    allowed: "a folder path"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Folder where Stamper writes execution evidence."
+    source: "ces-stamper/src/config/StamperConfig.ts:111"
+  - name: EVIDENCE_OPS_SECRET
+    component: [ces-ec, ces-eo]
+    required: true
+    default: ""
+    allowed: "a non-empty string (the install generator makes 32 random bytes, base64url)"
+    secret: true
+    owner: contractor
+    scope: all
+    description: "Bearer secret for EC's authenticated routes (ingest, index, items) and the one EO attaches when it calls EC; read through secretEnv(), so a DPAPI store value wins over the environment, and when unset EC disables those routes and EO refuses EC reads/writes."
+    source: "ces-ec/src/config.ts:35"
+  - name: EXCHANGE_ENV
+    component: [ces-stamper]
+    required: false
+    default: "the active stack provider's Exchange environment name"
+    allowed: "an Exchange Online environment name"
+    secret: false
+    owner: operator
+    scope: live
+    description: "Exchange Online environment name Stamper uses when connecting to Exchange."
+    source: "ces-stamper/src/config/StamperConfig.ts:106"
+  - name: FT_OUT_DIR
+    component: [ces-tester]
+    required: true
+    default: ""
+    allowed: "a folder path"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "Output folder for the tester's Muster plan-generator CLI; the CLI throws unless FT_PLAN_CASE, FT_OUT_DIR and FT_SLUG are all set."
+    source: "ces-tester/src/flow/muster-plan-gen.cli.ts:29"
+  - name: FT_PLAN_CASE
+    component: [ces-tester]
+    required: true
+    default: ""
+    allowed: "a path to a MusterPlanCase JSON file"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "Path of the plan-case JSON that the tester's Muster plan-generator CLI turns into a plan."
+    source: "ces-tester/src/flow/muster-plan-gen.cli.ts:28"
+  - name: FT_SLUG
+    component: [ces-tester]
+    required: true
+    default: ""
+    allowed: "a tenant slug"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "Tenant slug the tester's Muster plan-generator CLI writes the plan for."
+    source: "ces-tester/src/flow/muster-plan-gen.cli.ts:30"
+  - name: GCC_HIGH_ENDPOINTS
+    component: [ces-stamper]
+    required: false
+    default: "unset = off"
+    allowed: "exactly 'true' = on; anything else = off"
+    secret: false
+    owner: operator
+    scope: live
+    description: "Makes Stamper use the GCC High connection forms (for example the IPPS ConnectionUri and the GCC High PowerShell connect path)."
+    source: "ces-stamper/src/config/StamperConfig.ts:103"
+  - name: GRAPH_BASE_URL
+    component: [ces-tenant, muster-api]
+    required: false
+    default: "https://graph.microsoft.us/v1.0 (muster-api); the GCC High Graph endpoint (ces-tenant)"
+    allowed: "an https base URL"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Microsoft Graph base URL used by muster-api's Graph client and by ces-tenant's legacy env-fallback key provider; the tester points it at the simulator."
+    source: "ces-muster/muster-api/src/lib/graphClient.ts:26"
+  - name: GRAPH_CLIENT_ID
+    component: [ces-tenant]
+    required: false
+    default: ""
+    allowed: "an Entra application (client) id"
+    secret: false
+    owner: operator
+    scope: live
+    description: "App id for ces-tenant's legacy env fallback, used only when a caller passes no tenant slug; with GRAPH_TENANT_ID unset as well the provider reports degraded."
+    source: "ces-tenant/src/impl/http-provider.ts:168"
+  - name: GRAPH_ENDPOINT
+    component: [ces-stamper]
+    required: false
+    default: "the active stack provider's Graph endpoint (dotenv loader: https://graph.microsoft.us)"
+    allowed: "an https URL"
+    secret: false
+    owner: operator
+    scope: live
+    description: "Microsoft Graph endpoint Stamper uses for its tenant connection."
+    source: "ces-stamper/src/config/StamperConfig.ts:104"
+  - name: GRAPH_SCOPES
+    component: [ces-eo]
+    required: false
+    default: "https://graph.microsoft.us/.default"
+    allowed: "comma-separated OAuth scopes"
+    secret: false
+    owner: operator
+    scope: live
+    description: "UNCLEAR: EO parses this comma list into config.graphScopes (default the GCC High .default scope), but no code outside EoConfig.ts reads graphScopes."
+    source: "ces-eo/src/eo/config/EoConfig.ts:293"
+  - name: GRAPH_TENANT_ID
+    component: [ces-tenant]
+    required: false
+    default: ""
+    allowed: "an Entra tenant id"
+    secret: false
+    owner: operator
+    scope: live
+    description: "Tenant id for ces-tenant's legacy env fallback, used only when a caller passes no tenant slug; with GRAPH_CLIENT_ID unset as well the provider reports degraded."
+    source: "ces-tenant/src/impl/http-provider.ts:167"
+  - name: IDEMPOTENCY_CHECK
+    component: [ces-stamper]
+    required: false
+    default: "on"
+    allowed: "exactly 'false' = off; anything else = on"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Lets Stamper's idempotency guard skip tasks already applied; on unless set to exactly 'false'."
+    source: "ces-stamper/src/config/StamperConfig.ts:116"
+  - name: INFRA_MANIFEST_PATH
+    component: [ces-eo]
+    required: false
+    default: "newest <plan-data>\\<slug>\\plans\\infrastructure-manifest-*.json"
+    allowed: "a file path"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Infrastructure manifest EO loads; when unset EO auto-discovers the newest one in the tenant's Stamper plan-data folder."
+    source: "ces-eo/src/eo/config/EoConfig.ts:211"
+  - name: INFRA_REGISTRY_PATH
+    component: [ces-eo]
+    required: false
+    default: "unset = no infrastructure registry"
+    allowed: "a file path"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Optional infrastructure registry that EO loads alongside the main registry for assessment, POA&M, documents and config views."
+    source: "ces-eo/src/eo/config/EoConfig.ts:286"
+  - name: JWT_EXPIRES_IN
+    component: [muster-api]
+    required: false
+    default: "8h"
+    allowed: "a jsonwebtoken expiresIn value (for example '8h', '30m')"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Lifetime of the user session JWTs that muster-api mints."
+    source: "ces-muster/muster-api/src/lib/jwt.ts:37"
+  - name: JWT_SECRET
+    component: [muster-api]
+    required: true
+    default: ""
+    allowed: "a non-empty string (the install generator makes 32 random bytes, base64url)"
+    secret: true
+    owner: contractor
+    scope: all
+    description: "HS256 secret that signs and verifies muster-api user session JWTs; read through secretEnv(), so a DPAPI store value wins over the environment, and muster-api refuses to start without it."
+    source: "ces-muster/muster-api/src/lib/jwt.ts:26"
+  - name: LOCATION
+    component: [ces-stamper]
+    required: false
+    default: ""
+    allowed: "an Azure region name"
+    secret: false
+    owner: operator
+    scope: live
+    description: "Azure region for Stamper's CLI dotenv loader; only when SUBSCRIPTION_ID, RESOURCE_GROUP and LOCATION are all set does it add a subscription block to the tenant config."
+    source: "ces-stamper/src/config/dotenvLoader.ts:41"
+  - name: LOG_DIR
+    component: [ces-stamper]
+    required: false
+    default: "<STORAGE_ROOT>\\logs (Stamper module storage)"
+    allowed: "a folder path"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Folder Stamper uses for its logs."
+    source: "ces-stamper/src/config/StamperConfig.ts:113"
+  - name: LOG_LEVEL
+    component: [ces-stamper]
+    required: false
+    default: "info"
+    allowed: "free text"
+    secret: false
+    owner: operator
+    scope: all
+    description: "UNCLEAR: Stamper stores this as config.logLevel (default 'info'), but no code outside StamperConfig.ts reads logLevel."
+    source: "ces-stamper/src/config/StamperConfig.ts:112"
+  - name: LOGIN_ENDPOINT
+    component: [ces-stamper]
+    required: false
+    default: "the active stack provider's login endpoint (dotenv loader: https://login.microsoftonline.us)"
+    allowed: "an https URL"
+    secret: false
+    owner: operator
+    scope: live
+    description: "Entra login authority Stamper uses; the Azure auth endpoint default is derived from it."
+    source: "ces-stamper/src/config/StamperConfig.ts:105"
+  - name: MISSION_PLAN_PATH
+    component: [ces-eo]
+    required: false
+    default: "newest <plan-data>\\<slug>\\plans\\manual-mission-plan-*.json"
+    allowed: "a file path"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Mission plan EO loads; when unset EO auto-discovers the newest one in the tenant's Stamper plan-data folder."
+    source: "ces-eo/src/eo/config/EoConfig.ts:213"
+  - name: MU_API_URL
+    component: [muster-api]
+    required: false
+    default: "http://localhost:4000"
+    allowed: "muster-api base URL; the --api-url flag wins"
+    secret: false
+    owner: contractor
+    scope: all
+    description: "Base URL the mu command-line client calls when --api-url is not given."
+    source: "ces-muster/muster-api/src/cli/mu.ts:391"
+  - name: MU_EMAIL
+    component: [muster-api]
+    required: false
+    default: ""
+    allowed: "a muster-api user email; the --email flag wins"
+    secret: false
+    owner: contractor
+    scope: all
+    description: "Login email for 'mu login' when --email is not given; login fails without an email from the flag or this variable."
+    source: "ces-muster/muster-api/src/cli/mu.ts:459"
+  - name: MU_PASSWORD
+    component: [muster-api]
+    required: false
+    default: ""
+    allowed: "the user's password; the --password flag wins"
+    secret: true
+    owner: contractor
+    scope: all
+    description: "Login password for 'mu login' when --password is not given; login fails without a password from the flag or this variable."
+    source: "ces-muster/muster-api/src/cli/mu.ts:460"
+  - name: MU_TOKEN
+    component: [muster-api]
+    required: false
+    default: "saved credential in the mu credential store"
+    allowed: "a muster-api JWT; the --token flag wins"
+    secret: true
+    owner: contractor
+    scope: all
+    description: "muster-api bearer JWT the mu client uses when --token is not given, before falling back to the saved credential file."
+    source: "ces-muster/muster-api/src/cli/mu.ts:413"
+  - name: MUSTER_AI_SIM_ONLY
+    component: [muster-api]
+    required: false
+    default: "unset = AI off"
+    allowed: "exactly '1' = declared sim-only; anything else = not"
+    secret: false
+    owner: operator
+    scope: sim
+    description: "Declares this muster-api serves simulated tenants only; the AI routes run only when it is exactly '1', ANTHROPIC_API_KEY is set and MUSTER_LIVE_CLIENT_ID is unset, otherwise they answer 503 degraded."
+    source: "ces-muster/muster-api/src/lib/claude.ts:26"
+  - name: MUSTER_CORS_ORIGINS
+    component: [muster-api]
+    required: false
+    default: "http://localhost:5173,http://localhost:4173"
+    allowed: "comma-separated origins"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Browser origins muster-api returns CORS headers for; any other origin gets none, so the browser blocks it."
+    source: "ces-muster/muster-api/src/app.ts:45"
+  - name: MUSTER_LIVE_AREA_TOKEN
+    component: [muster-api]
+    required: false
+    default: ""
+    allowed: "set by muster-api only"
+    secret: true
+    owner: operator
+    scope: live
+    description: "Delegated access token that muster-api puts only into the environment of each live-discovery PowerShell child (Exchange, Purview, Azure, Teams connects); never set by hand."
+    source: "ces-muster/muster-api/src/services/liveDiscoveryRun.ts:245"
+  - name: MUSTER_LIVE_AZ_ENVIRONMENT
+    component: [muster-api]
+    required: false
+    default: "AzureUSGovernment"
+    allowed: "an Az PowerShell environment name"
+    secret: false
+    owner: operator
+    scope: live
+    description: "Azure environment name muster-api's live discovery passes to Connect-AzAccount."
+    source: "ces-muster/muster-api/src/services/liveDiscoveryRun.ts:254"
+  - name: MUSTER_LIVE_AZ_PERMISSIONS_API_VERSION
+    component: [muster-api]
+    required: false
+    default: "2022-04-01"
+    allowed: "an ARM api-version string"
+    secret: false
+    owner: operator
+    scope: live
+    description: "ARM Microsoft.Authorization/permissions api-version muster-api uses when checking live Azure access (marked unconfirmed for GCC High in code)."
+    source: "ces-muster/muster-api/src/services/liveAccess.ts:207"
+  - name: MUSTER_LIVE_CLIENT_ID
+    component: [muster-api]
+    required: false
+    default: "unset = live access not configured"
+    allowed: "a public Entra client id (device-code flow, no secret)"
+    secret: false
+    owner: operator
+    scope: live
+    description: "Public client id for muster-api's device-code consent used by live discovery and harvest; live consent fails with not_configured when unset, and when set the AI routes are refused."
+    source: "ces-muster/muster-api/src/services/liveAccess.ts:405"
+  - name: MUSTER_LIVE_EXO_ENVIRONMENT
+    component: [muster-api]
+    required: false
+    default: "O365USGovGCCHigh"
+    allowed: "an ExchangeEnvironmentName value"
+    secret: false
+    owner: operator
+    scope: live
+    description: "Exchange environment name muster-api's live discovery passes to Connect-ExchangeOnline."
+    source: "ces-muster/muster-api/src/services/liveDiscoveryRun.ts:245"
+  - name: MUSTER_LIVE_GLOBAL_READER_ROLE_ID
+    component: [muster-api]
+    required: false
+    default: "the Entra built-in Global Reader role template id (see source)"
+    allowed: "an Entra role template id"
+    secret: false
+    owner: operator
+    scope: live
+    description: "Entra role template id muster-api requires the consenting live user to hold (Global Reader); other roles held alongside are not refused."
+    source: "ces-muster/muster-api/src/services/liveAccess.ts:205"
+  - name: MUSTER_LIVE_GRAPH_ENVIRONMENT
+    component: [muster-api]
+    required: false
+    default: "USGov"
+    allowed: "a Microsoft Graph PowerShell environment name"
+    secret: false
+    owner: operator
+    scope: live
+    description: "Graph PowerShell environment muster-api's live discovery passes to Connect-MgGraph."
+    source: "ces-muster/muster-api/src/services/liveDiscoveryRun.ts:151"
+  - name: MUSTER_LIVE_GRAPH_TOKEN
+    component: [muster-api]
+    required: false
+    default: ""
+    allowed: "set by muster-api only"
+    secret: true
+    owner: operator
+    scope: live
+    description: "Delegated Graph access token that muster-api puts only into the environment of the live-discovery PowerShell child for Connect-MgGraph and Teams; never set by hand."
+    source: "ces-muster/muster-api/src/services/liveDiscoveryRun.ts:195"
+  - name: MUSTER_LIVE_IPPS_AUTH_URI
+    component: [muster-api]
+    required: false
+    default: "https://login.microsoftonline.us/<consented tenant id>"
+    allowed: "an Entra authorization endpoint URL"
+    secret: false
+    owner: operator
+    scope: live
+    description: "Overrides the -AzureADAuthorizationEndpointUri that muster-api's live Purview discovery passes to Connect-IPPSSession."
+    source: "ces-muster/muster-api/src/services/liveDiscoveryRun.ts:249"
+  - name: MUSTER_LIVE_IPPS_CONNECTION_URI
+    component: [muster-api]
+    required: false
+    default: "https://ps.compliance.protection.office365.us/powershell-liveid/"
+    allowed: "a Security & Compliance PowerShell connection URL"
+    secret: false
+    owner: operator
+    scope: live
+    description: "Overrides the -ConnectionUri that muster-api's live Purview discovery passes to Connect-IPPSSession (default is the GCC High endpoint)."
+    source: "ces-muster/muster-api/src/services/liveDiscoveryRun.ts:249"
+  - name: MUSTER_LIVE_LOGIN_BASE
+    component: [muster-api]
+    required: false
+    default: "https://login.microsoftonline.us"
+    allowed: "login authority base URL; trailing slashes are stripped"
+    secret: false
+    owner: operator
+    scope: live
+    description: "Login authority base URL muster-api uses for live device-code consent sign-ins, when the live-access config does not set one."
+    source: "ces-muster/muster-api/src/services/liveAccess.ts:408"
+  - name: MUSTER_SCHEDULER
+    component: [muster-api]
+    required: false
+    default: "on"
+    allowed: "'off' (any case) = scheduler not started; anything else = on"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Starts muster-api's background scheduler (nudges and reminders to the simulated mail outbox) unless set to 'off'; the POST /tick routes work either way."
+    source: "ces-muster/muster-api/src/server.ts:33"
+  - name: MUSTER_VERDICT_PREDICATES
+    component: [muster-api]
+    required: false
+    default: "ces-muster/src/features/discovery/verdictPredicates.json (resolved from the muster-api module location)"
+    allowed: "path to a verdict-predicates JSON file"
+    secret: false
+    owner: contractor
+    scope: all
+    description: "Path of the discovery verdict-predicate data file that muster-api's discovery service reads in place."
+    source: "ces-muster/muster-api/src/services/discoveryService.ts:259"
+  - name: MX_ALLOW_OVERRIDES
+    component: [ces-tester]
+    required: false
+    default: "unset = off"
+    allowed: "'1' = on; anything else = off"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "Lets the tester's e2e overrides gate accept the simulator override file only when exactly '1'."
+    source: "ces-tester/src/flow/muster-e2e-run.ts:1252"
+  - name: MX_ANSWERS
+    component: [ces-muster, muster-api]
+    required: false
+    default: "unset = scripted simulator boundary decision"
+    allowed: "path to an interview-answers JSON file (InterviewFact[])"
+    secret: false
+    owner: contractor
+    scope: sim
+    description: "Path to the organisation's interview answers that the plan-from-discovery script (and the discovery CLI when --answers is absent) uses in place of the scripted boundary decision; muster-api and the tester set it for the child run."
+    source: "ces-muster/scripts/mx/plan-from-discovery.ts:170"
+  - name: MX_DISCOVERY
+    component: [ces-muster]
+    required: true
+    default: ""
+    allowed: "path to a discovery JSON file"
+    secret: false
+    owner: contractor
+    scope: sim
+    description: "Path of the discovery document the plan-from-discovery script compiles a plan from; the script stops if it is unset, and muster-api's plan-compile service sets it for the child run."
+    source: "ces-muster/scripts/mx/plan-from-discovery.ts:116"
+  - name: MX_INITIAL_PASSWORD_REF
+    component: [ces-muster]
+    required: false
+    default: "unset = the script's own generated simulator initial-password fact"
+    allowed: "a secret reference of the form secretref:one-time:<uuid>"
+    secret: false
+    owner: contractor
+    scope: sim
+    description: "Initial-password reference muster-api issued, which the plan-from-discovery script writes into the plan in place of its generated answer (a reference, never the password)."
+    source: "ces-muster/scripts/mx/plan-from-discovery.ts:199"
+  - name: MX_ORG_CONTENT
+    component: [ces-muster]
+    required: false
+    default: "unset = no organisation content"
+    allowed: "path to an org-content JSON file"
+    secret: false
+    owner: contractor
+    scope: sim
+    description: "Path to the organisation content JSON that the plan-from-discovery script reads into the plan (including its simulation block)."
+    source: "ces-muster/scripts/mx/plan-from-discovery.ts:165"
+  - name: MX_OUT
+    component: [ces-muster]
+    required: true
+    default: ""
+    allowed: "output directory path"
+    secret: false
+    owner: contractor
+    scope: sim
+    description: "Output directory where the plan-from-discovery script writes the compiled plan; the script stops if it is unset."
+    source: "ces-muster/scripts/mx/plan-from-discovery.ts:117"
+  - name: MX_SLUG
+    component: [ces-muster]
+    required: true
+    default: ""
+    allowed: "tenant slug"
+    secret: false
+    owner: contractor
+    scope: sim
+    description: "Tenant slug the plan-from-discovery script compiles the plan for; the script stops if it is unset."
+    source: "ces-muster/scripts/mx/plan-from-discovery.ts:118"
+  - name: MX_STACKS
+    component: [ces-muster]
+    required: false
+    default: "m365_e5_gcc,microsoft_intune,microsoft_sentinel"
+    allowed: "comma-separated stack ids"
+    secret: false
+    owner: contractor
+    scope: sim
+    description: "Comma-separated technology stacks the plan-from-discovery script plans for."
+    source: "ces-muster/scripts/mx/plan-from-discovery.ts:119"
+  - name: MX_TENANT_HARVEST
+    component: [ces-muster]
+    required: false
+    default: "unset = harvest on"
+    allowed: "'off' (exact) = skip the simulator harvest; anything else = harvest"
+    secret: false
+    owner: contractor
+    scope: sim
+    description: "When exactly 'off', the plan-from-discovery script skips the readiness and tenant-fact harvest against the simulator's Graph endpoint."
+    source: "ces-muster/scripts/mx/plan-from-discovery.ts:153"
+  - name: NODE_ENV
+    component: [ces-ao]
+    required: false
+    default: "unset"
+    allowed: "'development' = include stack traces; anything else = omit"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "When exactly 'development', the AO execute route includes the error stack in its 500 response body."
+    source: "ces-ao/src/server/routes/execute.routes.ts:255"
+  - name: PORT
+    component: [muster-api]
+    required: false
+    default: "4000"
+    allowed: "integer TCP port"
+    secret: false
+    owner: operator
+    scope: all
+    description: "TCP port muster-api listens on."
+    source: "ces-muster/muster-api/src/server.ts:22"
+  - name: REASSESS_DAYS
+    component: [muster-api]
+    required: false
+    default: "365"
+    allowed: "integer days"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Number of days after an assessment before muster-api's reassessment service treats it as due for reassessment."
+    source: "ces-muster/muster-api/src/services/reassessmentService.ts:77"
+  - name: RECIPES_DIR
+    component: [muster-api]
+    required: false
+    default: "ces-muster/recipes (resolved from the muster-api module location)"
+    allowed: "directory path"
+    secret: false
+    owner: contractor
+    scope: all
+    description: "Directory muster-api loads signed recipes from."
+    source: "ces-muster/muster-api/src/lib/recipeSigning.ts:31"
+  - name: RECIPES_SELF_SERVE
+    component: [muster-api]
+    required: false
+    default: "unset = off"
+    allowed: "'true' = on; anything else = off"
+    secret: false
+    owner: BHD
+    scope: all
+    description: "When exactly 'true', POST /api/recipes/ingest no longer needs the 'x-concierge-session: true' header; off keeps recipe ingest behind concierge-assisted validation."
+    source: "ces-muster/muster-api/src/routes/recipes.ts:141"
+  - name: REGISTRY_PATH
+    component: [ces-eo]
+    required: true
+    default: ""
+    allowed: "path to a Stamper command registry JSON, e.g. ces-stamper/src/registry/cmmc-l2-commands.registry.json"
+    secret: false
+    owner: contractor
+    scope: all
+    description: "Path of the Stamper command registry EO maps controls from (EO also derives the Stamper root two folders above it); EO config validation fails at start without it."
+    source: "ces-eo/src/eo/config/EoConfig.ts:285"
+  - name: RESOURCE_GROUP
+    component: [ces-stamper]
+    required: false
+    default: ""
+    allowed: "Azure resource group name"
+    secret: false
+    owner: operator
+    scope: live
+    description: "Azure resource group for the Stamper CLI's dotenv tenant config; the subscription block is set only when SUBSCRIPTION_ID, RESOURCE_GROUP and LOCATION are all present."
+    source: "ces-stamper/src/config/dotenvLoader.ts:41"
+  - name: SCHEDULER_INTERVAL_MS
+    component: [muster-api]
+    required: false
+    default: "3600000"
+    allowed: "integer milliseconds"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Tick interval of muster-api's background scheduler; the first tick fires one interval after start."
+    source: "ces-muster/muster-api/src/server.ts:34"
+  - name: SCHEDULER_TENANT_ID
+    component: [muster-api]
+    required: false
+    default: "unset = every tenant"
+    allowed: "a muster-api tenant id"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Limits muster-api's background scheduler to one tenant id; unset or empty runs it for every tenant."
+    source: "ces-muster/muster-api/src/server.ts:35"
+  - name: SEED_PASSWORD
+    component: [muster-api]
+    required: false
+    default: ""
+    allowed: "the password to hash; the --password flag wins"
+    secret: true
+    owner: contractor
+    scope: dev
+    description: "Password the muster-api seed script hashes (bcrypt) for the operator user it creates or updates when --password is not given; the script exits without a password."
+    source: "ces-muster/muster-api/scripts/seed.ts:34"
+  - name: SIGNAL_CAPTURE_INTERVAL_HOURS
+    component: [ces-eo]
+    required: false
+    default: "24"
+    allowed: "number of hours"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Interval in hours of EO's scheduled compliance-signal capture."
+    source: "ces-eo/src/eo/config/EoConfig.ts:295"
+  - name: STACKSIM_FIXED_NOW
+    component: [tenant-stacksim]
+    required: false
+    default: "unset = live clock"
+    allowed: "ISO date-time; an unparseable value throws"
+    secret: false
+    owner: contractor
+    scope: sim
+    description: "Pins the simulator's seed anchor time so seeded data has fixed dates; unset or empty uses the current clock."
+    source: "tenant-stacksim/src/seed/SeedEngine.ts:89"
+  - name: STACKSIM_ROOT
+    component: [ces-tenant, muster-api]
+    required: false
+    default: "the tenant-stacksim folder beside the CES modules (resolved from the module location)"
+    allowed: "path to the tenant-stacksim checkout"
+    secret: false
+    owner: contractor
+    scope: sim
+    description: "Root of the tenant-stacksim checkout, whose psmodules and azshim folders muster-api and ces-tenant put on the PowerShell path for simulator sessions."
+    source: "ces-tenant/src/impl/stacksim.ts:239"
+  - name: STACKSIM_SERVER_URL
+    component: [ces-ao, ces-eo, ces-stamper, ces-tenant, ces-tester, muster-api, tenant-stacksim]
+    required: false
+    default: "http://127.0.0.1:4390 (ces-tenant and az shim); unset elsewhere = simulator off"
+    allowed: "simulator server URL; AO's sim rail accepts only localhost/127.0.0.1 URLs"
+    secret: false
+    owner: contractor
+    scope: sim
+    description: "URL of the tenant-stacksim server; when set, modules run PowerShell against the simulator (AO also requires a loopback URL and the shim module first on PSModulePath before it treats the process as sim mode)."
+    source: "ces-ao/src/execution/SimOnlyRail.ts:36"
+  - name: STAMPER_ALLOW_STALE_DIST
+    component: [ces-stamper]
+    required: false
+    default: "unset = refuse"
+    allowed: "'1' = warn and continue; anything else = refuse"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "When exactly '1', the Stamper CLI run from dist only warns when dist is older than src instead of refusing to run."
+    source: "ces-stamper/src/utils/distFreshness.ts:77"
+  - name: STAMPER_EVIDENCE_DIR
+    component: [ces-stamper]
+    required: false
+    default: "{CES_PIPELINE_ROOT}\\Stamper\\plan-data\\dev\\evidence"
+    allowed: "directory path"
+    secret: false
+    owner: contractor
+    scope: all
+    description: "Evidence directory Stamper's evidence-readiness analyzer reads, fixed at module load."
+    source: "ces-stamper/src/core/EvidenceReadinessAnalyzer.ts:16"
+  - name: STAMPER_INITIAL_PASSWORD
+    component: [ces-stamper]
+    required: false
+    default: "unset = no value"
+    allowed: "a password string"
+    secret: true
+    owner: contractor
+    scope: dev
+    description: "Stamper CLI fills the plan's unresolved initialPassword variable from this variable into the in-memory secret overlay (redacted in logs and evidence)."
+    source: "ces-stamper/src/cli/cliExecutionContext.ts:32"
+  - name: STAMPER_PLAN_DATA_ROOT
+    component: [ces-eo]
+    required: false
+    default: "{CES_PIPELINE_ROOT}\\Stamper\\plan-data"
+    allowed: "directory path"
+    secret: false
+    owner: contractor
+    scope: all
+    description: "Root of Stamper's plan-data that EO searches per tenant slug for manifests, the mission plan and variables.json."
+    source: "ces-eo/src/eo/config/EoConfig.ts:216"
+  - name: STAMPER_REGISTRY_ROOT
+    component: [muster-api]
+    required: false
+    default: "ces-stamper/src/registry (resolved from the muster-api module location)"
+    allowed: "directory path"
+    secret: false
+    owner: contractor
+    scope: all
+    description: "Folder of Stamper command registries muster-api reads for discovery wiring and simulator discovery runs."
+    source: "ces-muster/muster-api/src/services/simDiscoveryRun.ts:87"
+  - name: STATE_DIR
+    component: [ces-stamper]
+    required: false
+    default: "{STORAGE_ROOT}\\state"
+    allowed: "directory path"
+    secret: false
+    owner: contractor
+    scope: all
+    description: "Directory Stamper keeps its run state in."
+    source: "ces-stamper/src/config/StamperConfig.ts:110"
+  - name: STORAGE_ROOT
+    component: [ces-eo, ces-stamper]
+    required: false
+    default: "{CES_PIPELINE_ROOT}\\<Module>\\storage (EvidenceOps for EO, Stamper for Stamper)"
+    allowed: "directory path"
+    secret: false
+    owner: contractor
+    scope: all
+    description: "Module storage root: EO keeps its evidence store and last-tenant file under it, and Stamper derives its state, evidence and logs folders from it."
+    source: "ces-eo/src/eo/config/EoConfig.ts:172"
+  - name: SUBSCRIPTION_ID
+    component: [ces-stamper]
+    required: false
+    default: ""
+    allowed: "Azure subscription id (GUID)"
+    secret: false
+    owner: operator
+    scope: live
+    description: "Azure subscription id for the Stamper CLI's dotenv tenant config; the subscription block is set only when SUBSCRIPTION_ID, RESOURCE_GROUP and LOCATION are all present."
+    source: "ces-stamper/src/config/dotenvLoader.ts:37"
+  - name: TARGET_TENANT_DOMAIN
+    component: [ces-stamper]
+    required: false
+    default: "a hard-coded customer onmicrosoft.us domain"
+    allowed: "tenant primary domain"
+    secret: false
+    owner: operator
+    scope: live
+    description: "Tenant domain in the Stamper CLI's dotenv tenant config (dotenv loader, CLI bootstrap only)."
+    source: "ces-stamper/src/config/dotenvLoader.ts:31"
+  - name: TENANT_CONFIG
+    component: [ces-eo]
+    required: false
+    default: "unset = resolve through the ces-tenant registry by slug"
+    allowed: "path to a tenant config JSON"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Path to a tenant config JSON that EO loads at start; its slug is used when TENANT_SLUG is not set."
+    source: "ces-eo/src/eo/config/EoConfig.ts:171"
+  - name: TENANT_ID
+    component: [ces-stamper]
+    required: false
+    default: "\"\""
+    allowed: "Entra tenant id (GUID)"
+    secret: false
+    owner: operator
+    scope: live
+    description: "Entra tenant id in Stamper's config when it is not taken from a tenant record."
+    source: "ces-stamper/src/config/StamperConfig.ts:99"
+  - name: TENANT_MANIFEST_PATH
+    component: [ces-eo]
+    required: false
+    default: "newest tenant-manifest-<slug>-*.json found under Stamper plan-data"
+    allowed: "file path"
+    secret: false
+    owner: contractor
+    scope: all
+    description: "Explicit tenant-manifest file for EO; unset, EO auto-discovers the newest pushed manifest for the tenant slug."
+    source: "ces-eo/src/eo/config/EoConfig.ts:212"
+  - name: TENANT_SLUG
+    component: [ces-eo, ces-stamper]
+    required: false
+    default: "EO: tenant config slug, then ACTIVE_TENANT_SLUG, then last-used tenant; Stamper dotenv: 'unknown'"
+    allowed: "tenant slug"
+    secret: false
+    owner: operator
+    scope: all
+    description: "Tenant slug EO starts on, and the last fallback Stamper uses for the tenant slug when publishing execution results."
+    source: "ces-eo/src/eo/config/EoConfig.ts:175"
+  - name: VITE_MUSTER_API_URL
+    component: [ces-muster]
+    required: false
+    default: "/api"
+    allowed: "muster-api base URL"
+    secret: false
+    owner: contractor
+    scope: all
+    description: "Build-time setting (Vite inlines it at build) for the muster-api base URL the Muster SPA calls when no runtime __MUSTER_CONFIG__.apiBaseUrl is present."
+    source: "ces-muster/src/shared/api/musterApi.ts:42"
+# Legend (codes used in the descriptions above):
+#   AO = AdminOps, the change-execution server (ces-ao). EO = EvidenceOps, the evidence, SSP and approval server (ces-eo).
+#   EC = Evidence Collector, the evidence ingest server (ces-ec). Stamper = the tenant-configuration engine (ces-stamper).
+#   Muster / muster-api = the readiness-assessment app and its API (ces-muster). stacksim = the tenant simulator (tenant-stacksim).
+#   SSP = System Security Plan. UPN = a user's sign-in name. PFX = a password-protected file holding a private key.
+#   DPAPI = Windows Data Protection API; the module-secret store is a DPAPI file (ces-shared/src/secrets/moduleSecrets.ts).
+#   secretEnv() = the read-only view of the environment in which a module-secret store value wins (same file).
+#   HS256 = HMAC-SHA-256 signing with a key shared by signer and verifier. JWT = JSON Web Token.
+#   CSPRNG = cryptographically secure random number generator. Entra = Microsoft Entra ID (Azure AD).
+#   GCC High = Microsoft's US-government cloud for defense contractors. CUI = Controlled Unclassified Information.
+#   Sim-only rail = the guard that refuses non-simulator tenants unless explicitly allowed.
+#   SP-n, F-n, R-n = secrets-plan slices, flags and risks (BHD secrets plan; names only, no action needed by the contractor).

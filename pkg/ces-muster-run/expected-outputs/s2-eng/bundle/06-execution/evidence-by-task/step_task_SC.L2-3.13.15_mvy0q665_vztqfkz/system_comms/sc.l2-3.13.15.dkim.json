@@ -1,0 +1,48 @@
+{
+  "rawResponse": "{\r\n    \"Domain\":  \"s2-eng.simtenant.onmicrosoft.us\",\r\n    \"Enabled\":  true,\r\n    \"Status\":  \"Valid\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Resource already exists — creation skipped (idempotent)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Already compliant — state unchanged, evidence confirms resource exists",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "Already compliant — state unchanged, evidence confirms resource exists"
+  },
+  "registryEntry": {
+    "entry_id": "SC.L2-3.13.15.dkim",
+    "label": "Enable DKIM Signing for Primary Domain",
+    "engine": "exchange",
+    "layer_hint": 5,
+    "sequence_hint": 14,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "SC.L2-3.13.15"
+    ],
+    "get_command": "Get-DkimSigningConfig | Select-Object Domain,Enabled,Status | ConvertTo-Json -Depth 10",
+    "set_command": "try { New-DkimSigningConfig -DomainName '{primaryDomain}' -Enabled $true } catch { Set-DkimSigningConfig -Identity '{primaryDomain}' -Enabled $true }",
+    "evidence_commands": [
+      "Get-DkimSigningConfig -Identity '{primaryDomain}' | Select-Object Domain,Enabled,Status,KeySize | ConvertTo-Json"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SC.L2-3.13.15"
+    ],
+    "timestamp": "2026-11-01T16:03:26.634Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "try { New-DkimSigningConfig -DomainName '{primaryDomain}' -Enabled $true } catch { Set-DkimSigningConfig -Identity '{primaryDomain}' -Enabled $true }",
+    "sha256Hash": "e01421052e5eb1198ed3530bdba02e3e357df3f1fd0cb861b5357a81d7892514",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "{\r\n    \"Domain\":  \"s2-eng.simtenant.onmicrosoft.us\",\r\n    \"Enabled\":  true,\r\n    \"Status\":  \"Valid\"\r\n}\r\n",
+    "postcheckMode": "state"
+  }
+}

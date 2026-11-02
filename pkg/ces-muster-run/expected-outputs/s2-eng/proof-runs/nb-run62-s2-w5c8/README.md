@@ -1,0 +1,3 @@
+# Run 62 (2026-10-28): synthetic customer S2 (s2-eng), wave W5 cycle 8 proof (59 checks)
+
+59/59 on the run-58 baseline, no status change (EO 89/1/0/20 SPRS 62); Stamper 110/110; V10 green (no suites ran). Personnel store: ledger PS.L2-3.9.1 met (29 persons cleared), PS.L2-3.9.2 not met naming the contractor leaver s2c-028 (account-disable step open). Cycle-8 evaluators produce no move on S2 (no shared login, MFA registered, no standing admin on a normal account, no anonymous links, no open Critical vulnerabilities, alerts triaged), as predicted. Scorecard 9/10 vs the S2 thresholds; SC-8a 21.6 % (threshold 20); GAPS 312. OUTSIDE UNCHANGED.

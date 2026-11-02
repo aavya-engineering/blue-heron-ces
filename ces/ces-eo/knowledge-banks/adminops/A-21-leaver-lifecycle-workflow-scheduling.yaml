@@ -1,0 +1,76 @@
+# GC-RED-2 created this entry from the AO registry; FIN-11 authored the procedure from the AO registry entry and the
+# A-21 command template (ces-ao/src/registry/TemplateRegistry.ts). The role and permission names are Microsoft's
+# published names for lifecycle workflows; nothing else here comes from outside CES code.
+controlId: PS.L2-3.9.2
+practiceStatement: >-
+  Ensure that organizational systems containing CUI are protected during and after personnel actions such as
+  terminations and transfers.
+useCaseId: A-21
+useCaseTitle: Leaver Lifecycle Workflow Scheduling
+domain: Identity & Access Management
+priority: P3 Medium
+trigger: CONFIG
+sodTier: Tier 2
+entraRolesRequired:
+  - Lifecycle Workflows Administrator
+approvalRequired: false
+services:
+  - name: Microsoft Entra ID Governance -- lifecycle workflows
+    purpose: >-
+      Leaver workflows that disable or delete the user account on termination, and the mover workflow that runs on a
+      transfer. A-21 turns on scheduling (and enables the workflow if it is off) so each runs without an administrator
+      starting it on demand.
+  - name: Microsoft Graph
+    purpose: Reads the workflows with their tasks, then updates isSchedulingEnabled and isEnabled.
+configurationSteps:
+  portalPath: >-
+    Microsoft Entra admin center > Identity governance > Lifecycle workflows > Workflows > select the leaver or mover
+    workflow > Properties > Enable schedule
+  powershellCmdlets:
+    - cmdlet: Invoke-MgGraphRequest
+      parameters:
+        - -Method GET
+        - -Uri /v1.0/identityGovernance/lifecycleWorkflows/workflows?$expand=tasks
+    - cmdlet: Invoke-MgGraphRequest
+      parameters:
+        - -Method PATCH
+        - -Uri /v1.0/identityGovernance/lifecycleWorkflows/workflows/{workflowId}
+        - -Body {"isSchedulingEnabled":true} (and "isEnabled":true when the workflow is off)
+  graphApiEndpoint: GET then PATCH https://graph.microsoft.us/v1.0/identityGovernance/lifecycleWorkflows/workflows
+  requiredPermissions:
+    - LifecycleWorkflows.ReadWrite.All
+  targetRule: >-
+    Every workflow of category mover, and every workflow of category leaver with an enabled task that disables or
+    deletes the user account (the built-in task definition ids 1dfdfcc7-52fa-4c2e-bf3a-e3919cc12950 and
+    8d18588d-9ad3-4c0f-99d0-ec215f0e3dff, or a task named "disable/delete user account"). The named leaver workflow
+    (parameter leaverWorkflowId) must be among them, or the apply stops.
+  idempotency: >-
+    Get-then-set. A workflow already enabled and scheduled is left unchanged; the read before the apply lists each
+    target with its planned change, so a dry run names the workflows and the change.
+evidenceArtifacts:
+  - type: Use Case Execution Evidence
+    retentionPeriod: Not set by CES (the organisation's evidence retention policy applies)
+    storageLocation: CES repository, adminops_evidence collection (one row per run)
+    format: >-
+      The AdminOps evidence row: the targeted workflows with their state before the apply, the change made to each,
+      and the state read after the apply.
+    hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+    - https://graph.microsoft.us
+  complianceBoundary: ''
+  endpointValidation: All Graph calls target graph.microsoft.us.
+  notes: >-
+    Lifecycle workflows need a Microsoft Entra ID Governance licence (AO registry licence_dependency; recorded as
+    licence-gated, not as a cost start). CES code does not confirm that lifecycle workflows are offered in a given
+    GCC High tenant; confirm it per tenant.
+relatedPolicies: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: >-
+  Evidence objectives in the AO registry: PS.L2-3.9.2[a] and [b]. The procedure protects systems during and after
+  terminations (scheduled account disable or delete) and transfers (scheduled mover workflow). It does not recover
+  equipment or CUI, and it does not record the HR action itself; those come from the organisation's records.
+  Prerequisites: a Microsoft Entra ID Governance licence, and a leaver lifecycle workflow with a disable-account or
+  delete-account task (parameter leaverWorkflowId).

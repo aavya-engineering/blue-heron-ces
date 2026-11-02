@@ -1,0 +1,37 @@
+{
+  "rawResponse": "",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "AU.L2-3.3.8.audit-protect",
+    "label": "Audit Log Access Restriction - Compliance Admin Role Evidence",
+    "engine": "mgraph",
+    "layer_hint": 7,
+    "sequence_hint": 2,
+    "idempotency": "evidence-only",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "AU.L2-3.3.8",
+      "AU.L2-3.3.9"
+    ],
+    "get_command": "Get-MgRoleManagementDirectoryRoleAssignment -Filter 'roleDefinitionId eq ''{complianceRoleId}''' -All",
+    "set_command": "",
+    "evidence_commands": [
+      "Get-MgDirectoryRole -Filter \"displayName eq 'Compliance Administrator'\" -All | ForEach-Object { Get-MgDirectoryRoleMember -DirectoryRoleId $_.Id -All | Select-Object Id,AdditionalProperties } | ConvertTo-Json -Depth 3"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AU.L2-3.3.8",
+      "AU.L2-3.3.9"
+    ],
+    "timestamp": "2026-11-01T15:28:19.612Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Audit Log Access Restriction - Compliance Admin Role Evidence",
+    "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

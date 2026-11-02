@@ -1,0 +1,3043 @@
+{
+  "schema_version": "2.0",
+  "authorization_package": "Microsoft 365 GCC High and Azure Government FedRAMP High",
+  "authorization_reference": "Office 365 GCC High: FedRAMP High agency ATO, FedRAMP Marketplace FR1824057433; Azure Government: FedRAMP High JAB P-ATO (US Gov Arizona, Texas, Virginia). Authorization dates not verified from a fetched source; Microsoft SSP and CRM are on the Service Trust Portal under sign-in/NDA.",
+  "ato_date": null,
+  "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+  "url": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+  "last_verified": "2026-10-27",
+  "coverage_definition": "Placemat values per Microsoft: 'Microsoft Coverage' = practices inherited from the underlying cloud platform; 'Shared Coverage' = the platform contributes coverage but customer configuration is required; 'Customer Responsibility' = no platform coverage (https://learn.microsoft.com/en-us/azure/compliance/offerings/offering-cmmc, 'Microsoft Product Placemat for CMMC').",
+  "inheritance_rule": "EO 'inheritance': 'none' when the Placemat says Customer Responsibility; 'full' only when the Placemat says Microsoft Coverage AND the requirement is satisfied wholly inside Microsoft's authorization boundary for the organization's in-scope assets (datacenter physical protection PE.L1-3.10.1/3/4/5 and PE.L2-3.10.2 when physical_facility_count is 0; maintenance MA.L2-3.7.1/2/3/6 when customer_equipment_count is 0; IA.L2-3.5.11); 'partial' otherwise. Rows where 'partial' overrides a Placemat 'Microsoft Coverage' carry basis 'BHD assessment' and a note tied to the control text.",
+  "condition_semantics": {
+    "physical_facility_count_zero": "Inherited only when the SI baseline dependency physical_facility_count is 0 (Muster gate). A positive count makes the row Shared; a null/absent count makes the row Shared with status 'pending facts'.",
+    "customer_equipment_count_zero": "Inherited only when the SI baseline dependency customer_equipment_count is 0 (Muster gate). A positive count makes the row Shared; a null/absent count makes the row Shared with status 'pending facts'."
+  },
+  "sources": [
+    {
+      "key": "placemat",
+      "name": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "url": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "alias": "https://aka.ms/cmmc/productplacemat",
+      "accessed": "2026-10-27"
+    },
+    {
+      "key": "techref",
+      "name": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "url": "https://www.microsoft.com/en-us/download/details.aspx?id=103401",
+      "accessed": "2026-10-27",
+      "note": "structured copy in the build: ces-muster public/knowledge/gcc-high-g5-cmmc-2-tech-ref-structured.json (customer_responsibilities.azure / .gcch)"
+    },
+    {
+      "key": "offering-cmmc",
+      "name": "Cybersecurity Maturity Model Certification (CMMC) - Azure Compliance",
+      "url": "https://learn.microsoft.com/en-us/azure/compliance/offerings/offering-cmmc",
+      "accessed": "2026-10-27"
+    },
+    {
+      "key": "shared-responsibility",
+      "name": "Shared responsibility in the cloud - Microsoft Azure",
+      "url": "https://learn.microsoft.com/en-us/azure/security/fundamentals/shared-responsibility",
+      "accessed": "2026-10-27"
+    },
+    {
+      "key": "fedramp-scope",
+      "name": "Azure and other Microsoft cloud services compliance scope - Azure Government",
+      "url": "https://learn.microsoft.com/en-us/azure/azure-government/compliance/azure-services-in-fedramp-auditscope",
+      "accessed": "2026-10-27"
+    },
+    {
+      "key": "fedramp-m365",
+      "name": "FedRAMP - Microsoft Compliance (Office 365 GCC High ATO, Marketplace FR1824057433)",
+      "url": "https://learn.microsoft.com/en-us/compliance/regulatory/offering-fedramp",
+      "accessed": "2026-10-27"
+    },
+    {
+      "key": "fedramp-azure",
+      "name": "FedRAMP - Azure Compliance (Azure Government JAB P-ATO; SSP/CRM on the Service Trust Portal)",
+      "url": "https://learn.microsoft.com/en-us/azure/compliance/offerings/offering-fedramp",
+      "accessed": "2026-10-27"
+    },
+    {
+      "key": "encryption-cloud",
+      "name": "Encryption in the Microsoft cloud",
+      "url": "https://learn.microsoft.com/en-us/purview/office-365-encryption-in-the-microsoft-cloud-overview",
+      "accessed": "2026-10-27"
+    },
+    {
+      "key": "encryption-m365",
+      "name": "Encryption in Microsoft 365",
+      "url": "https://learn.microsoft.com/en-us/purview/encryption",
+      "accessed": "2026-10-27"
+    },
+    {
+      "key": "vm-time-sync",
+      "name": "Time sync for Windows VMs in Azure",
+      "url": "https://learn.microsoft.com/en-us/azure/virtual-machines/windows/time-sync",
+      "accessed": "2026-10-27"
+    },
+    {
+      "key": "entra-fedramp",
+      "name": "Configure Microsoft Entra ID to meet FedRAMP High Impact level",
+      "url": "https://learn.microsoft.com/en-us/entra/standards/configure-for-fedramp-high-impact",
+      "accessed": "2026-10-27"
+    },
+    {
+      "key": "compliance-manager",
+      "name": "Working with improvement actions in Microsoft Purview Compliance Manager",
+      "url": "https://learn.microsoft.com/en-us/purview/compliance-manager-improvement-actions",
+      "accessed": "2026-10-27"
+    },
+    {
+      "key": "azure-policy-171-gov",
+      "name": "Azure Policy Regulatory Compliance - NIST SP 800-171 R2 (Azure Government)",
+      "url": "https://learn.microsoft.com/en-us/azure/governance/policy/samples/gov-nist-sp-800-171-r2",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "excluded_ids": [
+    {
+      "id": "SC.L2-3.13.17",
+      "reason": "SP 800-53 SC-7 text (separation of public-access systems from internal infrastructure); NIST SP 800-171 Rev 2 has no requirement 3.13.17 (family ends at 3.13.16)."
+    },
+    {
+      "id": "SI.L2-3.14.9",
+      "reason": "SP 800-53 SI-11 text (secure error handling); no NIST SP 800-171 Rev 2 requirement 3.14.9 (family ends at 3.14.7)."
+    },
+    {
+      "id": "SI.L2-3.14.10",
+      "reason": "SP 800-53 SI-10 text (information input validation); no NIST SP 800-171 Rev 2 requirement 3.14.10."
+    },
+    {
+      "id": "SI.L2-3.14.11",
+      "reason": "SP 800-53 SI-11 text (error messages without sensitive data); no NIST SP 800-171 Rev 2 requirement 3.14.11."
+    },
+    {
+      "id": "SI.L2-3.14.12",
+      "reason": "SP 800-53 SI-12 text (information management and retention); no NIST SP 800-171 Rev 2 requirement 3.14.12."
+    },
+    {
+      "id": "SI.L2-3.14.13",
+      "reason": "SP 800-53 SI-13 text (predictable failure prevention); no NIST SP 800-171 Rev 2 requirement 3.14.13."
+    },
+    {
+      "id": "SI.L2-3.14.14",
+      "reason": "SP 800-53 SI-14 text (non-persistence); no NIST SP 800-171 Rev 2 requirement 3.14.14."
+    }
+  ],
+  "muster_table_notes": [
+    "Muster's public/knowledge/fedramp-inheritance-table.yaml keys the Level 1 physical-protection practices as PE.L1-3.10.1/3/4/5; this file formerly keyed them PE.L2-*. Resolved: this file now uses the ces-shared reference ids (PE.L1-*).",
+    "AU.L2-3.3.7 (time stamps): Muster's table claims Inherited ('M365 GCC High uses NIST-traceable NTP'); this file records Shared per founder decision B10 (2026-10-27): the build deploys customer resources whose clocks Microsoft does not manage. The Placemat says Shared Coverage; the Technical Reference Guide assigns time stamps on customer-deployed resources to the customer.",
+    "IA.L2-3.5.10 (cryptographically protected passwords): Muster's table claims Inherited; the Placemat says Shared Coverage for GCC High; this file records Shared.",
+    "IA.L2-3.5.11, PE.L1-3.10.1/3/4/5, PE.L2-3.10.2 and MA.L2-3.7.1/2/3/6: this file and Muster's table agree (Inherited, PE and MA under the same count-zero conditions)."
+  ],
+  "inherited_controls": [
+    {
+      "controlId": "AC.L1-3.1.1",
+      "nistRef": "3.1.1",
+      "requirement": "Limit information system access to authorized users, processes acting on behalf of authorized users or devices (including other information systems).",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Entra ID (GCC High) authenticates users and enforces the tenant's access assignments; Azure RBAC enforces authorizations on Azure Government resources.",
+      "customerResponsibility": "Identify authorized users, processes and devices, and assign and review their access in Entra ID, Azure RBAC and Conditional Access.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Entra ID",
+        "Azure RBAC",
+        "Intune/Intune Suite"
+      ],
+      "nist80053": "AC-2, AC-3, AC-17",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "AC.L1-3.1.2",
+      "nistRef": "3.1.2",
+      "requirement": "Limit information system access to the types of transactions and functions that authorized users are permitted to execute.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Entra ID roles, Azure RBAC and Privileged Identity Management enforce the transaction and function limits the tenant assigns.",
+      "customerResponsibility": "Define and assign the roles and permissions that limit users to the transactions and functions they are permitted to execute.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Entra ID",
+        "Azure RBAC",
+        "Privileged Identity Management (PIM)"
+      ],
+      "nist80053": "AC-2, AC-3, AC-17",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "AC.L2-3.1.3",
+      "nistRef": "3.1.3",
+      "requirement": "Control the flow of CUI in accordance with approved authorizations.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "The service enforces the flow rules the tenant configures (sensitivity labels, DLP, NSG and Azure Firewall rules) and keeps GCC High data inside the US sovereign boundary.",
+      "customerResponsibility": "Define approved CUI flows and configure DLP, information protection and network flow rules on the tenant and customer-deployed resources.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Azure Web Application Firewall",
+        "Microsoft Information Protection",
+        "Microsoft 365 DLP"
+      ],
+      "nist80053": "AC-4",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "AC.L2-3.1.4",
+      "nistRef": "3.1.4",
+      "requirement": "Separate the duties of individuals to reduce the risk of malevolent activity without collusion.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Entra ID and Azure RBAC provide the role model used to separate duties.",
+      "customerResponsibility": "Separate duties across customer-controlled accounts and roles and document the separation.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Entra ID",
+        "Azure RBAC"
+      ],
+      "nist80053": "AC-5",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "AC.L2-3.1.5",
+      "nistRef": "3.1.5",
+      "requirement": "Employ the principle of least privilege, including for specific security functions and privileged accounts.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "PIM, Azure RBAC and Entra built-in roles enforce least privilege for the assignments the tenant makes.",
+      "customerResponsibility": "Assign least-privilege roles, use PIM for privileged accounts and security functions, and review assignments.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Privileged Identity Management (PIM)",
+        "Privileged Access Management",
+        "Azure RBAC"
+      ],
+      "nist80053": "AC-6, AC-6(1), AC-6(5)",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "AC.L2-3.1.6",
+      "nistRef": "3.1.6",
+      "requirement": "Use non-privileged accounts or roles when accessing non-security functions.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Entra ID and Azure RBAC enforce separate privileged and non-privileged role assignments.",
+      "customerResponsibility": "Require separate non-privileged accounts or roles for non-security functions on the tenant and customer-deployed resources.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Entra ID",
+        "Azure RBAC"
+      ],
+      "nist80053": "AC-6(2)",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "AC.L2-3.1.7",
+      "nistRef": "3.1.7",
+      "requirement": "Prevent non-privileged users from executing privileged functions and capture the execution of such functions in audit logs.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Entra ID, Azure RBAC and PIM enforce role assignments and log privileged role activation.",
+      "customerResponsibility": "Prevent non-privileged users from executing privileged functions and capture such attempts in audit logs.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Entra ID",
+        "Azure RBAC",
+        "Privileged Identity Management (PIM)",
+        "Azure Monitor",
+        "Microsoft Sentinel",
+        "Privileged Access Management"
+      ],
+      "nist80053": "AC-6(9), AC-6(10)",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "AC.L2-3.1.8",
+      "nistRef": "3.1.8",
+      "requirement": "Limit unsuccessful logon attempts.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Entra ID Smart Lockout limits consecutive failed sign-ins at the service with Microsoft-managed defaults; the Technical Reference Guide records this as inherited from Azure for the GCC High service.",
+      "customerResponsibility": "Set lockout thresholds that meet policy and enforce limits on customer-deployed resources (VM local accounts, ADFS where used).",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Entra ID"
+      ],
+      "nist80053": "AC-7",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because the build deploys customer-managed Azure resources whose local accounts enforce their own lockout."
+    },
+    {
+      "controlId": "AC.L2-3.1.9",
+      "nistRef": "3.1.9",
+      "requirement": "Provide privacy and security notices consistent with applicable Controlled Unclassified Information (CUI) rules.\nAssessment Objective:\n[a] privacy and security notices required by CUI-specified rules are identified, consistent, \nand associated with the specific CUI category; and\n[b] privacy and security notices are displayed.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Entra ID terms of use and Intune deliver the notices the tenant configures.",
+      "customerResponsibility": "Author privacy and security notices and configure terms of use and sign-in banners.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Intune/Intune Suite",
+        "Microsoft Entra ID"
+      ],
+      "nist80053": "AC-8",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "AC.L2-3.1.10",
+      "nistRef": "3.1.10",
+      "requirement": "Use session lock with pattern-hiding displays to prevent access and viewing of data after a period of inactivity.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Service sign-in sessions honour the Conditional Access session controls the tenant sets.",
+      "customerResponsibility": "Configure session lock with pattern-hiding display on endpoints (Intune) and customer-deployed resources after the defined inactivity period.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Entra ID",
+        "Conditional Access"
+      ],
+      "nist80053": "AC-11, AC-11(1)",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "AC.L2-3.1.11",
+      "nistRef": "3.1.11",
+      "requirement": "Terminate (automatically) user sessions after a defined condition.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Conditional Access sign-in frequency and Defender for Cloud Apps session policies terminate sessions on the conditions the tenant defines.",
+      "customerResponsibility": "Define termination conditions and configure session termination on the tenant and customer-deployed resources.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Defender for Cloud Apps",
+        "Microsoft Defender for Endpoint",
+        "Microsoft Azure Portal",
+        "Intune/Intune Suite",
+        "Microsoft Entra Smart Lockout",
+        "Microsoft Entra ID",
+        "Continuous Access Evaluation"
+      ],
+      "nist80053": "AC-12",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "AC.L2-3.1.12",
+      "nistRef": "3.1.12",
+      "requirement": "Monitor and control remote access sessions.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Entra sign-in logs, Conditional Access, Azure Bastion and Sentinel provide the monitoring and control points.",
+      "customerResponsibility": "Monitor and control remote access methods to the tenant and customer-deployed resources.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Defender for IoT",
+        "Azure Bastion",
+        "Microsoft Sentinel",
+        "Microsoft Entra ID"
+      ],
+      "nist80053": "AC-17(1)",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "AC.L2-3.1.13",
+      "nistRef": "3.1.13",
+      "requirement": "Employ cryptographic mechanisms to protect the confidentiality of remote access sessions.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Service endpoints negotiate TLS 1.2 or later using FIPS 140-validated modules; Azure Bastion and VPN Gateway encrypt remote administrative sessions.",
+      "customerResponsibility": "Configure workstations and customer-deployed resources to use cryptographic protection (TLS, VPN) for remote access sessions.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Azure Portal",
+        "Microsoft Entra ID"
+      ],
+      "nist80053": "AC-17(2)",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "AC.L2-3.1.14",
+      "nistRef": "3.1.14",
+      "requirement": "Route remote access via managed access control points.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Azure Bastion, VPN Gateway and Conditional Access named locations serve as managed access control points.",
+      "customerResponsibility": "Route remote access to customer-deployed resources through managed access control points.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Azure Bastion",
+        "VPN Gateway",
+        "Intune/Intune Suite"
+      ],
+      "nist80053": "AC-17(3)",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "AC.L2-3.1.15",
+      "nistRef": "3.1.15",
+      "requirement": "Authorize remote execution of privileged commands and remote access to security-relevant information.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "PIM and Entra role activation gate privileged commands executed through remote access to the service.",
+      "customerResponsibility": "Authorize which privileged commands and security-relevant information may be reached via remote access and configure PIM accordingly.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Entra ID",
+        "Privileged Identity Management (PIM)"
+      ],
+      "nist80053": "AC-17(4)",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because the authorization decision and PIM configuration are the organization's."
+    },
+    {
+      "controlId": "AC.L2-3.1.16",
+      "nistRef": "3.1.16",
+      "requirement": "Authorize wireless access prior to allowing such connections.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "The service does not distinguish wireless from wired client access; Intune can enforce Wi-Fi profiles on managed devices.",
+      "customerResponsibility": "Authorize wireless access before connections are allowed on organizational networks and devices.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Intune/Intune Suite"
+      ],
+      "nist80053": "AC-18",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "AC.L2-3.1.17",
+      "nistRef": "3.1.17",
+      "requirement": "Protect wireless access using authentication and encryption.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Intune Wi-Fi profiles can enforce authentication and encryption for wireless networks the tenant manages.",
+      "customerResponsibility": "Protect wireless access using authentication and encryption on organizational wireless networks.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Intune/Intune Suite"
+      ],
+      "nist80053": "AC-18(1)",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "AC.L2-3.1.18",
+      "nistRef": "3.1.18",
+      "requirement": "Control connection of mobile devices.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Intune and Conditional Access device compliance control mobile device connections to the service.",
+      "customerResponsibility": "Establish mobile device usage restrictions and enrol and manage mobile devices in Intune.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Intune/Intune Suite"
+      ],
+      "nist80053": "AC-19",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "AC.L2-3.1.19",
+      "nistRef": "3.1.19",
+      "requirement": "Encrypt CUI on mobile devices and mobile computing platforms.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Intune app protection and device encryption policies encrypt CUI on managed mobile devices.",
+      "customerResponsibility": "Require encryption on mobile devices and computing platforms that store CUI.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Intune/Intune Suite",
+        "Microsoft Information Protection"
+      ],
+      "nist80053": "AC-19(5)",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true
+    },
+    {
+      "controlId": "AC.L1-3.1.20",
+      "nistRef": "3.1.20",
+      "requirement": "Verify and control/limit connections to and use of external information systems.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Conditional Access, Defender for Cloud Apps and Entra cross-tenant access settings provide controls over connections to external systems.",
+      "customerResponsibility": "Establish terms and conditions for, and verify and control, connections to and use of external systems.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Entra ID",
+        "Microsoft Defender for Cloud Apps",
+        "Conditional Access",
+        "Intune/Intune Suite",
+        "Azure Firewall",
+        "Network Security Groups"
+      ],
+      "nist80053": "AC-20, AC-20(1)",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "AC.L2-3.1.21",
+      "nistRef": "3.1.21",
+      "requirement": "Limit use of portable storage devices on external systems.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Intune device configuration and Defender for Endpoint device control can limit portable storage use on managed devices.",
+      "customerResponsibility": "Limit the use of portable storage devices on external systems through policy and device controls.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Intune/Intune Suite",
+        "Microsoft Defender for Endpoint"
+      ],
+      "nist80053": "AC-20(2)",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "AC.L1-3.1.22",
+      "nistRef": "3.1.22",
+      "requirement": "Control information posted or processed on publicly accessible\ninformation systems.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "SharePoint and Teams sharing controls and information protection labels support review of content before public posting.",
+      "customerResponsibility": "Designate authorized individuals to post publicly accessible information and review content before it is posted.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Intune/Intune Suite",
+        "Conditional Access",
+        "Microsoft Information Protection",
+        "Microsoft 365 DLP"
+      ],
+      "nist80053": "AC-22",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because the designation and review of what the organization posts is the organization's."
+    },
+    {
+      "controlId": "AT.L2-3.2.1",
+      "nistRef": "3.2.1",
+      "requirement": "Ensure that managers, system administrators and users of organizational systems are made aware of the security risks associated with their activities and of the applicable policies, standards and procedures related to the security of those systems.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft trains its own personnel under its FedRAMP authorization; Attack Simulation Training and Defender for Office 365 provide optional training tooling.",
+      "customerResponsibility": "Make managers, system administrators and users aware of security risks and applicable policies, standards and procedures.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [],
+      "nist80053": "AT-2, AT-3",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "AT.L2-3.2.2",
+      "nistRef": "3.2.2",
+      "requirement": "Ensure that personnel are trained to carry out their assigned information security- related duties and responsibilities.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft trains its own personnel under its FedRAMP authorization.",
+      "customerResponsibility": "Provide role-based security training to personnel with assigned security responsibilities.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [],
+      "nist80053": "AT-2, AT-3",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "AT.L2-3.2.3",
+      "nistRef": "3.2.3",
+      "requirement": "Provide security awareness training on recognizing and reporting potential indicators of insider threat.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft trains its own personnel on insider threat indicators under its FedRAMP authorization.",
+      "customerResponsibility": "Provide security awareness training on recognizing and reporting potential indicators of insider threat.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [],
+      "nist80053": "AT-2(2)",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "AU.L2-3.3.1",
+      "nistRef": "3.3.1",
+      "requirement": "Create and retain system audit logs and records to the extent needed to enable the monitoring, analysis, investigation, and reporting of unlawful or unauthorized system activity.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "The service generates and retains the unified audit log, Entra sign-in and audit logs, and Azure activity logs for the tenant.",
+      "customerResponsibility": "Define auditable events, set audit log retention, forward logs to Sentinel or Log Analytics, and audit customer-deployed resources.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Sentinel",
+        "Microsoft Defender for Cloud",
+        "Log Analytics Workspace",
+        "Microsoft Entra ID",
+        "Intune/Intune Suite",
+        "Microsoft 365 compliance center",
+        "Azure Storage"
+      ],
+      "nist80053": "AU-2, AU-3, AU-3(1), AU-6, AU-11, AU-12",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "AU.L2-3.3.2",
+      "nistRef": "3.3.2",
+      "requirement": "Ensure that the actions of individual system users can be uniquely traced to those users so they can be held accountable for their actions.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Service audit records attribute actions to the user principal that performed them.",
+      "customerResponsibility": "Configure auditing on customer-deployed resources so that actions trace to individual users.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Sentinel",
+        "Microsoft 365 Compliance Center",
+        "Microsoft Entra ID"
+      ],
+      "nist80053": "AU-2, AU-3, AU-3(1), AU-6, AU-11, AU-12",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "AU.L2-3.3.3",
+      "nistRef": "3.3.3",
+      "requirement": "Review and update logged events.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft reviews and updates the events it logs for the service.",
+      "customerResponsibility": "Review and update the organization's own list of logged events on the tenant and customer-deployed resources.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Defender for Endpoint"
+      ],
+      "nist80053": "AU-2",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because the organization's event selection is its own to review."
+    },
+    {
+      "controlId": "AU.L2-3.3.4",
+      "nistRef": "3.3.4",
+      "requirement": "Alert in the event of an audit logging process failure.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Azure Monitor and Sentinel health signals and service alerts can report log ingestion failures.",
+      "customerResponsibility": "Configure alerts for audit logging process failures (storage quota, collection failures) and respond to them.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Sentinel"
+      ],
+      "nist80053": "AU-5",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "AU.L2-3.3.5",
+      "nistRef": "3.3.5",
+      "requirement": "Correlate audit record review, analysis and reporting processes for investigation and response to indications of unlawful, unauthorized, suspicious or unusual activity.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Sentinel and Microsoft Defender XDR correlate audit records across the tenant's connected sources.",
+      "customerResponsibility": "Correlate and analyze audit records across tenant and customer-deployed repositories.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Sentinel"
+      ],
+      "nist80053": "AU-6(3)",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "AU.L2-3.3.6",
+      "nistRef": "3.3.6",
+      "requirement": "Provide audit record reduction and report generation to support on-demand analysis and reporting.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Audit log search, Sentinel workbooks and Log Analytics provide audit reduction and report generation.",
+      "customerResponsibility": "Produce on-demand analysis and reports from the configured audit sources.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Defender for IoT",
+        "Microsoft Sentinel"
+      ],
+      "nist80053": "AU-7",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "AU.L2-3.3.7",
+      "nistRef": "3.3.7",
+      "requirement": "Provide a system capability that compares and synchronizes internal system clocks with an authoritative source to generate time stamps for audit records.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft synchronizes the clocks of its service infrastructure and Azure hosts to Microsoft-owned Stratum 1 (GPS) time sources; service audit records carry UTC time stamps.",
+      "customerResponsibility": "Compare and synchronize the clocks of customer-deployed resources (the Azure VMs and other resources in the build) with an authoritative time source and generate audit time stamps from them.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Windows Time Service"
+      ],
+      "nist80053": "AU-8, SC-45(1)",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true,
+      "note": "Founder decision B10 (2026-10-27): Shared, because the build deploys customer resources whose clocks Microsoft does not manage. Muster's fedramp-inheritance-table.yaml claims Inherited; the Placemat says Shared Coverage and the Technical Reference Guide assigns time stamps on customer-deployed resources to the customer."
+    },
+    {
+      "controlId": "AU.L2-3.3.8",
+      "nistRef": "3.3.8",
+      "requirement": "Protect audit information and audit logging tools from unauthorized access, modification, and deletion.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Service audit logs are protected by Microsoft and exposed only through role-gated interfaces (Azure RBAC, Purview roles).",
+      "customerResponsibility": "Restrict access to audit information and tools (Log Analytics workspaces, Sentinel, audit roles) to authorized users.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Azure RBAC"
+      ],
+      "nist80053": "AU-6(7), AU-9",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "AU.L2-3.3.9",
+      "nistRef": "3.3.9",
+      "requirement": "Limit management of audit logging functionality to a subset of privileged users.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Azure RBAC and Purview roles provide the gating for audit management functions.",
+      "customerResponsibility": "Limit management of audit logging functionality to a defined subset of privileged users.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Azure RBAC"
+      ],
+      "nist80053": "AU-6(7), AU-9(4)",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "CM.L2-3.4.1",
+      "nistRef": "3.4.1",
+      "requirement": "Establish and maintain baseline configurations and inventories of organizational systems (including hardware, software, firmware, and documentation) throughout the respective system development life cycles.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft maintains the baseline configuration and inventory of the service infrastructure under its FedRAMP authorization.",
+      "customerResponsibility": "Establish and maintain baseline configurations and inventories of the tenant, endpoints and customer-deployed resources.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Azure Automation",
+        "Change Tracking and Inventory",
+        "Microsoft Defender for IoT",
+        "Intune/Intune Suite",
+        "Microsoft Defender for Endpoint",
+        "GitHub Enterprise Cloud",
+        "GitHub AE"
+      ],
+      "nist80053": "CM-2, CM-6, CM-8, CM-8(1)",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because the organization's tenant, endpoint and Azure resource baselines are its own."
+    },
+    {
+      "controlId": "CM.L2-3.4.2",
+      "nistRef": "3.4.2",
+      "requirement": "Establish and enforce security configuration settings for information technology products employed in organizational systems.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft configures the service infrastructure to its hardened baseline; Intune, Azure Policy and Secure Score expose the settings the tenant hardens.",
+      "customerResponsibility": "Establish and enforce security configuration settings on the tenant, endpoints and customer-deployed resources.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Entra ID",
+        "Intune/Intune Suite",
+        "Azure Automation",
+        "Microsoft Defender for Endpoint"
+      ],
+      "nist80053": "CM-2, CM-6, CM-8, CM-8(1)",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because tenant, endpoint and Azure resource settings are configured by the organization."
+    },
+    {
+      "controlId": "CM.L2-3.4.3",
+      "nistRef": "3.4.3",
+      "requirement": "Track, review, approve or disapprove and log changes to organizational systems.\nAssessment Objective:\n[a] changes to the system are tracked; \n[b] changes to the system are reviewed; \n[c] changes to the system are approved or disapproved; and \n[d] changes to the system are logged.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft change-controls the service under its FedRAMP authorization and announces changes through the Message Center.",
+      "customerResponsibility": "Track, review, approve and log changes to the tenant configuration and customer-deployed resources.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Defender for Cloud Apps",
+        "Power Automate",
+        "Change Tracking and Inventory",
+        "GitHub Enterprise Cloud",
+        "GitHub AE"
+      ],
+      "nist80053": "CM-3",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because changes to the organization's tenant and resources are its own to control."
+    },
+    {
+      "controlId": "CM.L2-3.4.4",
+      "nistRef": "3.4.4",
+      "requirement": "Analyze the security impact of changes prior to implementation.\nAssessment Objective:\n[a] the security impact of changes to the system is analyzed prior to implementation.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft analyzes the security impact of changes to the service infrastructure.",
+      "customerResponsibility": "Analyze the security impact of changes to the tenant and customer-deployed resources before implementation.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "GitHub Enterprise Cloud",
+        "GitHub AE",
+        "Azure DevTest Labs",
+        "Microsoft 365 for enterprise Test Lab"
+      ],
+      "nist80053": "CM-4",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because impact analysis of the organization's own changes is its own."
+    },
+    {
+      "controlId": "CM.L2-3.4.5",
+      "nistRef": "3.4.5",
+      "requirement": "Define, document, approve and enforce physical and logical access restrictions associated with changes to organizational systems.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft restricts who may change the service infrastructure; Entra ID, Azure RBAC and PIM enforce the change-access restrictions the tenant defines.",
+      "customerResponsibility": "Define, document and enforce logical access restrictions for changes to the tenant and customer-deployed resources.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Entra ID",
+        "Azure RBAC",
+        "Change Tracking and Inventory",
+        "Power Automate",
+        "GitHub Enterprise Cloud",
+        "GitHub AE"
+      ],
+      "nist80053": "CM-5",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because the organization defines and enforces its own change-access restrictions."
+    },
+    {
+      "controlId": "CM.L2-3.4.6",
+      "nistRef": "3.4.6",
+      "requirement": "Employ the principle of least functionality by configuring organizational systems to provide only essential capabilities.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft configures the service infrastructure for least functionality.",
+      "customerResponsibility": "Configure the tenant, endpoints and customer-deployed resources to provide only essential capabilities.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Entra ID",
+        "Intune/Intune Suite/ Intune/Intune Suite"
+      ],
+      "nist80053": "CM-7",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because least functionality on the organization's endpoints and Azure resources is its own."
+    },
+    {
+      "controlId": "CM.L2-3.4.7",
+      "nistRef": "3.4.7",
+      "requirement": "Restrict, disable or prevent the use of nonessential programs, functions, ports, protocols and services.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft restricts nonessential functions on the service infrastructure; NSGs, Azure Firewall and Intune enforce the restrictions the tenant defines.",
+      "customerResponsibility": "Restrict, disable or prevent nonessential programs, functions, ports, protocols and services on the tenant and customer-deployed resources.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Network Security Groups",
+        "Azure Firewall",
+        "Azure Web Application Firewall",
+        "Microsoft Entra ID",
+        "Intune/Intune Suite"
+      ],
+      "nist80053": "CM-7(1), CM-7(2)",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because ports, protocols and services on customer-deployed resources are the organization's."
+    },
+    {
+      "controlId": "CM.L2-3.4.8",
+      "nistRef": "3.4.8",
+      "requirement": "Apply deny-by-exception (blacklisting) policy to prevent the use of unauthorized software or deny-all, permit-by-exception (whitelisting) policy to allow the execution of authorized software.",
+      "inheritance": "none",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "No inherited coverage (Placemat: Customer Responsibility); Defender for Endpoint and Intune provide the tooling.",
+      "customerResponsibility": "Apply deny-by-exception (blacklisting) or permit-by-exception (whitelisting) policy for software execution on organizational systems.",
+      "placematCoverage": "Customer Responsibility",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Azure Virtual Machines",
+        "Intune/Intune Suite",
+        "Microsoft Defender for Cloud Apps",
+        "Microsoft Defender SmartScreen"
+      ],
+      "nist80053": "CM-7(4), CM-7(5)",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "CM.L2-3.4.9",
+      "nistRef": "3.4.9",
+      "requirement": "Control and monitor user-installed software.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft controls software installation on the service infrastructure; Intune and Defender for Endpoint enforce the user-installation policy the tenant sets.",
+      "customerResponsibility": "Control and monitor user-installed software on endpoints and customer-deployed resources.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Sentinel",
+        "Intune/Intune Suite",
+        "Microsoft Defender for Cloud Apps",
+        "Microsoft Entra ID",
+        "Log Analytics",
+        "Azure Monitor"
+      ],
+      "nist80053": "CM-11",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because user-installed software on the organization's endpoints and resources is its own to control."
+    },
+    {
+      "controlId": "IA.L1-3.5.1",
+      "nistRef": "3.5.1",
+      "requirement": "Identify information system users, processes acting on behalf of users or devices.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Entra ID provides unique identities and authenticates users, service principals and registered devices.",
+      "customerResponsibility": "Identify users, processes and devices uniquely in Entra ID and on customer-deployed resources.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Entra ID",
+        "Intune/Intune Suite"
+      ],
+      "nist80053": "IA-2, IA-3, IA-5",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "IA.L1-3.5.2",
+      "nistRef": "3.5.2",
+      "requirement": "Authenticate (or verify) the identities of those users, processes, or devices, as a prerequisite to allowing access to organizational information systems.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Entra ID and Entra multifactor authentication authenticate identities before granting access to the service.",
+      "customerResponsibility": "Manage authenticators and device identities and authenticate identities on customer-deployed resources.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Entra ID",
+        "Microsoft Entra Multifactor Authentication",
+        "Conditional Access",
+        "Intune/Intune Suite"
+      ],
+      "nist80053": "IA-2, IA-3, IA-5",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "IA.L2-3.5.3",
+      "nistRef": "3.5.3",
+      "requirement": "Use multi-factor authentication for local and network access to privileged accounts and for network access to non-privileged accounts.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Entra multifactor authentication provides the MFA capability the tenant enforces through Conditional Access.",
+      "customerResponsibility": "Require MFA for privileged accounts and for network access to non-privileged accounts, via Conditional Access and on customer-deployed resources.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Entra Multifactor Authentication"
+      ],
+      "nist80053": "IA-2(1), IA-2(2)",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true
+    },
+    {
+      "controlId": "IA.L2-3.5.4",
+      "nistRef": "3.5.4",
+      "requirement": "Employ replay-resistant authentication mechanisms for network access to privileged and non-privileged accounts.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Entra authentication protocols and FIDO2 and Windows Hello authenticators are replay-resistant.",
+      "customerResponsibility": "Enforce replay-resistant authentication methods for network access to privileged and non-privileged accounts.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Entra Multifactor Authentication",
+        "Intune/Intune Suite",
+        "Windows Hello for Business",
+        "Microsoft Azure Portal",
+        "Microsoft Entra ID"
+      ],
+      "nist80053": "IA-2(8)",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "IA.L2-3.5.5",
+      "nistRef": "3.5.5",
+      "requirement": "Prevent the reuse of identifiers for a defined period.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Entra ID object identifiers are unique and are not reassigned.",
+      "customerResponsibility": "Prevent reuse of user names and other identifiers for the defined period, including in Active Directory where used.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Entra ID",
+        "Entitlement Management"
+      ],
+      "nist80053": "IA-4",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "IA.L2-3.5.6",
+      "nistRef": "3.5.6",
+      "requirement": "Disable identifiers after a defined period of inactivity.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Entra ID Governance access reviews and Defender for Identity surface inactive accounts.",
+      "customerResponsibility": "Disable identifiers after the defined period of inactivity.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Entra ID",
+        "Microsoft Defender for Identity",
+        "Entitlement Management"
+      ],
+      "nist80053": "IA-4",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "IA.L2-3.5.7",
+      "nistRef": "3.5.7",
+      "requirement": "Enforce a minimum password complexity and change of characters when new passwords are created.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Entra Password Protection enforces banned-password lists and the complexity rules the tenant sets.",
+      "customerResponsibility": "Enforce password complexity and change-of-character requirements per policy, including on customer-deployed resources.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Entra ID"
+      ],
+      "nist80053": "IA-5(1)",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "IA.L2-3.5.8",
+      "nistRef": "3.5.8",
+      "requirement": "Prohibit password reuse for a specified number of generations.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Entra ID enforces password history for cloud accounts.",
+      "customerResponsibility": "Prohibit password reuse for the specified number of generations, including on customer-deployed resources.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Entra ID"
+      ],
+      "nist80053": "IA-5(1)",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "IA.L2-3.5.9",
+      "nistRef": "3.5.9",
+      "requirement": "Allow temporary password use for system logons with an immediate change to a permanent password.\nAssessment Objective:\n[a] an immediate change to a permanent password is required when a temporary password is used for system logon.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Entra ID supports temporary access passes and forced change on first sign-in.",
+      "customerResponsibility": "Allow temporary passwords only with an immediate change to a permanent password.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Entra ID"
+      ],
+      "nist80053": "IA-5(1)",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "IA.L2-3.5.10",
+      "nistRef": "3.5.10",
+      "requirement": "Store and transmit only cryptographically protected passwords.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Entra ID stores and transmits credentials cryptographically protected using FIPS 140-validated modules.",
+      "customerResponsibility": "Protect passwords cryptographically on customer-deployed resources and any on-premises identity infrastructure.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Azure Portal",
+        "Azure Key Vault",
+        "Azure Virtual Machines",
+        "Intune/Intune Suite"
+      ],
+      "nist80053": "IA-5(1)",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true,
+      "note": "Muster's fedramp-inheritance-table.yaml claims Inherited; the Placemat says Shared Coverage for GCC High. Recorded Shared (customer-deployed resources hold their own credential stores)."
+    },
+    {
+      "controlId": "IA.L2-3.5.11",
+      "nistRef": "3.5.11",
+      "requirement": "Obscure feedback of authentication information.",
+      "inheritance": "full",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "The Entra sign-in interface and the Windows and Linux logon interfaces obscure authentication feedback by default.",
+      "customerResponsibility": "None (obscured feedback is the service and operating-system default); do not alter the default.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Entra ID"
+      ],
+      "nist80053": "IA-6",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true,
+      "note": "Agrees with Muster's fedramp-inheritance-table.yaml (Inherited)."
+    },
+    {
+      "controlId": "IR.L2-3.6.1",
+      "nistRef": "3.6.1",
+      "requirement": "Establish an operational incident-handling capability for organizational systems that includes preparation, detection, analysis, containment, recovery, and user response activities.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft operates incident handling for the service under its FedRAMP authorization and notifies tenants of service incidents; Sentinel and Defender provide detection tooling.",
+      "customerResponsibility": "Establish the organization's incident-handling capability (preparation, detection, analysis, containment, recovery and user response) for the tenant and customer-deployed resources.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Defender for Cloud Apps",
+        "Microsoft Sentinel"
+      ],
+      "nist80053": "IR-2, IR-4, IR-5, IR-6, IR-7",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because the organization's own incident-handling capability is assessed, not Microsoft's."
+    },
+    {
+      "controlId": "IR.L2-3.6.2",
+      "nistRef": "3.6.2",
+      "requirement": "Track, document and report incidents to designated officials and/or authorities both internal and external to the organization.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft tracks and reports its own service incidents; the Message Center and Service Health report service incidents to the tenant.",
+      "customerResponsibility": "Track, document and report organizational incidents to designated officials and authorities (including DFARS 72-hour reporting).",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Sentinel",
+        "Dynamics 365",
+        "Microsoft Entra ID"
+      ],
+      "nist80053": "IR-2, IR-4, IR-5, IR-6, IR-7",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because reporting the organization's incidents is the organization's obligation."
+    },
+    {
+      "controlId": "IR.L2-3.6.3",
+      "nistRef": "3.6.3",
+      "requirement": "Test the organizational incident response capability.\nAssessment Objective:\n[a] the incident response capability is tested.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft tests its service incident response capability under its FedRAMP authorization.",
+      "customerResponsibility": "Test the organization's incident response capability.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [],
+      "nist80053": "IR-3",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because the organization's own plan must be tested."
+    },
+    {
+      "controlId": "MA.L2-3.7.1",
+      "nistRef": "3.7.1",
+      "requirement": "Perform maintenance on organizational systems.\nAssessment Objective:\n[a] system maintenance is performed.",
+      "inheritance": "full",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [
+        "customer_equipment_count_zero"
+      ],
+      "microsoftResponsibility": "Microsoft performs maintenance on the service infrastructure and Azure hosts.",
+      "customerResponsibility": "None when the organization owns no equipment requiring maintenance; otherwise perform maintenance on that equipment.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [],
+      "nist80053": "MA-2, MA-3, MA-3(1), MA-3(2)",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true
+    },
+    {
+      "controlId": "MA.L2-3.7.2",
+      "nistRef": "3.7.2",
+      "requirement": "Provide controls on the tools, techniques, mechanisms, and personnel used to conduct system maintenance.",
+      "inheritance": "full",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [
+        "customer_equipment_count_zero"
+      ],
+      "microsoftResponsibility": "Microsoft controls the tools, techniques, mechanisms and personnel used to maintain the service infrastructure.",
+      "customerResponsibility": "None when the organization owns no equipment requiring maintenance; otherwise control maintenance tools, techniques and personnel for that equipment.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Entra ID",
+        "Azure RBAC",
+        "Privileged Identity Management (PIM)"
+      ],
+      "nist80053": "MA-2, MA-3, MA-3(1), MA-3(2)",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true
+    },
+    {
+      "controlId": "MA.L2-3.7.3",
+      "nistRef": "3.7.3",
+      "requirement": "Ensure equipment removed for off-site maintenance is sanitized of any CUI.\nAssessment Objective:\n[a] equipment to be removed from organizational spaces for off-site maintenance is sanitized of any CUI.",
+      "inheritance": "full",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [
+        "customer_equipment_count_zero"
+      ],
+      "microsoftResponsibility": "Microsoft sanitizes service equipment before off-site maintenance under its FedRAMP authorization.",
+      "customerResponsibility": "None when the organization owns no equipment; otherwise sanitize equipment removed for off-site maintenance of any CUI.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [],
+      "nist80053": "MA-2",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true
+    },
+    {
+      "controlId": "MA.L2-3.7.4",
+      "nistRef": "3.7.4",
+      "requirement": "Check media containing diagnostic and test programs for malicious code before the media are used in organizational systems.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft checks diagnostic media used on the service infrastructure.",
+      "customerResponsibility": "Check media containing diagnostic and test programs for malicious code before use on organizational systems (Defender for Endpoint).",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [],
+      "nist80053": "MA-3(2)",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because diagnostic media used on the organization's own systems is its own to check."
+    },
+    {
+      "controlId": "MA.L2-3.7.5",
+      "nistRef": "3.7.5",
+      "requirement": "Require multifactor authentication to establish non-local maintenance sessions via external network connections and terminate such connections when nonlocal maintenance is complete.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft requires MFA for nonlocal maintenance of the service; Entra MFA and Azure Bastion provide the capability for customer sessions.",
+      "customerResponsibility": "Require MFA for nonlocal maintenance sessions to customer-deployed resources and terminate the connections when maintenance is complete.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Entra ID",
+        "Microsoft Entra Multifactor Authentication",
+        "Intune/Intune Suite",
+        "Conditional Access"
+      ],
+      "nist80053": "MA-4",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because nonlocal maintenance of customer-deployed resources is performed by the organization."
+    },
+    {
+      "controlId": "MA.L2-3.7.6",
+      "nistRef": "3.7.6",
+      "requirement": "Supervise the maintenance activities of personnel without required access authorization.\nAssessment Objective:\n[a] maintenance personnel without required access authorization are supervised during maintenance activities.",
+      "inheritance": "full",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [
+        "customer_equipment_count_zero"
+      ],
+      "microsoftResponsibility": "Microsoft supervises maintenance personnel on the service infrastructure under its FedRAMP authorization.",
+      "customerResponsibility": "None when the organization owns no equipment; otherwise supervise maintenance personnel who lack the required access authorization.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Azure Bastion",
+        "Privileged Identity Management (PIM)"
+      ],
+      "nist80053": "MA-5",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true
+    },
+    {
+      "controlId": "MP.L2-3.8.1",
+      "nistRef": "3.8.1",
+      "requirement": "Protect (i.e., physically control and securely store) system media containing CUI, both paper and digital.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft protects and controls the digital media in its datacenters.",
+      "customerResponsibility": "Protect (physically control and securely store) organizational paper and digital media containing CUI, including endpoints, removable media and print.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Azure Key Vault",
+        "Microsoft Information Protection",
+        "Intune/Intune Suite"
+      ],
+      "nist80053": "MP-2, MP-4, MP-6",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because the organization's own paper and digital media are outside Microsoft's boundary."
+    },
+    {
+      "controlId": "MP.L2-3.8.2",
+      "nistRef": "3.8.2",
+      "requirement": "Limit access to CUI on system media to authorized users.\nAssessment Objective:\n[a] access to CUI on system media is limited to authorized users.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft limits access to media in its datacenters to authorized personnel.",
+      "customerResponsibility": "Limit access to CUI on organizational media to authorized users.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Azure RBAC",
+        "Microsoft Information Protection",
+        "Conditional Access",
+        "Intune/Intune Suite"
+      ],
+      "nist80053": "MP-2, MP-4, MP-6",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because access to the organization's own media is its own to limit."
+    },
+    {
+      "controlId": "MP.L1-3.8.3",
+      "nistRef": "3.8.3",
+      "requirement": "Sanitize or destroy information system media containing Federal Contract Information (FCI) before disposal or release for reuse.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft sanitizes or destroys datacenter media before disposal or reuse.",
+      "customerResponsibility": "Sanitize or destroy organizational media (devices, drives, removable media, paper) containing CUI before disposal or reuse.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [],
+      "nist80053": "MP-2, MP-4, MP-6",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because the organization's own media must be sanitized by the organization."
+    },
+    {
+      "controlId": "MP.L2-3.8.4",
+      "nistRef": "3.8.4",
+      "requirement": "Mark media with necessary CUI markings and distribution limitations.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft Purview Information Protection labels can apply CUI markings to documents and emails.",
+      "customerResponsibility": "Mark media with the necessary CUI markings and distribution limitations.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Information Protection"
+      ],
+      "nist80053": "MP-3",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because marking the organization's media is its own duty."
+    },
+    {
+      "controlId": "MP.L2-3.8.5",
+      "nistRef": "3.8.5",
+      "requirement": "Control access to media containing CUI and maintain accountability for media during transport outside of controlled areas.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft controls access to and accountability for media transported from its datacenters.",
+      "customerResponsibility": "Control access to media containing CUI and maintain accountability for it during transport outside controlled areas.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [],
+      "nist80053": "MP-5",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because transport of the organization's own media is its own."
+    },
+    {
+      "controlId": "MP.L2-3.8.6",
+      "nistRef": "3.8.6",
+      "requirement": "Implement cryptographic mechanisms to protect the confidentiality of CUI stored on digital media during transport unless otherwise protected by alternative physical safeguards.\nAssessment Objective:\n[a] the confidentiality of CUI stored on digital media is protected during transport using cryptographic mechanisms or alternative physical safeguards.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Service data at rest is encrypted by Microsoft (BitLocker, Distributed Key Manager, service encryption); BitLocker and Intune provide endpoint encryption.",
+      "customerResponsibility": "Encrypt CUI on digital media (endpoints, removable media) during transport unless otherwise physically protected.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Bitlocker",
+        "Azure RBAC"
+      ],
+      "nist80053": "SC-28(1)",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because the organization's media in transport is its own."
+    },
+    {
+      "controlId": "MP.L2-3.8.7",
+      "nistRef": "3.8.7",
+      "requirement": "Control the use of removable media on system components.\t\nAssessment Objective:\n[a] the use of removable media on system components is controlled.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Intune and Defender for Endpoint device control enforce the removable media policy the tenant sets.",
+      "customerResponsibility": "Control and restrict the use of removable media on organizational systems.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Intune/Intune Suite",
+        "Microsoft Defender for Endpoint"
+      ],
+      "nist80053": "MP-7",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because the policy and its enforcement on the organization's endpoints are its own."
+    },
+    {
+      "controlId": "MP.L2-3.8.8",
+      "nistRef": "3.8.8",
+      "requirement": "Prohibit the use of portable storage devices when such devices have no identifiable owner.\nAssessment Objective:\n[a] the use of portable storage devices is prohibited when such devices have no identifiable owner.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Intune and Defender for Endpoint device control can block portable storage with no identifiable owner.",
+      "customerResponsibility": "Prohibit the use of portable storage devices with no identifiable owner.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Intune/Intune Suite",
+        "Microsoft Defender for Endpoint"
+      ],
+      "nist80053": "MP-7(1)",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because the prohibition is enforced on the organization's endpoints."
+    },
+    {
+      "controlId": "MP.L2-3.8.9",
+      "nistRef": "3.8.9",
+      "requirement": "Protect the confidentiality of backup CUI at storage locations.\nAssessment Objective:\n[a] the confidentiality of backup CUI is protected at storage locations.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Service backups of tenant data are stored encrypted inside the Microsoft boundary.",
+      "customerResponsibility": "Protect the confidentiality of organizational backups (Azure Backup, endpoint backups) at storage locations.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Entra ID",
+        "Azure RBAC"
+      ],
+      "nist80053": "CP-9",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true
+    },
+    {
+      "controlId": "PE.L1-3.10.1",
+      "nistRef": "3.10.1",
+      "requirement": "Limit physical access to organizational information systems, equipment, and the respective operating environments to authorized individuals.",
+      "inheritance": "full",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [
+        "physical_facility_count_zero"
+      ],
+      "microsoftResponsibility": "Microsoft limits physical access to its datacenters to authorized personnel under its FedRAMP authorization.",
+      "customerResponsibility": "None when the organization operates no physical facility holding in-scope systems; otherwise limit physical access to that facility.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Azure Datacenter",
+        "Microsoft Entra ID",
+        "Microsoft Information Protection",
+        "Conditional Access",
+        "Intune/Intune Suite"
+      ],
+      "nist80053": "PE-2, PE-4, PE-5, PE-6",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true
+    },
+    {
+      "controlId": "PE.L2-3.10.2",
+      "nistRef": "3.10.2",
+      "requirement": "Protect and monitor the physical facility and support infrastructure for organizational systems.",
+      "inheritance": "full",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [
+        "physical_facility_count_zero"
+      ],
+      "microsoftResponsibility": "Microsoft protects and monitors its datacenter facilities and support infrastructure.",
+      "customerResponsibility": "None when the organization operates no physical facility; otherwise protect and monitor the facility and its support infrastructure.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Azure Datacenter"
+      ],
+      "nist80053": "PE-2, PE-4, PE-5, PE-6",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true
+    },
+    {
+      "controlId": "PE.L1-3.10.3",
+      "nistRef": "3.10.3",
+      "requirement": "Escort visitors and monitor visitor activity.",
+      "inheritance": "full",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [
+        "physical_facility_count_zero"
+      ],
+      "microsoftResponsibility": "Microsoft escorts and monitors visitors in its datacenters.",
+      "customerResponsibility": "None when the organization operates no physical facility; otherwise escort visitors and monitor their activity.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Azure Datacenter",
+        "Intune/Intune Suite"
+      ],
+      "nist80053": "PE-3",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true
+    },
+    {
+      "controlId": "PE.L1-3.10.4",
+      "nistRef": "3.10.4",
+      "requirement": "Maintain audit logs of physical access.",
+      "inheritance": "full",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [
+        "physical_facility_count_zero"
+      ],
+      "microsoftResponsibility": "Microsoft maintains physical access audit logs for its datacenters.",
+      "customerResponsibility": "None when the organization operates no physical facility; otherwise maintain physical access audit logs.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Azure Datacenter",
+        "Microsoft Information Protection"
+      ],
+      "nist80053": "PE-3",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true
+    },
+    {
+      "controlId": "PE.L1-3.10.5",
+      "nistRef": "3.10.5",
+      "requirement": "Control and manage physical access devices.",
+      "inheritance": "full",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [
+        "physical_facility_count_zero"
+      ],
+      "microsoftResponsibility": "Microsoft controls and manages physical access devices for its datacenters.",
+      "customerResponsibility": "None when the organization operates no physical facility; otherwise control and manage physical access devices.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Azure Datacenter",
+        "Intune/Intune Suite"
+      ],
+      "nist80053": "PE-3",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true
+    },
+    {
+      "controlId": "PE.L2-3.10.6",
+      "nistRef": "3.10.6",
+      "requirement": "Enforce safeguarding measures for CUI at alternate work sites.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft covers its own personnel's alternate work sites; Intune, Conditional Access and MFA enforce safeguards on remote endpoints.",
+      "customerResponsibility": "Enforce safeguarding measures for CUI at the organization's alternate work sites (telework locations).",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Entra Multifactor Authentication",
+        "Intune/Intune Suite",
+        "Azure RBAC",
+        "Azure VPN",
+        "Azure Firewall",
+        "Bitlocker"
+      ],
+      "nist80053": "PE-17",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because the organization's own alternate work sites are outside Microsoft's boundary."
+    },
+    {
+      "controlId": "PS.L2-3.9.1",
+      "nistRef": "3.9.1",
+      "requirement": "Screen individuals prior to authorizing access to organizational systems containing CUI.\nAssessment Objective:\n[a] individuals are screened prior to authorizing access to organizational systems \ncontaining CUI.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft screens its personnel; Azure Government and GCC High restrict operational access to screened US persons.",
+      "customerResponsibility": "Screen organizational individuals before authorizing access to systems containing CUI.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [],
+      "nist80053": "PS-3, PS-4, PS-5",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "PS.L2-3.9.2",
+      "nistRef": "3.9.2",
+      "requirement": "Ensure that organizational systems containing CUI are protected during and after personnel actions such as terminations and transfers.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft handles its own personnel terminations and transfers; Entra ID and Azure RBAC provide the de-provisioning capability.",
+      "customerResponsibility": "Protect CUI and systems during and after organizational personnel terminations and transfers (disable accounts, recover assets).",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Entra ID",
+        "Azure RBAC"
+      ],
+      "nist80053": "PS-3, PS-4, PS-5",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "RA.L2-3.11.1",
+      "nistRef": "3.11.1",
+      "requirement": "Periodically assess the risk to organizational operations (including mission, functions, image or reputation), organizational assets and individuals, resulting from the operation of organizational systems and the associated processing, storage or transmission of CUI.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft assesses risk to the service under its FedRAMP continuous monitoring.",
+      "customerResponsibility": "Periodically assess risk to organizational operations, assets and individuals from operating the in-scope system and the CUI it handles.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Defender for IoT"
+      ],
+      "nist80053": "RA-3",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because the organization's risk assessment is its own."
+    },
+    {
+      "controlId": "RA.L2-3.11.2",
+      "nistRef": "3.11.2",
+      "requirement": "Scan for vulnerabilities in organizational systems and applications periodically and when new vulnerabilities affecting those systems and applications are identified.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft scans the service infrastructure; Defender Vulnerability Management and Defender for Cloud scan tenant endpoints and customer-deployed resources.",
+      "customerResponsibility": "Scan customer-deployed resources and endpoints periodically and when new vulnerabilities are identified.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Defender XDR",
+        "Microsoft Defender for IoT",
+        "Microsoft Defender for Endpoint",
+        "Microsoft Defender for Office 365",
+        "Threat and Vulnerability Management"
+      ],
+      "nist80053": "RA-5, RA-5(5)",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "RA.L2-3.11.3",
+      "nistRef": "3.11.3",
+      "requirement": "Remediate vulnerabilities in accordance with risk assessments.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft remediates service infrastructure vulnerabilities under its FedRAMP authorization.",
+      "customerResponsibility": "Remediate vulnerabilities on customer-deployed resources and endpoints in accordance with risk assessments.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Defender XDR",
+        "Microsoft Defender for Endpoint",
+        "Microsoft Defender for IoT",
+        "Microsoft Defender for Cloud"
+      ],
+      "nist80053": "RA-5",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "CA.L2-3.12.1",
+      "nistRef": "3.12.1",
+      "requirement": "Periodically assess the security controls in organizational systems to determine if the controls are effective in their application.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft's FedRAMP assessments (independent 3PAO) cover the service's security controls; reports are published on the Service Trust Portal.",
+      "customerResponsibility": "Periodically assess the organization's own security controls for the in-scope system (self-assessment, C3PAO assessment).",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [],
+      "nist80053": "CA-2, CA-5, CA-7, PL-2",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because the organization's own controls are what is assessed."
+    },
+    {
+      "controlId": "CA.L2-3.12.2",
+      "nistRef": "3.12.2",
+      "requirement": "Develop and implement plans of action (e.g., POA&M) designed to correct deficiencies and reduce or eliminate vulnerabilities in organizational systems.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft maintains a POA&M for the service under FedRAMP continuous monitoring.",
+      "customerResponsibility": "Develop and implement the organization's own plans of action to correct deficiencies and reduce vulnerabilities.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [],
+      "nist80053": "CA-2, CA-5, CA-7, PL-2",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because the organization's own POA&M is its own."
+    },
+    {
+      "controlId": "CA.L2-3.12.3",
+      "nistRef": "3.12.3",
+      "requirement": "Monitor security controls on an ongoing basis to ensure the continued effectiveness of the controls.\nAssessment Objective:\n[a] security controls are monitored on an ongoing basis to ensure the continued \neffectiveness of those controls.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft continuously monitors the service's controls under its FedRAMP authorization.",
+      "customerResponsibility": "Monitor the organization's security controls on an ongoing basis (Secure Score, Compliance Manager, Sentinel, EvidenceOps).",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [],
+      "nist80053": "CA-2, CA-5, CA-7, PL-2",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because ongoing monitoring of the organization's own controls is its own."
+    },
+    {
+      "controlId": "CA.L2-3.12.4",
+      "nistRef": "3.12.4",
+      "requirement": "Develop, document and periodically update System Security Plans (SSPs) that describe system boundaries, system environments of operation, how security requirements are implemented and the relationships with or connections to other systems.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft maintains the service's FedRAMP System Security Plan, available on the Service Trust Portal.",
+      "customerResponsibility": "Develop, document and periodically update the organization's own System Security Plan describing boundaries, environment, implementation and connections.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [],
+      "nist80053": "CA-2, CA-5, CA-7, PL-2",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because the organization must author its own SSP; Microsoft's SSP covers only the service."
+    },
+    {
+      "controlId": "SC.L1-3.13.1",
+      "nistRef": "3.13.1",
+      "requirement": "Monitor, control and protect organizational communications (e.g., information transmitted or received by organizational information systems) at the external boundaries and key internal boundaries of the information systems.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft monitors and protects the service's external and internal boundaries.",
+      "customerResponsibility": "Monitor, control and protect communications at the boundaries of customer-deployed resources (NSGs, Azure Firewall) and endpoints.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Microsoft Sentinel",
+        "Microsoft Information Protection",
+        "Azure Firewall"
+      ],
+      "nist80053": "SC-7, SA-8",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because the organization's VNet boundaries are configured by the organization."
+    },
+    {
+      "controlId": "SC.L2-3.13.2",
+      "nistRef": "3.13.2",
+      "requirement": "Employ architectural designs, software development techniques and systems engineering principles that promote effective information security within organizational systems.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft applies secure engineering principles to the service's architecture.",
+      "customerResponsibility": "Apply architectural designs, software development techniques and systems engineering principles to the organization's own system and customer-deployed resources.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "List ('GCCH Responsibility' column; Control Information tab shows #N/A)",
+      "placematPrimaries": [],
+      "nist80053": "SC-7, SA-8",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because the organization's own architecture is its own."
+    },
+    {
+      "controlId": "SC.L2-3.13.3",
+      "nistRef": "3.13.3",
+      "requirement": "Separate user functionality from system management functionality.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Service administration portals and APIs are separated from user functionality within the service.",
+      "customerResponsibility": "Separate user functionality from system management (dedicated admin accounts, PIM, admin workstations) on the tenant and customer-deployed resources.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "List ('GCCH Responsibility' column; Control Information tab shows #N/A)",
+      "placematPrimaries": [
+        "Microsoft Entra ID",
+        "Azure RBAC"
+      ],
+      "nist80053": "SC-2",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because admin-account separation on the tenant is configured by the organization."
+    },
+    {
+      "controlId": "SC.L2-3.13.4",
+      "nistRef": "3.13.4",
+      "requirement": "Prevent unauthorized and unintended information transfer via shared system resources.\nAssessment Objective:\n[a] unauthorized and unintended information transfer via shared system resources is \nprevented.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft prevents unauthorized information transfer via shared service resources (tenant isolation, hypervisor isolation).",
+      "customerResponsibility": "Share content only with properly authenticated and authorized users and prevent information transfer via shared resources on customer-deployed resources.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "List ('GCCH Responsibility' column; Control Information tab shows #N/A)",
+      "placematPrimaries": [
+        "Microsoft Information Protection",
+        "Microsoft 365 DLP"
+      ],
+      "nist80053": "SC-4",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "SC.L1-3.13.5",
+      "nistRef": "3.13.5",
+      "requirement": "Implement subnetworks for publicly accessible system components that are physically or logically separated from internal networks.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft separates publicly accessible service components from its internal networks.",
+      "customerResponsibility": "Place any organizational publicly accessible components on separated subnetworks (VNet subnets, NSGs).",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [],
+      "nist80053": "SC-7",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because any public-facing customer-deployed resources are segmented by the organization."
+    },
+    {
+      "controlId": "SC.L2-3.13.6",
+      "nistRef": "3.13.6",
+      "requirement": "Deny network communications traffic by default and allow network communications traffic by exception (e.g., deny all, permit by exception).",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Service network boundaries deny by default; NSGs and Azure Firewall enforce the deny-by-default rules the tenant configures.",
+      "customerResponsibility": "Configure customer-deployed network interfaces to deny all traffic by default and permit by exception.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "List ('GCCH Responsibility' column; Control Information tab shows #N/A)",
+      "placematPrimaries": [
+        "Azure Firewall"
+      ],
+      "nist80053": "SC-7(5)",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because NSG and firewall rules on customer-deployed resources are the organization's."
+    },
+    {
+      "controlId": "SC.L2-3.13.7",
+      "nistRef": "3.13.7",
+      "requirement": "Prevent remote devices from simultaneously establishing non-remote connections with organizational systems and communicating via some other connection to resources in external networks (i.e., split tunneling).\nAssessment Objective:\n[a] remote devices are prevented from simultaneously establishing non-remote \nconnections with the system and communicating via some other connection to \nresources in external networks (i.e., split tunneling).",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "No split tunnelling is possible inside the service boundary.",
+      "customerResponsibility": "Prevent split tunnelling on remote devices and VPN connections to customer-deployed resources.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "List ('GCCH Responsibility' column; Control Information tab shows #N/A)",
+      "placematPrimaries": [
+        "Azure VPN",
+        "Azure Firewall"
+      ],
+      "nist80053": "SC-7(7)",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because remote-device and VPN configuration is the organization's."
+    },
+    {
+      "controlId": "SC.L2-3.13.8",
+      "nistRef": "3.13.8",
+      "requirement": "Implement cryptographic mechanisms to prevent unauthorized disclosure of CUI during transmission unless otherwise protected by alternative physical safeguards.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Service connections negotiate TLS 1.2 or later using FIPS 140-validated modules; data in transit between Microsoft datacenters is encrypted.",
+      "customerResponsibility": "Configure clients and customer-deployed resources to communicate over FIPS-validated encryption and verify service endpoints before sign-in.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "List ('GCCH Responsibility' column; Control Information tab shows #N/A)",
+      "placematPrimaries": [
+        "Microsoft Information Protection",
+        "Office 365 Message Encryption (OME)"
+      ],
+      "nist80053": "SC-8, SC-8(1)",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "SC.L2-3.13.9",
+      "nistRef": "3.13.9",
+      "requirement": "Terminate network connections associated with communications sessions at the end of the sessions or after a defined period of inactivity.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "The service terminates idle sessions according to the Conditional Access sign-in frequency and idle time-out settings.",
+      "customerResponsibility": "Configure session and network termination after the defined period of inactivity on the tenant and customer-deployed resources.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "List ('GCCH Responsibility' column; Control Information tab shows #N/A)",
+      "placematPrimaries": [],
+      "nist80053": "SC-10",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because the time-out values and customer-deployed resource settings are the organization's."
+    },
+    {
+      "controlId": "SC.L2-3.13.10",
+      "nistRef": "3.13.10",
+      "requirement": "Establish and manage cryptographic keys for cryptography employed in organizational systems.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Azure Key Vault and Microsoft-managed keys protect service keys; Customer Key is available for customer-managed service encryption keys.",
+      "customerResponsibility": "Establish and manage cryptographic keys used by customer-deployed resources and any customer-managed keys.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Azure Key Vault",
+        "GitHub AE"
+      ],
+      "nist80053": "SC-12",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "SC.L2-3.13.11",
+      "nistRef": "3.13.11",
+      "requirement": "Employ FIPS-validated cryptography when used to protect the confidentiality of CUI.\nAssessment Objective:\n[a] FIPS-validated cryptography is employed to protect the confidentiality of CUI.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "The service uses FIPS 140-validated cryptographic modules.",
+      "customerResponsibility": "Configure client software and customer-deployed resources to use FIPS-validated cryptography when protecting CUI.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "Control Information ('GCC High Responsibility' column)",
+      "placematPrimaries": [
+        "Azure Key Vault",
+        "Bitlocker"
+      ],
+      "nist80053": "SC-13",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "SC.L2-3.13.12",
+      "nistRef": "3.13.12",
+      "requirement": "Prohibit remote activation of collaborative computing devices and provide indication of devices in use to users present at the device.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Teams does not activate cameras or microphones without indication to the user.",
+      "customerResponsibility": "Prohibit remote activation of collaborative computing devices on endpoints and in meeting rooms and indicate their use to users present.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "List ('GCCH Responsibility' column; Control Information tab shows #N/A)",
+      "placematPrimaries": [
+        "Intune/Intune Suite"
+      ],
+      "nist80053": "SC-15",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because endpoint and meeting-room devices are the organization's."
+    },
+    {
+      "controlId": "SC.L2-3.13.13",
+      "nistRef": "3.13.13",
+      "requirement": "Control and monitor the use of mobile code.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Defender for Office 365 Safe Attachments and Safe Links and Defender for Endpoint provide mobile code protection in the service.",
+      "customerResponsibility": "Control and monitor the use of mobile code (browser, Office macro and script policies) on endpoints and customer-deployed resources.",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "List ('GCCH Responsibility' column; Control Information tab shows #N/A)",
+      "placematPrimaries": [
+        "Azure Web Application Firewall",
+        "Microsoft Sentinel"
+      ],
+      "nist80053": "SC-18",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because mobile code policy on endpoints is the organization's. (Replaces the earlier row that described a fail-secure state, an SP 800-53 SC-24 concept.)"
+    },
+    {
+      "controlId": "SC.L2-3.13.14",
+      "nistRef": "3.13.14",
+      "requirement": "Control and monitor the use of Voice over Internet Protocol (VoIP) technologies.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Teams enforces FIPS-compliant encryption (SRTP, TLS) for VoIP media.",
+      "customerResponsibility": "Authorize, monitor and control VoIP use (Teams Phone policies and any customer-deployed VoIP).",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "List ('GCCH Responsibility' column; Control Information tab shows #N/A)",
+      "placematPrimaries": [
+        "Teams",
+        "Microsoft Sentinel"
+      ],
+      "nist80053": "N/A",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "SC.L2-3.13.15",
+      "nistRef": "3.13.15",
+      "requirement": "Protect the authenticity of communications sessions.\t\nAssessment Objective:\n[a] the authenticity of communications sessions is protected.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Service sessions are authenticated and protected with TLS certificates issued to Microsoft.",
+      "customerResponsibility": "Verify service endpoints before sign-in and protect the authenticity of sessions to customer-deployed resources.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "List ('GCCH Responsibility' column; Control Information tab shows #N/A)",
+      "placematPrimaries": [
+        "Microsoft Entra ID"
+      ],
+      "nist80053": "SC-23",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "SC.L2-3.13.16",
+      "nistRef": "3.13.16",
+      "requirement": "Protect the confidentiality of CUI at rest.\nAssessment Objective:\n[a] the confidentiality of CUI at rest is protected.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Service data at rest is encrypted by Microsoft (BitLocker, Distributed Key Manager, service encryption; Azure Storage Service Encryption in Azure Government).",
+      "customerResponsibility": "Protect CUI at rest on endpoints (BitLocker via Intune) and on customer-deployed resources (disk encryption, Customer Key where used).",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "List ('GCCH Responsibility' column; Control Information tab shows #N/A)",
+      "placematPrimaries": [
+        "Azure Key Vault",
+        "Bitlocker"
+      ],
+      "nist80053": "SC-28",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because CUI at rest on endpoints and customer-deployed resources is the organization's. (Replaces the earlier row that described mobile code protections, which belong to SC.L2-3.13.13.)"
+    },
+    {
+      "controlId": "SI.L1-3.14.1",
+      "nistRef": "3.14.1",
+      "requirement": "Identify, report and correct information and information system flaws in a timely manner.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft identifies, reports and corrects flaws in the service infrastructure.",
+      "customerResponsibility": "Identify, report and correct flaws on endpoints and customer-deployed resources (Windows Update, Azure Update Manager).",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "List ('GCCH Responsibility' column; Control Information tab shows #N/A)",
+      "placematPrimaries": [
+        "Microsoft Sentinel"
+      ],
+      "nist80053": "SI-2, SI-3, SI-5",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "SI.L1-3.14.2",
+      "nistRef": "3.14.2",
+      "requirement": "Provide protection from malicious code at appropriate locations within organizational information systems.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Exchange Online Protection and Defender for Office 365 provide malicious code protection at the service; Defender for Endpoint is available for endpoints.",
+      "customerResponsibility": "Deploy and maintain malicious code protection on endpoints and customer-deployed resources.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "List ('GCCH Responsibility' column; Control Information tab shows #N/A)",
+      "placematPrimaries": [
+        "Azure Web Application Firewall",
+        "App Locker"
+      ],
+      "nist80053": "SI-2, SI-3, SI-5",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "SI.L2-3.14.3",
+      "nistRef": "3.14.3",
+      "requirement": "Monitor system security alerts and advisories and take action in response.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft monitors security alerts for the service; the Message Center, Service Health and Defender portals surface alerts to the tenant.",
+      "customerResponsibility": "Monitor system security alerts and advisories and take action in response.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "List ('GCCH Responsibility' column; Control Information tab shows #N/A)",
+      "placematPrimaries": [
+        "Microsoft Sentinel",
+        "Microsoft Entra ID",
+        "Microsoft Defender for Cloud Apps",
+        "Microsoft Defender for Endpoint",
+        "Microsoft Defender for Cloud",
+        "Microsoft Defender XDR",
+        "Microsoft Defender for IoT"
+      ],
+      "nist80053": "SI-2, SI-3, SI-5",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true
+    },
+    {
+      "controlId": "SI.L1-3.14.4",
+      "nistRef": "3.14.4",
+      "requirement": "Update malicious code protection mechanisms when new releases are available.\t\nAssessment Objective:\n[a] malicious code protection mechanisms are updated when new releases are available.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft updates its service-side malicious code protection automatically.",
+      "customerResponsibility": "Keep malicious code protection updated on endpoints and customer-deployed resources.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "List ('GCCH Responsibility' column; Control Information tab shows #N/A)",
+      "placematPrimaries": [
+        "Microsoft Defender for Endpoint",
+        "Microsoft Defender for Office 365",
+        "Microsoft Defender for Cloud Apps",
+        "Microsoft Defender Antivirus cloud protection",
+        "Microsoft Defender for Cloud",
+        "Microsoft Defender XDR",
+        "Azure Automation"
+      ],
+      "nist80053": "SI-3",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "SI.L1-3.14.5",
+      "nistRef": "3.14.5",
+      "requirement": "Perform periodic scans of the information system and real-time scans of files from external sources as files are downloaded, opened or executed.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft performs service-side scanning of mail and files (Exchange Online Protection, Defender for Office 365).",
+      "customerResponsibility": "Perform periodic and real-time scans on endpoints and customer-deployed resources (Defender for Endpoint).",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "List ('GCCH Responsibility' column; Control Information tab shows #N/A)",
+      "placematPrimaries": [
+        "Microsoft Defender for Endpoint",
+        "Microsoft Defender for Office 365",
+        "Microsoft Defender SmartScreen",
+        "Microsoft Defender for Cloud Apps",
+        "Microsoft Defender Antivirus cloud protection"
+      ],
+      "nist80053": "SI-3",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "SI.L2-3.14.6",
+      "nistRef": "3.14.6",
+      "requirement": "Monitor organizational systems, including inbound and outbound communications traffic, to detect attacks and indicators of potential attacks.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft monitors the service infrastructure for attacks; Sentinel, Defender XDR and Defender for Cloud monitor the tenant and customer-deployed resources.",
+      "customerResponsibility": "Monitor organizational systems, including inbound and outbound communications traffic, for attacks and indicators of potential attacks.",
+      "placematCoverage": "Shared Coverage",
+      "placematSheet": "List ('GCCH Responsibility' column; Control Information tab shows #N/A)",
+      "placematPrimaries": [
+        "Azure Firewall",
+        "Microsoft Sentinel",
+        "Microsoft Defender for IoT",
+        "Microsoft Defender for Identity"
+      ],
+      "nist80053": "AU-2, AU-6, SI-4, SI-4(4)",
+      "basis": "Microsoft Product Placemat (GCC High Responsibility)",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "Microsoft Technical Reference Guide for CMMC 2.0 (1.0 Preview, published 2024-10-17), customer responsibility statements",
+      "verified": true
+    },
+    {
+      "controlId": "SI.L2-3.14.7",
+      "nistRef": "3.14.7",
+      "requirement": "Identify unauthorized use of organizational systems.",
+      "inheritance": "partial",
+      "architectures": [
+        "azure-gov",
+        "byod"
+      ],
+      "conditions": [],
+      "microsoftResponsibility": "Microsoft identifies unauthorized use of the service infrastructure.",
+      "customerResponsibility": "Identify unauthorized use of the tenant and customer-deployed resources (Sentinel analytics, Defender for Cloud Apps).",
+      "placematCoverage": "Microsoft Coverage",
+      "placematSheet": "List ('GCCH Responsibility' column; Control Information tab shows #N/A)",
+      "placematPrimaries": [
+        "Microsoft Sentinel"
+      ],
+      "nist80053": "SI-4",
+      "basis": "BHD assessment",
+      "source": "Microsoft Product Placemat for CMMC 2.0 (Preview), v2.0 Preview, published 2024-10-17, file 'Microsoft Product Placemat for CMMC - Preview Sept 2024.xlsm'",
+      "sourceUrl": "https://www.microsoft.com/en-us/download/details.aspx?id=102536",
+      "customerResponsibilitySource": "BHD assessment (control text and documented service capabilities)",
+      "verified": true,
+      "note": "Placemat: Microsoft Coverage. Recorded Shared because unauthorized use of the organization's tenant and resources is detected by the organization."
+    }
+  ],
+  "control_families": {
+    "AC": {
+      "inherited": 0,
+      "shared": 22,
+      "customer": 0
+    },
+    "AT": {
+      "inherited": 0,
+      "shared": 3,
+      "customer": 0
+    },
+    "AU": {
+      "inherited": 0,
+      "shared": 9,
+      "customer": 0
+    },
+    "CA": {
+      "inherited": 0,
+      "shared": 4,
+      "customer": 0
+    },
+    "CM": {
+      "inherited": 0,
+      "shared": 8,
+      "customer": 1
+    },
+    "IA": {
+      "inherited": 1,
+      "shared": 10,
+      "customer": 0
+    },
+    "IR": {
+      "inherited": 0,
+      "shared": 3,
+      "customer": 0
+    },
+    "MA": {
+      "inherited": 4,
+      "shared": 2,
+      "customer": 0
+    },
+    "MP": {
+      "inherited": 0,
+      "shared": 9,
+      "customer": 0
+    },
+    "PE": {
+      "inherited": 5,
+      "shared": 1,
+      "customer": 0
+    },
+    "PS": {
+      "inherited": 0,
+      "shared": 2,
+      "customer": 0
+    },
+    "RA": {
+      "inherited": 0,
+      "shared": 3,
+      "customer": 0
+    },
+    "SC": {
+      "inherited": 0,
+      "shared": 16,
+      "customer": 0
+    },
+    "SI": {
+      "inherited": 0,
+      "shared": 7,
+      "customer": 0
+    }
+  },
+  "control_families_scenario": "azure-gov architecture, no AdminOps credit, physical_facility_count = 0 and customer_equipment_count = 0"
+}

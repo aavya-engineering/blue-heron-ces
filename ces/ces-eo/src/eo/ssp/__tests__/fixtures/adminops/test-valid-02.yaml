@@ -1,0 +1,48 @@
+controlId: "TEST.L2-2.2.1"
+
+practiceStatement: "Second test control"
+
+useCaseId: "TEST-02"
+useCaseTitle: "Test Use Case Two"
+domain: "Testing Domain"
+priority: "P2"
+trigger: "Test trigger"
+
+sodTier: "Tier 2 -- Test Tier"
+entraRolesRequired:
+  - "Another Test Role"
+
+approvalRequired: false
+
+services:
+  - name: "Test Service 2"
+
+configurationSteps:
+  portalPath: "https://test.microsoft.us > Test2"
+
+  powershellCmdlets:
+    - cmdlet: "Get-MgTest"
+      parameters:
+        - "-Filter"
+
+  graphApiEndpoint: "GET https://graph.microsoft.us/v1.0/test2"
+
+  requiredPermissions:
+    - "Test.Read.All"
+
+evidenceArtifacts:
+  - type: "Test Audit"
+    retentionPeriod: "7 years"
+    storageLocation: "test-store-2/"
+
+gccHighSpecifics:
+  endpoints:
+    - "https://test2.microsoft.us"
+  complianceBoundary: "Test Boundary 2"
+  endpointValidation: "Test"
+
+relatedPolicies:
+  - "TEST-002"
+
+dependencies:
+  hardDependencies: []

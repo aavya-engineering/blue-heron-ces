@@ -1,0 +1,75 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"S3 Safe Links rule\",\r\n    \"Identity\":  \"S3 Safe Links rule\",\r\n    \"Name\":  \"S3 Safe Links rule\",\r\n    \"SafeLinksPolicy\":  \"S3 Safe Links - all users\",\r\n    \"RecipientDomainIs\":  [\r\n                              \"s3-def.simtenant.onmicrosoft.us\"\r\n                          ],\r\n    \"State\":  \"Enabled\",\r\n    \"Priority\":  0,\r\n    \"WhenCreated\":  \"2025-10-17T00:00:00.000Z\",\r\n    \"WhenChanged\":  \"2026-07-04T00:00:00.000Z\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Resource already exists — creation skipped (idempotent)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "existing equivalent 'S3 Safe Links rule' verified by effect (3 conditions) (existing equivalent 'S3 Safe Links rule' matched by effect)",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "existing equivalent 'S3 Safe Links rule' verified by effect (3 conditions)"
+  },
+  "registryEntry": {
+    "entry_id": "SI.L2-3.14.3.safe-links-rule",
+    "label": "Create Safe Links Rule for Primary Domain",
+    "engine": "exchange",
+    "layer_hint": 7,
+    "sequence_hint": 20,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "SI.L2-3.14.3"
+    ],
+    "get_command": "Get-SafeLinksRule | Where-Object { ($_.Name -eq 'CMMC-SafeLinks-Rule') -or (($_.State -eq 'Enabled') -and ($_.SafeLinksPolicy -eq '{safeLinksPolicyName}') -and (@($_.RecipientDomainIs) -contains '{primaryDomain}')) } | Sort-Object { $_.Name -ne 'CMMC-SafeLinks-Rule' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
+    "set_command": "New-SafeLinksRule -Name 'CMMC-SafeLinks-Rule' -SafeLinksPolicy '{safeLinksPolicyName}' -RecipientDomainIs '{primaryDomain}' -Enabled $true",
+    "evidence_commands": []
+  },
+  "metadata": {
+    "controlIds": [
+      "SI.L2-3.14.3"
+    ],
+    "timestamp": "2026-11-01T06:58:38.985Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "New-SafeLinksRule -Name 'CMMC-SafeLinks-Rule' -SafeLinksPolicy '{safeLinksPolicyName}' -RecipientDomainIs '{primaryDomain}' -Enabled $true",
+    "sha256Hash": "0d7a4c0428cb9da000de5bbafa48c47f237c9f13c7945aa89cefeab9c57a6c36",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "{\r\n    \"id\":  \"S3 Safe Links rule\",\r\n    \"Identity\":  \"S3 Safe Links rule\",\r\n    \"Name\":  \"S3 Safe Links rule\",\r\n    \"SafeLinksPolicy\":  \"S3 Safe Links - all users\",\r\n    \"RecipientDomainIs\":  [\r\n                              \"s3-def.simtenant.onmicrosoft.us\"\r\n                          ],\r\n    \"State\":  \"Enabled\",\r\n    \"Priority\":  0,\r\n    \"WhenCreated\":  \"2025-10-17T00:00:00.000Z\",\r\n    \"WhenChanged\":  \"2026-07-04T00:00:00.000Z\"\r\n}\r\n",
+    "postcheckMode": "state",
+    "lookupMatch": {
+      "basis": "effect",
+      "object": "S3 Safe Links rule",
+      "conditions": [
+        {
+          "path": "$.State",
+          "op": "equals",
+          "expected": "Enabled",
+          "observed": "Enabled",
+          "pass": true
+        },
+        {
+          "path": "$.SafeLinksPolicy",
+          "op": "equals",
+          "expected": "S3 Safe Links - all users",
+          "observed": "S3 Safe Links - all users",
+          "pass": true
+        },
+        {
+          "path": "$.RecipientDomainIs",
+          "op": "contains",
+          "expected": "s3-def.simtenant.onmicrosoft.us",
+          "observed": [
+            "s3-def.simtenant.onmicrosoft.us"
+          ],
+          "pass": true
+        }
+      ]
+    }
+  }
+}

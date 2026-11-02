@@ -1,0 +1,62 @@
+{
+  "_fictional": "SIMULATED CUSTOMER (FICTIONAL). Every organisation, person and record named here is invented for the CES simulator; no real organisation is described.",
+  "marker": "SIMULATED CUSTOMER (FICTIONAL)",
+  "schema": "ces-document-reviews/1",
+  "slug": "s3-def",
+  "about": "NS-4 (gap closure, GAP-CLOSURE-PLAN.md section 4 G-NS; rule GD-b, section 7). Harness step E8.5 uploads every artifact below to the Evidence Collector with the uploader's principal (uploadedBy); step E8.6 has EO mint an approver token for the reviewer and posts one review per row to POST /api/reviews. Under GD-b a control with no stack source is met only when every NIST SP 800-171A objective has a met review by a reviewer who is not the uploader; one not_met review sets not_met. Rows under not_reviewed have no review (the artifact does not show that objective), so their control stays not_assessed. The probe artifact is uploaded and never reviewed: V80 checks its control stays not_assessed. Verdicts are the reviewer's reading of the artifact; edit them here, never in the harness. S3 supplies no training records (deficiency S3-D17), so its one review is a not_met verdict on the training status statement it uploaded.",
+  "uploader": {
+    "role": "isso",
+    "upn": "belmira.pennanmore@s3-def.simtenant.onmicrosoft.us"
+  },
+  "reviewer": {
+    "role": "owner",
+    "upn": "derwyn.arrowbrook@s3-def.simtenant.onmicrosoft.us"
+  },
+  "operator_upn": "harness.operator@s3-def.simtenant.onmicrosoft.us",
+  "artifacts": [
+    {
+      "id": "role-based-training-status",
+      "file": "review-artifacts/role-based-training-status.json",
+      "media_type": "application/json",
+      "control_ids": [
+        "AT.L2-3.2.2"
+      ],
+      "submitted_by_role": "compliance_officer"
+    },
+    {
+      "id": "probe-unreviewed-upload",
+      "file": "review-artifacts/probe-unreviewed-upload.json",
+      "media_type": "application/json",
+      "control_ids": [
+        "CA.L2-3.12.4"
+      ],
+      "submitted_by_role": "compliance_officer"
+    }
+  ],
+  "reviews": [
+    {
+      "control_id": "AT.L2-3.2.2",
+      "objective_id": "AT.L2-3.2.2[c]",
+      "artifact": "role-based-training-status",
+      "verdict": "not_met",
+      "notes": "no privileged administrator has completed role-based security training (S3-D17)"
+    }
+  ],
+  "not_reviewed": [
+    {
+      "control_id": "AT.L2-3.2.2",
+      "objective_id": "AT.L2-3.2.2[a]",
+      "reason": "the statement does not define the security duties, roles and responsibilities"
+    },
+    {
+      "control_id": "AT.L2-3.2.2",
+      "objective_id": "AT.L2-3.2.2[b]",
+      "reason": "the statement does not assign the security duties"
+    }
+  ],
+  "probe": {
+    "artifact": "probe-unreviewed-upload",
+    "control_id": "CA.L2-3.12.4",
+    "expect": "not_assessed"
+  }
+}

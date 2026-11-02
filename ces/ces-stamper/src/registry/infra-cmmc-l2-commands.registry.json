@@ -1,0 +1,3268 @@
+{
+  "version": "1.0.0",
+  "generated_on": "2026-03-08",
+  "description": "CMMC Level 2 Infra Command Registry — Azure GCC High Tenant Onboarding",
+  "entries": [
+    {
+      "entry_id": "AZ-PREFLIGHT-001",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter"},
+      "control_ids": [
+        "SC.L1-3.13.1"
+      ],
+      "objective_ids": [],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.resources/register-azresourceprovider",
+      "label": "Register Required Azure Resource Providers",
+      "engine": "az",
+      "set_command": "@('Microsoft.OperationalInsights','Microsoft.SecurityInsights','Microsoft.Security','Microsoft.Automation','Microsoft.KeyVault','Microsoft.Storage','Microsoft.Network','Microsoft.Compute','microsoft.insights','Microsoft.AlertsManagement','Microsoft.OperationsManagement') | ForEach-Object { Register-AzResourceProvider -ProviderNamespace $_ }",
+      "get_command": "Get-AzResourceProvider -ListAvailable | Where-Object { $_.ProviderNamespace -in @('Microsoft.OperationalInsights','Microsoft.SecurityInsights','Microsoft.Security','Microsoft.Automation','Microsoft.KeyVault','Microsoft.Storage','Microsoft.Network','Microsoft.Compute','microsoft.insights','Microsoft.AlertsManagement','Microsoft.OperationsManagement') } | Select-Object ProviderNamespace,RegistrationState",
+      "idempotency": "get-then-set",
+      "variables_required": [],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 0,
+      "sequence_hint": 3,
+      "manual_only": false,
+      "evidence_commands": [],
+      "on_failure": "abort_plan",
+      "azure_tier": "foundation",
+      "verification": {
+        "evidence": {
+          "not_empty": true,
+          "regex": "^(?!.*\\b(?:NotRegistered|Unregistered|Registering|Unregistering)\\b)(?=.*\\bMicrosoft\\.OperationalInsights\\s+Registered\\b)(?=.*\\bMicrosoft\\.SecurityInsights\\s+Registered\\b)(?=.*\\bMicrosoft\\.Security\\s+Registered\\b)(?=.*\\bMicrosoft\\.Automation\\s+Registered\\b)(?=.*\\bMicrosoft\\.KeyVault\\s+Registered\\b)(?=.*\\bMicrosoft\\.Storage\\s+Registered\\b)(?=.*\\bMicrosoft\\.Network\\s+Registered\\b)(?=.*\\bMicrosoft\\.Compute\\s+Registered\\b)(?=.*\\bmicrosoft\\.insights\\s+Registered\\b)(?=.*\\bMicrosoft\\.AlertsManagement\\s+Registered\\b)(?=.*\\bMicrosoft\\.OperationsManagement\\s+Registered\\b)"
+        },
+        "postcheck_mode": "state"
+      },
+      "notes": "Registers 11 Azure resource providers required for the CMMC L2 infrastructure stack (Sentinel, Key Vault, Storage, Network, Compute, etc.). Idempotent — re-registration of already-registered providers is a no-op. Evidence proves the subscription is ready for resource provisioning."
+    },
+    {
+      "entry_id": "AZ-CTX-001",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter"},
+      "control_ids": [
+        "SC.L1-3.13.1"
+      ],
+      "objective_ids": [],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.accounts/set-azcontext",
+      "label": "Set Azure Subscription Context",
+      "engine": "az",
+      "set_command": "Set-AzContext -Subscription '{subscriptionId}'",
+      "get_command": "Get-AzContext | Select-Object -ExpandProperty Subscription | Where-Object { $_.Id -eq '{subscriptionId}' } | Select-Object Id,Name | ConvertTo-Json",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "subscriptionId"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 0,
+      "sequence_hint": 1,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzContext | Select-Object -ExpandProperty Subscription | Where-Object { $_.Id -eq '{subscriptionId}' }"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "foundation",
+      "verification": {
+        "evidence": {
+          "not_empty": true,
+          "jsonpath": "$.Id",
+          "equals": "{subscriptionId}"
+        },
+        "postcheck_mode": "state"
+      },
+      "notes": "Sets the Az PowerShell session to the target Azure Gov subscription. Evidence confirms the operator is working in the correct subscription boundary, satisfying SC.L1-3.13.1 boundary monitoring requirements."
+    },
+    {
+      "entry_id": "AZ-FOUND-001",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter"},
+      "control_ids": [
+        "SC.L1-3.13.1"
+      ],
+      "objective_ids": [],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.resources/new-azresourcegroup",
+      "label": "Create Azure Resource Group",
+      "engine": "az",
+      "set_command": "New-AzResourceGroup -Name '{resourceGroup}' -Location '{location}' -Tag @{environment='cmmc-l2'; managed_by='bhd-stamper'}",
+      "get_command": "Get-AzResourceGroup -Name '{resourceGroup}' | ConvertTo-Json -Depth 5",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "location"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 0,
+      "sequence_hint": 4,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzResourceGroup -Name '{resourceGroup}' | ConvertTo-Json -Depth 5"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "foundation",
+      "verification": {
+        "evidence": {
+          "not_empty": true,
+          "jsonpath": "$.ResourceGroupName",
+          "equals": "{resourceGroup}",
+          "checks": [
+            {
+              "jsonpath": "$.ProvisioningState",
+              "equals": "Succeeded"
+            }
+          ]
+        },
+        "postcheck_mode": "state"
+      },
+      "notes": "Creates the primary resource group with CMMC L2 tags (environment=cmmc-l2, managed_by=bhd-stamper). All subsequent infrastructure resources are deployed into this resource group. Evidence proves a dedicated, tagged container exists for CUI-scoped resources."
+    },
+    {
+      "entry_id": "AZ-FOUND-002",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter"},
+      "control_ids": [
+        "CM.L2-3.4.1"
+      ],
+      "objective_ids": [
+        "CM.L2-3.4.1[a]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.resources/new-azpolicyassignment",
+      "label": "Assign CMMC L2 Azure Policy Initiative",
+      "engine": "az",
+      "set_command": "$policySetDef = Get-AzPolicySetDefinition -Id '/providers/Microsoft.Authorization/policySetDefinitions/4e50fd13-098b-3206-61d6-d1d78205cb45'; $existing = Get-AzPolicyAssignment -Name 'CMMC-L2-Initiative' -Scope '/subscriptions/{subscriptionId}' -ErrorAction SilentlyContinue; if (-not $existing) { New-AzPolicyAssignment -Name 'CMMC-L2-Initiative' -DisplayName 'CMMC Level 2 Requirements' -PolicySetDefinition $policySetDef -Scope '/subscriptions/{subscriptionId}' -IdentityType 'SystemAssigned' -Location '{location}' } else { Write-Output 'Assignment already exists - skipping creation' }",
+      "get_command": "Get-AzPolicyAssignment -Name 'CMMC-L2-Initiative' -Scope '/subscriptions/{subscriptionId}' -ErrorAction SilentlyContinue | Select-Object Name, DisplayName, EnforcementMode | ConvertTo-Json",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "subscriptionId",
+        "location"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 0,
+      "sequence_hint": 5,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzPolicyAssignment -Name 'CMMC-L2-Initiative' -Scope '/subscriptions/{subscriptionId}' -ErrorAction SilentlyContinue | Select-Object Name, DisplayName, EnforcementMode | ConvertTo-Json"
+      ],
+      "on_failure": "warn_continue",
+      "notes": "Assigns the built-in CMMC Level 2 policy initiative (policy set 4e50fd13-098b-3206-61d6-d1d78205cb45) at the tenant's subscription, with a system-assigned identity in the tenant's region. Subscription and region come from the tenant variables (QUESTIONS P-11).",
+      "azure_tier": "foundation",
+      "verification": {
+        "evidence": {
+          "not_empty": true,
+          "jsonpath": "$.Name",
+          "equals": "CMMC-L2-Initiative",
+          "checks": [
+            {
+              "jsonpath": "$.EnforcementMode",
+              "equals": "Default"
+            }
+          ]
+        },
+        "postcheck_mode": "state"
+      }
+    },
+    {
+      "entry_id": "AZ-FOUND-003",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter"},
+      "control_ids": [
+        "SI.L1-3.14.1",
+        "SI.L2-3.14.6"
+      ],
+      "objective_ids": [
+        "SI.L1-3.14.1[b]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.security/set-azsecuritypricing",
+      "label": "Defender for Cloud at the free tier (Foundational CSPM)",
+      "engine": "az",
+      "set_command": "foreach ($p in @('VirtualMachines','StorageAccounts','CloudPosture','Arm')) { $cur = Get-AzSecurityPricing -Name $p -ErrorAction SilentlyContinue; if (-not $cur -or $cur.PricingTier -ne 'Standard') { Set-AzSecurityPricing -Name $p -PricingTier 'Free' | Out-Null } }; Get-AzSecurityPricing | Where-Object { $_.Name -in @('VirtualMachines','StorageAccounts','CloudPosture','Arm') } | Select-Object Name,PricingTier | ConvertTo-Json",
+      "get_command": "Get-AzSecurityPricing | Where-Object { $_.Name -in @('VirtualMachines','StorageAccounts','CloudPosture','Arm') } | Select-Object Name,PricingTier",
+      "idempotency": "get-then-set",
+      "variables_required": [],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 0,
+      "sequence_hint": 7,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzSecurityPricing | Where-Object { $_.Name -in @('VirtualMachines','StorageAccounts','CloudPosture','Arm') } | Select-Object Name,PricingTier | ConvertTo-Json"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "foundation",
+      "notes": "Free by default (COST-GATE-SPEC.md §3.7; Muster manifest resource sec-defender, tier Free). Sets the four plans to the free tier, which keeps Foundational CSPM (posture recommendations) on at no cost, and never downgrades a plan the customer already pays for (Standard is left as found). The paid plans (threat detection, SI.L2-3.14.6[a]) are the opt-in recurring entry AZ-FOUND-005.",
+      "verification": {
+        "evidence": {
+          "regex": "^(?=.*\\bVirtualMachines\\s+(?:Free|Standard)\\b)(?=.*\\bStorageAccounts\\s+(?:Free|Standard)\\b)(?=.*\\bCloudPosture\\s+(?:Free|Standard)\\b)(?=.*\\bArm\\s+(?:Free|Standard)\\b)",
+          "not_empty": true
+        },
+        "postcheck_mode": "state"
+      }
+    },
+    {
+      "entry_id": "AZ-LOG-001",
+      "cost_gate": {"recurring":true,"cost_key":"azure.log_analytics.workspace","estimate_basis":"10 GB/month ingestion; 90-day retention (inside the free window)","standard_alternative":["AU.L2-3.3.1.audit-retention"]},
+      "control_ids": [
+        "AU.L2-3.3.1"
+      ],
+      "objective_ids": [
+        "AU.L2-3.3.1[f]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.operationalinsights/new-azoperationalinsightsworkspace",
+      "label": "Create Log Analytics Workspace (90-day retention)",
+      "engine": "az",
+      "set_command": "New-AzOperationalInsightsWorkspace -ResourceGroupName '{resourceGroup}' -Name '{lawWorkspaceName}' -Location '{location}' -Sku 'PerGB2018' -RetentionInDays 90",
+      "get_command": "Get-AzOperationalInsightsWorkspace -ResourceGroupName '{resourceGroup}' -Name '{lawWorkspaceName}' | ConvertTo-Json -Depth 10",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "location",
+        "lawWorkspaceName"
+      ],
+      "variables_runtime": [],
+      "captures": [
+        {
+          "variable": "lawWorkspaceId",
+          "from": "json_field",
+          "json_path": "$.CustomerId"
+        },
+        {
+          "variable": "lawResourceId",
+          "from": "json_field",
+          "json_path": "$.Id"
+        }
+      ],
+      "layer_hint": 6,
+      "sequence_hint": 0,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzOperationalInsightsWorkspace -ResourceGroupName '{resourceGroup}' -Name '{lawWorkspaceName}' | Select-Object Name,RetentionInDays,ProvisioningState | ConvertTo-Json"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.ProvisioningState",
+          "equals": "Succeeded"
+        }
+      },
+      "notes": "Creates the central Log Analytics workspace with 90-day retention, inside the free interactive window (COST-GATE-SPEC.md §3.7; Muster manifest LAW_RETENTION_DAYS = 90). Long-term evidence retention is the WORM storage days (AZ-LOG-002/003), not the workspace. Ingestion is still billed, so the entry is recurring and off by default. Captures lawWorkspaceId and lawResourceId for downstream Sentinel and diagnostic entries. PerGB2018 is the only SKU in Azure Government."
+    },
+    {
+      "entry_id": "AZ-LOG-002",
+      "cost_gate": {"recurring":true,"cost_key":"azure.storage.log_account","estimate_basis":"50 GB LRS + operations","standard_alternative":["AU.L2-3.3.1.audit-retention"]},
+      "control_ids": [
+        "AU.L2-3.3.1"
+      ],
+      "objective_ids": [
+        "AU.L2-3.3.1[f]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.storage/new-azstorageaccount",
+      "label": "Create Immutable Log Storage Account",
+      "engine": "az",
+      "set_command": "New-AzStorageAccount -ResourceGroupName '{resourceGroup}' -Name '{storageAccountName}' -Location '{location}' -SkuName 'Standard_LRS' -Kind 'StorageV2' -AllowBlobPublicAccess $false -MinimumTlsVersion 'TLS1_2' -EnableHttpsTrafficOnly $true",
+      "get_command": "Get-AzStorageAccount -ResourceGroupName '{resourceGroup}' -Name '{storageAccountName}' | Select-Object -Property * -ExcludeProperty Context | ConvertTo-Json -Depth 3",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "location",
+        "storageAccountName"
+      ],
+      "variables_runtime": [],
+      "captures": [
+        {
+          "variable": "storageResourceId",
+          "from": "json_field",
+          "json_path": "$.Id"
+        }
+      ],
+      "layer_hint": 6,
+      "sequence_hint": 1,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzStorageAccount -ResourceGroupName '{resourceGroup}' -Name '{storageAccountName}' | Select-Object StorageAccountName,EnableHttpsTrafficOnly,MinimumTlsVersion | ConvertTo-Json"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.Id",
+          "not_empty": true
+        }
+      },
+      "notes": "Creates an immutable log storage account with TLS 1.2 minimum, HTTPS-only traffic, and no public blob access. Serves as the secondary audit log store for WORM-locked evidence containers. Captures storageResourceId for downstream RBAC and diagnostic settings."
+    },
+    {
+      "entry_id": "AZ-LOG-002a",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter","requires_entries":["AZ-LOG-002"]},
+      "control_ids": [
+        "SC.L2-3.13.10"
+      ],
+      "objective_ids": [],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.storage/set-azstorageaccount",
+      "label": "Assign System Managed Identity to Storage Account",
+      "engine": "az",
+      "set_command": "Set-AzStorageAccount -ResourceGroupName '{resourceGroup}' -Name '{storageAccountName}' -AssignIdentity",
+      "get_command": "Get-AzStorageAccount -ResourceGroupName '{resourceGroup}' -Name '{storageAccountName}' | Select-Object -ExpandProperty Identity | ConvertTo-Json -Depth 10",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "storageAccountName"
+      ],
+      "variables_runtime": [],
+      "captures": [
+        {
+          "variable": "storageMiPrincipalId",
+          "from": "json_field",
+          "json_path": "$.PrincipalId"
+        }
+      ],
+      "layer_hint": 6,
+      "sequence_hint": 2,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzStorageAccount -ResourceGroupName '{resourceGroup}' -Name '{storageAccountName}' | Select-Object StorageAccountName,@{Name='IdentityType';Expression={$_.Identity.Type}},@{Name='PrincipalId';Expression={$_.Identity.PrincipalId}} | ConvertTo-Json -Depth 2"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "not_empty": true
+        }
+      },
+      "notes": "Assigns a system-managed identity to the log storage account so it can authenticate to Key Vault for CMK encryption without storing credentials. Captures storageMiPrincipalId for the RBAC role assignment in AZ-LOG-002b. Evidence proves identity-based access is configured per SC.L2-3.13.10."
+    },
+    {
+      "entry_id": "AZ-LOG-002b",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter","requires_entries":["AZ-LOG-002a","AZ-KV-001"]},
+      "control_ids": [
+        "SC.L2-3.13.10"
+      ],
+      "objective_ids": [
+        "SC.L2-3.13.10[b]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.resources/new-azroleassignment",
+      "label": "Grant Storage MI Key Vault Crypto Service Encryption User Role",
+      "engine": "az",
+      "set_command": "New-AzRoleAssignment -RoleDefinitionName 'Key Vault Crypto Service Encryption User' -ObjectId '{storageMiPrincipalId}' -Scope '{kvResourceId}'",
+      "get_command": "Get-AzRoleAssignment -ObjectId '{storageMiPrincipalId}' -Scope '{kvResourceId}' | Where-Object RoleDefinitionName -eq 'Key Vault Crypto Service Encryption User' | Select-Object RoleDefinitionName,ObjectId,Scope,RoleAssignmentId -First 1 | ConvertTo-Json -Depth 3",
+      "idempotency": "get-then-set",
+      "variables_required": [],
+      "variables_runtime": [
+        "storageMiPrincipalId",
+        "kvResourceId"
+      ],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 6,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzRoleAssignment -ObjectId '{storageMiPrincipalId}' -Scope '{kvResourceId}' | Select-Object RoleDefinitionName,ObjectId,Scope,RoleAssignmentId | ConvertTo-Json -Depth 3"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.RoleDefinitionName",
+          "equals": "Key Vault Crypto Service Encryption User",
+          "checks": [
+            {
+              "jsonpath": "$.RoleDefinitionName",
+              "equals": "Key Vault Crypto Service Encryption User"
+            },
+            {
+              "jsonpath": "$.Scope",
+              "equals": "{kvResourceId}"
+            }
+          ]
+        },
+        "postcheck_mode": "state"
+      },
+      "notes": "Grants the storage account managed identity the Key Vault Crypto Service Encryption User role, enabling customer-managed key (CMK) envelope encryption. This RBAC assignment must propagate before AZ-LOG-002c can apply CMK encryption. Evidence proves least-privilege cryptographic key access. PH-12 (P12-R5): the GET and the evidence read the role assignment as JSON, and the rule checks the role and its scope; the evidence used Get-AzKeyVaultAccessPolicy, which is not an Az cmdlet (the simulator could not answer it, and Azure would not either), and the rule read $.ResourceId, which a role assignment does not carry."
+    },
+    {
+      "entry_id": "AZ-LOG-002c",
+      "cost_gate": {"recurring":true,"cost_key":"azure.keyvault.operations","estimate_basis":"customer-managed key: Key Vault operations billed per use","standard_alternative":["SC.L2-3.13.10.key-escrow"],"requires_entries":["AZ-LOG-002","AZ-KV-001"]},
+      "control_ids": [
+        "SC.L2-3.13.10"
+      ],
+      "objective_ids": [
+        "SC.L2-3.13.10[b]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.storage/set-azstorageaccount",
+      "label": "Enable CMK Encryption on Storage Account",
+      "engine": "az",
+      "set_command": "Set-AzStorageAccount -ResourceGroupName '{resourceGroup}' -Name '{storageAccountName}' -KeyvaultEncryption -KeyName '{cmkKeyName}' -KeyVaultUri '{kvUri}'",
+      "get_command": "Get-AzStorageAccount -ResourceGroupName '{resourceGroup}' -Name '{storageAccountName}' | Select-Object -ExpandProperty Encryption | Where-Object { $_.KeySource -eq 'Microsoft.Keyvault' } | ConvertTo-Json -Depth 5",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "storageAccountName",
+        "cmkKeyName"
+      ],
+      "variables_runtime": [
+        "kvUri"
+      ],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 7,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzStorageAccount -ResourceGroupName '{resourceGroup}' -Name '{storageAccountName}' | Select-Object -ExpandProperty Encryption | ConvertTo-Json"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "not_empty": true
+        }
+      },
+      "notes": "Enables customer-managed key (CMK) encryption on the log storage account using an RSA-HSM key in Key Vault. Satisfies SC.L2-3.13.10 cryptographic key management and SC.L2-3.13.16 CUI-at-rest protection. Evidence proves KeySource is Microsoft.Keyvault rather than Microsoft-managed."
+    },
+    {
+      "entry_id": "AZ-LOG-003",
+      "cost_gate": {"recurring":true,"cost_key":"azure.storage.immutability","estimate_basis":"storage only, cannot be undone while locked","irreversible":true,"two_person":true,"standard_alternative":["AU.L2-3.3.1.audit-retention"],"requires_entries":["AZ-LOG-002"]},
+      "control_ids": [
+        "AU.L2-3.3.1"
+      ],
+      "objective_ids": [
+        "AU.L2-3.3.1[f]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.storage/set-azrmstoragecontainerimmutabilitypolicy",
+      "label": "Set Storage Container Immutability Policy (WORM)",
+      "engine": "az",
+      "set_command": "$ctx = (Get-AzStorageAccount -ResourceGroupName '{resourceGroup}' -Name '{storageAccountName}').Context; New-AzStorageContainer -Name 'logs' -Context $ctx -Permission Off; Set-AzRmStorageContainerImmutabilityPolicy -ResourceGroupName '{resourceGroup}' -StorageAccountName '{storageAccountName}' -ContainerName 'logs' -ImmutabilityPeriodSinceCreationInDays 90",
+      "get_command": "Get-AzRmStorageContainerImmutabilityPolicy -ResourceGroupName '{resourceGroup}' -StorageAccountName '{storageAccountName}' -ContainerName 'logs' | ConvertTo-Json -Depth 5",
+      "idempotency": "safe",
+      "variables_required": [
+        "resourceGroup",
+        "storageAccountName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 9,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzRmStorageContainerImmutabilityPolicy -ResourceGroupName '{resourceGroup}' -StorageAccountName '{storageAccountName}' -ContainerName 'logs' | Select-Object ImmutabilityPeriod,State,AllowProtectedAppendWrites | ConvertTo-Json -Depth 5"
+      ],
+      "on_failure": "abort_step",
+      "notes": "WORM lock is irreversible. Operator must review get_command output before live execution. If PolicyState is Locked, this step must be skipped manually — do not re-run.",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.ImmutabilityPeriod",
+          "equals": "90"
+        }
+      }
+    },
+    {
+      "entry_id": "AZ-KV-001",
+      "cost_gate": {"recurring":true,"cost_key":"azure.keyvault.operations","estimate_basis":"Standard vault, billed per operation (CQ-2)","standard_alternative":["SC.L2-3.13.10.key-escrow"]},
+      "control_ids": [
+        "SC.L2-3.13.10"
+      ],
+      "objective_ids": [
+        "SC.L2-3.13.10[b]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.keyvault/new-azkeyvault",
+      "label": "Create Key Vault (purge-protection enabled)",
+      "engine": "az",
+      "set_command": "New-AzKeyVault -ResourceGroupName '{resourceGroup}' -VaultName '{keyVaultName}' -Location '{location}' -EnablePurgeProtection -Sku 'Standard' -EnabledForDeployment $false -EnableRbacAuthorization $true",
+      "get_command": "Get-AzKeyVault -ResourceGroupName '{resourceGroup}' -VaultName '{keyVaultName}' | ConvertTo-Json -Depth 10",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "location",
+        "keyVaultName"
+      ],
+      "variables_runtime": [],
+      "captures": [
+        {
+          "variable": "kvResourceId",
+          "from": "json_field",
+          "json_path": "$.ResourceId"
+        },
+        {
+          "variable": "kvUri",
+          "from": "json_field",
+          "json_path": "$.VaultUri"
+        }
+      ],
+      "layer_hint": 6,
+      "sequence_hint": 3,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzKeyVault -ResourceGroupName '{resourceGroup}' -VaultName '{keyVaultName}' | Select-Object VaultName,EnableSoftDelete,EnablePurgeProtection,EnableRbacAuthorization | ConvertTo-Json"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.Id",
+          "not_empty": true
+        }
+      },
+      "notes": "Creates a Standard Azure Key Vault (founder ruling OQ-4: Standard by default, HSM opt-in) with purge protection, RBAC authorization and deployment disabled. Captures kvResourceId and kvUri for downstream CMK and RBAC entries. Key Vault is billed per use, which counts as recurring (CQ-2): off by default, behind DP-1 and DP-2. SC.L2-3.13.10 has free evidence without it (SC.L2-3.13.10.key-escrow)."
+    },
+    {
+      "entry_id": "AZ-KV-002",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter","requires_entries":["AZ-KV-001"]},
+      "control_ids": [
+        "SC.L2-3.13.10",
+        "AC.L1-3.1.1"
+      ],
+      "objective_ids": [
+        "SC.L2-3.13.10[b]",
+        "AC.L1-3.1.1[e]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.resources/new-azroleassignment",
+      "label": "Assign Key Vault Crypto Officer Role to EO Service Principal",
+      "engine": "az",
+      "set_command": "$assignment = New-AzRoleAssignment -ObjectId '{eoSpObjectId}' -RoleDefinitionName 'Key Vault Crypto Officer' -Scope (Get-AzKeyVault -ResourceGroupName '{resourceGroup}' -VaultName '{keyVaultName}').ResourceId; Write-Host 'RBAC assignment created, waiting 5 minutes for propagation...'; Start-Sleep -Seconds 300; $assignment",
+      "get_command": "Get-AzRoleAssignment -Scope (Get-AzKeyVault -ResourceGroupName '{resourceGroup}' -VaultName '{keyVaultName}').ResourceId | Where-Object ObjectId -eq '{eoSpObjectId}'",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "keyVaultName"
+      ],
+      "variables_runtime": [
+        "eoSpObjectId"
+      ],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 4,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzRoleAssignment -Scope (Get-AzKeyVault -ResourceGroupName '{resourceGroup}' -VaultName '{keyVaultName}').ResourceId | Where-Object ObjectId -eq '{eoSpObjectId}' | Select-Object ObjectId,RoleDefinitionName,Scope"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.ResourceId",
+          "not_empty": true
+        }
+      },
+      "notes": "Assigns the EO service principal the Key Vault Crypto Officer role for automated key lifecycle management. Includes a 300-second propagation delay for Azure RBAC to replicate. Evidence proves the automation identity has least-privilege cryptographic access per AC.L1-3.1.1."
+    },
+    {
+      "entry_id": "AZ-KV-003",
+      "cost_gate": {"recurring":true,"cost_key":"azure.keyvault.software_key","estimate_basis":"1 software RSA 4096 key, billed per use (CQ-2)","standard_alternative":["SC.L2-3.13.10.key-escrow"],"requires_entries":["AZ-KV-001"]},
+      "control_ids": [
+        "SC.L2-3.13.10"
+      ],
+      "objective_ids": [
+        "SC.L2-3.13.10[a]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.keyvault/add-azkeyvaultkey",
+      "label": "Create CMK Key in Key Vault (software RSA 4096)",
+      "engine": "az",
+      "set_command": "Add-AzKeyVaultKey -VaultName '{keyVaultName}' -Name '{cmkKeyName}' -Destination Software -KeyType RSA -Size 4096 -KeyOps @('wrapKey','unwrapKey') -WarningAction SilentlyContinue | Select-Object Name,Version,Enabled,Id,@{N='KeyType';E={$_.Key.Kty}},@{N='KeySize';E={$_.KeySize}},@{N='KeyOps';E={$_.Key.KeyOps}} | ConvertTo-Json -Depth 5",
+      "get_command": "Get-AzKeyVaultKey -VaultName '{keyVaultName}' -Name '{cmkKeyName}' -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Select-Object Name,Version,Enabled,Id,@{N='KeyType';E={$_.Key.Kty}},@{N='KeySize';E={$_.KeySize}},@{N='KeyOps';E={$_.Key.KeyOps}} | ConvertTo-Json -Depth 5",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "keyVaultName",
+        "cmkKeyName"
+      ],
+      "variables_runtime": [],
+      "captures": [
+        {
+          "variable": "cmkKeyVersion",
+          "from": "json_field",
+          "json_path": "$.Version"
+        }
+      ],
+      "layer_hint": 6,
+      "sequence_hint": 5,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzKeyVaultKey -VaultName '{keyVaultName}' -Name '{cmkKeyName}' -WarningAction SilentlyContinue | Select-Object Name,Version,Enabled,Id | ConvertTo-Json"
+      ],
+      "on_failure": "abort_step",
+      "notes": "Software-protected RSA 4096 key in a Standard vault (founder ruling OQ-4: Standard Key Vault by default, HSM opt-in; Muster manifest resource sto-cmk). Key Vault is billed per use, which counts as recurring (CQ-2), so this stays behind DP-1 and DP-2. An HSM key needs a Premium vault and is not offered by default (open item: an HSM opt-in entry). Capture cmkKeyVersion is reserved for key rotation tracking.",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.Id",
+          "not_empty": true
+        }
+      }
+    },
+    {
+      "entry_id": "AZ-KV-005",
+      "cost_gate": {"recurring":true,"cost_key":"azure.keyvault.hsm_key","estimate_basis":"opt-in: Premium vault + 1 HSM-protected RSA key version, billed per key version and per use","standard_alternative":["AZ-KV-003"],"requires_entries":["AZ-KV-001"]},
+      "control_ids": [
+        "SC.L2-3.13.10"
+      ],
+      "objective_ids": [
+        "SC.L2-3.13.10[a]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/azure/key-vault/keys/hsm-protected-keys",
+      "label": "Opt-in: HSM-protected CMK Key (Premium vault)",
+      "engine": "az",
+      "set_command": "$r = Invoke-AzRestMethod -Method PATCH -Path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.KeyVault/vaults/{keyVaultName}?api-version=2023-07-01' -Payload '{\"properties\":{\"sku\":{\"family\":\"A\",\"name\":\"premium\"}}}'; if ($r.StatusCode -ge 300) { throw ('Key Vault SKU change failed: ' + $r.StatusCode) }; Add-AzKeyVaultKey -VaultName '{keyVaultName}' -Name '{cmkKeyName}-hsm' -Destination HSM -KeyType RSA -Size 3072 -KeyOps @('wrapKey','unwrapKey') -WarningAction SilentlyContinue | Select-Object Name,Version,Enabled,Id,@{N='KeyType';E={$_.Key.Kty}} | ConvertTo-Json -Depth 5",
+      "get_command": "Get-AzKeyVaultKey -VaultName '{keyVaultName}' -Name '{cmkKeyName}-hsm' -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Select-Object Name,Version,Enabled,Id,@{N='KeyType';E={$_.Key.Kty}} | ConvertTo-Json -Depth 5",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "subscriptionId",
+        "resourceGroup",
+        "keyVaultName",
+        "cmkKeyName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 6,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzKeyVaultKey -VaultName '{keyVaultName}' -Name '{cmkKeyName}-hsm' -WarningAction SilentlyContinue | Select-Object Name,Version,Enabled,Id,@{N='KeyType';E={$_.Key.Kty}} | ConvertTo-Json"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.KeyType",
+          "equals": "RSA-HSM"
+        }
+      },
+      "notes": "Opt-in only (founder ruling OQ-4: Standard Key Vault by default, HSM opt-in; SP-12). Moves the vault to the Premium SKU (no standing charge) and adds an HSM-protected RSA 3072 key beside the software key of AZ-KV-003. HSM key versions are billed monthly, so this is recurring: off by default, behind DP-1 and DP-2, and planned only together with AZ-KV-001 (cost_gate.requires_entries). The default is the software key, AZ-KV-003. Not served by the simulator."
+    },
+    {
+      "entry_id": "AZ-NET-001",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter"},
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6",
+        "SC.L1-3.13.5"
+      ],
+      "objective_ids": [],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.network/new-azvirtualnetwork",
+      "label": "Create Virtual Network",
+      "engine": "az",
+      "set_command": "New-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name '{vnetName}' -Location '{location}' -AddressPrefix '{vnetCidr}'",
+      "get_command": "Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name '{vnetName}' | ConvertTo-Json -Depth 5",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "location",
+        "vnetName",
+        "vnetCidr"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 10,
+      "manual_only": false,
+      "evidence_commands": [],
+      "on_failure": "abort_step",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.Id",
+          "not_empty": true,
+          "checks": [
+            {
+              "jsonpath": "$.AddressSpace.AddressPrefixes",
+              "equals": "{vnetCidr}"
+            },
+            {
+              "jsonpath": "$.ProvisioningState",
+              "equals": "Succeeded"
+            }
+          ]
+        },
+        "postcheck_mode": "state"
+      },
+      "notes": "Creates the primary VNet in Azure Gov with the specified CIDR range. This VNet provides the network boundary for all CUI-scoped workloads, satisfying SC.L1-3.13.1 boundary protection and SC.L1-3.13.5 subnet segmentation requirements."
+    },
+    {
+      "entry_id": "AZ-NET-002",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter"},
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6",
+        "SC.L1-3.13.5"
+      ],
+      "objective_ids": [
+        "SC.L1-3.13.1[b]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.network/add-azvirtualnetworksubnetconfig",
+      "label": "Create Management Subnet",
+      "engine": "az",
+      "set_command": "$vnet = Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name '{vnetName}'; $existing = $vnet.Subnets | Where-Object {$_.Name -eq 'snet-mgmt'}; if (-not $existing) { Add-AzVirtualNetworkSubnetConfig -Name 'snet-mgmt' -VirtualNetwork $vnet -AddressPrefix '{mgmtSubnetCidr}' | Set-AzVirtualNetwork } else { Write-Output 'snet-mgmt subnet already exists' }",
+      "get_command": "Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name '{vnetName}' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Subnets | Where-Object {$_.Name -eq 'snet-mgmt'} | Select-Object -First 1 Name, AddressPrefix | ConvertTo-Json -Depth 3",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "vnetName",
+        "mgmtSubnetCidr"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 11,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name '{vnetName}' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Subnets | Select-Object Name, AddressPrefix"
+      ],
+      "on_failure": "warn_continue",
+      "azure_tier": "full",
+      "verification": {
+        "set_output": {
+          "regex_pattern": "Succeeded|snet-mgmt|already exists"
+        },
+        "evidence": {
+          "not_empty": true,
+          "jsonpath": "$.Name",
+          "equals": "snet-mgmt",
+          "checks": [
+            {
+              "jsonpath": "$.AddressPrefix",
+              "equals": "{mgmtSubnetCidr}"
+            }
+          ]
+        },
+        "confidence_weights": {
+          "exit_code": 0.4,
+          "set_output": 0.3,
+          "evidence_match": 0.3
+        },
+        "postcheck_mode": "state"
+      },
+      "notes": "Creates the management subnet (snet-mgmt) within the VNet for administrative access paths. Segmentation from workload and bastion subnets satisfies SC.L1-3.13.5 network segmentation. Evidence proves the subnet exists with the correct CIDR range."
+    },
+    {
+      "entry_id": "AZ-NET-003",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter"},
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "objective_ids": [
+        "SC.L1-3.13.1[b]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.network/add-azvirtualnetworksubnetconfig",
+      "label": "Create Workload Subnet",
+      "engine": "az",
+      "set_command": "$vnet = Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name '{vnetName}'; $existing = $vnet.Subnets | Where-Object {$_.Name -eq 'snet-workload'}; if (-not $existing) { Add-AzVirtualNetworkSubnetConfig -Name 'snet-workload' -VirtualNetwork $vnet -AddressPrefix '{workloadSubnetCidr}' | Set-AzVirtualNetwork } else { Write-Output 'snet-workload subnet already exists' }",
+      "get_command": "Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name '{vnetName}' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Subnets | Where-Object {$_.Name -eq 'snet-workload'} | Select-Object -First 1 Name, AddressPrefix | ConvertTo-Json -Depth 3",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "vnetName",
+        "workloadSubnetCidr"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 12,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name '{vnetName}' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Subnets | Select-Object Name, AddressPrefix"
+      ],
+      "on_failure": "warn_continue",
+      "azure_tier": "full",
+      "verification": {
+        "set_output": {
+          "regex_pattern": "Succeeded|snet-workload|already exists"
+        },
+        "evidence": {
+          "not_empty": true,
+          "jsonpath": "$.Name",
+          "equals": "snet-workload",
+          "checks": [
+            {
+              "jsonpath": "$.AddressPrefix",
+              "equals": "{workloadSubnetCidr}"
+            }
+          ]
+        },
+        "confidence_weights": {
+          "exit_code": 0.4,
+          "set_output": 0.3,
+          "evidence_match": 0.3
+        },
+        "postcheck_mode": "state"
+      },
+      "notes": "Creates the workload subnet (snet-workload) for CUI-processing resources. This subnet receives the NSG association (AZ-NSG-005) enforcing deny-all-by-default traffic rules per SC.L2-3.13.6. Evidence proves the subnet exists with the correct CIDR range."
+    },
+    {
+      "entry_id": "AZ-NET-004",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter"},
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "objective_ids": [
+        "SC.L1-3.13.1[b]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.network/add-azvirtualnetworksubnetconfig",
+      "label": "Create AzureBastionHost Subnet",
+      "engine": "az",
+      "set_command": "$vnet = Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name '{vnetName}'; $existing = $vnet.Subnets | Where-Object {$_.Name -eq 'AzureBastionSubnet'}; if (-not $existing) { Add-AzVirtualNetworkSubnetConfig -Name 'AzureBastionSubnet' -VirtualNetwork $vnet -AddressPrefix '{bastionSubnetCidr}' | Set-AzVirtualNetwork } else { Write-Output 'AzureBastionSubnet already exists' }",
+      "get_command": "Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name '{vnetName}' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Subnets | Where-Object {$_.Name -eq 'AzureBastionSubnet'} | Select-Object -First 1 Name, AddressPrefix | ConvertTo-Json -Depth 3",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "vnetName",
+        "bastionSubnetCidr"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 13,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name '{vnetName}' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Subnets | Select-Object Name, AddressPrefix"
+      ],
+      "on_failure": "warn_continue",
+      "azure_tier": "full",
+      "verification": {
+        "set_output": {
+          "regex_pattern": "Succeeded|AzureBastionSubnet|already exists"
+        },
+        "evidence": {
+          "not_empty": true,
+          "jsonpath": "$.Name",
+          "equals": "AzureBastionSubnet",
+          "checks": [
+            {
+              "jsonpath": "$.AddressPrefix",
+              "equals": "{bastionSubnetCidr}"
+            }
+          ]
+        },
+        "confidence_weights": {
+          "exit_code": 0.4,
+          "set_output": 0.3,
+          "evidence_match": 0.3
+        },
+        "postcheck_mode": "state"
+      },
+      "notes": "Creates the AzureBastionSubnet, which is a required named subnet for Azure Bastion deployment. Bastion provides secure RDP/SSH access without exposing VMs to public IPs, satisfying SC.L1-3.13.1 boundary protection. The subnet name \"AzureBastionSubnet\" is mandated by Azure."
+    },
+    {
+      "entry_id": "AZ-NET-005",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter","last_resort":true,"two_person":true,"standard_alternative":["AZ-NSG-002","AZ-NSG-003","AZ-NSG-005","AZ-NSG-006","AZ-NSG-007","AZ-SEP-001","AZ-POL-001","AZ-VM-005","SC.L1-3.13.1.endpoint-firewall","SC.L1-3.13.1.nsg-boundary-rules"],"requires_entries":["AZ-FW-002"]},
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "objective_ids": [
+        "SC.L1-3.13.1[b]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.network/add-azvirtualnetworksubnetconfig",
+      "label": "Create AzureFirewall Subnet",
+      "engine": "az",
+      "set_command": "$vnet = Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name '{vnetName}'; $existing = $vnet.Subnets | Where-Object {$_.Name -eq 'AzureFirewallSubnet'}; if (-not $existing) { Add-AzVirtualNetworkSubnetConfig -Name 'AzureFirewallSubnet' -VirtualNetwork $vnet -AddressPrefix '{firewallSubnetCidr}' | Set-AzVirtualNetwork } else { Write-Output 'AzureFirewallSubnet already exists' }",
+      "get_command": "Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name '{vnetName}' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Subnets | Where-Object {$_.Name -eq 'AzureFirewallSubnet'} | Select-Object Name, AddressPrefix",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "vnetName",
+        "firewallSubnetCidr"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 14,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name '{vnetName}' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Subnets | Select-Object Name, AddressPrefix"
+      ],
+      "on_failure": "warn_continue",
+      "azure_tier": "full",
+      "verification": {
+        "set_output": {
+          "regex_pattern": "Succeeded|AzureFirewallSubnet|already exists"
+        },
+        "evidence": {
+          "not_empty": true,
+          "regex": "AzureFirewallSubnet"
+        },
+        "confidence_weights": {
+          "exit_code": 0.4,
+          "set_output": 0.3,
+          "evidence_match": 0.3
+        }
+      },
+      "notes": "LAST RESORT: the AzureFirewallSubnet is created only together with the firewall (AZ-FW-002) and is not in Muster's default manifest (COST-GATE-SPEC.md §4.8). The name \"AzureFirewallSubnet\" is mandated by Azure and needs at least a /26."
+    },
+    {
+      "entry_id": "AZ-NSG-001",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter"},
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L1-3.13.5"
+      ],
+      "objective_ids": [],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.network/new-aznetworksecuritygroup",
+      "label": "Create Network Security Group",
+      "engine": "az",
+      "set_command": "New-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'nsg-workload-cmmc' -Location '{location}'",
+      "get_command": "Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'nsg-workload-cmmc' | ConvertTo-Json -Depth 5",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "location"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 15,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'nsg-workload-cmmc' | ConvertTo-Json -Depth 5"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.Id",
+          "not_empty": true,
+          "checks": [
+            {
+              "jsonpath": "$.ProvisioningState",
+              "equals": "Succeeded"
+            }
+          ]
+        },
+        "postcheck_mode": "state"
+      },
+      "notes": "Creates the primary Network Security Group (nsg-workload-cmmc) for the workload subnet. NSGs enforce layer-4 traffic filtering at the subnet level. Evidence proves the NSG resource exists and is ready for rule configuration (AZ-NSG-002 through AZ-NSG-004)."
+    },
+    {
+      "entry_id": "AZ-NSG-002",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter"},
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L1-3.13.5",
+        "SC.L2-3.13.6"
+      ],
+      "objective_ids": [
+        "SC.L1-3.13.1[e]",
+        "SC.L1-3.13.1[f]",
+        "SC.L1-3.13.5[b]",
+        "SC.L2-3.13.6[a]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.network/add-aznetworksecurityruleconfig",
+      "label": "Add NSG Rule — Deny All Inbound",
+      "engine": "az",
+      "set_command": "$nsg = Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'nsg-workload-cmmc'; Add-AzNetworkSecurityRuleConfig -NetworkSecurityGroup $nsg -Name 'DenyAllInbound' -Description 'Deny all inbound traffic' -Protocol '*' -SourcePortRange '*' -DestinationPortRange '*' -SourceAddressPrefix '*' -DestinationAddressPrefix '*' -Access 'Deny' -Priority 4096 -Direction 'Inbound' | Set-AzNetworkSecurityGroup",
+      "get_command": "Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'nsg-workload-cmmc' | Select-Object -ExpandProperty SecurityRules | Where-Object Name -eq 'DenyAllInbound' | Select-Object -First 1 Name,Access,Direction,Priority,SourceAddressPrefix,DestinationPortRange | ConvertTo-Json -Depth 3",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 16,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' | Select-Object Name,@{Name='SecurityRules';Expression={$_.SecurityRules | Select-Object Name,Direction,Access,Priority,SourceAddressPrefix,DestinationPortRange}} | ConvertTo-Json -Depth 10"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "not_empty": true,
+          "jsonpath": "$.Access",
+          "equals": "Deny",
+          "checks": [
+            {
+              "jsonpath": "$.Direction",
+              "equals": "Inbound"
+            },
+            {
+              "jsonpath": "$.SourceAddressPrefix",
+              "equals": "*"
+            },
+            {
+              "jsonpath": "$.DestinationPortRange",
+              "equals": "*"
+            }
+          ]
+        },
+        "postcheck_mode": "state"
+      },
+      "notes": "Adds a DenyAllInbound rule at the lowest priority (4096) to enforce deny-by-default inbound traffic per SC.L2-3.13.6. Only explicitly allowed rules at higher priority (lower number) can override this baseline deny. Evidence proves the deny-all-inbound posture is in place."
+    },
+    {
+      "entry_id": "AZ-NSG-003",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter"},
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L1-3.13.5"
+      ],
+      "objective_ids": [
+        "SC.L1-3.13.1[e]",
+        "SC.L1-3.13.1[f]",
+        "SC.L1-3.13.5[b]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.network/add-aznetworksecurityruleconfig",
+      "label": "Add NSG Rule — Deny All Outbound",
+      "engine": "az",
+      "set_command": "$nsg = Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'nsg-workload-cmmc'; Add-AzNetworkSecurityRuleConfig -NetworkSecurityGroup $nsg -Name 'DenyAllOutbound' -Description 'Deny all outbound traffic' -Protocol '*' -SourcePortRange '*' -DestinationPortRange '*' -SourceAddressPrefix '*' -DestinationAddressPrefix '*' -Access 'Deny' -Priority 4096 -Direction 'Outbound' | Set-AzNetworkSecurityGroup",
+      "get_command": "Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'nsg-workload-cmmc' | Select-Object -ExpandProperty SecurityRules | Where-Object Name -eq 'DenyAllOutbound' | Select-Object -First 1 Name,Access,Direction,Priority,SourceAddressPrefix,DestinationPortRange | ConvertTo-Json -Depth 3",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 17,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'nsg-workload-cmmc' | Select-Object -ExpandProperty SecurityRules | Where-Object Name -eq 'DenyAllOutbound'"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "not_empty": true,
+          "jsonpath": "$.Access",
+          "equals": "Deny",
+          "checks": [
+            {
+              "jsonpath": "$.Direction",
+              "equals": "Outbound"
+            },
+            {
+              "jsonpath": "$.SourceAddressPrefix",
+              "equals": "*"
+            },
+            {
+              "jsonpath": "$.DestinationPortRange",
+              "equals": "*"
+            }
+          ]
+        },
+        "postcheck_mode": "state"
+      },
+      "notes": "Adds a DenyAllOutbound rule at priority 4096: deny-by-default egress (SC.L1-3.13.1, SC.L2-3.13.6). Paired with the standard-boundary allow rules AZ-NSG-006 (443 to named service tags) and AZ-NSG-007 (443 to the Microsoft 365 GCC High ranges); without them a VM behind this NSG reaches no Microsoft service (COST-GATE-SPEC.md §4.1, §4.3 SB-2)."
+    },
+    {
+      "entry_id": "AZ-NSG-004",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter","requires_entries":["AZ-BAS-002"]},
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L1-3.13.5"
+      ],
+      "objective_ids": [
+        "SC.L1-3.13.1[f]",
+        "SC.L1-3.13.5[b]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.network/add-aznetworksecurityruleconfig",
+      "label": "Add NSG Rule — Allow Bastion Inbound",
+      "engine": "az",
+      "set_command": "$nsg = Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'nsg-workload-cmmc'; Add-AzNetworkSecurityRuleConfig -NetworkSecurityGroup $nsg -Name 'AllowBastionInbound' -Description 'Allow inbound from AzureBastionSubnet' -Protocol 'Tcp' -SourcePortRange '*' -DestinationPortRange @('22','3389') -SourceAddressPrefix '{bastionSubnetCidr}' -DestinationAddressPrefix 'VirtualNetwork' -Access 'Allow' -Priority 100 -Direction 'Inbound' | Set-AzNetworkSecurityGroup",
+      "get_command": "Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'nsg-workload-cmmc' | Select-Object -ExpandProperty SecurityRules | Where-Object Name -eq 'AllowBastionInbound'",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "bastionSubnetCidr"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 18,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'nsg-workload-cmmc' | Select-Object -ExpandProperty SecurityRules | Where-Object Name -eq 'AllowBastionInbound'"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "not_empty": true
+        }
+      },
+      "notes": "Allows TCP 22/3389 inbound from the Bastion subnet only. Only for a tenant that opts in to Bastion (AZ-BAS-001/002, recurring and two-person); the standard boundary has no inbound allow at all, and administration goes through Azure Run Command under PIM-gated RBAC (COST-GATE-SPEC.md §4.6, §4.8). Making this entry conditional on the Bastion opt-in is a translation change (DEPTH-2)."
+    },
+    {
+      "entry_id": "AZ-NSG-005",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter"},
+      "control_ids": [
+        "SC.L1-3.13.1"
+      ],
+      "objective_ids": [
+        "SC.L1-3.13.1[e]",
+        "SC.L1-3.13.1[f]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.network/set-azvirtualnetworksubnetconfig",
+      "label": "Associate NSG with Workload Subnet",
+      "engine": "az",
+      "set_command": "$vnet = Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name '{vnetName}'; $nsg = Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'nsg-workload-cmmc'; $subnet = Get-AzVirtualNetworkSubnetConfig -VirtualNetwork $vnet -Name 'snet-workload'; Set-AzVirtualNetworkSubnetConfig -VirtualNetwork $vnet -Name 'snet-workload' -AddressPrefix $subnet.AddressPrefix -NetworkSecurityGroup $nsg | Set-AzVirtualNetwork",
+      "get_command": "(Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name '{vnetName}' | Select-Object -ExpandProperty Subnets | Where-Object Name -eq 'snet-workload').NetworkSecurityGroup | ConvertTo-Json -Depth 5",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "vnetName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 19,
+      "manual_only": false,
+      "evidence_commands": [
+        "(Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name '{vnetName}' | Select-Object -ExpandProperty Subnets | Where-Object Name -eq 'snet-workload').NetworkSecurityGroup | ConvertTo-Json -Depth 5"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "not_empty": true,
+          "jsonpath": "$.Id",
+          "regex": "/networkSecurityGroups/nsg-workload-cmmc$"
+        },
+        "postcheck_mode": "state"
+      },
+      "notes": "Associates the nsg-workload-cmmc NSG with the snet-workload subnet, activating the deny-by-default rules (AZ-NSG-002/003) and Bastion allow rule (AZ-NSG-004). Without this association, NSG rules are not enforced. Evidence proves the workload subnet has active boundary protection."
+    },
+    {
+      "entry_id": "AZ-NW-001",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter"},
+      "control_ids": [
+        "SC.L1-3.13.1"
+      ],
+      "objective_ids": [],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.network/new-aznetworkwatcher",
+      "label": "Create Network Watcher",
+      "engine": "az",
+      "set_command": "$existing = Get-AzNetworkWatcher | Where-Object {$_.Location -eq '{location}'}; if (-not $existing) { New-AzNetworkWatcher -ResourceGroupName '{resourceGroup}' -Name 'nw-{location}' -Location '{location}' } else { Write-Output \"Network Watcher already exists in $($existing.ResourceGroupName) - no action needed\" }",
+      "get_command": "Get-AzNetworkWatcher | Where-Object {$_.Location -eq '{location}'} | Select-Object Name, Location, ResourceGroupName, ProvisioningState | ConvertTo-Json",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "location"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 20,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzNetworkWatcher | Where-Object {$_.Location -eq '{location}'} | Select-Object Name, Location, ResourceGroupName, ProvisioningState | ConvertTo-Json"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.ProvisioningState",
+          "equals": "Succeeded"
+        },
+        "postcheck_mode": "state"
+      },
+      "notes": "Creates a Network Watcher in the tenant's region (QUESTIONS P-11: region from {location}, no hard-coded region) unless one already exists there. Azure creates one per region automatically in most subscriptions. Free (no meter); flow logs (AZ-NW-002) are retired."
+    },
+    {
+      "entry_id": "AZ-NW-002",
+      "retired": true,
+      "retired_reason": "Microsoft stopped allowing new NSG flow logs in June 2025; VNet flow logs (AO F-14) replace them. Kept for reference; do not plan it.",
+      "cost_gate": {"recurring":true,"cost_key":"azure.network_watcher.flow_logs","estimate_basis":"NSG flow logs to storage (retired by Microsoft, June 2025)","standard_alternative":["AZ-NSG-002","AZ-NSG-003"]},
+      "control_ids": [
+        "AU.L2-3.3.1"
+      ],
+      "objective_ids": [
+        "AU.L2-3.3.1[c]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.network/set-aznetworkwatcherflowlog",
+      "label": "Enable NSG Flow Logs to Log Analytics",
+      "engine": "az",
+      "set_command": "$nsg = Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'nsg-workload-cmmc'; $nw = Get-AzNetworkWatcher | Where-Object {$_.Location -eq '{location}'}; Set-AzNetworkWatcherFlowLog -NetworkWatcher $nw -TargetResourceId $nsg.Id -StorageId (Get-AzStorageAccount -ResourceGroupName '{resourceGroup}' -Name '{storageAccountName}').Id -EnableFlowLog $true -Format JSON -Version 2",
+      "get_command": "$flowLog = Get-AzNetworkWatcherFlowLogStatus -NetworkWatcher (Get-AzNetworkWatcher | Where-Object {$_.Location -eq '{location}'}) -TargetResourceId (Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'nsg-workload-cmmc').Id; if ($flowLog.StorageId -like '*/{storageAccountName}') { $flowLog } else { $null }",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "location",
+        "storageAccountName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 22,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzNetworkWatcherFlowLogStatus -NetworkWatcher (Get-AzNetworkWatcher | Where-Object {$_.Location -eq '{location}'}) -TargetResourceId (Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'nsg-workload-cmmc').Id"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "not_empty": true
+        }
+      },
+      "notes": "Enables NSG flow logs in JSON v2 format, directing traffic metadata to the immutable log storage account. Flow logs provide the raw network traffic data needed for AU.L2-3.3.1 audit logging and AU.L2-3.3.2 user-traceable activity. Evidence proves flow logging is active on the workload NSG."
+    },
+    {
+      "entry_id": "AZ-FW-001",
+      "cost_gate": {"recurring":true,"cost_key":"azure.public_ip.standard","estimate_basis":"1 static IP, only with the firewall","two_person":true,"last_resort":true,"standard_alternative":["AZ-NSG-002","AZ-NSG-003","AZ-NSG-005","AZ-NSG-006","AZ-NSG-007","AZ-SEP-001","AZ-POL-001","AZ-VM-005","SC.L1-3.13.1.endpoint-firewall","SC.L1-3.13.1.nsg-boundary-rules"],"requires_entries":["AZ-FW-002"]},
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "objective_ids": [],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.network/new-azpublicipaddress",
+      "label": "Create Firewall Public IP",
+      "engine": "az",
+      "set_command": "New-AzPublicIpAddress -ResourceGroupName '{resourceGroup}' -Name 'pip-fw-cmmc' -Location '{location}' -Sku 'Standard' -AllocationMethod 'Static' -Zone @(1,2,3)",
+      "get_command": "Get-AzPublicIpAddress -ResourceGroupName '{resourceGroup}' -Name 'pip-fw-cmmc'",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "location"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 25,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzPublicIpAddress -ResourceGroupName '{resourceGroup}' -Name 'pip-fw-cmmc'"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.Id",
+          "not_empty": true
+        }
+      },
+      "notes": "LAST RESORT: the firewall public IP, created only together with AZ-FW-002 (COST-GATE-SPEC.md §4.8). Recurring and two-person. The standard boundary has no firewall and no public IP except the one gated egress IP of AZ-NET-007."
+    },
+    {
+      "entry_id": "AZ-FW-002",
+      "cost_gate": {"recurring":true,"cost_key":"azure.firewall.premium","estimate_basis":"1 firewall x 730 h; data processed extra","two_person":true,"last_resort":true,"standard_alternative":["AZ-NSG-002","AZ-NSG-003","AZ-NSG-005","AZ-NSG-006","AZ-NSG-007","AZ-SEP-001","AZ-POL-001","AZ-VM-005","SC.L1-3.13.1.endpoint-firewall","SC.L1-3.13.1.nsg-boundary-rules"],"requires_entries":["AZ-FW-001"]},
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "objective_ids": [
+        "SC.L1-3.13.1[c]",
+        "SC.L1-3.13.1[e]",
+        "SC.L1-3.13.1[g]",
+        "SC.L2-3.13.6[a]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.network/new-azfirewall",
+      "label": "Create Azure Firewall",
+      "engine": "az",
+      "set_command": "$policy = Get-AzFirewallPolicy -ResourceGroupName '{resourceGroup}' -Name 'cmmc-fw-policy' -ErrorAction SilentlyContinue; if (-not $policy) { $policy = New-AzFirewallPolicy -Name 'cmmc-fw-policy' -ResourceGroupName '{resourceGroup}' -Location '{location}' -ThreatIntelMode 'Deny' }; $pip = Get-AzPublicIpAddress -ResourceGroupName '{resourceGroup}' -Name 'pip-fw-cmmc'; $vnet = Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name '{vnetName}'; New-AzFirewall -ResourceGroupName '{resourceGroup}' -Name 'fw-cmmc' -Location '{location}' -VirtualNetwork $vnet -PublicIpAddress $pip -FirewallPolicyId $policy.Id -SkuTier 'Premium'",
+      "get_command": "Get-AzFirewall -ResourceGroupName '{resourceGroup}' -Name 'fw-cmmc' -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | ConvertTo-Json -Depth 5",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "location",
+        "vnetName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 26,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzFirewall -ResourceGroupName '{resourceGroup}' | Select-Object Name,ProvisioningState,@{Name='ThreatIntelMode';Expression={$_.ThreatIntelMode}} | ConvertTo-Json -Depth 10"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.ProvisioningState",
+          "equals": "Succeeded"
+        }
+      },
+      "notes": "LAST RESORT (COST-GATE-SPEC.md §4.7; founder ruling 2026-10-31): recurring, two-person, off by default. The standard boundary (SB, spec §4.3: AZ-POL-001, AZ-NSG-002/003/006/007, AZ-SEP-001, AZ-VM-005) meets SC.L1-3.13.1 and SC.L2-3.13.6 without it. As written this entry filters nothing: no route table sends traffic to the firewall and no application or network rule collection exists (spec §4.1). An approved firewall must come with that route table and those rule collections (open follow-up, FIN-40 log). The SKU tier is Premium here; spec §4.8 wants a variable defaulting to Basic, and Basic also needs a management subnet and a second public IP (open item, DEPTH-2). DP-1 needs the no_other_means justification."
+    },
+    {
+      "entry_id": "AZ-BAS-001",
+      "cost_gate": {"recurring":true,"cost_key":"azure.public_ip.standard","estimate_basis":"1 static IP, only with Bastion","standard_alternative":["none: no VMs in a cloud-native enclave; administer through Azure Run Command under PIM"],"requires_entries":["AZ-BAS-002"]},
+      "control_ids": [
+        "SC.L1-3.13.1"
+      ],
+      "objective_ids": [],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.network/new-azpublicipaddress",
+      "label": "Create Bastion Public IP",
+      "engine": "az",
+      "set_command": "New-AzPublicIpAddress -ResourceGroupName '{resourceGroup}' -Name 'pip-bastion-cmmc' -Location '{location}' -Sku 'Standard' -AllocationMethod 'Static'",
+      "get_command": "Get-AzPublicIpAddress -ResourceGroupName '{resourceGroup}' -Name 'pip-bastion-cmmc' -ErrorAction SilentlyContinue | ConvertTo-Json -Depth 5",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "location"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 27,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzPublicIpAddress -ResourceGroupName '{resourceGroup}' -Name 'pip-bastion-cmmc' -ErrorAction SilentlyContinue | Select-Object Name,IpAddress,PublicIpAllocationMethod,Id | ConvertTo-Json -Depth 5"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.Id",
+          "not_empty": true
+        }
+      },
+      "notes": "Creates a Standard SKU static public IP for the Azure Bastion host. This IP is the only public-facing endpoint in the architecture and is locked down by Bastion service requirements. Evidence proves the public IP resource exists for Bastion deployment."
+    },
+    {
+      "entry_id": "AZ-BAS-002",
+      "cost_gate": {"recurring":true,"cost_key":"azure.bastion.standard","estimate_basis":"1 host x 730 h","two_person":true,"standard_alternative":["none: no VMs in a cloud-native enclave; administer through Azure Run Command under PIM"],"requires_entries":["AZ-BAS-001"]},
+      "control_ids": [
+        "SC.L1-3.13.1"
+      ],
+      "objective_ids": [
+        "SC.L1-3.13.1[e]",
+        "SC.L1-3.13.1[g]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.network/new-azbastion",
+      "label": "Create Azure Bastion Host",
+      "engine": "az",
+      "set_command": "$vnet = Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name '{vnetName}'; $pip = Get-AzPublicIpAddress -ResourceGroupName '{resourceGroup}' -Name 'pip-bastion-cmmc'; New-AzBastion -ResourceGroupName '{resourceGroup}' -Name 'bastion-cmmc' -PublicIpAddressRgName '{resourceGroup}' -PublicIpAddressName 'pip-bastion-cmmc' -VirtualNetworkRgName '{resourceGroup}' -VirtualNetworkName '{vnetName}' -Sku 'Standard'",
+      "get_command": "$bastion = Get-AzBastion -ResourceGroupName '{resourceGroup}' -Name 'bastion-cmmc'; if ($bastion.IpConfigurations.Subnet.Id -like '*/virtualNetworks/{vnetName}/*') { $bastion } else { $null }",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "vnetName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 28,
+      "manual_only": false,
+      "evidence_commands": [
+        "$bastion = Get-AzBastion -ResourceGroupName '{resourceGroup}' -Name 'bastion-cmmc'; if ($bastion.IpConfigurations.Subnet.Id -like '*/virtualNetworks/{vnetName}/*') { $bastion } else { $null }"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "not_empty": true
+        }
+      },
+      "notes": "Deploys an Azure Bastion Standard host for secure, browser-based RDP/SSH access to VMs without exposing public IPs. Bastion satisfies SC.L1-3.13.1 by routing all administrative remote access through a managed access control point. Evidence proves Bastion is deployed on the correct VNet."
+    },
+    {
+      "entry_id": "AZ-PE-001",
+      "cost_gate": {"recurring":true,"cost_key":"azure.private_endpoint","estimate_basis":"1 endpoint x 730 h","standard_alternative":["AZ-KV-004"],"requires_entries":["AZ-KV-001"]},
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "objective_ids": [
+        "SC.L1-3.13.1[h]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.network/new-azprivateendpoint",
+      "label": "Create Private Endpoint for Key Vault",
+      "engine": "az",
+      "set_command": "$existing = Get-AzPrivateEndpoint -ResourceGroupName '{resourceGroup}' | Where-Object {$_.Name -like 'pe-kv*'}; if (-not $existing) { $kv = Get-AzKeyVault -ResourceGroupName '{resourceGroup}' -VaultName '{keyVaultName}'; $conn = New-AzPrivateLinkServiceConnection -Name 'pe-conn-kv' -PrivateLinkServiceId $kv.ResourceId -GroupId 'vault'; New-AzPrivateEndpoint -ResourceGroupName '{resourceGroup}' -Name 'pe-kv-prod' -Location '{location}' -Subnet (Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name '{vnetName}' | Select-Object -ExpandProperty Subnets | Where-Object Name -eq 'snet-workload') -PrivateLinkServiceConnection $conn } else { Write-Output \"Key Vault private endpoint already exists: $($existing.Name)\" }",
+      "get_command": "Get-AzPrivateEndpoint -ResourceGroupName '{resourceGroup}' -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Where-Object {$_.Name -like 'pe-kv*'} | Select-Object Name, Location, ProvisioningState | ConvertTo-Json -Depth 3",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "location",
+        "keyVaultName",
+        "vnetName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 29,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzPrivateEndpoint -ResourceGroupName '{resourceGroup}' | Where-Object {$_.Name -like 'pe-kv*'} | Select-Object Name, Location, ProvisioningState | ConvertTo-Json"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "not_empty": true
+        }
+      },
+      "notes": "Creates a private endpoint for Key Vault on the workload subnet, removing public network exposure for cryptographic key operations. Private endpoints satisfy SC.L2-3.13.6 deny-by-default by restricting Key Vault access to the VNet only. Evidence proves the private endpoint is provisioned."
+    },
+    {
+      "entry_id": "AZ-PE-002",
+      "cost_gate": {"recurring":true,"cost_key":"azure.private_endpoint","estimate_basis":"1 endpoint x 730 h","standard_alternative":["AZ-LOG-002"],"requires_entries":["AZ-LOG-002"]},
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "objective_ids": [
+        "SC.L1-3.13.1[h]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.network/new-azprivateendpoint",
+      "label": "Create Private Endpoint for Storage Account",
+      "engine": "az",
+      "set_command": "$existing = Get-AzPrivateEndpoint -ResourceGroupName '{resourceGroup}' | Where-Object {$_.Name -like 'pe-storage*' -or $_.Name -like 'pe-sa*'}; if (-not $existing) { $sa = Get-AzStorageAccount -ResourceGroupName '{resourceGroup}' -Name '{storageAccountName}'; $conn = New-AzPrivateLinkServiceConnection -Name 'pe-conn-sa' -PrivateLinkServiceId $sa.Id -GroupId 'blob'; New-AzPrivateEndpoint -ResourceGroupName '{resourceGroup}' -Name 'pe-storage-blob-prod' -Location '{location}' -Subnet (Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name '{vnetName}' | Select-Object -ExpandProperty Subnets | Where-Object Name -eq 'snet-workload') -PrivateLinkServiceConnection $conn } else { Write-Output \"Storage private endpoint already exists: $($existing.Name)\" }",
+      "get_command": "Get-AzPrivateEndpoint -ResourceGroupName '{resourceGroup}' -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Where-Object {$_.Name -like 'pe-storage*' -or $_.Name -like 'pe-sa*'} | Select-Object Name, Location, ProvisioningState | ConvertTo-Json -Depth 3",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "location",
+        "storageAccountName",
+        "vnetName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 30,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzPrivateEndpoint -ResourceGroupName '{resourceGroup}' | Where-Object {$_.Name -like 'pe-storage*' -or $_.Name -like 'pe-sa*'} | Select-Object Name, Location, ProvisioningState | ConvertTo-Json"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "not_empty": true
+        }
+      },
+      "notes": "Creates a private endpoint for the blob storage account on the workload subnet, ensuring audit log writes traverse the private network only. This satisfies SC.L2-3.13.6 by eliminating public blob access to the immutable log store. Evidence proves the storage private endpoint is provisioned."
+    },
+    {
+      "entry_id": "AZ-AUTO-001",
+      "cost_gate": {"recurring":true,"cost_key":"azure.automation.job_minutes","estimate_basis":"500 job-minutes free, then per minute","standard_alternative":["none: the CES runner scheduler"]},
+      "control_ids": [
+        "AU.L2-3.3.1"
+      ],
+      "objective_ids": [],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.automation/new-azautomationaccount",
+      "label": "Create Automation Account",
+      "engine": "az",
+      "set_command": "New-AzAutomationAccount -Name '{automationAccountName}' -ResourceGroupName '{resourceGroup}' -Location '{location}'",
+      "get_command": "Get-AzAutomationAccount -ResourceGroupName '{resourceGroup}' -Name '{automationAccountName}'",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "automationAccountName",
+        "resourceGroup",
+        "location"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 31,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzAutomationAccount -ResourceGroupName '{resourceGroup}' -Name '{automationAccountName}' | ConvertTo-Json -Depth 5"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.AutomationAccountName",
+          "not_empty": true
+        }
+      },
+      "notes": "Creates an Azure Automation account for scheduled compliance runbooks (evidence collection, drift detection, key rotation). The automation account is the execution host for recurring CMMC compliance tasks. Evidence proves the account exists and is provisioned in the correct resource group."
+    },
+    {
+      "entry_id": "AZ-AUTO-002",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter","requires_entries":["AZ-AUTO-001"]},
+      "control_ids": [
+        "AU.L2-3.3.1"
+      ],
+      "objective_ids": [],
+      "source": "https://learn.microsoft.com/en-us/rest/api/automation/automation-account/update",
+      "label": "Assign System Managed Identity to Automation Account",
+      "engine": "az",
+      "set_command": "Invoke-AzRestMethod -Method PATCH -Uri '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}?api-version=2021-06-22' -Payload '{\"identity\":{\"type\":\"SystemAssigned\"}}'",
+      "get_command": "$acct = Get-AzAutomationAccount -ResourceGroupName '{resourceGroup}' -Name '{automationAccountName}'; if ($acct.SubscriptionId -eq '{subscriptionId}' -and $acct.Identity.Type -eq 'SystemAssigned') { $acct.Identity | ConvertTo-Json -Depth 10 } else { $null }",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "subscriptionId",
+        "resourceGroup",
+        "automationAccountName"
+      ],
+      "variables_runtime": [],
+      "captures": [
+        {
+          "variable": "automationMiPrincipalId",
+          "from": "json_field",
+          "json_path": "$.PrincipalId"
+        }
+      ],
+      "layer_hint": 6,
+      "sequence_hint": 32,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzAutomationAccount -ResourceGroupName '{resourceGroup}' -Name '{automationAccountName}' | Select-Object AutomationAccountName,@{Name='IdentityType';Expression={$_.Identity.Type}},@{Name='PrincipalId';Expression={$_.Identity.PrincipalId}} | ConvertTo-Json -Depth 10"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "not_empty": true
+        }
+      },
+      "notes": "Assigns a system-managed identity to the Automation account via REST API (Az PowerShell does not expose the identity property directly). Captures automationMiPrincipalId for RBAC grants in AZ-AUTO-003. Evidence proves identity-based authentication is configured for automation runbooks."
+    },
+    {
+      "entry_id": "AZ-AUTO-003",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter","requires_entries":["AZ-AUTO-002","AZ-LOG-001","AZ-LOG-002","AZ-KV-001"]},
+      "control_ids": [
+        "AC.L1-3.1.1"
+      ],
+      "objective_ids": [
+        "AC.L1-3.1.1[e]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.resources/new-azroleassignment",
+      "label": "Grant Automation MI RBAC Roles (Security Reader, LAR on LAW, SBDC on Storage, KV Crypto User on KV)",
+      "engine": "az",
+      "set_command": "New-AzRoleAssignment -ObjectId '{automationMiPrincipalId}' -RoleDefinitionName 'Security Reader' -Scope '/subscriptions/{subscriptionId}'; New-AzRoleAssignment -ObjectId '{automationMiPrincipalId}' -RoleDefinitionName 'Log Analytics Reader' -Scope '{lawResourceId}'; New-AzRoleAssignment -ObjectId '{automationMiPrincipalId}' -RoleDefinitionName 'Storage Blob Data Contributor' -Scope '{storageResourceId}'; New-AzRoleAssignment -ObjectId '{automationMiPrincipalId}' -RoleDefinitionName 'Key Vault Crypto User' -Scope '{kvResourceId}'",
+      "get_command": "$assignments = Get-AzRoleAssignment -ObjectId '{automationMiPrincipalId}'; @{ hasSubScope = ($assignments | Where-Object { $_.Scope -eq '/subscriptions/{subscriptionId}' -and $_.RoleDefinitionName -eq 'Security Reader' }) -ne $null; hasLawScope = ($assignments | Where-Object { $_.Scope -like '*/workspaces/{lawWorkspaceName}' -and $_.RoleDefinitionName -eq 'Log Analytics Reader' }) -ne $null; hasStorageScope = ($assignments | Where-Object { $_.Scope -like '*/storageAccounts/{storageAccountName}' -and $_.RoleDefinitionName -eq 'Storage Blob Data Contributor' }) -ne $null; hasKvScope = ($assignments | Where-Object { $_.Scope -like '*/vaults/{keyVaultName}' -and $_.RoleDefinitionName -eq 'Key Vault Crypto User' }) -ne $null } | ConvertTo-Json -Compress",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "subscriptionId"
+      ],
+      "variables_runtime": [
+        "automationMiPrincipalId",
+        "lawResourceId",
+        "storageResourceId",
+        "kvResourceId"
+      ],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 33,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzRoleAssignment -ObjectId '{automationMiPrincipalId}' | Select-Object RoleDefinitionName,Scope | ConvertTo-Json"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.Id",
+          "not_empty": true
+        }
+      },
+      "notes": "Grants the Automation account managed identity four RBAC roles: Security Reader (subscription-wide), Log Analytics Reader (LAW), Storage Blob Data Contributor (storage), and Key Vault Crypto User (KV). These are the minimum permissions for compliance runbooks per AC.L1-3.1.1 least privilege."
+    },
+    {
+      "entry_id": "AZ-SEN-001",
+      "cost_gate": {"recurring":true,"cost_key":"azure.sentinel.ingestion","estimate_basis":"10 GB/month billable; free sources $0","standard_alternative":["AU.L2-3.3.1.audit-retention","AU.L2-3.3.5.audit-search"],"requires_entries":["AZ-LOG-001"]},
+      "control_ids": [
+        "AU.L2-3.3.1",
+        "AU.L2-3.3.3"
+      ],
+      "objective_ids": [
+        "AU.L2-3.3.3[c]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/rest/api/securityinsights/sentinel-onboarding-states/create",
+      "label": "Onboard Sentinel to Log Analytics Workspace",
+      "engine": "az",
+      "set_command": "az rest --method PUT --url 'https://management.usgovcloudapi.net/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.OperationalInsights/workspaces/{lawWorkspaceName}/providers/Microsoft.SecurityInsights/onboardingStates/default?api-version=2023-11-01' --body '{}'",
+      "get_command": "az rest --method GET --url 'https://management.usgovcloudapi.net/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.OperationalInsights/workspaces/{lawWorkspaceName}/providers/Microsoft.SecurityInsights/onboardingStates/default?api-version=2023-11-01'",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "subscriptionId",
+        "resourceGroup",
+        "lawWorkspaceName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 7,
+      "sequence_hint": 0,
+      "manual_only": false,
+      "evidence_commands": [],
+      "on_failure": "abort_step",
+      "notes": "Uses az CLI syntax (az rest) — required for operations without Az PowerShell cmdlet equivalents.",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "not_empty": true
+        }
+      }
+    },
+    {
+      "entry_id": "AZ-SEN-002",
+      "cost_gate": {"recurring":false,"free_reason":"free_source","requires_entries":["AZ-SEN-001"]},
+      "control_ids": [
+        "AU.L2-3.3.1"
+      ],
+      "objective_ids": [
+        "AU.L2-3.3.1[c]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.securityinsights/new-azsentineldataconnector",
+      "label": "Enable Sentinel Azure Activity Data Connector",
+      "engine": "az",
+      "set_command": "New-AzSentinelDataConnector -ResourceGroupName '{resourceGroup}' -WorkspaceName '{lawWorkspaceName}' -Kind 'AzureActivity' -SubscriptionId '{subscriptionId}'",
+      "get_command": "$connector = Get-AzSentinelDataConnector -ResourceGroupName '{resourceGroup}' -WorkspaceName '{lawWorkspaceName}' | Where-Object Kind -eq 'AzureActivity'; if ($connector -and $connector.SubscriptionId -eq '{subscriptionId}') { $connector } else { $null }",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "subscriptionId",
+        "lawWorkspaceName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 7,
+      "sequence_hint": 1,
+      "manual_only": false,
+      "evidence_commands": [
+        "$connector = Get-AzSentinelDataConnector -ResourceGroupName '{resourceGroup}' -WorkspaceName '{lawWorkspaceName}' | Where-Object Kind -eq 'AzureActivity'; if ($connector -and $connector.SubscriptionId -eq '{subscriptionId}') { $connector } else { $null }"
+      ],
+      "on_failure": "abort_step",
+      "notes": "Uses az CLI syntax (az rest) — required for operations without Az PowerShell cmdlet equivalents.",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.Id",
+          "not_empty": true
+        }
+      }
+    },
+    {
+      "entry_id": "AZ-SEN-003",
+      "cost_gate": {"recurring":false,"free_reason":"free_source","requires_entries":["AZ-SEN-001"]},
+      "control_ids": [
+        "SI.L1-3.14.1",
+        "AU.L2-3.3.1"
+      ],
+      "objective_ids": [
+        "AU.L2-3.3.1[c]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.securityinsights/new-azsentineldataconnector",
+      "label": "Enable Sentinel Microsoft Defender for Cloud Data Connector",
+      "engine": "az",
+      "set_command": "New-AzSentinelDataConnector -ResourceGroupName '{resourceGroup}' -WorkspaceName '{lawWorkspaceName}' -Kind 'MicrosoftDefenderAdvancedThreatProtection'",
+      "get_command": "Get-AzSentinelDataConnector -ResourceGroupName '{resourceGroup}' -WorkspaceName '{lawWorkspaceName}' | Where-Object Kind -eq 'MicrosoftDefenderAdvancedThreatProtection'",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "lawWorkspaceName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 7,
+      "sequence_hint": 2,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzSentinelDataConnector -ResourceGroupName '{resourceGroup}' -WorkspaceName '{lawWorkspaceName}' | Where-Object Kind -eq 'MicrosoftDefenderAdvancedThreatProtection'"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.Id",
+          "not_empty": true
+        }
+      },
+      "notes": "Enables the Microsoft Defender for Cloud data connector in Sentinel, ingesting Defender alerts and security recommendations into the SIEM. Provides unified threat detection and incident correlation for SI.L1-3.14.1 flaw identification and AU.L2-3.3.1 centralized audit logging."
+    },
+    {
+      "entry_id": "AZ-SEN-004",
+      "cost_gate": {"recurring":true,"cost_key":"azure.diagnostic_setting","estimate_basis":"Key Vault diagnostic setting into the workspace","standard_alternative":["AU.L2-3.3.1.audit-retention"],"requires_entries":["AZ-SEN-001"]},
+      "control_ids": [
+        "AU.L2-3.3.1"
+      ],
+      "objective_ids": [
+        "AU.L2-3.3.1[c]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.securityinsights/new-azsentineldataconnector",
+      "label": "Enable Sentinel Azure Key Vault Data Connector",
+      "engine": "az",
+      "set_command": "New-AzSentinelDataConnector -ResourceGroupName '{resourceGroup}' -WorkspaceName '{lawWorkspaceName}' -Kind 'AzureKeyVault'",
+      "get_command": "Get-AzSentinelDataConnector -ResourceGroupName '{resourceGroup}' -WorkspaceName '{lawWorkspaceName}' | Where-Object Kind -eq 'AzureKeyVault'",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "lawWorkspaceName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 7,
+      "sequence_hint": 3,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzSentinelDataConnector -ResourceGroupName '{resourceGroup}' -WorkspaceName '{lawWorkspaceName}' | Where-Object Kind -eq 'AzureKeyVault'"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.Id",
+          "not_empty": true
+        }
+      },
+      "notes": "Enables the Azure Key Vault data connector in Sentinel, streaming Key Vault audit events (key access, secret reads, policy changes) into the SIEM. Evidence proves cryptographic key operations are monitored for SI.L1-3.14.1 flaw identification and AU.L2-3.3.1 centralized logging."
+    },
+    {
+      "entry_id": "AZ-SEN-005",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter","requires_entries":["AZ-SEN-001"]},
+      "control_ids": [
+        "SI.L2-3.14.6"
+      ],
+      "objective_ids": [
+        "SI.L2-3.14.6[a]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.securityinsights/new-azsentinelalertrule",
+      "label": "Create Sentinel CMMC Analytics Rule - Privileged Identity Changes",
+      "engine": "az",
+      "set_command": "$existing = Get-AzSentinelAlertRule -ResourceGroupName '{resourceGroup}' -WorkspaceName '{lawWorkspaceName}' -ErrorAction SilentlyContinue | Where-Object DisplayName -eq 'CMMC L2 - Privileged Identity Changes'; if (-not $existing) { New-AzSentinelAlertRule -ResourceGroupName '{resourceGroup}' -WorkspaceName '{lawWorkspaceName}' -Kind 'Scheduled' -DisplayName 'CMMC L2 - Privileged Identity Changes' -Description 'Detects privileged role assignments outside of approved PIM workflow' -Severity 'High' -Enabled -Query 'AuditLogs | where OperationName contains \"Add member to role\" | where Result == \"success\"' -QueryFrequency (New-TimeSpan -Hours 1) -QueryPeriod (New-TimeSpan -Hours 1) -TriggerOperator 'GreaterThan' -TriggerThreshold 0 } else { Write-Output 'Rule already exists - skipping creation' }",
+      "get_command": "Get-AzSentinelAlertRule -ResourceGroupName '{resourceGroup}' -WorkspaceName '{lawWorkspaceName}' -ErrorAction SilentlyContinue | Where-Object {$_.DisplayName -eq 'CMMC L2 - Privileged Identity Changes'}",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "lawWorkspaceName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 7,
+      "sequence_hint": 4,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzSentinelAlertRule -ResourceGroupName '{resourceGroup}' -WorkspaceName '{lawWorkspaceName}' -ErrorAction SilentlyContinue | Where-Object {$_.DisplayName -eq 'CMMC L2 - Privileged Identity Changes'} | Select-Object DisplayName, Enabled, Kind | ConvertTo-Json"
+      ],
+      "on_failure": "warn_continue",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "not_empty": true,
+          "regex": "Privileged Identity Changes"
+        }
+      },
+      "notes": "Creates a scheduled Sentinel analytics rule that detects privileged role assignments outside approved PIM workflows. Queries AuditLogs every hour for \"Add member to role\" events. Satisfies SI.L2-3.14.6 inbound/outbound monitoring and SI.L1-3.14.1 flaw identification for identity-based threats."
+    },
+    {
+      "entry_id": "AZ-SEN-006",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter","requires_entries":["AZ-SEN-001"]},
+      "control_ids": [
+        "SI.L2-3.14.6"
+      ],
+      "objective_ids": [
+        "SI.L2-3.14.6[a]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.securityinsights/new-azsentinelalertrule",
+      "label": "Create Sentinel CMMC Analytics Rule - Malware Detection",
+      "engine": "az",
+      "set_command": "$existing = Get-AzSentinelAlertRule -ResourceGroupName '{resourceGroup}' -WorkspaceName '{lawWorkspaceName}' -ErrorAction SilentlyContinue | Where-Object DisplayName -eq 'CMMC L2 - Malware Detection'; if (-not $existing) { New-AzSentinelAlertRule -ResourceGroupName '{resourceGroup}' -WorkspaceName '{lawWorkspaceName}' -Kind 'Scheduled' -DisplayName 'CMMC L2 - Malware Detection' -Description 'Detects malware events from Microsoft Defender for Endpoint' -Severity 'High' -Enabled -Query 'DeviceEvents | where ActionType == \"AntivirusDetection\" | where isnotempty(AdditionalFields)' -QueryFrequency (New-TimeSpan -Minutes 15) -QueryPeriod (New-TimeSpan -Hours 1) -TriggerOperator 'GreaterThan' -TriggerThreshold 0 } else { Write-Output 'Rule already exists - skipping creation' }",
+      "get_command": "Get-AzSentinelAlertRule -ResourceGroupName '{resourceGroup}' -WorkspaceName '{lawWorkspaceName}' -ErrorAction SilentlyContinue | Where-Object DisplayName -eq 'CMMC L2 - Malware Detection'",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "lawWorkspaceName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 7,
+      "sequence_hint": 5,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzSentinelAlertRule -ResourceGroupName '{resourceGroup}' -WorkspaceName '{lawWorkspaceName}' | Where-Object DisplayName -eq 'CMMC L2 - Malware Detection'"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.Id",
+          "not_empty": true
+        }
+      },
+      "notes": "Creates a scheduled Sentinel analytics rule that detects malware events from Defender for Endpoint via the DeviceEvents table. Queries every 15 minutes for AntivirusDetection actions. Satisfies SI.L2-3.14.6 attack detection and SI.L1-3.14.1 malware identification."
+    },
+    {
+      "entry_id": "AZ-SEN-007",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter","requires_entries":["AZ-SEN-001"]},
+      "control_ids": [
+        "AU.L2-3.3.2",
+        "AU.L2-3.3.3"
+      ],
+      "objective_ids": [
+        "AU.L2-3.3.3[c]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.securityinsights/new-azsentinelalertrule",
+      "label": "Create Sentinel CMMC Analytics Rule - Excessive Failed Logins",
+      "engine": "az",
+      "set_command": "$existing = Get-AzSentinelAlertRule -ResourceGroupName '{resourceGroup}' -WorkspaceName '{lawWorkspaceName}' -ErrorAction SilentlyContinue | Where-Object DisplayName -eq 'CMMC L2 - Excessive Failed Logins'; if (-not $existing) { New-AzSentinelAlertRule -ResourceGroupName '{resourceGroup}' -WorkspaceName '{lawWorkspaceName}' -Kind 'Scheduled' -DisplayName 'CMMC L2 - Excessive Failed Logins' -Description 'Detects brute force attempts via repeated failed sign-ins' -Severity 'Medium' -Enabled -Query 'SigninLogs | where ResultType != \"0\" | summarize FailureCount=count() by UserPrincipalName, bin(TimeGenerated, 5m) | where FailureCount > 10' -QueryFrequency (New-TimeSpan -Minutes 15) -QueryPeriod (New-TimeSpan -Hours 1) -TriggerOperator 'GreaterThan' -TriggerThreshold 0 } else { Write-Output 'Rule already exists - skipping creation' }",
+      "get_command": "Get-AzSentinelAlertRule -ResourceGroupName '{resourceGroup}' -WorkspaceName '{lawWorkspaceName}' -ErrorAction SilentlyContinue | Where-Object DisplayName -eq 'CMMC L2 - Excessive Failed Logins'",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "lawWorkspaceName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 7,
+      "sequence_hint": 7,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzSentinelAlertRule -ResourceGroupName '{resourceGroup}' -WorkspaceName '{lawWorkspaceName}' | Select-Object DisplayName,Enabled,Severity,Query"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.Id",
+          "not_empty": true
+        }
+      },
+      "notes": "Creates a scheduled Sentinel analytics rule that detects brute-force login attempts by aggregating failed sign-ins (>10 per 5-minute window). Satisfies AU.L2-3.3.2 user-traceable activity and SI.L1-3.14.1 flaw identification for credential-based attacks."
+    },
+    {
+      "entry_id": "AZ-SEN-008",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter","requires_entries":["AZ-SEN-001"]},
+      "control_ids": [
+        "AU.L2-3.3.1"
+      ],
+      "objective_ids": [],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.securityinsights/new-azsentinelalertrule",
+      "label": "Create Sentinel CMMC Analytics Rule - Unauthorized Resource Deletion",
+      "engine": "az",
+      "set_command": "$existing = Get-AzSentinelAlertRule -ResourceGroupName '{resourceGroup}' -WorkspaceName '{lawWorkspaceName}' -ErrorAction SilentlyContinue | Where-Object DisplayName -eq 'CMMC L2 - Unauthorized Resource Deletion'; if (-not $existing) { New-AzSentinelAlertRule -ResourceGroupName '{resourceGroup}' -WorkspaceName '{lawWorkspaceName}' -Kind 'Scheduled' -DisplayName 'CMMC L2 - Unauthorized Resource Deletion' -Description 'Detects deletion of critical Azure resources outside of change window' -Severity 'High' -Enabled -Query 'AzureActivity | where OperationNameValue endswith \"/delete\" | where ActivityStatusValue == \"Success\"' -QueryFrequency (New-TimeSpan -Hours 1) -QueryPeriod (New-TimeSpan -Hours 1) -TriggerOperator 'GreaterThan' -TriggerThreshold 0 } else { Write-Output 'Rule already exists - skipping creation' }",
+      "get_command": "Get-AzSentinelAlertRule -ResourceGroupName '{resourceGroup}' -WorkspaceName '{lawWorkspaceName}' -ErrorAction SilentlyContinue | Where-Object DisplayName -eq 'CMMC L2 - Unauthorized Resource Deletion'",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "lawWorkspaceName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 7,
+      "sequence_hint": 8,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzSentinelAlertRule -ResourceGroupName '{resourceGroup}' -WorkspaceName '{lawWorkspaceName}' | Select-Object DisplayName,Enabled,Severity,Query"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.Id",
+          "not_empty": true
+        }
+      },
+      "notes": "Creates a scheduled Sentinel analytics rule that detects unauthorized deletion of Azure resources by monitoring AzureActivity for successful delete operations. Satisfies AU.L2-3.3.1 audit logging and SI.L1-3.14.1 flaw identification for unauthorized configuration changes."
+    },
+    {
+      "entry_id": "AZ-VM-001",
+      "cost_gate": {"recurring":true,"cost_key":"azure.vm.d2s_v5_windows","estimate_basis":"1 VM x 730 h + disk","two_person":true,"standard_alternative":["none: a VM is a scope decision, not a control"]},
+      "control_ids": [
+        "SC.L1-3.13.1"
+      ],
+      "objective_ids": [],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.compute/new-azvm",
+      "label": "Create Workload VM (no public IP, system managed identity, Trusted Launch, encryption at host)",
+      "engine": "az",
+      "set_command": "$vnet = Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name '{vnetName}'; $subnet = $vnet.Subnets | Where-Object Name -eq 'snet-workload'; $nic = New-AzNetworkInterface -ResourceGroupName '{resourceGroup}' -Name 'nic-{vmName}' -Location '{location}' -SubnetId $subnet.Id; if ((Get-AzProviderFeature -FeatureName 'EncryptionAtHost' -ProviderNamespace 'Microsoft.Compute').RegistrationState -ne 'Registered') { Register-AzProviderFeature -FeatureName 'EncryptionAtHost' -ProviderNamespace 'Microsoft.Compute' | Out-Null }; $pw = [System.Web.Security.Membership]::GeneratePassword(24,6); $cred = New-Object PSCredential('cmmcadmin', (ConvertTo-SecureString $pw -AsPlainText -Force)); Remove-Variable pw; New-AzVM -ResourceGroupName '{resourceGroup}' -Name '{vmName}' -Location '{location}' -NetworkInterfaceId $nic.Id -Image '{vmImage}' -Size '{vmSize}' -Credential $cred -SystemAssignedIdentity -SecurityType 'TrustedLaunch' -EnableSecureBoot $true -EnableVtpm $true -EncryptionAtHost; Remove-Variable cred",
+      "get_command": "Get-AzVM -ResourceGroupName '{resourceGroup}' -Name '{vmName}'",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "location",
+        "vnetName",
+        "vmName",
+        "vmImage",
+        "vmSize"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 34,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzVM -ResourceGroupName '{resourceGroup}' -Name '{vmName}' | Select-Object Name,@{N='SecurityType';E={$_.SecurityProfile.SecurityType}},@{N='EncryptionAtHost';E={$_.SecurityProfile.EncryptionAtHost}},@{N='SecureBoot';E={$_.SecurityProfile.UefiSettings.SecureBootEnabled}},@{N='VTpm';E={$_.SecurityProfile.UefiSettings.VTpmEnabled}} | ConvertTo-Json -Depth 5"
+      ],
+      "on_failure": "warn_continue",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "not_empty": true
+        }
+      },
+      "notes": "Creates the landing-zone VM with no public IP and a system-managed identity, as a Trusted Launch VM (Secure Boot and the free virtual TPM) with encryption at host, so the OS disk, data disks, temp disk and caches are encrypted with platform-managed keys at no cost (SP-12, SECRETS-PLAN.md; options paper O7). The SET registers the subscription's EncryptionAtHost feature first when it is not registered. The generated local admin password is never stored: Key Vault is not in the standard baseline (founder ruling OQ-4), so the password is discarded and recovery uses the free VM Access password-reset extension under the customer's own Azure role (BA-10); CES holds nothing. Trusted Launch needs a Generation 2 image, so {vmImage} must name a Gen2 image. The VM is placed on snet-workload behind the NSG deny-all rules. A VM is a recurring cost: off by default, behind DP-1 and DP-2."
+    },
+    {
+      "entry_id": "AZ-VM-002",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter","requires_entries":["AZ-VM-001"]},
+      "control_ids": [
+        "SC.L2-3.13.16"
+      ],
+      "objective_ids": [
+        "SC.L2-3.13.16[a]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/azure/virtual-machines/disk-encryption#encryption-at-host---end-to-end-encryption-for-your-vm-data",
+      "label": "VM Encryption at Host (platform-managed keys, free)",
+      "engine": "az",
+      "set_command": "$vm = Get-AzVM -ResourceGroupName '{resourceGroup}' -Name '{vmName}'; if (-not $vm.SecurityProfile.EncryptionAtHost) { Stop-AzVM -ResourceGroupName '{resourceGroup}' -Name '{vmName}' -Force | Out-Null; Update-AzVM -ResourceGroupName '{resourceGroup}' -VM $vm -EncryptionAtHost $true | Out-Null; Start-AzVM -ResourceGroupName '{resourceGroup}' -Name '{vmName}' | Out-Null }; Get-AzVM -ResourceGroupName '{resourceGroup}' -Name '{vmName}' | Select-Object Name,@{N='EncryptionAtHost';E={$_.SecurityProfile.EncryptionAtHost}},@{N='SecurityType';E={$_.SecurityProfile.SecurityType}} | ConvertTo-Json -Depth 5",
+      "get_command": "$vm = Get-AzVM -ResourceGroupName '{resourceGroup}' -Name '{vmName}' -ErrorAction SilentlyContinue; if ($vm -and $vm.SecurityProfile.EncryptionAtHost) { $vm | Select-Object Name,@{N='EncryptionAtHost';E={$_.SecurityProfile.EncryptionAtHost}},@{N='SecurityType';E={$_.SecurityProfile.SecurityType}} | ConvertTo-Json -Depth 5 }",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "vmName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 35,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzVM -ResourceGroupName '{resourceGroup}' -Name '{vmName}' | Select-Object Name,@{N='EncryptionAtHost';E={$_.SecurityProfile.EncryptionAtHost}},@{N='SecurityType';E={$_.SecurityProfile.SecurityType}},@{N='OsDiskEncryption';E={(Get-AzDisk -ResourceGroupName '{resourceGroup}' -DiskName $_.StorageProfile.OsDisk.Name).Encryption.Type}} | ConvertTo-Json -Depth 5"
+      ],
+      "on_failure": "warn_continue",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.EncryptionAtHost",
+          "equals": "true"
+        }
+      },
+      "notes": "SP-12 (SECRETS-PLAN.md): zero-cost encryption at rest for the VM that holds ces.db and the evidence store. Encryption at host plus Azure server-side encryption with platform-managed keys covers the OS and data disks, the temp disk and the caches, at no cost (options paper O7). Azure Disk Encryption (Set-AzVMDiskEncryptionExtension, a Key Vault-backed BitLocker extension) is no longer used, so Disk Backup keeps working (packaging record line 178) and no Key Vault is needed. Turning encryption at host on for an existing VM needs it stopped, so the SET stops, updates and starts the VM only when the setting is off; AZ-VM-001 creates the VM with it on, so on a first run the GET finds it and nothing restarts. Planned only together with AZ-VM-001 (cost_gate.requires_entries). It no longer claims SC.L2-3.13.10 (no key is managed); SC.L2-3.13.16 is inherited from the platform."
+    },
+    {
+      "entry_id": "AZ-VM-003",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter","requires_entries":["AZ-VM-001"]},
+      "control_ids": [
+        "CM.L2-3.4.1",
+        "CM.L2-3.4.2"
+      ],
+      "objective_ids": [
+        "CM.L2-3.4.1[a]",
+        "CM.L2-3.4.2[a]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.resources/new-azpolicyassignment",
+      "label": "Assign DISA STIG Policy to VM",
+      "engine": "az",
+      "set_command": "New-AzPolicyAssignment -Name 'DISA-STIG-VM-{vmName}' -DisplayName 'DISA STIG for Windows Server 2022 — {vmName}' -PolicySetDefinitionId '/providers/Microsoft.Authorization/policySetDefinitions/5459cfe4-3767-4c8a-b5b5-5a3da3bc1db9' -Scope '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.Compute/virtualMachines/{vmName}'",
+      "get_command": "Get-AzPolicyAssignment -Name 'DISA-STIG-VM-{vmName}'",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "subscriptionId",
+        "resourceGroup",
+        "vmName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 36,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzPolicyAssignment -Name 'DISA-STIG-VM-{vmName}' | Select-Object Name,PolicyDefinitionId,Scope,EnforcementMode"
+      ],
+      "on_failure": "warn_continue",
+      "notes": "DISA STIG policy set ID 5459cfe4... is the built-in 'Windows Server 2022 STIG' initiative.",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.Id",
+          "not_empty": true
+        }
+      }
+    },
+    {
+      "entry_id": "AZ-VM-004",
+      "retired": true,
+      "retired_reason": "The Microsoft Monitoring Agent (MicrosoftMonitoringAgent extension) is retired; use the Azure Monitor Agent with a data-collection rule. Kept for reference; do not plan it.",
+      "cost_gate": {"recurring":true,"cost_key":"azure.vm.mma_ingestion","estimate_basis":"SecurityEvent ingestion per VM (retired agent)","standard_alternative":["none: Azure Monitor Agent with a narrow data-collection rule"]},
+      "control_ids": [
+        "SI.L1-3.14.1"
+      ],
+      "objective_ids": [],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.compute/set-azvmextension",
+      "label": "Install Microsoft Defender for Endpoint VM Extension",
+      "engine": "az",
+      "set_command": "Set-AzVMExtension -ResourceGroupName '{resourceGroup}' -VMName '{vmName}' -Name 'MicrosoftMonitoringAgent' -Publisher 'Microsoft.EnterpriseCloud.Monitoring' -ExtensionType 'MicrosoftMonitoringAgent' -TypeHandlerVersion '1.0' -Settings @{workspaceId='{lawWorkspaceId}'} -ProtectedSettings @{workspaceKey=(Get-AzOperationalInsightsWorkspaceSharedKey -ResourceGroupName '{resourceGroup}' -Name '{lawWorkspaceName}').PrimarySharedKey}",
+      "get_command": "$ext = Get-AzVMExtension -ResourceGroupName '{resourceGroup}' -VMName '{vmName}' -Name 'MicrosoftMonitoringAgent'; if ($ext.PublicSettings -match '{lawWorkspaceName}' -or $ext.Settings.workspaceId -eq '{lawWorkspaceId}') { $ext } else { $null }",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "vmName",
+        "lawWorkspaceName"
+      ],
+      "variables_runtime": [
+        "lawWorkspaceId"
+      ],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 37,
+      "manual_only": false,
+      "evidence_commands": [
+        "$ext = Get-AzVMExtension -ResourceGroupName '{resourceGroup}' -VMName '{vmName}' -Name 'MicrosoftMonitoringAgent'; if ($ext.PublicSettings -match '{lawWorkspaceName}' -or $ext.Settings.workspaceId -eq '{lawWorkspaceId}') { $ext } else { $null }"
+      ],
+      "on_failure": "warn_continue",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "not_empty": true
+        }
+      },
+      "notes": "Installs the Microsoft Monitoring Agent VM extension to forward VM telemetry to the Log Analytics workspace. Connects the VM to the centralized SIEM pipeline for SI.L1-3.14.1 flaw detection and CM.L2-3.4.1 baseline configuration monitoring. Evidence proves the extension is installed and connected."
+    },
+    {
+      "entry_id": "AZ-DIAG-001",
+      "cost_gate": {"recurring":false,"free_reason":"free_source","requires_entries":["AZ-LOG-001"]},
+      "control_ids": [
+        "AU.L2-3.3.1",
+        "AU.L2-3.3.2"
+      ],
+      "objective_ids": [
+        "AU.L2-3.3.1[c]",
+        "AU.L2-3.3.2[b]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.monitor/new-azsubscriptiondiagnosticsetting",
+      "label": "Set Diagnostic Setting — Subscription Activity Log",
+      "engine": "az",
+      "set_command": "$law = Get-AzOperationalInsightsWorkspace -ResourceGroupName '{resourceGroup}' -Name '{lawWorkspaceName}'; $logs = @('Administrative','Security','ServiceHealth','Alert','Recommendation','Policy','Autoscale','ResourceHealth') | ForEach-Object { New-AzDiagnosticSettingSubscriptionLogSettingsObject -Category $_ -Enabled $true }; New-AzSubscriptionDiagnosticSetting -Name 'activitylog-to-law' -WorkspaceId $law.ResourceId -Log $logs",
+      "get_command": "$diag = Get-AzSubscriptionDiagnosticSetting -Name 'activitylog-to-law' -WarningAction SilentlyContinue; if ($diag.WorkspaceId -like '*/workspaces/{lawWorkspaceName}') { $diag } else { $null }",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "subscriptionId",
+        "resourceGroup",
+        "lawWorkspaceName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 7,
+      "sequence_hint": 9,
+      "manual_only": true,
+      "evidence_commands": [
+        "Get-AzSubscriptionDiagnosticSetting -Name 'activitylog-to-law' | ConvertTo-Json"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "not_empty": true
+        }
+      },
+      "notes": "Configures subscription-level diagnostic settings to forward Azure Activity Logs (Administrative, Security, ServiceHealth, Alert, Policy, etc.) to the Log Analytics workspace. Satisfies AU.L2-3.3.1 audit logging for all subscription-level operations. Marked manual_only due to Azure Gov portal requirements."
+    },
+    {
+      "entry_id": "AZ-DIAG-002",
+      "cost_gate": {"recurring":true,"cost_key":"azure.diagnostic_setting","estimate_basis":"Key Vault logs into the workspace","standard_alternative":["AU.L2-3.3.1.audit-retention"],"requires_entries":["AZ-KV-001","AZ-LOG-001"]},
+      "control_ids": [
+        "AU.L2-3.3.1",
+        "AU.L2-3.3.2"
+      ],
+      "objective_ids": [
+        "AU.L2-3.3.1[c]",
+        "AU.L2-3.3.2[b]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.monitor/new-azdiagnosticsetting",
+      "label": "Set Diagnostic Setting — Key Vault",
+      "engine": "az",
+      "set_command": "$law = Get-AzOperationalInsightsWorkspace -ResourceGroupName '{resourceGroup}' -Name '{lawWorkspaceName}'; $log = New-AzDiagnosticSettingLogSettingsObject -Enabled $true -CategoryGroup 'allLogs'; New-AzDiagnosticSetting -ResourceId (Get-AzKeyVault -ResourceGroupName '{resourceGroup}' -VaultName '{keyVaultName}').ResourceId -Name 'kv-to-law' -WorkspaceId $law.ResourceId -Log @($log)",
+      "get_command": "$diag = Get-AzDiagnosticSetting -ResourceId (Get-AzKeyVault -ResourceGroupName '{resourceGroup}' -VaultName '{keyVaultName}').ResourceId -Name 'kv-to-law' -WarningAction SilentlyContinue; if ($diag.WorkspaceId -like '*/workspaces/{lawWorkspaceName}') { $diag } else { $null }",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "keyVaultName",
+        "lawWorkspaceName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 7,
+      "sequence_hint": 11,
+      "manual_only": false,
+      "evidence_commands": [
+        "$diag = Get-AzDiagnosticSetting -ResourceId (Get-AzKeyVault -ResourceGroupName '{resourceGroup}' -VaultName '{keyVaultName}').ResourceId -Name 'kv-to-law' -WarningAction SilentlyContinue; if ($diag.WorkspaceId -like '*/workspaces/{lawWorkspaceName}') { $diag | ConvertTo-Json -Depth 5 }"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "not_empty": true
+        }
+      },
+      "notes": "Configures diagnostic settings on the Key Vault resource to forward all audit logs (allLogs category group) to the Log Analytics workspace. Evidence proves cryptographic key operations and access attempts are centrally logged for AU.L2-3.3.1 audit accountability."
+    },
+    {
+      "entry_id": "AZ-DIAG-003",
+      "cost_gate": {"recurring":true,"cost_key":"azure.diagnostic_setting","estimate_basis":"NSG logs into the workspace","standard_alternative":["AU.L2-3.3.1.audit-retention"],"requires_entries":["AZ-LOG-001"]},
+      "control_ids": [
+        "AU.L2-3.3.1",
+        "AU.L2-3.3.2"
+      ],
+      "objective_ids": [
+        "AU.L2-3.3.1[c]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.monitor/new-azdiagnosticsetting",
+      "label": "Set Diagnostic Setting — Network Security Group",
+      "engine": "az",
+      "set_command": "$law = Get-AzOperationalInsightsWorkspace -ResourceGroupName '{resourceGroup}' -Name '{lawWorkspaceName}'; $log = New-AzDiagnosticSettingLogSettingsObject -Enabled $true -CategoryGroup 'allLogs'; New-AzDiagnosticSetting -ResourceId (Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'nsg-workload-cmmc').Id -Name 'nsg-to-law' -WorkspaceId $law.ResourceId -Log @($log)",
+      "get_command": "$diag = Get-AzDiagnosticSetting -ResourceId (Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'nsg-workload-cmmc').Id -Name 'nsg-to-law' -WarningAction SilentlyContinue; if ($diag.WorkspaceId -like '*/workspaces/{lawWorkspaceName}') { $diag } else { $null }",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "lawWorkspaceName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 7,
+      "sequence_hint": 13,
+      "manual_only": false,
+      "evidence_commands": [
+        "$diag = Get-AzDiagnosticSetting -ResourceId (Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'nsg-workload-cmmc').Id -Name 'nsg-to-law' -WarningAction SilentlyContinue; if ($diag.WorkspaceId -like '*/workspaces/{lawWorkspaceName}') { $diag | ConvertTo-Json -Depth 5 }"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "not_empty": true
+        }
+      },
+      "notes": "Configures diagnostic settings on the workload NSG to forward all log categories to the Log Analytics workspace. Captures NSG rule hits, flow decisions, and security events. Evidence proves network boundary enforcement actions are centrally logged for AU.L2-3.3.1 audit accountability."
+    },
+    {
+      "entry_id": "AZ-DIAG-004",
+      "cost_gate": {"recurring":true,"cost_key":"azure.diagnostic_setting","estimate_basis":"storage logs into the workspace","standard_alternative":["AU.L2-3.3.1.audit-retention"],"requires_entries":["AZ-LOG-002","AZ-LOG-001"]},
+      "control_ids": [
+        "AU.L2-3.3.1",
+        "AU.L2-3.3.2"
+      ],
+      "objective_ids": [],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.monitor/new-azdiagnosticsetting",
+      "label": "Set Diagnostic Setting — Storage Account",
+      "engine": "az",
+      "set_command": "$law = Get-AzOperationalInsightsWorkspace -ResourceGroupName '{resourceGroup}' -Name '{lawWorkspaceName}' -ErrorAction Stop; $sa = Get-AzStorageAccount -ResourceGroupName '{resourceGroup}' -Name '{storageAccountName}' -ErrorAction Stop; $metric = New-AzDiagnosticSettingMetricSettingsObject -Enabled $true -Category 'Transaction'; New-AzDiagnosticSetting -ResourceId $sa.Id -Name 'storage-to-law' -WorkspaceId $law.ResourceId -Metric @($metric) -WarningAction SilentlyContinue | Select-Object Name,WorkspaceId | ConvertTo-Json -Depth 5",
+      "get_command": "$sa = Get-AzStorageAccount -ResourceGroupName '{resourceGroup}' -Name '{storageAccountName}' -ErrorAction SilentlyContinue; if (-not $sa) { $null } else { $diag = Get-AzDiagnosticSetting -ResourceId $sa.Id -Name 'storage-to-law' -ErrorAction SilentlyContinue -WarningAction SilentlyContinue; if ($diag -and $diag.WorkspaceId -like '*/workspaces/{lawWorkspaceName}') { $diag | Select-Object Name,WorkspaceId,@{N='Metrics';E={$_.Metric | Select-Object Category,Enabled}} | ConvertTo-Json -Depth 5 } else { $null } }",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "storageAccountName",
+        "lawWorkspaceName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 7,
+      "sequence_hint": 15,
+      "manual_only": false,
+      "evidence_commands": [
+        "$sa = Get-AzStorageAccount -ResourceGroupName '{resourceGroup}' -Name '{storageAccountName}' -ErrorAction SilentlyContinue; if (-not $sa) { [PSCustomObject]@{ Name='storage-to-law'; Status='Storage account not found' } | ConvertTo-Json -Depth 5 } else { $diag = Get-AzDiagnosticSetting -ResourceId $sa.Id -Name 'storage-to-law' -ErrorAction SilentlyContinue -WarningAction SilentlyContinue; if ($diag -and $diag.WorkspaceId -like '*/workspaces/{lawWorkspaceName}') { $diag | Select-Object Name,WorkspaceId,@{N='Metrics';E={$_.Metric | Select-Object Category,Enabled}} | ConvertTo-Json -Depth 5 } else { [PSCustomObject]@{ Name='storage-to-law'; Status='Not configured' } | ConvertTo-Json -Depth 5 } }"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "not_empty": true
+        }
+      },
+      "notes": "Configures diagnostic settings on the log storage account to forward Transaction metrics to the Log Analytics workspace. Evidence proves storage access patterns (reads, writes, deletes) are centrally monitored for AU.L2-3.3.1 audit logging and AU.L2-3.3.2 user-traceable activity."
+    },
+    {
+      "entry_id": "AZ-DIAG-005",
+      "cost_gate": {"recurring":true,"cost_key":"azure.diagnostic_setting","estimate_basis":"VM logs into the workspace","standard_alternative":["AU.L2-3.3.1.audit-retention"],"requires_entries":["AZ-VM-001","AZ-LOG-001"]},
+      "control_ids": [
+        "AU.L2-3.3.1",
+        "AU.L2-3.3.2"
+      ],
+      "objective_ids": ["AU.L2-3.3.1[c]"],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.monitor/new-azdiagnosticsetting",
+      "label": "Set Diagnostic Setting — Virtual Machine",
+      "engine": "az",
+      "set_command": "$law = Get-AzOperationalInsightsWorkspace -ResourceGroupName '{resourceGroup}' -Name '{lawWorkspaceName}'; $log = New-AzDiagnosticSettingLogSettingsObject -Enabled $true -CategoryGroup 'allLogs'; New-AzDiagnosticSetting -ResourceId (Get-AzVM -ResourceGroupName '{resourceGroup}' -Name '{vmName}').Id -Name 'diag-vm-to-law' -WorkspaceId $law.ResourceId -Log @($log)",
+      "get_command": "$diag = Get-AzDiagnosticSetting -ResourceId (Get-AzVM -ResourceGroupName '{resourceGroup}' -Name '{vmName}').Id -Name 'diag-vm-to-law'; if ($diag.WorkspaceId -like '*/workspaces/{lawWorkspaceName}') { $diag } else { $null }",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "vmName",
+        "lawWorkspaceName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 7,
+      "sequence_hint": 17,
+      "manual_only": false,
+      "evidence_commands": [],
+      "on_failure": "warn_continue",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "not_empty": true
+        }
+      },
+      "notes": "Configures diagnostic settings on the workload VM to forward all log categories to the Log Analytics workspace. Satisfies AU.L2-3.3.1 audit logging for VM-level events. This entry is conditional on AZ-VM-001 deploying a VM; for cloud-native architectures see AZ-FOUND-003."
+    },
+    {
+      "entry_id": "AZ-DIAG-006",
+      "cost_gate": {"recurring":false,"free_reason":"free_source","requires_entries":["AZ-LOG-001"]},
+      "control_ids": [
+        "AU.L2-3.3.1",
+        "AU.L2-3.3.2"
+      ],
+      "objective_ids": [
+        "AU.L2-3.3.1[c]",
+        "AU.L2-3.3.2[b]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.monitor/new-azsubscriptiondiagnosticsetting",
+      "label": "Set Diagnostic Setting — Subscription Activity Log",
+      "engine": "az",
+      "set_command": "$law = Get-AzOperationalInsightsWorkspace -ResourceGroupName '{resourceGroup}' -Name '{lawWorkspaceName}' -ErrorAction Stop; New-AzSubscriptionDiagnosticSetting -Name 'activitylog-to-law' -WorkspaceId $law.ResourceId -Log @(@{Category='Administrative';Enabled=$true},@{Category='Security';Enabled=$true},@{Category='Policy';Enabled=$true}) -WarningAction SilentlyContinue | Select-Object Name,WorkspaceId | ConvertTo-Json -Depth 5",
+      "get_command": "$diag = Get-AzSubscriptionDiagnosticSetting -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Where-Object { $_.Name -eq 'activitylog-to-law' }; if ($diag -and $diag.WorkspaceId -like '*/workspaces/{lawWorkspaceName}') { $diag | Select-Object Name,WorkspaceId,@{N='LogCategories';E={($_.Log | Where-Object Enabled) | Select-Object -ExpandProperty Category}} | ConvertTo-Json -Depth 5 } else { $null }",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "lawWorkspaceName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 7,
+      "sequence_hint": 18,
+      "manual_only": false,
+      "evidence_commands": [
+        "$diag = Get-AzSubscriptionDiagnosticSetting -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Where-Object { $_.Name -eq 'activitylog-to-law' }; if ($diag) { $diag | Select-Object Name,WorkspaceId,@{N='LogCategories';E={($_.Log | Where-Object Enabled) | Select-Object -ExpandProperty Category}} | ConvertTo-Json -Depth 5 } else { $null }"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.WorkspaceId",
+          "not_empty": true
+        }
+      },
+      "notes": "Configures subscription-level Activity Log diagnostic settings forwarding Administrative, Security, and Policy categories to the Log Analytics workspace. Provides the subscription-level audit trail required by AU.L2-3.3.1 and AU.L2-3.3.2 for user-traceable activity."
+    },
+    {
+      "entry_id": "AZ-ID-001",
+      "cost_gate": {"recurring":false,"free_reason":"read_only"},
+      "control_ids": [
+        "AC.L1-3.1.1"
+      ],
+      "objective_ids": [
+        "AC.L1-3.1.1[a]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.users/get-mguser",
+      "label": "Break-Glass Emergency Account",
+      "engine": "mgraph",
+      "set_command": "",
+      "get_command": "Get-MgUser -Filter 'userPrincipalName eq ''{breakGlassUPN}''' | Select-Object Id,DisplayName,UserPrincipalName,AccountEnabled | ConvertTo-Json -Depth 10",
+      "idempotency": "evidence-only",
+      "variables_required": [
+        "breakGlassUPN"
+      ],
+      "variables_runtime": [],
+      "captures": [
+        {
+          "variable": "breakGlassUserId",
+          "from": "json_field",
+          "json_path": "$.Id"
+        }
+      ],
+      "layer_hint": 0,
+      "sequence_hint": 10,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-MgUser -Filter 'userPrincipalName eq ''{breakGlassUPN}''' | Select-Object Id,DisplayName,UserPrincipalName,AccountEnabled,CreatedDateTime | ConvertTo-Json"
+      ],
+      "on_failure": "warn_continue",
+      "notes": "Capture breakGlassUserId reserved for future CA exclusion entries. Uses mgraph engine for Entra ID operations despite AZ- prefix.",
+      "azure_tier": "none",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.Id",
+          "not_empty": true
+        }
+      }
+    },
+    {
+      "entry_id": "AZ-ID-002",
+      "cost_gate": {"recurring":false,"free_reason":"read_only"},
+      "control_ids": [
+        "AC.L1-3.1.1",
+        "AC.L2-3.1.5"
+      ],
+      "objective_ids": [
+        "AC.L1-3.1.1[a]",
+        "AC.L2-3.1.5[a]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.users/get-mguser",
+      "label": "Operator Admin Account",
+      "engine": "mgraph",
+      "set_command": "",
+      "get_command": "Get-MgUser -Filter 'userPrincipalName eq ''{operatorUPN}''' | Select-Object Id,DisplayName,UserPrincipalName,AccountEnabled | ConvertTo-Json -Depth 10",
+      "idempotency": "evidence-only",
+      "variables_required": [
+        "operatorUPN"
+      ],
+      "variables_runtime": [],
+      "captures": [
+        {
+          "variable": "operatorUserId",
+          "from": "json_field",
+          "json_path": "$.Id"
+        }
+      ],
+      "layer_hint": 0,
+      "sequence_hint": 11,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-MgUser -Filter 'userPrincipalName eq ''{operatorUPN}''' | Select-Object Id,DisplayName,UserPrincipalName,AccountEnabled,CreatedDateTime | ConvertTo-Json"
+      ],
+      "on_failure": "warn_continue",
+      "notes": "Uses mgraph engine for Entra ID operations despite AZ- prefix.",
+      "azure_tier": "none",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.Id",
+          "not_empty": true
+        }
+      }
+    },
+    {
+      "entry_id": "AZ-ID-003",
+      "cost_gate": {"recurring":false,"free_reason":"read_only"},
+      "control_ids": [
+        "AC.L1-3.1.1"
+      ],
+      "objective_ids": [
+        "AC.L1-3.1.1[b]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.applications/get-mgserviceprincipal",
+      "label": "EO Automation Service Principal",
+      "engine": "mgraph",
+      "set_command": "",
+      "get_command": "Get-MgServicePrincipal -Filter 'appId eq ''{appId}''' | Select-Object Id,DisplayName,AppId | ConvertTo-Json -Depth 10",
+      "idempotency": "evidence-only",
+      "variables_required": [
+        "appId"
+      ],
+      "variables_runtime": [],
+      "captures": [
+        {
+          "variable": "eoSpObjectId",
+          "from": "json_field",
+          "json_path": "$.Id"
+        }
+      ],
+      "layer_hint": 0,
+      "sequence_hint": 12,
+      "manual_only": false,
+      "evidence_commands": [
+        "$app = Get-MgApplication -Filter 'appId eq ''{appId}''' | Select-Object -First 1; $sp = Get-MgServicePrincipal -Filter 'appId eq ''{appId}''' | Select-Object -First 1; if ($app -or $sp) { [pscustomobject]@{ AppId = '{appId}'; ApplicationObjectId = $app.Id; DisplayName = $(if ($sp) { $sp.DisplayName } else { $app.DisplayName }); Id = $sp.Id; ServicePrincipalType = $sp.ServicePrincipalType; AccountEnabled = $sp.AccountEnabled } | ConvertTo-Json }"
+      ],
+      "on_failure": "warn_continue",
+      "notes": "Uses mgraph engine for Entra ID operations despite AZ- prefix. PH-13 (founder Q3, P13-ST): the evidence reads the automation identity CES signs in with (appId) as its app registration and, when present, its service principal; the service-principal-only read was empty on a tenant that holds the app registration (the simulator seeds the registration, not its service principal) and the empty read was SAT. Neither found: an empty read, NOT_SAT.",
+      "azure_tier": "none",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.AppId",
+          "not_empty": true
+        }
+      }
+    },
+    {
+      "entry_id": "AZ-ID-004",
+      "cost_gate": {"recurring":false,"free_reason":"read_only"},
+      "control_ids": [
+        "AC.L1-3.1.1"
+      ],
+      "objective_ids": [],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.identity.signins/get-mgpolicyidentitysecuritydefaultenforcementpolicy",
+      "label": "Security Defaults Disabled",
+      "engine": "mgraph",
+      "set_command": "",
+      "get_command": "Get-MgPolicyIdentitySecurityDefaultEnforcementPolicy | Select-Object IsEnabled | ConvertTo-Json",
+      "idempotency": "evidence-only",
+      "variables_required": [],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 0,
+      "sequence_hint": 13,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-MgPolicyIdentitySecurityDefaultEnforcementPolicy | Select-Object Id,IsEnabled,Description | ConvertTo-Json"
+      ],
+      "on_failure": "warn_continue",
+      "notes": "Uses mgraph engine for Entra ID operations despite AZ- prefix.",
+      "azure_tier": "none",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.IsEnabled",
+          "equals": "False"
+        }
+      }
+    },
+    {
+      "entry_id": "AZ-ID-005",
+      "cost_gate": {"recurring":false,"free_reason":"read_only"},
+      "control_ids": [
+        "AC.L2-3.1.5",
+        "AC.L2-3.1.7"
+      ],
+      "objective_ids": [
+        "AC.L2-3.1.5[b]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.identity.governance/get-mgrolemanagementdirectoryroleeligibilityschedule",
+      "label": "PIM Eligible Role Assignment for Operator",
+      "engine": "mgraph",
+      "set_command": "",
+      "get_command": "Get-MgRoleManagementDirectoryRoleEligibilitySchedule -All | Select-Object PrincipalId,RoleDefinitionId,Status",
+      "idempotency": "evidence-only",
+      "variables_required": [],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 0,
+      "sequence_hint": 14,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-MgRoleManagementDirectoryRoleEligibilitySchedule -All | Where-Object { $_.PrincipalId -eq '{operatorUserId}' } | Select-Object PrincipalId,RoleDefinitionId,DirectoryScopeId,ScheduleInfo,Status | ConvertTo-Json -Depth 10"
+      ],
+      "on_failure": "warn_continue",
+      "notes": "Uses mgraph engine for Entra ID operations despite AZ- prefix.",
+      "azure_tier": "none",
+      "verification": {
+        "evidence": {
+          "not_empty": true
+        }
+      }
+    },
+    {
+      "entry_id": "AZ-FOUND-004",
+      "cost_gate": {"recurring":true,"cost_key":"azure.resource_lock.ratchet","estimate_basis":"locks the resource group that holds billable resources","irreversible":true,"two_person":true,"standard_alternative":["none: RBAC limits who can delete"]},
+      "control_ids": [
+        "CM.L2-3.4.2"
+      ],
+      "objective_ids": [],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.resources/new-azresourcelock",
+      "label": "Resource Group CanNotDelete Lock",
+      "engine": "az",
+      "set_command": "New-AzResourceLock -LockName 'DoNotDelete' -LockLevel CanNotDelete -ResourceGroupName '{resourceGroup}' -Force",
+      "get_command": "$locks = Get-AzResourceLock -ResourceGroupName '{resourceGroup}' -ErrorAction SilentlyContinue; $match = $locks | Where-Object { $_.Properties.Level -eq 'CanNotDelete' }; if ($match) { $match | ConvertTo-Json -Depth 5 } else { $null }",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 0,
+      "sequence_hint": 6,
+      "manual_only": false,
+      "evidence_commands": [
+        "$locks = Get-AzResourceLock -ResourceGroupName '{resourceGroup}' -ErrorAction SilentlyContinue; $locks | Where-Object { $_.Properties.Level -eq 'CanNotDelete' } | Select-Object Name,LockId,ResourceType,@{N='Level';E={$_.Properties.Level}} | ConvertTo-Json -Depth 5"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "foundation",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.LockId",
+          "not_empty": true
+        }
+      },
+      "notes": "Applies a CanNotDelete resource lock to the primary resource group, preventing accidental or unauthorized deletion of CMMC L2 infrastructure resources. Satisfies CM.L2-3.4.2 security configuration enforcement and AU.L2-3.3.1 by preserving audit log sources."
+    },
+    {
+      "entry_id": "AZ-DNS-001",
+      "cost_gate": {"recurring":true,"cost_key":"azure.private_dns_zone","estimate_basis":"1 zone + queries","standard_alternative":["AZ-KV-004"],"requires_entries":["AZ-PE-001"]},
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "objective_ids": [],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.privatedns/new-azprivatednszone",
+      "label": "Private DNS Zone: Key Vault",
+      "engine": "az",
+      "set_command": "New-AzPrivateDnsZone -ResourceGroupName '{resourceGroup}' -Name 'privatelink.vaultcore.usgovcloudapi.net' | ConvertTo-Json -Compress",
+      "get_command": "Get-AzPrivateDnsZone -ResourceGroupName '{resourceGroup}' -Name 'privatelink.vaultcore.usgovcloudapi.net'",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 21,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzPrivateDnsZone -ResourceGroupName '{resourceGroup}' -Name 'privatelink.vaultcore.usgovcloudapi.net'"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "foundation",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.Id",
+          "not_empty": true
+        }
+      },
+      "notes": "Creates the Private DNS Zone for Key Vault (privatelink.vaultcore.usgovcloudapi.net). Azure Gov uses the usgovcloudapi.net domain suffix instead of azure.net. This zone resolves Key Vault private endpoint connections to private IPs within the VNet per SC.L2-3.13.6."
+    },
+    {
+      "entry_id": "AZ-DNS-002",
+      "cost_gate": {"recurring":true,"cost_key":"azure.private_dns_zone","estimate_basis":"1 zone + queries","standard_alternative":["AZ-LOG-002"],"requires_entries":["AZ-PE-002"]},
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "objective_ids": [],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.privatedns/new-azprivatednszone",
+      "label": "Private DNS Zone: Blob Storage",
+      "engine": "az",
+      "set_command": "New-AzPrivateDnsZone -ResourceGroupName '{resourceGroup}' -Name 'privatelink.blob.core.usgovcloudapi.net' | ConvertTo-Json -Compress",
+      "get_command": "Get-AzPrivateDnsZone -ResourceGroupName '{resourceGroup}' -Name 'privatelink.blob.core.usgovcloudapi.net'",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 23,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzPrivateDnsZone -ResourceGroupName '{resourceGroup}' -Name 'privatelink.blob.core.usgovcloudapi.net'"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "foundation",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.Id",
+          "not_empty": true
+        }
+      },
+      "notes": "Creates the Private DNS Zone for Blob Storage (privatelink.blob.core.usgovcloudapi.net). Azure Gov uses the usgovcloudapi.net domain suffix. This zone resolves storage private endpoint connections to private IPs within the VNet, eliminating public blob access per SC.L2-3.13.6."
+    },
+    {
+      "entry_id": "AZ-DIAG-007",
+      "cost_gate": {"recurring":false,"free_reason":"read_only","requires_entries":["AZ-LOG-001"]},
+      "control_ids": [
+        "AU.L2-3.3.1",
+        "AU.L2-3.3.2"
+      ],
+      "objective_ids": [
+        "AU.L2-3.3.1[c]",
+        "AU.L2-3.3.2[b]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/entra/identity/monitoring-health/howto-configure-diagnostic-settings",
+      "label": "Entra ID Diagnostic Settings",
+      "engine": "az",
+      "set_command": "",
+      "get_command": "az rest --method GET --url 'https://management.usgovcloudapi.net/providers/microsoft.aadiam/diagnosticSettings?api-version=2017-04-01' | ConvertFrom-Json | Where-Object { $_.value } | ConvertTo-Json -Depth 10",
+      "idempotency": "evidence-only",
+      "variables_required": [],
+      "variables_runtime": [
+        "lawResourceId"
+      ],
+      "captures": [],
+      "layer_hint": 7,
+      "sequence_hint": 6,
+      "manual_only": false,
+      "evidence_commands": [],
+      "on_failure": "warn_continue",
+      "notes": "Uses az CLI syntax (az rest) — required for operations without Az PowerShell cmdlet equivalents.",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "not_empty": true
+        }
+      }
+    },
+    {
+      "entry_id": "AZ-DIAG-008",
+      "cost_gate": {"recurring":true,"cost_key":"azure.diagnostic_setting.entra","estimate_basis":"manual: Entra sign-in and audit logs into the workspace","standard_alternative":["AU.L2-3.3.1.audit-retention","AU.L2-3.3.2.signin-logs"],"requires_entries":["AZ-LOG-001"]},
+      "control_ids": [
+        "AU.L2-3.3.1",
+        "AU.L2-3.3.2"
+      ],
+      "objective_ids": [
+        "AU.L2-3.3.1[c]",
+        "AU.L2-3.3.2[b]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/entra/identity/monitoring-health/howto-configure-diagnostic-settings",
+      "label": "Create Entra ID Diagnostic Settings",
+      "engine": "az",
+      "set_command": "",
+      "get_command": "az rest --method GET --url 'https://management.usgovcloudapi.net/providers/microsoft.aadiam/diagnosticSettings?api-version=2017-04-01'",
+      "idempotency": "evidence-only",
+      "variables_required": [],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 7,
+      "sequence_hint": 7,
+      "manual_only": true,
+      "evidence_commands": [
+        "az rest --method GET --url 'https://management.usgovcloudapi.net/providers/microsoft.aadiam/diagnosticSettings?api-version=2017-04-01'"
+      ],
+      "on_failure": "warn_continue",
+      "notes": "Evidence-only — Entra ID diagnostic settings API (microsoft.aadiam) does not support service principal auth and its JSON parser rejects ARM resource IDs (forward-slash comment parsing bug). Operator must configure via Azure Portal: Entra ID > Monitoring > Diagnostic settings > add AuditLogs, SignInLogs, NonInteractiveUserSignInLogs, ServicePrincipalSignInLogs to LAW workspace. Retention delegated to LAW (365 days per AZ-LOG-001).",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "not_empty": true
+        }
+      }
+    },
+    {
+      "entry_id": "AZ-SEN-009",
+      "cost_gate": {"recurring":false,"free_reason":"read_only","requires_entries":["AZ-SEN-001"]},
+      "control_ids": [
+        "AU.L2-3.3.1"
+      ],
+      "objective_ids": [],
+      "source": "https://learn.microsoft.com/en-us/rest/api/securityinsights/content-packages/list",
+      "label": "Sentinel CMMC 2.0 Content Hub Solution",
+      "engine": "az",
+      "set_command": "",
+      "get_command": "$json = az rest --method GET --url 'https://management.usgovcloudapi.net/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.OperationalInsights/workspaces/{lawWorkspaceName}/providers/Microsoft.SecurityInsights/contentPackages?api-version=2024-03-01' | ConvertFrom-Json; $cmmc = $json.value | Where-Object { $_.properties.displayName -like '*CMMC*' }; if ($cmmc) { $cmmc | Select-Object @{N='displayName';E={$_.properties.displayName}},@{N='version';E={$_.properties.version}},@{N='contentId';E={$_.properties.contentId}} | ConvertTo-Json -Depth 5 } else { $null }",
+      "idempotency": "evidence-only",
+      "variables_required": [
+        "subscriptionId",
+        "resourceGroup",
+        "lawWorkspaceName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 7,
+      "sequence_hint": 10,
+      "manual_only": false,
+      "evidence_commands": [
+        "$json = az rest --method GET --url 'https://management.usgovcloudapi.net/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.OperationalInsights/workspaces/{lawWorkspaceName}/providers/Microsoft.SecurityInsights/contentPackages?api-version=2024-03-01' | ConvertFrom-Json; $json.value | Where-Object { $_.properties.displayName -like '*CMMC*' } | Select-Object @{N='displayName';E={$_.properties.displayName}},@{N='version';E={$_.properties.version}},@{N='contentId';E={$_.properties.contentId}},@{N='contentKind';E={$_.properties.contentKind}} | ConvertTo-Json -Depth 5"
+      ],
+      "on_failure": "warn_continue",
+      "notes": "Queries Sentinel Content Hub contentPackages API via az rest. Filters for CMMC 2.0 by displayName. Do NOT use 2>&1 — causes $LASTEXITCODE contamination in session-host.",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.displayName",
+          "not_empty": true
+        }
+      }
+    },
+    {
+      "entry_id": "AZ-BOUNDARY-001",
+      "cost_gate": {"recurring":false,"free_reason":"read_only"},
+      "control_ids": [
+        "SC.L1-3.13.1"
+      ],
+      "objective_ids": [
+        "SC.L1-3.13.1[b]",
+        "SC.L1-3.13.1[f]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.network/get-aznetworksecuritygroup",
+      "label": "Verify Network Security Group Boundary Rules",
+      "engine": "az",
+      "set_command": "",
+      "get_command": "Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -ErrorAction SilentlyContinue | Select-Object Name,@{N='Rules';E={$_.SecurityRules | Select-Object Name,Direction,Access,Priority}} | ConvertTo-Json -Depth 10",
+      "idempotency": "evidence-only",
+      "variables_required": [
+        "resourceGroup"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 0,
+      "sequence_hint": 0,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' | Select-Object Name,@{N='Rules';E={$_.SecurityRules | Select-Object Name,Direction,Access,Priority,SourceAddressPrefix,DestinationPortRange}} | ConvertTo-Json -Depth 10"
+      ],
+      "on_failure": "warn_continue",
+      "notes": "L1 carry-forward. Verifies NSGs exist and enforce boundary protection. Complements SC.L2-3.13.1 infra entries. Uses az CLI syntax (az rest) — required for operations without Az PowerShell cmdlet equivalents.",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "not_empty": true
+        }
+      }
+    },
+    {
+      "entry_id": "AZ-SUBNET-001",
+      "cost_gate": {"recurring":false,"free_reason":"read_only"},
+      "control_ids": [
+        "SC.L1-3.13.5"
+      ],
+      "objective_ids": [
+        "SC.L1-3.13.5[b]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.network/get-azvirtualnetwork",
+      "label": "Verify VNet Subnet Segmentation",
+      "engine": "az",
+      "set_command": "",
+      "get_command": "Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' | Select-Object Name,Subnets",
+      "idempotency": "evidence-only",
+      "variables_required": [
+        "resourceGroup"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 0,
+      "sequence_hint": 2,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' | Select-Object Name,@{N='Subnets';E={$_.Subnets | Select-Object Name,AddressPrefix,NetworkSecurityGroup}} | ConvertTo-Json -Depth 10"
+      ],
+      "on_failure": "warn_continue",
+      "notes": "L1 carry-forward. Verifies VNet has segmented subnets separating public-facing from internal components. Uses az CLI syntax (az rest) — required for operations without Az PowerShell cmdlet equivalents.",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "not_empty": true
+        }
+      }
+    },
+    {
+      "entry_id": "AZ-MON-001",
+      "cost_gate": {"recurring":true,"cost_key":"azure.monitor.action_group","estimate_basis":"1,000 emails free, then per message","standard_alternative":["none: Microsoft 365 alert policies email at no cost"]},
+      "control_ids": [
+        "AU.L2-3.3.4"
+      ],
+      "objective_ids": [
+        "AU.L2-3.3.4[a]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.monitor/new-azactiongroup",
+      "label": "Create Azure Monitor Action Group for CISO Alerts",
+      "engine": "az",
+      "set_command": "$emailReceiver = New-AzActionGroupEmailReceiverObject -Name 'CISO' -EmailAddress '{cisoEmail}' -UseCommonAlertSchema $true; New-AzActionGroup -ResourceGroupName '{resourceGroup}' -Name 'CMMC-AlertGroup' -ShortName 'CMMCAlert' -Location 'Global' -EmailReceiver @($emailReceiver)",
+      "get_command": "Get-AzActionGroup | ForEach-Object { [pscustomobject]@{ Name = $_.Name; ResourceGroupName = $_.ResourceGroupName; Enabled = $_.Enabled; EmailAddresses = @(@($_.EmailReceiver) + @($_.EmailReceivers) | Where-Object { $_ } | ForEach-Object { $_.EmailAddress }) } } | Where-Object { ($_.Name -eq 'CMMC-AlertGroup') -or (($_.Enabled -eq $true) -and (@($_.EmailAddresses) -contains '{cisoEmail}')) } | Sort-Object { $_.Name -ne 'CMMC-AlertGroup' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "cisoEmail",
+        "resourceGroup"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 7,
+      "sequence_hint": 14,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzActionGroup -ResourceGroupName '{resourceGroup}' | Select-Object Name,Enabled,@{Name='EmailReceivers';Expression={$_.EmailReceivers | Select-Object Name,EmailAddress}} | ConvertTo-Json -Depth 10"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "not_empty": true
+        }
+      },
+      "notes": "Creates an Azure Monitor Action Group that sends CMMC-related alerts to the CISO email address. Satisfies AU.L2-3.3.4 by establishing an automated notification path for audit logging process failures and security-critical events. Evidence proves the action group is configured with the correct email receiver.",
+      "lookup": {
+        "source": "Get-AzActionGroup | ForEach-Object { [pscustomobject]@{ Name = $_.Name; ResourceGroupName = $_.ResourceGroupName; Enabled = $_.Enabled; EmailAddresses = @(@($_.EmailReceiver) + @($_.EmailReceivers) | Where-Object { $_ } | ForEach-Object { $_.EmailAddress }) } }",
+        "by_name": {
+          "path": "$.Name",
+          "equals": "CMMC-AlertGroup"
+        },
+        "by_effect": [
+          {
+            "path": "$.Enabled",
+            "op": "equals",
+            "value": true
+          },
+          {
+            "path": "$.EmailAddresses",
+            "op": "contains",
+            "value": "{cisoEmail}"
+          }
+        ]
+      }
+    },
+    {
+      "entry_id": "AZ-LOG-004",
+      "cost_gate": {"recurring":true,"cost_key":"azure.resource_lock.ratchet","estimate_basis":"locks the billable workspace","irreversible":true,"two_person":true,"standard_alternative":["none: RBAC limits who can delete"],"requires_entries":["AZ-LOG-001"]},
+      "control_ids": [
+        "AU.L2-3.3.8"
+      ],
+      "objective_ids": [
+        "AU.L2-3.3.8[c]",
+        "AU.L2-3.3.8[f]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/rest/api/resources/management-locks/create-or-update-by-scope",
+      "label": "Apply CanNotDelete Lock to Sentinel Log Analytics Workspace",
+      "engine": "az",
+      "set_command": "Invoke-AzRestMethod -Method PUT -Path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.OperationalInsights/workspaces/{lawWorkspaceName}/providers/Microsoft.Authorization/locks/DoNotDelete?api-version=2016-09-01' -Payload (@{properties=@{level='CanNotDelete';notes='CMMC AU protection'}} | ConvertTo-Json -Depth 10)",
+      "get_command": "Invoke-AzRestMethod -Method GET -Path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.OperationalInsights/workspaces/{lawWorkspaceName}/providers/Microsoft.Authorization/locks?api-version=2016-09-01'",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "subscriptionId",
+        "resourceGroup",
+        "lawWorkspaceName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 7,
+      "sequence_hint": 16,
+      "manual_only": false,
+      "evidence_commands": [
+        "Invoke-AzRestMethod -Method GET -Path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.OperationalInsights/workspaces/{lawWorkspaceName}/providers/Microsoft.Authorization/locks?api-version=2016-09-01'"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "not_empty": true
+        }
+      },
+      "notes": "Applies a CanNotDelete lock to the Sentinel Log Analytics workspace via ARM REST API, preventing accidental deletion of the audit log store. Satisfies AU.L2-3.3.8 protection of audit information from unauthorized modification or deletion. Uses Invoke-AzRestMethod because New-AzResourceLock does not support nested provider scopes."
+    },
+    {
+      "entry_id": "AZ-FW-000",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter","last_resort":true,"two_person":true,"standard_alternative":["AZ-NSG-002","AZ-NSG-003","AZ-NSG-005","AZ-NSG-006","AZ-NSG-007","AZ-SEP-001","AZ-POL-001","AZ-VM-005","SC.L1-3.13.1.endpoint-firewall","SC.L1-3.13.1.nsg-boundary-rules"],"requires_entries":["AZ-FW-002"]},
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "objective_ids": [
+        "SC.L1-3.13.1[e]",
+        "SC.L1-3.13.1[g]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.network/new-azfirewallpolicy",
+      "label": "Create Azure Firewall Policy with Threat Intel Deny Mode",
+      "engine": "az",
+      "set_command": "New-AzFirewallPolicy -Name 'cmmc-fw-policy' -ResourceGroupName '{resourceGroup}' -Location '{location}' -ThreatIntelMode 'Deny'",
+      "get_command": "Get-AzFirewallPolicy -ResourceGroupName '{resourceGroup}' -Name 'cmmc-fw-policy' | ConvertTo-Json -Depth 10",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "location"
+      ],
+      "variables_runtime": [],
+      "captures": [
+        {
+          "variable": "fwPolicyId",
+          "from": "json_field",
+          "json_path": "$.Id"
+        }
+      ],
+      "layer_hint": 6,
+      "sequence_hint": 24,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzFirewallPolicy -ResourceGroupName '{resourceGroup}' -Name 'cmmc-fw-policy'"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.Id",
+          "not_empty": true
+        }
+      },
+      "notes": "LAST RESORT: the firewall policy has no meter of its own, but it exists only for AZ-FW-002 and is never created unless the firewall is (COST-GATE-SPEC.md §4.8). ThreatIntelMode Deny blocks known-malicious addresses once traffic is routed through the firewall; without a route table it inspects nothing (spec §4.1)."
+    },
+    {
+      "entry_id": "AZ-KV-004",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter","requires_entries":["AZ-KV-001"]},
+      "control_ids": [
+        "SC.L2-3.13.10"
+      ],
+      "objective_ids": [
+        "SC.L2-3.13.10[b]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.keyvault/update-azkeyvaultnetworkruleset",
+      "label": "Restrict Key Vault Network Access to Azure Services Only",
+      "engine": "az",
+      "set_command": "Update-AzKeyVaultNetworkRuleSet -VaultName '{keyVaultName}' -DefaultAction Deny -Bypass AzureServices",
+      "get_command": "$vault = Get-AzKeyVault -VaultName '{keyVaultName}' -ErrorAction SilentlyContinue -WarningAction SilentlyContinue; if ($vault -and $vault.NetworkAcls -and $vault.NetworkAcls.DefaultAction.ToString() -eq 'Deny') { $vault.NetworkAcls | Select-Object @{N='DefaultAction';E={$_.DefaultAction.ToString()}},@{N='Bypass';E={$_.Bypass.ToString()}},IpAddressRanges,VirtualNetworkResourceIds | ConvertTo-Json -Depth 5 } else { $null }",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "keyVaultName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 8,
+      "manual_only": false,
+      "evidence_commands": [
+        "$vault = Get-AzKeyVault -VaultName '{keyVaultName}' -ErrorAction SilentlyContinue -WarningAction SilentlyContinue; if ($vault) { @{ DefaultAction = if ($vault.NetworkAcls) { $vault.NetworkAcls.DefaultAction.ToString() } else { 'Allow' }; Bypass = if ($vault.NetworkAcls) { $vault.NetworkAcls.Bypass.ToString() } else { 'None' } } | ConvertTo-Json -Depth 5 } else { $null }"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "jsonpath": "$.DefaultAction",
+          "not_empty": true
+        }
+      },
+      "notes": "Restricts Key Vault network access to Azure services only by setting DefaultAction to Deny and Bypass to AzureServices. This ensures cryptographic key operations are only accessible from within Azure, not from the public internet. Satisfies SC.L2-3.13.10 cryptographic key management."
+    },
+    {
+      "entry_id": "AZ-SEN-010",
+      "cost_gate": {"recurring":true,"cost_key":"azure.sentinel.ueba","estimate_basis":"BehaviorAnalytics and IdentityInfo ingestion","standard_alternative":["none: Entra ID Protection risk policies (G5)"],"requires_entries":["AZ-SEN-001"]},
+      "control_ids": [
+        "SI.L2-3.14.7"
+      ],
+      "objective_ids": [
+        "SI.L2-3.14.7[b]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/rest/api/securityinsights/product-settings/update",
+      "label": "Enable Sentinel UEBA for Anomalous Behavior Detection",
+      "engine": "az",
+      "set_command": "Invoke-AzRestMethod -Method PUT -Path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.OperationalInsights/workspaces/{lawWorkspaceName}/providers/Microsoft.SecurityInsights/settings/Ueba?api-version=2023-02-01' -Payload (@{kind='Ueba';properties=@{dataSources=@('AuditLogs','SigninLogs','SecurityEvent')}} | ConvertTo-Json -Depth 10)",
+      "get_command": "Invoke-AzRestMethod -Method GET -Path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.OperationalInsights/workspaces/{lawWorkspaceName}/providers/Microsoft.SecurityInsights/settings/Ueba?api-version=2023-02-01'",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "subscriptionId",
+        "resourceGroup",
+        "lawWorkspaceName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 7,
+      "sequence_hint": 12,
+      "manual_only": false,
+      "evidence_commands": [
+        "Invoke-AzRestMethod -Method GET -Path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.OperationalInsights/workspaces/{lawWorkspaceName}/providers/Microsoft.SecurityInsights/settings/Ueba?api-version=2023-02-01'"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "sentinel",
+      "verification": {
+        "evidence": {
+          "not_empty": true
+        }
+      },
+      "notes": "Enables Sentinel User and Entity Behavior Analytics (UEBA) with AuditLogs, SigninLogs, and SecurityEvent data sources. UEBA uses machine learning to detect anomalous user behavior patterns. Satisfies SI.L2-3.14.7 identification of unauthorized system use via behavioral baselines."
+    },
+    {
+      "entry_id": "AZ-FW-003",
+      "cost_gate": {"recurring":false,"free_reason":"cost_reducing","requires_entries":["AZ-FW-002"]},
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "objective_ids": [],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.network/set-azfirewall",
+      "label": "Azure Firewall - Deallocate",
+      "engine": "az",
+      "set_command": "$fw = Get-AzFirewall -ResourceGroupName '{resourceGroup}' -Name '{firewallName}'; $fw.Deallocate(); Set-AzFirewall -AzureFirewall $fw",
+      "get_command": "Get-AzFirewall -ResourceGroupName '{resourceGroup}' -Name '{firewallName}' | Select-Object Name,ProvisioningState,@{Name='AllocationState';Expression={if($_.IpConfigurations.Count -eq 0){'Deallocated'}else{'Allocated'}}} | ConvertTo-Json -Depth 3",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "firewallName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 27,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzFirewall -ResourceGroupName '{resourceGroup}' -Name '{firewallName}' | Select-Object Name,ProvisioningState,@{Name='AllocationState';Expression={if($_.IpConfigurations.Count -eq 0){'Deallocated'}else{'Allocated'}}} | ConvertTo-Json -Depth 3"
+      ],
+      "on_failure": "abort_plan",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "not_empty": true
+        }
+      },
+      "notes": "Deallocates Azure Firewall to stop its hourly billing while keeping its configuration (free, cost_reducing). A deallocated firewall has no IP configurations; AllocationState is derived from IpConfigurations.Count (0 = Deallocated). Deallocating changes no traffic path today: no route table sends traffic to the firewall (COST-GATE-SPEC.md §4.1)."
+    },
+    {
+      "entry_id": "AZ-FW-004",
+      "cost_gate": {"recurring":true,"cost_key":"azure.firewall.premium","estimate_basis":"restarts the 730 h meter","two_person":true,"last_resort":true,"standard_alternative":["AZ-NSG-002","AZ-NSG-003","AZ-NSG-005","AZ-NSG-006","AZ-NSG-007","AZ-SEP-001","AZ-POL-001","AZ-VM-005","SC.L1-3.13.1.endpoint-firewall","SC.L1-3.13.1.nsg-boundary-rules"],"requires_entries":["AZ-FW-002"]},
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "objective_ids": [],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.network/set-azfirewall",
+      "label": "Azure Firewall - Allocate",
+      "engine": "az",
+      "set_command": "$fw = Get-AzFirewall -ResourceGroupName '{resourceGroup}' -Name '{firewallName}'; $vnet = Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name '{vnetName}'; $pip = Get-AzPublicIpAddress -ResourceGroupName '{resourceGroup}' -Name '{publicIpName}'; $fw.Allocate($vnet, $pip); Set-AzFirewall -AzureFirewall $fw",
+      "get_command": "Get-AzFirewall -ResourceGroupName '{resourceGroup}' -Name '{firewallName}' | Select-Object Name,ProvisioningState,@{Name='AllocationState';Expression={if($_.IpConfigurations.Count -eq 0){'Deallocated'}else{'Allocated'}}} | ConvertTo-Json -Depth 3",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "firewallName",
+        "vnetName",
+        "publicIpName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 28,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzFirewall -ResourceGroupName '{resourceGroup}' -Name '{firewallName}' | Select-Object Name,ProvisioningState,@{Name='AllocationState';Expression={if($_.IpConfigurations.Count -eq 0){'Deallocated'}else{'Allocated'}}} | ConvertTo-Json -Depth 3"
+      ],
+      "on_failure": "abort_plan",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "not_empty": true
+        }
+      },
+      "notes": "LAST RESORT: re-allocating restarts the firewall's hourly meter (recurring, two-person; COST-GATE-SPEC.md §4.8). It assigns the VNet and one public IP; AllocationState is derived from IpConfigurations.Count (>0 = Allocated). It filters traffic only when a route table sends traffic to the firewall and rule collections exist (spec §4.1)."
+    },
+    {
+      "entry_id": "AZ-NSG-006",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter"},
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "objective_ids": [
+        "SC.L1-3.13.1[e]",
+        "SC.L1-3.13.1[f]",
+        "SC.L2-3.13.6[b]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.network/add-aznetworksecurityruleconfig",
+      "label": "Add NSG Rules — CES Outbound 443 to Named Service Tags (SB-2)",
+      "engine": "az",
+      "set_command": "$nsg = Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'nsg-workload-cmmc'; $p = 200; foreach ($t in @('AzureActiveDirectory','AzureResourceManager','AzureKeyVault','Storage','GuestAndHybridManagement','AzureUpdateDelivery','AzureFrontDoor.FirstParty')) { $n = 'CES-Out-443-' + ($t -replace '\\.','-'); if (-not ($nsg.SecurityRules | Where-Object Name -eq $n)) { $null = Add-AzNetworkSecurityRuleConfig -NetworkSecurityGroup $nsg -Name $n -Description 'SB-2 CES outbound allow (COST-GATE-SPEC 4.3)' -Protocol 'Tcp' -SourcePortRange '*' -DestinationPortRange '443' -SourceAddressPrefix 'VirtualNetwork' -DestinationAddressPrefix $t -Access 'Allow' -Priority $p -Direction 'Outbound' }; $p++ }; $nsg | Set-AzNetworkSecurityGroup | Out-Null; Write-Output 'SB-2 service-tag allow rules present'",
+      "get_command": "$r = @(Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'nsg-workload-cmmc' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty SecurityRules | Where-Object { $_.Name -like 'CES-Out-443-*' -and $_.Name -ne 'CES-Out-443-M365' -and $_.Access -eq 'Allow' -and $_.Direction -eq 'Outbound' -and (@($_.DestinationPortRange) -contains '443') }); if ($r.Count -ge 7) { [pscustomobject]@{ Rules = @($r | Select-Object Name,Priority,Access,Direction,DestinationAddressPrefix,DestinationPortRange); AllowedServiceTags = (@($r | ForEach-Object { $_.DestinationAddressPrefix }) | Sort-Object -Unique) -join ',' } | ConvertTo-Json -Depth 4 }",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 21,
+      "manual_only": false,
+      "evidence_commands": [
+        "$r = @(Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'nsg-workload-cmmc' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty SecurityRules | Where-Object { $_.Name -like 'CES-Out-443-*' -and $_.Name -ne 'CES-Out-443-M365' -and $_.Access -eq 'Allow' -and $_.Direction -eq 'Outbound' }); if ($r.Count -ge 7) { $r | Select-Object Name,Priority,Access,Direction,DestinationAddressPrefix,DestinationPortRange | ConvertTo-Json -Depth 3 }"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "not_empty": true,
+          "jsonpath": "$.AllowedServiceTags",
+          "equals": "AzureActiveDirectory,AzureFrontDoor.FirstParty,AzureKeyVault,AzureResourceManager,AzureUpdateDelivery,GuestAndHybridManagement,Storage",
+          "checks": [
+            {
+              "jsonpath": "$.AllowedServiceTags",
+              "equals": "AzureActiveDirectory,AzureFrontDoor.FirstParty,AzureKeyVault,AzureResourceManager,AzureUpdateDelivery,GuestAndHybridManagement,Storage"
+            },
+            {
+              "jsonpath": "$.Rules",
+              "min_items": 7
+            }
+          ]
+        },
+        "postcheck_mode": "state"
+      },
+      "notes": "Standard boundary layer SB-2 (COST-GATE-SPEC.md §4.3): outbound allows on TCP 443 only, from the CES subnet's NSG (nsg-workload-cmmc) to the service tags AzureActiveDirectory, AzureResourceManager, AzureKeyVault, Storage, GuestAndHybridManagement, AzureUpdateDelivery and AzureFrontDoor.FirstParty, at priorities 200-206, above AZ-NSG-003's Deny-All-Outbound (4096). Free (no meter). Unregioned tags are used; narrowing AzureKeyVault and Storage to the region (AzureKeyVault.<region>) and whether Graph sits inside AzureActiveDirectory in Azure Government are unconfirmed (spec §4.3 \"Check in Azure Government\"). Not yet served by the simulator (DEPTH-9a)."
+    },
+    {
+      "entry_id": "AZ-NSG-007",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter"},
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "objective_ids": [
+        "SC.L1-3.13.1[e]",
+        "SC.L1-3.13.1[f]",
+        "SC.L2-3.13.6[b]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/microsoft-365/enterprise/microsoft-365-ip-web-service",
+      "label": "Add NSG Rule — CES Outbound 443 to Microsoft 365 GCC High Ranges (SB-2/SB-3)",
+      "engine": "az",
+      "set_command": "$ips = @('{m365Ipv4Ranges}' -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ -and $_ -notmatch ':' } | Sort-Object -Unique); if ($ips.Count -eq 0) { throw 'The Microsoft 365 endpoint service returned no GCC High IPv4 ranges' }; $nsg = Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'nsg-workload-cmmc'; $rule = @{ NetworkSecurityGroup = $nsg; Name = 'CES-Out-443-M365'; Description = 'SB-2/SB-3 Microsoft 365 GCC High ranges (COST-GATE-SPEC 4.3)'; Protocol = 'Tcp'; SourcePortRange = '*'; DestinationPortRange = '443'; SourceAddressPrefix = 'VirtualNetwork'; DestinationAddressPrefix = $ips; Access = 'Allow'; Priority = 210; Direction = 'Outbound' }; if ($nsg.SecurityRules | Where-Object Name -eq 'CES-Out-443-M365') { $null = Set-AzNetworkSecurityRuleConfig @rule } else { $null = Add-AzNetworkSecurityRuleConfig @rule }; $nsg | Set-AzNetworkSecurityGroup | Out-Null; Write-Output ('CES-Out-443-M365 holds ' + $ips.Count + ' ranges')",
+      "get_command": "Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'nsg-workload-cmmc' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty SecurityRules | Where-Object { $_.Name -eq 'CES-Out-443-M365' -and $_.Access -eq 'Allow' } | Select-Object Name,Priority,Access,Direction,DestinationPortRange,@{N='RangeCount';E={@($_.DestinationAddressPrefix).Count}} | ConvertTo-Json -Depth 3",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "m365Ipv4Ranges"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 22,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'nsg-workload-cmmc' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty SecurityRules | Where-Object { $_.Name -eq 'CES-Out-443-M365' -and $_.Access -eq 'Allow' } | Select-Object Name,Priority,Access,Direction,DestinationPortRange,@{N='RangeCount';E={@($_.DestinationAddressPrefix).Count}} | ConvertTo-Json -Depth 3"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "not_empty": true
+        }
+      },
+      "notes": "Standard boundary layers SB-2 and SB-3 (COST-GATE-SPEC.md §4.3): one outbound allow on TCP 443 (priority 210) to the IPv4 ranges Microsoft publishes for the US Government GCC High instance (endpoint web service instance USGovGCCHigh, service areas Exchange and Common), so the CES VM reaches Exchange Online, Graph and the sign-in endpoints behind Deny-All-Outbound. Free (no meter). The SET re-reads the list each time it runs; the scheduled refresh on the CES VM is SB-3 (CG-10). The caller needs outbound HTTPS to endpoints.office.com when this runs. Which service area carries Graph in GCC High is unconfirmed. Not yet served by the simulator (DEPTH-9a). DEPTH-2 (2026-10-31): the ranges are no longer fetched inside the SET. They arrive as {m365Ipv4Ranges}, a comma-separated list of the IPv4 ranges the Microsoft 365 endpoint service (instance USGovGCCHigh, service areas Exchange and Common, TCP 443) publishes, supplied by the scheduled refresh (SB-3, CG-10). Until a manifest supplies it, the translator leaves this entry out (unresolved variable), so no configuration command makes a live web call."
+    },
+    {
+      "entry_id": "AZ-SEP-001",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter","requires_entries":["AZ-LOG-002"]},
+      "control_ids": [
+        "SC.L2-3.13.6"
+      ],
+      "objective_ids": [
+        "SC.L2-3.13.6[a]",
+        "SC.L2-3.13.6[b]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.network/new-azserviceendpointpolicy",
+      "label": "Storage Service Endpoint Policy for Named Accounts (SB-4)",
+      "engine": "az",
+      "set_command": "$sa = Get-AzStorageAccount -ResourceGroupName '{resourceGroup}' -Name '{storageAccountName}'; $pol = Get-AzServiceEndpointPolicy -ResourceGroupName '{resourceGroup}' -Name 'sep-ces-storage' -ErrorAction SilentlyContinue; if (-not $pol) { $def = New-AzServiceEndpointPolicyDefinition -Name 'ces-named-storage' -Service 'Microsoft.Storage' -ServiceResource @($sa.Id) -Description 'SB-4 named storage accounts only'; $pol = New-AzServiceEndpointPolicy -ResourceGroupName '{resourceGroup}' -Name 'sep-ces-storage' -Location '{location}' -ServiceEndpointPolicyDefinition $def }; $vnet = Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name '{vnetName}'; $sn = $vnet.Subnets | Where-Object Name -eq 'snet-workload'; $eps = @(@($sn.ServiceEndpoints | ForEach-Object { $_.Service }) + @('Microsoft.Storage','Microsoft.KeyVault') | Where-Object { $_ } | Sort-Object -Unique); $null = Set-AzVirtualNetworkSubnetConfig -VirtualNetwork $vnet -Name 'snet-workload' -AddressPrefix $sn.AddressPrefix -NetworkSecurityGroup $sn.NetworkSecurityGroup -RouteTable $sn.RouteTable -ServiceEndpoint $eps -ServiceEndpointPolicy $pol; $vnet | Set-AzVirtualNetwork | Out-Null; Write-Output 'sep-ces-storage attached to snet-workload'",
+      "get_command": "$vnet = Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name '{vnetName}' -ErrorAction SilentlyContinue; $sn = $vnet.Subnets | Where-Object Name -eq 'snet-workload'; if ($sn.ServiceEndpointPolicies | Where-Object { $_.Id -like '*/serviceEndpointPolicies/sep-ces-storage' }) { Get-AzServiceEndpointPolicy -ResourceGroupName '{resourceGroup}' -Name 'sep-ces-storage' | Select-Object Name,ProvisioningState,@{N='ServiceResources';E={$_.ServiceEndpointPolicyDefinitions.ServiceResources}} | ConvertTo-Json -Depth 5 }",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "resourceGroup",
+        "location",
+        "vnetName",
+        "storageAccountName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 23,
+      "manual_only": false,
+      "evidence_commands": [
+        "$vnet = Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name '{vnetName}' -ErrorAction SilentlyContinue; $sn = $vnet.Subnets | Where-Object Name -eq 'snet-workload'; if ($sn.ServiceEndpointPolicies | Where-Object { $_.Id -like '*/serviceEndpointPolicies/sep-ces-storage' }) { Get-AzServiceEndpointPolicy -ResourceGroupName '{resourceGroup}' -Name 'sep-ces-storage' | Select-Object Name,ProvisioningState,@{N='ServiceResources';E={$_.ServiceEndpointPolicyDefinitions.ServiceResources}} | ConvertTo-Json -Depth 5 }"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "not_empty": true
+        }
+      },
+      "notes": "Standard boundary layer SB-4 (COST-GATE-SPEC.md §4.3): service endpoints for Microsoft.Storage and Microsoft.KeyVault on snet-workload, plus a service endpoint policy that lets the subnet reach only the named storage account (the CES evidence account, {storageAccountName}); Storage.<region> alone would allow any account in the region. Free (no meter). Runs after AZ-NSG-005 and keeps the subnet's NSG and route table (Set-AzVirtualNetworkSubnetConfig drops any association it is not given). The release-feed account sits in another Entra tenant; whether a policy can name it is unconfirmed, so it is reached through the CES egress proxy (SB-6) until confirmed. Not yet served by the simulator (DEPTH-9a)."
+    },
+    {
+      "entry_id": "AZ-POL-001",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter"},
+      "control_ids": [
+        "SC.L1-3.13.5"
+      ],
+      "objective_ids": [
+        "SC.L1-3.13.5[a]",
+        "SC.L1-3.13.5[b]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.resources/new-azpolicyassignment",
+      "label": "Assign Policy — Network Interfaces Should Not Have Public IPs (SB-1)",
+      "engine": "az",
+      "set_command": "$a = Get-AzPolicyAssignment -Name 'CES-No-NIC-Public-IP' -Scope '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}' -ErrorAction SilentlyContinue; if (-not $a) { $def = Get-AzPolicyDefinition -Id '/providers/Microsoft.Authorization/policyDefinitions/83a86a26-fd1f-447c-b59d-e51f44264114'; New-AzPolicyAssignment -Name 'CES-No-NIC-Public-IP' -DisplayName 'Network interfaces should not have public IPs (SB-1)' -PolicyDefinition $def -Scope '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}' | Select-Object Name,EnforcementMode | ConvertTo-Json } else { Write-Output 'Assignment already exists - skipping creation' }",
+      "get_command": "Get-AzPolicyAssignment -Name 'CES-No-NIC-Public-IP' -Scope '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}' -ErrorAction SilentlyContinue | Select-Object Name, DisplayName, EnforcementMode | ConvertTo-Json",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "subscriptionId",
+        "resourceGroup"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 9,
+      "manual_only": false,
+      "evidence_commands": [
+        "Get-AzPolicyAssignment -Name 'CES-No-NIC-Public-IP' -Scope '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}' -ErrorAction SilentlyContinue | Select-Object Name, DisplayName, EnforcementMode | ConvertTo-Json"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "foundation",
+      "verification": {
+        "evidence": {
+          "not_empty": true,
+          "jsonpath": "$.Name",
+          "equals": "CES-No-NIC-Public-IP",
+          "checks": [
+            {
+              "jsonpath": "$.EnforcementMode",
+              "equals": "Default"
+            }
+          ]
+        },
+        "postcheck_mode": "state"
+      },
+      "notes": "Standard boundary layer SB-1 (COST-GATE-SPEC.md §4.3): the built-in policy \"Network interfaces should not have public IPs\" (deny), assigned at the CES resource group. Free (no meter). The only exemption is the one explicit egress IP, created by AZ-NET-007 on the CES VM's network card. The built-in definition id is the commercial-cloud id; its presence in Azure Government is unconfirmed. Not yet served by the simulator (DEPTH-9a)."
+    },
+    {
+      "entry_id": "AZ-VM-005",
+      "cost_gate": {"recurring":false,"free_reason":"no_meter","requires_entries":["AZ-VM-001"]},
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "CM.L2-3.4.7"
+      ],
+      "objective_ids": [
+        "SC.L1-3.13.1[c]",
+        "SC.L1-3.13.1[d]",
+        "SC.L1-3.13.1[e]",
+        "SC.L1-3.13.1[f]",
+        "CM.L2-3.4.7[i]",
+        "CM.L2-3.4.7[l]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/azure/governance/machine-configuration/overview",
+      "label": "Machine Configuration — CES VM Host Firewall Baseline, Apply and Autocorrect (SB-5)",
+      "engine": "az",
+      "set_command": "$body = @{ location = '{location}'; properties = @{ guestConfiguration = @{ name = 'CesHostFirewall'; version = '1.0.0'; contentUri = '{hostFirewallPackageUri}'; contentHash = '{hostFirewallPackageHash}'; assignmentType = 'ApplyAndAutoCorrect' } } } | ConvertTo-Json -Depth 5; $r = Invoke-AzRestMethod -Method PUT -Path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/CesHostFirewall?api-version=2022-01-25' -Payload $body; if ($r.StatusCode -ge 300) { throw ('Machine Configuration assignment failed: ' + $r.StatusCode + ' ' + $r.Content) }; $r.Content",
+      "get_command": "$r = Invoke-AzRestMethod -Method GET -Path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/CesHostFirewall?api-version=2022-01-25'; if ($r.StatusCode -eq 200) { $r.Content }",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "subscriptionId",
+        "resourceGroup",
+        "location",
+        "vmName",
+        "hostFirewallPackageUri",
+        "hostFirewallPackageHash"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 37,
+      "manual_only": false,
+      "evidence_commands": [
+        "$r = Invoke-AzRestMethod -Method GET -Path '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/CesHostFirewall?api-version=2022-01-25'; if ($r.StatusCode -eq 200) { $r.Content }"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "not_empty": true,
+          "regex": "ApplyAndAutoCorrect"
+        }
+      },
+      "notes": "Standard boundary layer SB-5 (COST-GATE-SPEC.md §4.3): a Machine Configuration assignment that holds the CES VM's Windows Defender Firewall baseline (all profiles on, inbound blocked, outbound blocked by default except the CES egress proxy, DNS, the VM agent and time/activation; logging on) with apply-and-autocorrect. Free on Azure VMs (no meter). The package ({hostFirewallPackageUri}, {hostFirewallPackageHash}) is built and signed by the packaging slice (CG-10); the VM needs a system-assigned identity and the guest configuration extension. Machine Configuration availability in Azure Government is unconfirmed. Not yet served by the simulator (DEPTH-9a)."
+    },
+    {
+      "entry_id": "AZ-NET-007",
+      "cost_gate": {"recurring":true,"cost_key":"azure.public_ip.standard","estimate_basis":"1 static Standard IP x 730 h on the CES VM network card; inbound denied","standard_alternative":["none: customer-owned egress when the tenant record names one (COST-GATE-SPEC 4.4)"],"requires_entries":["AZ-VM-001"]},
+      "control_ids": [
+        "SC.L1-3.13.1"
+      ],
+      "objective_ids": [],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.network/new-azpublicipaddress",
+      "label": "Explicit Egress Public IP for the CES VM (SB outbound floor)",
+      "engine": "az",
+      "set_command": "$pip = Get-AzPublicIpAddress -ResourceGroupName '{resourceGroup}' -Name 'pip-ces-egress-{vmName}' -ErrorAction SilentlyContinue; if (-not $pip) { $pip = New-AzPublicIpAddress -ResourceGroupName '{resourceGroup}' -Name 'pip-ces-egress-{vmName}' -Location '{location}' -Sku 'Standard' -AllocationMethod 'Static' }; $nic = Get-AzNetworkInterface -ResourceGroupName '{resourceGroup}' -Name 'nic-{vmName}'; $a = Get-AzPolicyAssignment -Name 'CES-No-NIC-Public-IP' -Scope '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}' -ErrorAction SilentlyContinue; if ($a -and -not (Get-AzPolicyExemption -Name 'ces-egress-{vmName}' -Scope $nic.Id -ErrorAction SilentlyContinue)) { $null = New-AzPolicyExemption -Name 'ces-egress-{vmName}' -PolicyAssignment $a -Scope $nic.Id -ExemptionCategory 'Waiver' -Description 'SB-1 exemption for the one explicit egress IP (AZ-NET-007)' }; $nic.IpConfigurations[0].PublicIpAddress = $pip; $nic | Set-AzNetworkInterface | Select-Object Name,@{N='PublicIpId';E={$_.IpConfigurations[0].PublicIpAddress.Id}} | ConvertTo-Json",
+      "get_command": "$nic = Get-AzNetworkInterface -ResourceGroupName '{resourceGroup}' -Name 'nic-{vmName}' -ErrorAction SilentlyContinue; if ($nic.IpConfigurations[0].PublicIpAddress.Id -like '*/publicIPAddresses/pip-ces-egress-{vmName}') { $nic | Select-Object Name,@{N='PublicIpId';E={$_.IpConfigurations[0].PublicIpAddress.Id}} | ConvertTo-Json }",
+      "idempotency": "get-then-set",
+      "variables_required": [
+        "subscriptionId",
+        "resourceGroup",
+        "location",
+        "vmName"
+      ],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 6,
+      "sequence_hint": 38,
+      "manual_only": false,
+      "evidence_commands": [
+        "$nic = Get-AzNetworkInterface -ResourceGroupName '{resourceGroup}' -Name 'nic-{vmName}' -ErrorAction SilentlyContinue; if ($nic.IpConfigurations[0].PublicIpAddress.Id -like '*/publicIPAddresses/pip-ces-egress-{vmName}') { $nic | Select-Object Name,@{N='PublicIpId';E={$_.IpConfigurations[0].PublicIpAddress.Id}} | ConvertTo-Json }"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "full",
+      "verification": {
+        "evidence": {
+          "not_empty": true
+        }
+      },
+      "notes": "The outbound floor (COST-GATE-SPEC.md §4.4): once Azure's default outbound access is retired, a VM in a private subnet reaches nothing without an explicit outbound method. This is the cheapest one: one Standard static public IP on the CES VM's network card, about $4.56 a month (US Gov list). Recurring, so off by default behind DP-1 and DP-2; not two-person. Inbound stays denied by the NSG (AZ-NSG-002) and the host firewall (AZ-VM-005). It adds the only SB-1 policy exemption (AZ-POL-001). It should be skipped when the tenant record names customer-owned egress; that condition is a translation change (DEPTH-2). The retirement date and Azure Government behaviour are unconfirmed. Not yet served by the simulator (DEPTH-9a)."
+    },
+    {
+      "entry_id": "AZ-FOUND-005",
+      "cost_gate": {"recurring":true,"cost_key":"azure.defender.paid_plans","estimate_basis":"Storage + ARM + CSPM paid plans, 0 VMs; Servers P2 per VM extra","standard_alternative":["AZ-FOUND-003"]},
+      "control_ids": [
+        "SI.L1-3.14.1",
+        "SI.L2-3.14.6"
+      ],
+      "objective_ids": [
+        "SI.L1-3.14.1[b]",
+        "SI.L2-3.14.6[a]"
+      ],
+      "source": "https://learn.microsoft.com/en-us/powershell/module/az.security/set-azsecuritypricing",
+      "label": "Enable Microsoft Defender for Cloud Paid Plans (opt-in)",
+      "engine": "az",
+      "set_command": "Set-AzSecurityPricing -Name 'VirtualMachines' -PricingTier 'Standard'; Set-AzSecurityPricing -Name 'StorageAccounts' -PricingTier 'Standard'; Set-AzSecurityPricing -Name 'CloudPosture' -PricingTier 'Standard'; Set-AzSecurityPricing -Name 'Arm' -PricingTier 'Standard'",
+      "get_command": "$p = @(Get-AzSecurityPricing | Where-Object { $_.Name -in @('VirtualMachines','StorageAccounts','CloudPosture','Arm') -and $_.PricingTier -eq 'Standard' }); if ($p.Count -ge 4) { $p | Select-Object Name,PricingTier | ConvertTo-Json }",
+      "idempotency": "get-then-set",
+      "variables_required": [],
+      "variables_runtime": [],
+      "captures": [],
+      "layer_hint": 0,
+      "sequence_hint": 8,
+      "manual_only": false,
+      "evidence_commands": [
+        "$p = @(Get-AzSecurityPricing | Where-Object { $_.Name -in @('VirtualMachines','StorageAccounts','CloudPosture','Arm') -and $_.PricingTier -eq 'Standard' }); if ($p.Count -ge 4) { $p | Select-Object Name,PricingTier | ConvertTo-Json }"
+      ],
+      "on_failure": "abort_step",
+      "azure_tier": "foundation",
+      "verification": {
+        "evidence": {
+          "regex": "Standard",
+          "not_empty": true
+        }
+      },
+      "notes": "The paid Defender for Cloud plans (Servers, Storage, Defender CSPM, Resource Manager), split out of AZ-FOUND-003 so the default is free (COST-GATE-SPEC.md §3.2, §3.7). Recurring, so off by default behind DP-1 and DP-2. Adds threat detection (SI.L2-3.14.6[a]); the free alternative is AZ-FOUND-003 (Foundational CSPM) plus Defender XDR for users under G5. Not in Muster's default manifest."
+    }
+  ]
+}

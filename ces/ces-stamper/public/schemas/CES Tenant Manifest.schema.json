@@ -1,0 +1,445 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/ces-tenant-manifest.schema.json",
+  "title": "CES Tenant Manifest Schema (Canonical)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "ces",
+    "tenant_manifest"
+  ],
+  "properties": {
+    "ces": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact",
+        "version",
+        "generated_on",
+        "intent"
+      ],
+      "properties": {
+        "artifact": {
+          "type": "string",
+          "const": "tenant_manifest"
+        },
+        "version": {
+          "type": "string"
+        },
+        "generated_on": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "intent": {
+          "type": "string"
+        },
+        "inputs": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "tenant_manifest": {
+      "type": "object",
+      "required": [
+        "manifest_id",
+        "tech_stack_id",
+        "normative_controls",
+        "assets",
+        "config_intents",
+        "evidence_monitors",
+        "drift_policies"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "manifest_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tech_stack_id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "normative_controls": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/normative_control"
+          }
+        },
+        "assets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/asset"
+          }
+        },
+        "config_intents": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/config_intent"
+          }
+        },
+        "evidence_monitors": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/evidence_monitor"
+          }
+        },
+        "drift_policies": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/drift_policy"
+          }
+        },
+        "tenant_identity": {
+          "$ref": "#/$defs/tenant_identity"
+        },
+        "boundary_zones": {
+          "$ref": "#/$defs/boundary_zones"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "normative_control": {
+      "type": "object",
+      "required": [
+        "control_id",
+        "required_state",
+        "verification",
+        "evidence_artifacts"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "control_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required_state": {
+          "type": "string"
+        },
+        "verification": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "description",
+              "method",
+              "expected",
+              "on_fail"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "method": {
+                "type": "string",
+                "description": "Verification method: api_query, config_export, manual, event_stream"
+              },
+              "expected": {
+                "type": "string"
+              },
+              "on_fail": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "evidence_artifacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "artifact_id": {
+                "type": "string"
+              },
+              "artifact_type": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "collector": {
+                "type": "string"
+              },
+              "retention_days": {
+                "type": "number"
+              },
+              "storage_location_ref": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    "asset": {
+      "type": "object",
+      "required": [
+        "asset_id",
+        "asset_type",
+        "scope_category",
+        "tags"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "asset_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "asset_type": {
+          "type": "string",
+          "description": "Asset classification: system, identity_provider, endpoint_fleet, devops_pipeline, data_boundary, break_glass_account, admin_account, security_group, network_location"
+        },
+        "scope_category": {
+          "type": "string",
+          "description": "Scope: CUI, privileged_access, identity, conditional_access"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "owner": {
+          "type": "string"
+        }
+      }
+    },
+    "config_intent": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "control_ids",
+        "desired_config",
+        "source_of_truth",
+        "query_method"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string"
+        },
+        "control_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "desired_config": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Varies per control — at minimum contains { state } or control-specific TCP parameters"
+        },
+        "source_of_truth": {
+          "type": "string",
+          "description": "Source: platform_setting, iac, policy_doc, manual"
+        },
+        "query_method": {
+          "type": "string",
+          "description": "Query method: api, export, manual"
+        }
+      }
+    },
+    "evidence_monitor": {
+      "type": "object",
+      "required": [
+        "id",
+        "control_ids",
+        "signal",
+        "collection_method",
+        "cadence",
+        "retention_days",
+        "on_drift"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "control_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "signal": {
+          "type": "string"
+        },
+        "collection_method": {
+          "type": "string",
+          "description": "Collection: api_poll, scheduled_export, event_stream, manual"
+        },
+        "cadence": {
+          "type": "string",
+          "description": "Frequency: daily, weekly, monthly"
+        },
+        "retention_days": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "on_drift": {
+          "type": "string"
+        },
+        "sentinel_workspace": {
+          "type": "string",
+          "description": "TCP-specific: Sentinel workspace name"
+        },
+        "sentinel_resource_group": {
+          "type": "string",
+          "description": "TCP-specific: Sentinel resource group"
+        },
+        "log_analytics_workspace_id": {
+          "type": "string",
+          "description": "TCP-specific: Log Analytics workspace ID"
+        }
+      }
+    },
+    "drift_policy": {
+      "type": "object",
+      "required": [
+        "id",
+        "scope",
+        "severity",
+        "detection",
+        "response_playbook"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "type": "string"
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "critical",
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "detection": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "response_playbook": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "tenant_identity": {
+      "type": "object",
+      "required": [
+        "tenant_id",
+        "primary_domain",
+        "cloud_environment",
+        "display_name",
+        "primary_sku",
+        "license_count"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tenant_id": {
+          "type": "string",
+          "description": "Azure AD / Entra ID tenant GUID"
+        },
+        "primary_domain": {
+          "type": "string"
+        },
+        "custom_domains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "cloud_environment": {
+          "type": "string",
+          "description": "Cloud environment: commercial, gcc, gcc_high, dod_il5, dod_il6"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "primary_sku": {
+          "type": "string"
+        },
+        "license_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "addon_skus": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "service_activations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "boundary_zones": {
+      "type": "object",
+      "required": [
+        "cui_boundary_version",
+        "definitions"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "cui_boundary_version": {
+          "type": "string",
+          "description": "Timestamp from CUI boundary generation"
+        },
+        "definitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "key",
+              "value",
+              "type"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "value": {},
+              "type": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

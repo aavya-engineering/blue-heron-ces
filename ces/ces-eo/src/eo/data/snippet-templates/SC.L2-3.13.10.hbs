@@ -1,0 +1,32 @@
+## Control {{controlId}}: Establish and Manage Cryptographic Keys for Cryptography Employed in Organizational Systems
+
+**Implementation Status:** {{status}}
+
+This organization establishes and manages cryptographic keys through operational procedures documented in "Cryptographic Key Management Policy v1.0" maintained by {{variables.systemAdministrator}}.
+
+Cryptographic key management for the {{tenantName}} M365 GCC High tenant follows NIST SP 800-57 guidelines for key generation, distribution, storage, rotation, and destruction. Microsoft manages platform-level encryption keys for M365 GCC High services using FIPS 140-2 Level 2 validated hardware security modules (HSMs).
+
+**Key Management Procedures:**
+- **Key Generation:** Platform encryption keys generated within Microsoft-managed HSMs; tenant-specific keys generated per NIST SP 800-57 Part 1 requirements
+- **Key Storage:** Keys stored in FIPS 140-2 validated cryptographic modules; no plaintext key storage permitted
+- **Key Rotation:** Platform keys rotated per Microsoft security operations schedule; customer-managed keys rotated annually or upon suspected compromise
+- **Key Revocation/Destruction:** Compromised keys revoked immediately per incident response procedures; destroyed keys purged from all storage locations with documented chain of custody
+
+**Operational Procedure:**
+- **Action:** Annual review of key management practices, inventory of active cryptographic keys, and validation of key rotation compliance
+- **Frequency:** Annually, or upon suspected key compromise
+- **Responsible Party:** {{variables.systemAdministrator}}
+- **Documentation:** Cryptographic Key Management Policy v1.0, NIST SP 800-57 compliance checklist
+
+**Review Frequency:** Annually by ISSO
+
+**Verification Method:** Examine key management policy documentation, key rotation logs, HSM validation certificates, and annual key inventory reports.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** Review records maintained per procedure SC-010. No automated evidence collection available for this procedural control. {{evidenceArtifactUrl}}
+{{/if}}

@@ -1,0 +1,428 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ces-tester/muster-e2e.schema.json",
+  "title": "ces-tester muster-e2e scenario (P4.1)",
+  "description": "The end-to-end Muster run on the sim, driven by ces-tester: reseed and serve a stacksim scenario, discovery, the headless runner, the push through muster-api, Stamper translate + execute, the EC upload, EO connect + assess + SSP/POA&M, the expected-state comparison, the bundle and the forced run. Separate from scenario.schema.json (frozen); run-scenario dispatches on type.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "scenario_id",
+    "sim_scenario",
+    "stance",
+    "expected_facts",
+    "expected_state",
+    "expected_ledger"
+  ],
+  "definitions": {
+    "stateCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request",
+        "path",
+        "assert"
+      ],
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "request": {
+          "type": "object"
+        },
+        "select": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "field",
+            "equals"
+          ],
+          "properties": {
+            "field": {
+              "type": "string"
+            },
+            "equals": {
+              "type": "string"
+            }
+          }
+        },
+        "path": {
+          "type": "string"
+        },
+        "assert": {
+          "enum": [
+            "equals",
+            "exists",
+            "includes"
+          ]
+        },
+        "value": {},
+        "ledger_object_type": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "properties": {
+    "type": {
+      "const": "muster-e2e"
+    },
+    "scenario_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string"
+    },
+    "sim_scenario": {
+      "type": "string",
+      "minLength": 1,
+      "description": "stacksim's own scenario name (scenarios/<name>.json in tenant-stacksim); also the tenant slug for ces-tenant, Stamper --tenant and EO TENANT_SLUG"
+    },
+    "stance": {
+      "enum": [
+        "m365_only",
+        "m365_sentinel",
+        "m365_azure"
+      ]
+    },
+    "force_fail_entry": {
+      "type": "string",
+      "minLength": 1
+    },
+    "eo_assess_runs": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "ec_upload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "controlIds",
+        "source",
+        "filename",
+        "mediaType",
+        "contentBase64",
+        "submittedByRole",
+        "form_id",
+        "emx_ids"
+      ],
+      "properties": {
+        "controlIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "source": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "mediaType": {
+          "type": "string"
+        },
+        "contentBase64": {
+          "type": "string"
+        },
+        "submittedByRole": {
+          "type": "string"
+        },
+        "form_id": {
+          "type": "string"
+        },
+        "emx_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "expected_facts": {
+      "type": "object",
+      "description": "Readiness-activity id (RR-ACT-*) -> expected answer, compared with the runner's readiness-result facts",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^RR-ACT-"
+      },
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "expected_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "checks"
+      ],
+      "properties": {
+        "checks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/stateCheck"
+          }
+        }
+      }
+    },
+    "expected_ledger": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "no_writes_during": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "writes_only_during": {
+          "type": "string"
+        },
+        "allowed_write_windows": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          },
+          "description": "Synthetic-customer W2: every non-seed write outside the build window falls inside one of these steps' windows (E6, E6X, E7A); takes precedence over writes_only_during"
+        },
+        "build_window": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "from",
+            "before"
+          ],
+          "properties": {
+            "from": {
+              "type": "string"
+            },
+            "before": {
+              "type": "string"
+            }
+          }
+        },
+        "min_writes_during": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "mutated": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "objectType"
+            ],
+            "properties": {
+              "objectType": {
+                "type": "string"
+              },
+              "objectId": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "ao_coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled",
+        "expected_total"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "expected_total": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "adminops_ops": {
+      "type": "array",
+      "description": "Synthetic-customer W2 (PLAN section 3, E7A): AdminOps ops run in order through the AO CLI. Parameters are registry-record paths (resources.<key>), never literal values",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "op",
+          "tier",
+          "kind"
+        ],
+        "properties": {
+          "op": {
+            "type": "string",
+            "pattern": "^[A-H]-[0-9]{2}$"
+          },
+          "tier": {
+            "enum": [
+              "T2",
+              "T3"
+            ]
+          },
+          "kind": {
+            "enum": [
+              "read",
+              "write"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "params": {
+            "type": "object",
+            "propertyNames": {
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+            },
+            "additionalProperties": {
+              "type": "string",
+              "pattern": "^resources\\.[a-z0-9_]+$"
+            }
+          },
+          "confirm": {
+            "$ref": "#/definitions/stateCheck"
+          }
+        }
+      }
+    },
+    "expected_improvements": {
+      "type": "array",
+      "description": "W2 (V47): the E7B drift improvements, exactly",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "controlId",
+          "op"
+        ],
+        "properties": {
+          "controlId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "op": {
+            "type": "string"
+          },
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "allowed_reverts": {
+      "type": "array",
+      "description": "W2 (V48, V43a): AO-touched objects the forced run (E8F) may revert, and the controls it may then regress",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "objectType",
+          "reason"
+        ],
+        "properties": {
+          "objectType": {
+            "type": "string",
+            "minLength": 1
+          },
+          "objectId": {
+            "type": "string"
+          },
+          "controls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "drift_injection": {
+      "type": "array",
+      "description": "W2 (PLAN section 3, E6X; S3 only): sim writes re-injected after Stamper through /resolve",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "request"
+        ],
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "request": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind",
+              "method",
+              "uri"
+            ],
+            "properties": {
+              "kind": {
+                "const": "uri"
+              },
+              "method": {
+                "enum": [
+                  "PATCH",
+                  "POST",
+                  "DELETE"
+                ]
+              },
+              "uri": {
+                "type": "string",
+                "pattern": "^/"
+              },
+              "body": {}
+            }
+          }
+        }
+      }
+    },
+    "postcheck_thresholds": {
+      "type": "object",
+      "description": "W3/V55 thresholds for this scenario: gates_max = manual gates with no action + renderables without a policy hash allowed; presence_max = presence-only SAT postchecks allowed. Keys starting with _ are notes.",
+      "properties": {
+        "gates_max": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "presence_max": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "patternProperties": {
+        "^_": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "scorecard_gate": {
+      "type": "boolean",
+      "description": "W4/V51: when true the scorecard thresholds gate the run (set per scenario in W5 once they hold); absent/false = report-only."
+    }
+  }
+}

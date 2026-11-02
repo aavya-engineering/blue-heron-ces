@@ -1,0 +1,749 @@
+schema_version: '1.0'
+module: Tenant_Configuration_Profile
+purpose: Collect execution-ready tenant configuration data — tenant IDs, UPNs, naming conventions, license SKUs — needed to parameterize manifest config_intents with real tenant values.
+metadata:
+  created_utc: '2026-02-22T00:00:00Z'
+  owner: CES
+  notes: 37 questions across 9 sections. Each question has bindings.tenant_config mapping to TenantConfigProfileOutput paths.
+sections:
+- id: TCP-01
+  name: Tenant Identity
+  questions:
+  - id: TCP.TI.001
+    section: Tenant Identity
+    prompt: What is the Microsoft Entra tenant ID (GUID)?
+    answer_type: guid
+    options: []
+    required: true
+    help: The tenant ID is a GUID found in Entra ID > Overview. Example format 12345678-abcd-1234-abcd-1234567890ab.
+    recommended: '00000000-0000-0000-0000-000000000000'
+    roles:
+      primary_respondents:
+      - IT Admin
+      validators:
+      - Security Admin
+    bindings:
+      tenant_config: identity.tenant_id
+    risk_flags: []
+  - id: TCP.TI.002
+    section: Tenant Identity
+    prompt: What is the primary domain for this tenant?
+    answer_type: text
+    options: []
+    required: true
+    help: The primary verified domain (e.g., contoso.us for GCC High).
+    recommended: '{domain}'
+    roles:
+      primary_respondents:
+      - IT Admin
+      validators:
+      - Security Admin
+    bindings:
+      tenant_config: identity.primary_domain
+    risk_flags: []
+  - id: TCP.TI.003
+    section: Tenant Identity
+    prompt: List all custom/vanity domains registered on this tenant.
+    answer_type: list
+    options: []
+    required: false
+    help: One domain per line. Include all verified custom domains.
+    recommended:
+    - '{domain}'
+    roles:
+      primary_respondents:
+      - IT Admin
+      validators:
+      - Security Admin
+    bindings:
+      tenant_config: identity.custom_domains
+    risk_flags: []
+  - id: TCP.TI.004
+    section: Tenant Identity
+    prompt: What is the cloud environment for this tenant?
+    answer_type: single_select
+    options:
+    - Commercial
+    - GCC
+    - GCC High
+    - DoD
+    required: true
+    help: Select the Microsoft cloud environment this tenant operates in.
+    roles:
+      primary_respondents:
+      - IT Admin
+      validators:
+      - Security Admin
+    bindings:
+      tenant_config: identity.cloud_environment
+    risk_flags:
+    - commercial_tenant_for_cui
+  - id: TCP.TI.005
+    section: Tenant Identity
+    prompt: What is the display name for this tenant?
+    answer_type: text
+    options: []
+    required: true
+    help: The human-readable organization name shown in Entra ID.
+    recommended: '{org} GCC High Tenant'
+    roles:
+      primary_respondents:
+      - IT Admin
+      validators:
+      - Executive Sponsor
+    bindings:
+      tenant_config: identity.display_name
+    risk_flags: []
+- id: TCP-02
+  name: Licensing
+  questions:
+  - id: TCP.LIC.001
+    section: Licensing
+    prompt: What is the primary license SKU for this tenant?
+    answer_type: single_select
+    options:
+    - Microsoft 365 G5
+    - Microsoft 365 G3
+    - Microsoft 365 E5
+    - Microsoft 365 E3
+    - Office 365 G5
+    - Office 365 G3
+    - Other
+    required: true
+    help: Select the main license SKU. G-series for GCC/GCC High, E-series for commercial.
+    recommended: Microsoft 365 G5
+    roles:
+      primary_respondents:
+      - IT Admin
+      - Licensing Admin
+      validators:
+      - Executive Sponsor
+    bindings:
+      tenant_config: licensing.primary_sku
+    risk_flags:
+    - g3_may_lack_compliance_features
+  - id: TCP.LIC.002
+    section: Licensing
+    prompt: How many licenses are assigned?
+    answer_type: number
+    options: []
+    required: true
+    help: Total number of assigned licenses for the primary SKU.
+    roles:
+      primary_respondents:
+      - IT Admin
+      validators:
+      - Licensing Admin
+    bindings:
+      tenant_config: licensing.license_count
+    risk_flags: []
+  - id: TCP.LIC.003
+    section: Licensing
+    prompt: List any add-on license SKUs in use.
+    answer_type: list
+    options: []
+    required: false
+    help: One SKU per line (e.g., Microsoft Defender for Endpoint P2, Azure AD P2, Intune Suite).
+    recommended:
+    - IDENTITY_THREAT_PROTECTION
+    - CLOUD_APP_SECURITY
+    roles:
+      primary_respondents:
+      - IT Admin
+      validators:
+      - Licensing Admin
+    bindings:
+      tenant_config: licensing.addon_skus
+    risk_flags: []
+  - id: TCP.LIC.004
+    section: Licensing
+    prompt: Which services are activated in the tenant?
+    answer_type: multi_select
+    options:
+    - None
+    - Exchange Online
+    - SharePoint Online
+    - Teams
+    - Intune
+    - Defender for Endpoint
+    - Defender for Office 365
+    - Defender for Identity
+    - Defender for Cloud Apps
+    - Azure Information Protection
+    - Purview Compliance
+    - Sentinel
+    required: true
+    help: Select all M365 services that are currently activated and in use.
+    recommended:
+    - Exchange Online
+    - SharePoint Online
+    - Teams
+    - Intune
+    - Defender for Endpoint
+    - Defender for Office 365
+    - Defender for Identity
+    - Purview Compliance
+    - Sentinel
+    roles:
+      primary_respondents:
+      - IT Admin
+      validators:
+      - Security Admin
+    bindings:
+      tenant_config: licensing.service_activations
+    risk_flags: []
+- id: TCP-03
+  name: Identity Architecture
+  questions:
+  - id: TCP.IA.001
+    section: Identity Architecture
+    prompt: List all break-glass (emergency access) account UPNs.
+    answer_type: upn_list
+    options: []
+    required: true
+    help: One UPN per line. These are cloud-only accounts excluded from Conditional Access for emergency access.
+    recommended:
+    - 'breakglass1@{domain}'
+    - 'breakglass2@{domain}'
+    roles:
+      primary_respondents:
+      - Security Admin
+      validators:
+      - IT Admin
+    bindings:
+      tenant_config: identity_architecture.break_glass_accounts
+    risk_flags:
+    - no_break_glass_accounts
+  - id: TCP.IA.002
+    section: Identity Architecture
+    prompt: What is the admin account naming convention?
+    answer_type: text
+    options: []
+    required: true
+    help: "Example: adm-{lastname}.{firstname}@contoso.us or admin_{samaccountname}@contoso.us"
+    recommended: 'adm-{lastname}.{firstname}@{domain}'
+    roles:
+      primary_respondents:
+      - IT Admin
+      validators:
+      - Security Admin
+    bindings:
+      tenant_config: identity_architecture.admin_naming_convention
+    risk_flags: []
+  - id: TCP.IA.003
+    section: Identity Architecture
+    prompt: What is the service account naming convention?
+    answer_type: text
+    options: []
+    required: true
+    help: "Example: svc-{appname}@contoso.us or sa_{function}@contoso.us"
+    recommended: 'svc-{appname}@{domain}'
+    roles:
+      primary_respondents:
+      - IT Admin
+      validators:
+      - Security Admin
+    bindings:
+      tenant_config: identity_architecture.service_account_naming_convention
+    risk_flags: []
+  - id: TCP.IA.004
+    section: Identity Architecture
+    prompt: What is the identity provider model?
+    answer_type: single_select
+    options:
+    - Entra ID native (cloud-only)
+    - Hybrid with AD Connect
+    - Hybrid with Cloud Sync
+    - External IdP (Okta, Ping, etc.)
+    required: true
+    help: Select how user identities are managed and synchronized.
+    roles:
+      primary_respondents:
+      - IT Admin
+      validators:
+      - Security Admin
+    bindings:
+      tenant_config: identity_architecture.identity_provider
+    risk_flags:
+    - external_idp_requires_federation_review
+  - id: TCP.IA.005
+    section: Identity Architecture
+    prompt: Is directory synchronization enabled?
+    answer_type: boolean
+    options: []
+    required: true
+    help: Is AD Connect or Cloud Sync actively synchronizing identities from on-premises AD?
+    roles:
+      primary_respondents:
+      - IT Admin
+      validators:
+      - Security Admin
+    bindings:
+      tenant_config: identity_architecture.directory_sync_enabled
+    risk_flags: []
+- id: TCP-04
+  name: Privileged Access
+  questions:
+  - id: TCP.PA.001
+    section: Privileged Access
+    prompt: List all Global Administrator UPNs.
+    answer_type: upn_list
+    options: []
+    required: true
+    help: One UPN per line. Include all accounts with the Global Administrator role (excluding break-glass).
+    recommended:
+    - 'admin@{domain}'
+    roles:
+      primary_respondents:
+      - Security Admin
+      validators:
+      - IT Admin
+    bindings:
+      tenant_config: privileged_access.global_admins
+    risk_flags:
+    - too_many_global_admins
+  - id: TCP.PA.002
+    section: Privileged Access
+    prompt: List all Security Administrator UPNs.
+    answer_type: upn_list
+    options: []
+    required: true
+    help: One UPN per line. Accounts with the Security Administrator role.
+    recommended:
+    - 'secadmin@{domain}'
+    roles:
+      primary_respondents:
+      - Security Admin
+      validators:
+      - IT Admin
+    bindings:
+      tenant_config: privileged_access.security_admins
+    risk_flags: []
+  - id: TCP.PA.003
+    section: Privileged Access
+    prompt: List all Compliance Administrator UPNs.
+    answer_type: upn_list
+    options: []
+    required: false
+    help: One UPN per line. Accounts with the Compliance Administrator role.
+    recommended:
+    - 'complianceadmin@{domain}'
+    roles:
+      primary_respondents:
+      - Security Admin
+      validators:
+      - IT Admin
+    bindings:
+      tenant_config: privileged_access.compliance_admins
+    risk_flags: []
+  - id: TCP.PA.004
+    section: Privileged Access
+    prompt: Is Privileged Identity Management (PIM) enabled?
+    answer_type: boolean
+    options: []
+    required: true
+    help: PIM provides just-in-time privileged access and requires Azure AD P2 or equivalent.
+    recommended: true
+    roles:
+      primary_respondents:
+      - Security Admin
+      validators:
+      - IT Admin
+    bindings:
+      tenant_config: privileged_access.pim_enabled
+    risk_flags:
+    - pim_not_enabled
+  - id: TCP.PA.005
+    section: Privileged Access
+    prompt: What is the break-glass exclusion group name?
+    answer_type: text
+    options: []
+    required: true
+    help: "The security group used to exclude break-glass accounts from Conditional Access policies. Example: SG-BreakGlass-Exclusion"
+    recommended: SG-BreakGlass-Exclusion
+    roles:
+      primary_respondents:
+      - Security Admin
+      validators:
+      - IT Admin
+    bindings:
+      tenant_config: privileged_access.break_glass_exclusion_group
+    risk_flags: []
+- id: TCP-05
+  name: Group Architecture
+  questions:
+  - id: TCP.GA.001
+    section: Group Architecture
+    prompt: What is the security group naming convention?
+    answer_type: text
+    options: []
+    required: true
+    help: "Example: SG-{Department}-{Function} or SEC-GRP-{Purpose}"
+    recommended: 'SG-{Department}-{Function}'
+    roles:
+      primary_respondents:
+      - IT Admin
+      validators:
+      - Security Admin
+    bindings:
+      tenant_config: group_architecture.security_group_convention
+    risk_flags: []
+  - id: TCP.GA.002
+    section: Group Architecture
+    prompt: List key security groups and their roles (one per line, format Name=Role).
+    answer_type: list
+    options: []
+    required: true
+    help: "Example lines: SG-CUI-Users=CUI Access, SG-All-Employees=Base Access, SG-IT-Admins=IT Administration"
+    recommended:
+    - CUI-Authorized-Users
+    - CMMC-Operators
+    - Evidence-Reviewers
+    roles:
+      primary_respondents:
+      - IT Admin
+      validators:
+      - Security Admin
+    bindings:
+      tenant_config: group_architecture.key_groups
+    risk_flags: []
+  - id: TCP.GA.003
+    section: Group Architecture
+    prompt: What is the distribution group naming convention?
+    answer_type: text
+    options: []
+    required: false
+    help: "Example: DL-{Department} or DG-{TeamName}"
+    recommended: 'DL-{Department}'
+    roles:
+      primary_respondents:
+      - IT Admin
+      validators:
+      - Security Admin
+    bindings:
+      tenant_config: group_architecture.distribution_group_convention
+    risk_flags: []
+  - id: TCP.GA.004
+    section: Group Architecture
+    prompt: What is the primary group membership strategy?
+    answer_type: single_select
+    options:
+    - Dynamic (attribute-based)
+    - Assigned (manual)
+    - Mixed (both)
+    required: true
+    help: Dynamic groups auto-populate based on user attributes; assigned groups require manual management.
+    recommended: Dynamic (attribute-based)
+    roles:
+      primary_respondents:
+      - IT Admin
+      validators:
+      - Security Admin
+    bindings:
+      tenant_config: group_architecture.group_strategy
+    risk_flags: []
+- id: TCP-06
+  name: Conditional Access
+  questions:
+  - id: TCP.CA.001
+    section: Conditional Access
+    prompt: What is the Conditional Access policy naming convention?
+    answer_type: text
+    options: []
+    required: true
+    help: "Example: CA-{Number}-{Purpose} or CA_{Persona}_{Grant/Block}_{Platform}"
+    recommended: 'CA-{Number}-{Purpose}'
+    roles:
+      primary_respondents:
+      - Security Admin
+      validators:
+      - IT Admin
+    bindings:
+      tenant_config: conditional_access.ca_naming_convention
+    risk_flags: []
+  - id: TCP.CA.002
+    section: Conditional Access
+    prompt: List named locations (one per line, format Name|Type|Value where Type is ip or country).
+    answer_type: list
+    options: []
+    required: false
+    help: "Example: Corporate HQ|ip|203.0.113.0/24 or Allowed Countries|country|US,GB"
+    recommended:
+    - '{org} Approved IP Range'
+    - '{org} VPN'
+    roles:
+      primary_respondents:
+      - Security Admin
+      validators:
+      - IT Admin
+    bindings:
+      tenant_config: conditional_access.named_locations
+    risk_flags: []
+  - id: TCP.CA.003
+    section: Conditional Access
+    prompt: How many Conditional Access policies currently exist?
+    answer_type: number
+    options: []
+    required: true
+    help: Count of existing CA policies in the tenant. Check Entra ID > Protection > Conditional Access.
+    recommended: 0
+    roles:
+      primary_respondents:
+      - Security Admin
+      validators:
+      - IT Admin
+    bindings:
+      tenant_config: conditional_access.existing_policy_count
+    risk_flags:
+    - zero_ca_policies
+- id: TCP-07
+  name: Device Management
+  questions:
+  - id: TCP.DM.001
+    section: Device Management
+    prompt: What is the device enrollment type?
+    answer_type: single_select
+    options:
+    - Azure AD Join
+    - Hybrid Join
+    - Enroll Only (BYOD MDM)
+    - None
+    required: true
+    help: How are devices registered with your identity and management platform.
+    roles:
+      primary_respondents:
+      - IT Admin
+      validators:
+      - Security Admin
+    bindings:
+      tenant_config: device_management.enrollment_type
+    risk_flags:
+    - no_device_enrollment
+  - id: TCP.DM.002
+    section: Device Management
+    prompt: What is the device naming convention?
+    answer_type: text
+    options: []
+    required: true
+    help: "Example: {Company}-{Type}-{Number} like CONTOSO-WKS-001 or CUI-LAP-{AssetTag}"
+    recommended: '{ORG}-{Type}-{Number}'
+    roles:
+      primary_respondents:
+      - IT Admin
+      validators:
+      - Security Admin
+    bindings:
+      tenant_config: device_management.device_naming_convention
+    risk_flags: []
+  - id: TCP.DM.003
+    section: Device Management
+    prompt: What is the compliance policy naming convention?
+    answer_type: text
+    options: []
+    required: true
+    help: "Example: CP-{Platform}-{Level} like CP-Win-CUI or CP-iOS-Standard"
+    recommended: 'CP-{Platform}-{Level}'
+    roles:
+      primary_respondents:
+      - IT Admin
+      validators:
+      - Security Admin
+    bindings:
+      tenant_config: device_management.compliance_policy_convention
+    risk_flags: []
+  - id: TCP.DM.004
+    section: Device Management
+    prompt: Which device platforms are in scope for CUI access?
+    answer_type: multi_select
+    options:
+    - None
+    - Windows
+    - macOS
+    - iOS/iPadOS
+    - Android
+    - Linux
+    required: true
+    help: Select all platforms that will access CUI data and need compliance policies.
+    recommended:
+    - Windows
+    - iOS/iPadOS
+    roles:
+      primary_respondents:
+      - IT Admin
+      validators:
+      - Security Admin
+    bindings:
+      tenant_config: device_management.platforms_in_scope
+    risk_flags: []
+- id: TCP-08
+  name: Data Protection
+  questions:
+  - id: TCP.DP.001
+    section: Data Protection
+    prompt: What is the sensitivity label naming convention?
+    answer_type: text
+    options: []
+    required: true
+    help: "Example: {Org}-{Classification}-{Handling} like CONTOSO-CUI-Encrypt or CUI//SP-ExCtrl"
+    recommended: '{ORG}-{Classification}-{Handling}'
+    roles:
+      primary_respondents:
+      - Security Admin
+      validators:
+      - IT Admin
+    bindings:
+      tenant_config: data_protection.sensitivity_label_convention
+    risk_flags: []
+  - id: TCP.DP.002
+    section: Data Protection
+    prompt: List SharePoint site URLs designated for CUI storage.
+    answer_type: list
+    options: []
+    required: true
+    help: One URL per line. These sites will have sensitivity labels and DLP policies applied.
+    recommended:
+    - 'https://{slug}.sharepoint.us/sites/CUI'
+    roles:
+      primary_respondents:
+      - IT Admin
+      validators:
+      - Security Admin
+    bindings:
+      tenant_config: data_protection.cui_sharepoint_sites
+    risk_flags: []
+  - id: TCP.DP.003
+    section: Data Protection
+    prompt: List Teams channels designated for CUI collaboration.
+    answer_type: list
+    options: []
+    required: false
+    help: "One per line, format: TeamName/ChannelName"
+    recommended:
+    - CUI Operations
+    - CMMC Compliance
+    roles:
+      primary_respondents:
+      - IT Admin
+      validators:
+      - Security Admin
+    bindings:
+      tenant_config: data_protection.cui_teams_channels
+    risk_flags: []
+  - id: TCP.DP.004
+    section: Data Protection
+    prompt: What is the DLP policy naming convention?
+    answer_type: text
+    options: []
+    required: true
+    help: "Example: DLP-{Scope}-{Action} like DLP-CUI-BlockExternal or DLP-FCI-Notify"
+    recommended: 'DLP-{Scope}-{Action}'
+    roles:
+      primary_respondents:
+      - Security Admin
+      validators:
+      - IT Admin
+    bindings:
+      tenant_config: data_protection.dlp_policy_convention
+    risk_flags: []
+- id: TCP-09
+  name: Monitoring & SIEM
+  questions:
+  - id: TCP.MON.001
+    section: Monitoring & SIEM
+    prompt: What is the Sentinel workspace name?
+    answer_type: text
+    options: []
+    required: true
+    help: The Log Analytics workspace name used by Microsoft Sentinel.
+    recommended: '{slug}-law-prod'
+    roles:
+      primary_respondents:
+      - Security Admin
+      validators:
+      - IT Admin
+    bindings:
+      tenant_config: monitoring.sentinel_workspace_name
+    risk_flags: []
+  - id: TCP.MON.002
+    section: Monitoring & SIEM
+    prompt: What is the Azure resource group for Sentinel?
+    answer_type: text
+    options: []
+    required: true
+    help: "The resource group containing the Sentinel workspace. Example: rg-security-sentinel-prod"
+    recommended: '{slug}-rg-security'
+    roles:
+      primary_respondents:
+      - Security Admin
+      validators:
+      - IT Admin
+    bindings:
+      tenant_config: monitoring.sentinel_resource_group
+    risk_flags: []
+  - id: TCP.MON.003
+    section: Monitoring & SIEM
+    prompt: What is the Log Analytics workspace ID?
+    answer_type: guid
+    options: []
+    required: true
+    help: The GUID for the Log Analytics workspace. Found in Azure Portal > Log Analytics workspaces > Properties.
+    recommended: '00000000-0000-0000-0000-000000000000'
+    roles:
+      primary_respondents:
+      - Security Admin
+      validators:
+      - IT Admin
+    bindings:
+      tenant_config: monitoring.log_analytics_workspace_id
+    risk_flags: []
+  - id: TCP.MON.004
+    section: Monitoring & SIEM
+    prompt: Which Sentinel data connectors are enabled?
+    answer_type: multi_select
+    options:
+    - None
+    - Azure Active Directory
+    - Microsoft 365
+    - Microsoft Defender for Endpoint
+    - Microsoft Defender for Office 365
+    - Microsoft Defender for Identity
+    - Microsoft Defender for Cloud Apps
+    - Azure Activity
+    - Office 365
+    - Azure Information Protection
+    - Windows Security Events
+    - Syslog
+    required: true
+    help: Select all currently enabled data connectors in your Sentinel workspace.
+    recommended:
+    - Azure Active Directory
+    - Microsoft 365
+    - Microsoft Defender for Endpoint
+    - Microsoft Defender for Office 365
+    - Microsoft Defender for Identity
+    - Azure Activity
+    - Windows Security Events
+    roles:
+      primary_respondents:
+      - Security Admin
+      validators:
+      - IT Admin
+    bindings:
+      tenant_config: monitoring.data_connectors
+    risk_flags: []
+  - id: TCP.MON.005
+    section: Monitoring & SIEM
+    prompt: What is the alert rule naming convention?
+    answer_type: text
+    options: []
+    required: true
+    help: "Example: AR-{Severity}-{Source}-{Description} like AR-HIGH-MDE-SuspiciousProcess"
+    recommended: 'AR-{Severity}-{Source}-{Description}'
+    roles:
+      primary_respondents:
+      - Security Admin
+      validators:
+      - IT Admin
+    bindings:
+      tenant_config: monitoring.alert_rule_convention
+    risk_flags: []

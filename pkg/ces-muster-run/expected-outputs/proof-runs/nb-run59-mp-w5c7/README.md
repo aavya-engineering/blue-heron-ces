@@ -1,0 +1,3 @@
+# Run 59 (2026-10-28): muster-partial under synthetic-customer W5 cycle 7 (59 checks)
+
+59/59 after re-baseline (V10 green with no suites running); Stamper 110/110 (CMMC-MFA-CompliantDevice and CMMC-Time-Sync created and assigned); EO 84/3/0/23 SPRS 49 (was 82/5/0/23 SPRS 43): AC.L1-3.1.1 and AU.L2-3.3.7 -> met on CES's new policies, exactly as predicted; not met: AC.L2-3.1.5, AC.L2-3.1.6 (standing licensed Global Administrators), PS.L2-3.9.2 (no leaver records on this tenant). Directives 86/24. Scorecard 6/10 (SC-3a 88.7 %, SC-4 16.7 %); SC-8a 27/97 = 27.8 %; GAPS 502 (was 506). OUTSIDE UNCHANGED.

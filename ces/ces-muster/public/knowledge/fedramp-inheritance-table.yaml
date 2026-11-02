@@ -1,0 +1,97 @@
+# FedRAMP CSP Inheritance Table
+# Controls that may be classified as Inherited-FedRAMP when the SI baseline
+# declares cloud-only posture with valid FedRAMP package IDs.
+#
+# requires_fields: per-control conditions on SIBaseline.dependencies fields.
+#   - physical_facility_count_zero: deps.physical_facility_count must be 0
+#   - customer_equipment_count_zero: deps.customer_equipment_count must be 0
+#   - Empty array: no infrastructure gate beyond cloud_only + package IDs.
+
+metadata:
+  version: "1.0.0"
+  description: "FedRAMP inheritance eligibility for cloud-only CMMC L2 assessments"
+
+controls:
+  - control_id: PE.L1-3.10.1
+    domain: PE
+    title: Limit Physical Access
+    requires_fields: [physical_facility_count_zero]
+    tenant_variants: [gcc, gcc_high, dod_il5]
+    rationale: "Physical access controls inherited from FedRAMP-authorized CSP when organization operates zero physical facilities."
+
+  - control_id: PE.L2-3.10.2
+    domain: PE
+    title: Monitor Physical Access
+    requires_fields: [physical_facility_count_zero]
+    tenant_variants: [gcc, gcc_high, dod_il5]
+    rationale: "Physical access monitoring inherited from FedRAMP-authorized CSP when organization operates zero physical facilities."
+
+  - control_id: PE.L1-3.10.3
+    domain: PE
+    title: Escort Visitors
+    requires_fields: [physical_facility_count_zero]
+    tenant_variants: [gcc, gcc_high, dod_il5]
+    rationale: "Visitor escort controls inherited from FedRAMP-authorized CSP when organization operates zero physical facilities."
+
+  - control_id: PE.L1-3.10.4
+    domain: PE
+    title: Physical Access Logs
+    requires_fields: [physical_facility_count_zero]
+    tenant_variants: [gcc, gcc_high, dod_il5]
+    rationale: "Physical access log controls inherited from FedRAMP-authorized CSP when organization operates zero physical facilities."
+
+  - control_id: PE.L1-3.10.5
+    domain: PE
+    title: Physical Access Control
+    requires_fields: [physical_facility_count_zero]
+    tenant_variants: [gcc, gcc_high, dod_il5]
+    rationale: "Physical access device controls inherited from FedRAMP-authorized CSP when organization operates zero physical facilities."
+
+  - control_id: MA.L2-3.7.1
+    domain: MA
+    title: Perform Maintenance
+    requires_fields: [customer_equipment_count_zero]
+    tenant_variants: [gcc, gcc_high, dod_il5]
+    rationale: "System maintenance controls inherited from FedRAMP-authorized CSP when organization owns zero equipment requiring maintenance."
+
+  - control_id: MA.L2-3.7.2
+    domain: MA
+    title: Maintenance Controls
+    requires_fields: [customer_equipment_count_zero]
+    tenant_variants: [gcc, gcc_high, dod_il5]
+    rationale: "Maintenance tool controls inherited from FedRAMP-authorized CSP when organization owns zero equipment requiring maintenance."
+
+  - control_id: MA.L2-3.7.3
+    domain: MA
+    title: Off-site Equipment Sanitization
+    requires_fields: [customer_equipment_count_zero]
+    tenant_variants: [gcc, gcc_high, dod_il5]
+    rationale: "Equipment sanitization controls inherited from FedRAMP-authorized CSP when organization owns zero equipment requiring maintenance."
+
+  - control_id: MA.L2-3.7.6
+    domain: MA
+    title: Supervise Maintenance
+    requires_fields: [customer_equipment_count_zero]
+    tenant_variants: [gcc, gcc_high, dod_il5]
+    rationale: "Maintenance supervision controls inherited from FedRAMP-authorized CSP when organization owns zero equipment requiring maintenance."
+
+  - control_id: AU.L2-3.3.7
+    domain: AU
+    title: Time Stamps
+    requires_fields: []
+    tenant_variants: [gcc, gcc_high, dod_il5]
+    rationale: "Time synchronization inherited from FedRAMP-authorized CSP infrastructure. M365 GCC High uses NIST-traceable NTP."
+
+  - control_id: IA.L2-3.5.10
+    domain: IA
+    title: Cryptographically-Protected Passwords
+    requires_fields: []
+    tenant_variants: [gcc, gcc_high, dod_il5]
+    rationale: "Password cryptographic protection inherited from FedRAMP-authorized CSP. Entra ID stores credentials using FIPS 140-2 validated cryptographic modules."
+
+  - control_id: IA.L2-3.5.11
+    domain: IA
+    title: Authentication Feedback
+    requires_fields: []
+    tenant_variants: [gcc, gcc_high, dod_il5]
+    rationale: "Authentication feedback obscurity inherited from FedRAMP-authorized CSP. Entra ID sign-in UI masks credential feedback by default."

@@ -1,0 +1,86 @@
+controlId: "AC.L2-3.1.3"
+relatedControlIds:
+  - "AC.L1-3.1.1"
+  - "AC.L2-3.1.5"
+  - "AC.L2-3.1.6"
+  - "MP.L2-3.8.1"  # [VERIFY] mapping not yet confirmed
+practiceStatement: Limit system access to authorized users, processes acting on behalf of users, and devices.
+useCaseId: D-05
+useCaseTitle: "CUI Site Membership Recertification"
+domain: Data Protection & Information Management
+priority: P4 Standard
+trigger: 'SCHEDULE: Quarterly'
+sodTier: Tier 2 -- Config Manager
+entraRolesRequired:
+- User Administrator
+- Compliance Administrator
+approvalRequired: true
+services:
+- name: Entra Admin Center
+  purpose: '`https://entra.microsoft.us`'
+- name: Entra ID Access Reviews
+  purpose: ''
+- name: Entra ID Security Groups
+  purpose: CUI access groups
+- name: SharePoint Online
+  purpose: CUI-scoped sites
+- name: Microsoft Teams
+  purpose: CUI-scoped teams
+- name: Microsoft Graph API
+  purpose: Access Reviews endpoints
+configurationSteps:
+  portalPath: //entra.microsoft.us > **Identity Governance** > **Access reviews** > **+ New access review**.
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes AccessReview.ReadWrite.All
+  - cmdlet: Get-MgGroup
+    parameters:
+    - -MgGroup
+    - -Filter
+    - -All
+    - -Object
+    - -Csv
+  - cmdlet: New-MgIdentityGovernanceAccessReviewDefinition
+    parameters:
+    - -MgIdentityGovernanceAccessReviewDefinition
+    - -BodyParameter
+    - -MgGroupMember
+    - -GroupId
+    - -All
+  - cmdlet: Get-MgGroupMember
+    parameters:
+    - -MgGroupMember
+    - -GroupId
+    - -All
+    - -Object
+    - -Csv
+  graphApiEndpoint: POST https://graph.microsoft.us/v1.0/identityGovernance/accessReviews/definitions
+  graphApiPayloadExample: {}
+  requiredPermissions:
+  - AccessReview.ReadWrite.All
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-d-dataprotection/D-05/2026/03/
+  format: CSV (group membership snapshots, review decisions), JSON (access review definition)
+  filenamePattern: D-05_AccessReview_{YYYYMMDD}_{HHmmss}_Quarterly.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://entra.microsoft.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |-
+    - Entra ID Access Reviews are fully available in GCC High via `https://entra.microsoft.us`.
+    - The Graph API access review endpoints use `https://graph.microsoft.us/v1.0/identityGovernance/accessReviews/definitions`.
+    - Auto-apply decisions and the "Remove access" default for non-responsive reviewers function identically in GCC High.
+    - Ensure CUI group owners have active Entra accounts and are reachable via email for review notifications; service accounts cannot serve as reviewers.
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

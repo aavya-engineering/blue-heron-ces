@@ -1,0 +1,38 @@
+## Control {{controlId}}: Deny Network Communications Traffic by Default and Allow by Exception
+
+**Implementation Status:** {{status}}
+
+This organization implements a deny-all, permit-by-exception network communications posture within the {{tenantName}} M365 GCC High tenant through Conditional Access policies and named location restrictions managed by {{variables.systemAdministrator}}.
+
+{{#if conditionalAccessActive}}
+**Default-Deny Policy Enforcement:**
+{{caPoliciesTotalCount}} Conditional Access policies implement default-deny controls, requiring explicit authorization for all network communications:
+{{#each policies}}
+- **{{displayName}}** ({{state}}): Applied to {{conditions.users}} users across {{conditions.applications}} applications. Requires {{#each grantControls.builtInControls}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}.
+{{/each}}
+{{else}}
+Conditional Access default-deny policies have not been configured. Network communications are permitted without explicit authorization controls.
+{{/if}}
+
+{{#if namedLocationsConfigured}}
+**Location-Based Exceptions:**
+Network access is restricted to {{namedLocationsCount}} authorized locations. Traffic originating from unrecognized locations is blocked by default:
+{{#each locations}}
+- **{{displayName}}**{{#if isTrusted}} (Trusted){{/if}}{{#if ipRanges}} — {{#each ipRanges}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{/if}}
+{{/each}}
+{{else}}
+Named locations have not been defined. Location-based deny-by-default enforcement is not active.
+{{/if}}
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine Conditional Access policy configurations, named location definitions, default block rules, and exception authorization documentation.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

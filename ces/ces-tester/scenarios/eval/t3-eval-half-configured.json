@@ -1,0 +1,61 @@
+{
+  "config_id": "eval-half-configured",
+  "description": "T3 (docs/demo/EVAL-CONFIGS.md) — THE demo tenant: 18 months in, undocumented. Session-timeout and admin-MFA CA policies are CMMC-named (met) but block-untrusted-locations was never renamed (unknown); a 4th CA policy covers remote-maintenance MFA (met) but not mobile-device access (unknown); user-5 is disabled (PS.L2-3.9.2 met). The realistic interleave: met/unknown alternate across categories, matching truth exactly.",
+  "stacksim_seed": {
+    "stance": "m365_azure",
+    "countOverrides": {
+      "caPolicies": 4
+    },
+    "steps": [
+      {
+        "kind": "uri",
+        "method": "PATCH",
+        "uri": "/v1.0/identity/conditionalAccess/policies/caPolicy-1",
+        "body": {
+          "displayName": "CMMC-SessionTimeout"
+        },
+        "note": "P1 AC.L2-3.1.11 session-timeout CA -> met"
+      },
+      {
+        "kind": "uri",
+        "method": "PATCH",
+        "uri": "/v1.0/identity/conditionalAccess/policies/caPolicy-3",
+        "body": {
+          "displayName": "CMMC-AdminMFA-PhishingResistant"
+        },
+        "note": "P3 AC.L2-3.1.15 admin-MFA CA -> met"
+      },
+      {
+        "kind": "uri",
+        "method": "PATCH",
+        "uri": "/v1.0/identity/conditionalAccess/policies/caPolicy-4",
+        "body": {
+          "displayName": "CMMC-RemoteMaintenance-MFA"
+        },
+        "note": "P5 MA.L2-3.7.5 remote-maintenance CA -> met"
+      },
+      {
+        "kind": "uri",
+        "method": "PATCH",
+        "uri": "/v1.0/users/user-5",
+        "body": {
+          "accountEnabled": false
+        },
+        "note": "P6 PS.L2-3.9.2 disabled-account present -> met"
+      }
+    ]
+  },
+  "expected_discovery": {
+    "AC.L2-3.1.11": "met",
+    "AC.L2-3.1.14": "unknown",
+    "SC.L2-3.13.7": "unknown",
+    "AC.L2-3.1.15": "met",
+    "MA.L2-3.7.5": "met",
+    "PS.L2-3.9.2": "met",
+    "IA.L2-3.5.5": "met",
+    "IA.L2-3.5.6": "met",
+    "AC.L1-3.1.20": "met",
+    "AC.L2-3.1.12": "unknown",
+    "IA.L2-3.5.4": "unknown"
+  }
+}

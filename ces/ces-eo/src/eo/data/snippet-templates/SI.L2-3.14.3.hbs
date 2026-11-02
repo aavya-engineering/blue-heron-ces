@@ -1,0 +1,43 @@
+## Control {{controlId}}: Monitor System Security Alerts and Advisories and Take Action in Response
+
+**Implementation Status:** {{status}}
+
+This organization monitors security alerts and advisories within the {{tenantName}} M365 GCC High tenant through Microsoft Defender for Endpoint, Defender for Cloud, and security alert triage procedures managed by {{variables.systemAdministrator}}.
+
+{{#if securityAlertsActive}}
+**Active Security Alerts:**
+{{securityAlertsCount}} security alerts monitored through Microsoft Defender:
+{{#if alerts}}
+{{#each alerts}}
+- **{{title}}** — Severity: {{severity}} — Status: {{status}} — Vendor: {{vendor}} — {{createdDateTime}}
+{{/each}}
+{{/if}}
+
+Security alerts are triaged by severity: Critical alerts require response within 1 hour, High within 4 hours, Medium within 24 hours, Low within 72 hours.
+{{else}}
+Security alert monitoring has not been confirmed. Defender alert configuration requires verification.
+{{/if}}
+
+**Malicious Code Protection:**
+- Microsoft Defender Antivirus provides real-time protection with cloud-delivered protection enabled
+- Automatic signature updates ensure current threat detection (updated multiple times daily)
+- Behavior monitoring detects fileless malware, living-off-the-land attacks, and memory-based threats
+- Potentially Unwanted Application (PUA) blocking enabled
+
+{{#if directoryAuditsAvailable}}
+**Security Event Correlation:**
+Directory audit logs ({{directoryAuditsCount}} events) provide context for security alert investigation, correlating administrative actions with detected threats.
+{{/if}}
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine Microsoft Defender alert configurations, antivirus scan status, signature update logs, PUA blocking settings, and alert response records.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

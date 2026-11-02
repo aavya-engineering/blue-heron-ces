@@ -1,0 +1,42 @@
+## Control {{controlId}}: Screen Individuals Prior to Authorizing Access to Systems Containing CUI
+
+**Implementation Status:** {{status}}
+
+This organization screens individuals prior to authorizing CUI access within the {{tenantName}} M365 GCC High tenant through background investigation procedures documented in "Personnel Security Policy v1.0" maintained by {{variables.humanResourcesManager}}.
+
+All personnel requiring access to CUI undergo appropriate background investigations prior to access authorization:
+
+**Screening Requirements:**
+- **Employees:** Tier 1 (NACI-equivalent) background investigation completed through Defense Counterintelligence and Security Agency (DCSA) prior to CUI access provisioning
+- **Contractors:** Background investigation appropriate to contract requirements and CUI sensitivity level
+- **Temporary Personnel:** Escort-only access until screening is completed and adjudicated
+- **Re-investigation:** Personnel re-screened every 5 years or upon promotion to positions with elevated CUI access
+
+**Access Authorization Process:**
+- HR confirms favorable screening adjudication before notifying {{variables.accessControlAdministrator}}
+- Account provisioned in Entra ID only after screening verification documented
+- CUI group membership granted after screening confirmation and role-based need-to-know verification
+
+{{#if cuiGroupExists}}
+**CUI Access Population:**
+The "{{groupDisplayName}}" security group ({{memberCount}} members) contains only personnel with verified screening status.
+{{/if}}
+
+**Operational Procedure:**
+- **Action:** Screen all personnel before CUI access; maintain screening status records; initiate re-investigations per schedule
+- **Frequency:** Prior to access authorization; re-investigation every 5 years
+- **Responsible Party:** {{variables.humanResourcesManager}}
+- **Documentation:** Personnel Security Policy v1.0, DCSA investigation records, adjudication memoranda
+
+**Review Frequency:** Annually by ISSO
+
+**Verification Method:** Examine personnel security files, screening completion records, adjudication documentation, and CUI group membership against screening status.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** Review personnel security records per procedure PS-001. No automated evidence collection available for this procedural control. {{evidenceArtifactUrl}}
+{{/if}}

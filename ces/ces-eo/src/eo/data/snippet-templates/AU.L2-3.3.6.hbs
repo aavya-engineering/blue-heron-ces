@@ -1,0 +1,47 @@
+## Control {{controlId}}: Provide Audit Record Reduction and Report Generation to Support On-Demand Analysis
+
+**Implementation Status:** {{status}}
+
+This organization provides audit record reduction and report generation within the {{tenantName}} M365 GCC High tenant to support on-demand analysis of security events, managed by {{variables.systemAdministrator}}.
+
+{{#if auditQueriesConfigured}}
+**Automated Reduction and Reporting:**
+Microsoft Sentinel provides audit record reduction through saved queries and workbooks:
+{{#if queries}}
+{{#each queries}}
+- **{{name}}**{{#if description}} — {{description}}{{/if}} — Source: {{dataSource}}
+{{/each}}
+{{/if}}
+
+KQL (Kusto Query Language) queries filter, aggregate, and summarize large volumes of audit data. Pre-built workbooks provide executive and technical reports on demand.
+{{/if}}
+
+{{#if sentinelNotAvailable}}
+**Manual Reduction and Reporting:**
+Microsoft Sentinel is not deployed. Audit record reduction uses native M365 capabilities:
+
+**Available Reduction Tools:**
+- **Entra ID Sign-In Reports:** Filtered views by user, application, status, location, and date range
+- **Directory Audit Filters:** Filtered by activity type, actor, target resource, and date range
+- **Unified Audit Log Search:** Cross-service search with export to CSV for offline analysis
+- **Microsoft Defender Reports:** Pre-built security reports with filtering and export capabilities
+
+**Operational Procedure:**
+- **Action:** Generate monthly audit summary reports from M365 admin center; perform ad-hoc audit searches for investigations
+- **Frequency:** Monthly summary reports; on-demand for incident investigation
+- **Responsible Party:** {{variables.systemAdministrator}}
+- **Documentation:** Audit Reporting Procedure AU-006
+{{/if}}
+
+**Review Frequency:** Monthly report review by ISSO
+
+**Verification Method:** Examine audit report generation capabilities, saved query configurations, monthly summary reports, and ad-hoc investigation records.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** Review audit reports per procedure AU-006. {{evidenceArtifactUrl}}
+{{/if}}

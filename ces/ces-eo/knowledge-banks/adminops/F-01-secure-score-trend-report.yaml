@@ -1,0 +1,64 @@
+controlId: "RA.L2-3.11.1"
+relatedControlIds:
+  - "CA.L2-3.12.1"
+  - "CA.L2-3.12.3"  # [VERIFY] mapping not yet confirmed
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: F-01
+useCaseTitle: "Secure Score Trend Report"
+domain: Security Operations
+priority: P3 Medium
+trigger: 'SCHEDULE: Weekly (every Monday 08:00 UTC)'
+sodTier: Tier 1 (per SoD model in front matter)
+entraRolesRequired:
+- Security Reader
+- Reports Reader
+approvalRequired: false
+services:
+- name: Microsoft Graph API -- `secureScores` endpoint
+  purpose: ''
+- name: Microsoft Defender Portal -- Secure Score dashboard
+  purpose: ''
+- name: Microsoft Sentinel -- Log Analytics workspace for trend storage
+  purpose: ''
+- name: Azure Immutable Blob Storage -- evidence artifact storage
+  purpose: ''
+configurationSteps:
+  portalPath: //security.microsoft.us > Secure Score.
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes SecurityEvents.Read.All
+  - cmdlet: Get-MgSecuritySecureScore
+    parameters:
+    - -MgSecuritySecureScore
+    - -Top
+    - -OrderBy
+    - -Object
+    - -Date
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/security/secureScores?$top=56&$orderby=createdDateTime
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-f-security/F-01/2026/03/
+  format: CSV
+  filenamePattern: F-01_SecureScoreTrend_{YYYYMMDD}_{HHmmss}_Weekly.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |-
+    - The `secureScores` endpoint is fully available in GCC High at `graph.microsoft.us`. No commercial parity gaps.
+    - The Defender portal Secure Score dashboard at `security.microsoft.us` renders the same data as the API. Some commercial Secure Score recommendations that reference Security Copilot will not apply; ignore those entries.
+    - Secure Score calculation may exclude controls for features not available in GCC High (e.g., Security Copilot). This does not affect the validity of the score; the `maxScore` adjusts accordingly.
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

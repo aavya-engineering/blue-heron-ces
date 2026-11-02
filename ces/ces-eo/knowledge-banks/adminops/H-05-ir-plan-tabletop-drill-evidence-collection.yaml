@@ -1,0 +1,72 @@
+controlId: "IR.L2-3.6.3"
+relatedControlIds:
+  - "IR.L2-3.6.1"
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: H-05
+useCaseTitle: "IR Tabletop/Drill Evidence"
+domain: Incident Response
+priority: P4 Standard
+trigger: 'SCHEDULE: Annual (minimum), or as directed by the CISO or compliance officer'
+sodTier: Tier 1 -- Read-Only Audit (for evidence collection); Tier 2 -- Config Manager (for exercise facilitation)
+entraRolesRequired:
+- Security Reader (evidence collection)
+- Compliance Administrator (exercise coordination)
+approvalRequired: false
+services:
+- name: Microsoft Sentinel
+  purpose: Azure Government -- for realistic scenario data and alert examples
+- name: Microsoft Teams
+  purpose: GCC High -- for virtual exercise facilitation
+- name: SharePoint Online
+  purpose: GCC High -- for document storage and attendee roster
+- name: ITSM system
+  purpose: for exercise ticket creation if simulating full workflow
+configurationSteps:
+  portalPath: '**Pre-Exercise (2 weeks before):**'
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes User.Read.All
+  - cmdlet: Get-MgGroupMember
+    parameters:
+    - -MgGroupMember
+    - -GroupId
+    - -All
+    - -Object
+    - -MgUser
+  - cmdlet: Get-MgUser
+    parameters:
+    - -MgUser
+    - -UserId
+    - -Property
+    - '-03'
+    - '-18'
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/groups/{irTeamGroupId}/members?$select=id,displayName,userPrincipalName,jobTitle,department
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-h-incident/H-05/{year}/{month}/
+  format: JSON (roster, AAR), PDF (scenario document, signed facilitation notes)
+  filenamePattern: H-05_AttendeeRoster_{YYYYMMDD}_{HHmmss}_Annual.json
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: Teams meetings in GCC High use the GCC High Teams infrastructure; meeting recordings and transcripts are stored in
+    GCC High OneDrive/SharePoint. Ensure the exercise scenario document and all artifacts are stored in SharePoint Online
+    GCC High (`.sharepoint.us`), not in personal cloud storage or commercial SharePoint. If the exercise involves demonstrating
+    Sentinel capabilities, all Sentinel portal interactions use `https://portal.azure.us`. The CMMC Assessment Guide v2.0
+    requires that the IR plan testing evidence demonstrate that the organization has tested its incident response plan. The
+    AAR m
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

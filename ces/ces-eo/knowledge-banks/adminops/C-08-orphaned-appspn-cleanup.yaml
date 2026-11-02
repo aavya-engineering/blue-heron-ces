@@ -1,0 +1,82 @@
+controlId: "AC.L1-3.1.1"
+relatedControlIds:
+  - "AC.L2-3.1.5"
+  - "CM.L2-3.4.6"  # [VERIFY] mapping not yet confirmed
+practiceStatement: Limit system access to authorized users, processes acting on behalf of users, and devices.
+useCaseId: C-08
+useCaseTitle: "Orphaned App/SPN Cleanup"
+domain: Credential & Secret Management
+priority: P4 Standard
+trigger: 'SCHEDULE: Monthly (second business day); or ASSESSMENT: Pre-C3PAO preparation'
+sodTier: Tier 2 (Config Manager) for identification and disable; Tier 3 (Privileged Admin) for deletion
+entraRolesRequired:
+- Application Administrator (Tier 2 for disable); Global Administrator via PIM (Tier 3 for delete)
+approvalRequired: true
+services:
+- name: Entra ID Application Registrations
+  purpose: ''
+- name: Entra ID Service Principals
+  purpose: ''
+- name: Entra ID Sign-In Logs
+  purpose: service principal sign-ins
+- name: Microsoft Graph API
+  purpose: ''
+- name: Microsoft Sentinel
+  purpose: orphan detection alerting
+- name: ITSM system
+  purpose: deletion approval ticket
+configurationSteps:
+  portalPath: //entra.microsoft.us > Applications > App registrations > All applications.
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes Application.Read.All, AuditLog.Read.All, Directory.ReadWrite.All
+  - cmdlet: Get-MgApplication
+    parameters:
+    - -MgApplication
+    - -All
+    - -Property
+    - -ExpandProperty
+    - -gt
+  - cmdlet: Get-MgServicePrincipal
+    parameters:
+    - -MgServicePrincipal
+    - -Filter
+    - -Property
+    - -eq
+    - -or
+  - cmdlet: Update-MgServicePrincipal
+    parameters:
+    - -MgServicePrincipal
+    - -ServicePrincipalId
+    - -AccountEnabled
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/applications?$select=id,displayName,appId,passwordCredentials,keyCredentials&$expand=owners($select=id,displayName)
+  graphApiPayloadExample: {}
+  requiredPermissions:
+  - Application.Read.All
+  - AuditLog.Read.All
+  - Application.ReadWrite.All
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-c-credential/C-08/2026/03/
+  format: 'CSV (columns: AppName, AppId, ObjectId, HasOwner, NoValidCreds, NoRecentActivity, LastSignIn, OrphanScore, Recommendation)'
+  filenamePattern: C-08_OrphanedApps_{YYYYMMDD}_{HHmmss}_MonthlyReport.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: 'The `signInActivity` property on service principals requires Entra ID P2 and uses the beta endpoint (`/beta/servicePrincipals`).
+    This feature is available in GCC High. Sign-in activity data may have a latency of up to 24 hours. The `ConsistencyLevel:
+    eventual` header is required for advanced queries with `$count` or `$filter` on certain properties. All Graph queries
+    must target `graph.microsoft.us`.'
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

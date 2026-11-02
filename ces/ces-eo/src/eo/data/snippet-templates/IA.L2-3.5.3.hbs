@@ -1,0 +1,47 @@
+## Control {{controlId}}: Use Multi-Factor Authentication for Local and Network Access to Privileged Accounts and for Network Access to Non-Privileged Accounts
+
+**Implementation Status:** {{status}}
+
+This organization enforces multi-factor authentication for all local and network access within the {{tenantName}} M365 GCC High tenant through Entra ID authentication policies and Conditional Access managed by {{variables.accessControlAdministrator}}.
+
+{{#if mfaEnabled}}
+**Authentication Methods:**
+{{authMethodsCount}} authentication methods are configured for MFA enforcement:
+{{#if authMethods}}
+{{#each authMethods}}
+- **{{displayName}}** — State: {{state}}
+{{/each}}
+{{/if}}
+
+MFA is required for both privileged and non-privileged accounts accessing CUI resources. Phishing-resistant methods (FIDO2 security keys, Windows Hello for Business, certificate-based authentication) are prioritized for privileged accounts per NIST SP 800-63B AAL2 requirements.
+{{else}}
+Multi-factor authentication configuration has not been confirmed. MFA enforcement for privileged and non-privileged accounts requires verification.
+{{/if}}
+
+{{#if conditionalAccessActive}}
+**Conditional Access Enforcement:**
+{{caPoliciesTotalCount}} Conditional Access policies enforce MFA requirements:
+{{#each policies}}
+- **{{displayName}}** ({{state}}): Requires {{#each grantControls.builtInControls}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{#if grantControls.authenticationStrength}} with {{grantControls.authenticationStrength}} authentication strength{{/if}}
+{{/each}}
+{{else}}
+Conditional Access MFA enforcement has not been configured.
+{{/if}}
+
+{{#if roleAssignmentsConfigured}}
+**Privileged Account MFA:**
+{{roleAssignmentsCount}} privileged role assignments require MFA at every authentication. Privileged accounts are subject to stricter authentication strength requirements (phishing-resistant methods only).
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Examine authentication method policies, Conditional Access MFA requirements, privileged account authentication logs, and AAL2 compliance evidence.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

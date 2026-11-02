@@ -1,0 +1,183 @@
+{
+  "type": "muster-e2e",
+  "scenario_id": "muster-partial-e2e",
+  "description": "P4.1: the MX run driven by ces-tester on the stacksim scenario muster-partial (device enrollment and compliance exist, no CA policy enforces MFA). Steps E1-E8F as in the package's mx-e2e.ps1, plus EX (the tester's comparison: readiness facts, post-Stamper state via /resolve, and the sim ledger) and AO (stacksim coverage-ao). expected_facts are the sim scenario's own expectedFacts (tenant-stacksim scenarios/muster-partial.json, readiness-activity ids since cadfba6); expected_state reuses the checks of the tester's baseline scenarios for the controls this plan changes.",
+  "sim_scenario": "muster-partial",
+  "stance": "m365_azure",
+  "force_fail_entry": "SC.L2-3.13.15.anti-spam",
+  "eo_assess_runs": 3,
+  "ec_upload": {
+    "controlIds": [
+      "AC.L1-3.1.1"
+    ],
+    "source": "manual_upload",
+    "filename": "acp.pdf",
+    "mediaType": "application/pdf",
+    "contentBase64": "JVBERi0xLjQK",
+    "submittedByRole": "compliance_officer",
+    "form_id": "access_control_policy",
+    "emx_ids": [
+      "EMX-IAM-004"
+    ]
+  },
+  "expected_facts": {
+    "RR-ACT-AC_L2_3_1_13": "no",
+    "RR-ACT-IA_L2_3_5_3": "no",
+    "RR-ACT-AC_L2_3_1_12": "no",
+    "RR-ACT-AC_L2_3_1_14": "no",
+    "RR-ACT-CM_L2_3_4_1": "yes",
+    "RR-ACT-CM_L2_3_4_2": "yes",
+    "RR-ACT-SI_L1_3_14_1": "yes",
+    "RR-ACT-SI_L2_3_14_2": "yes"
+  },
+  "expected_state": {
+    "checks": [
+      {
+        "description": "ATP enabled for SPO/Teams/ODB (Set-AtpPolicyForO365 -EnableATPForSPOTeamsODB $true)",
+        "request": {
+          "kind": "cmdlet",
+          "cmdlet": "Get-AtpPolicyForO365"
+        },
+        "path": "EnableATPForSPOTeamsODB",
+        "assert": "equals",
+        "value": true,
+        "ledger_object_type": "atpPolicyForO365"
+      },
+      {
+        "description": "Legacy TLS clients disallowed (Set-TransportConfig -AllowLegacyTLSClients $false)",
+        "request": {
+          "kind": "cmdlet",
+          "cmdlet": "Get-TransportConfig"
+        },
+        "path": "AllowLegacyTLSClients",
+        "assert": "equals",
+        "value": false,
+        "ledger_object_type": "transportConfig"
+      },
+      {
+        "description": "Unified audit log ingestion enabled (Set-AdminAuditLogConfig -UnifiedAuditLogIngestionEnabled $true)",
+        "request": {
+          "kind": "cmdlet",
+          "cmdlet": "Get-AdminAuditLogConfig"
+        },
+        "path": "UnifiedAuditLogIngestionEnabled",
+        "assert": "equals",
+        "value": true,
+        "ledger_object_type": "adminAuditLogConfig"
+      },
+      {
+        "description": "Teams external federation access disabled on the Global policy (the base seed has it enabled)",
+        "request": {
+          "kind": "cmdlet",
+          "cmdlet": "Get-CsExternalAccessPolicy"
+        },
+        "select": {
+          "field": "Identity",
+          "equals": "Global"
+        },
+        "path": "EnableFederationAccess",
+        "assert": "equals",
+        "value": false,
+        "ledger_object_type": "csExternalAccessPolicy"
+      },
+      {
+        "description": "Remote-maintenance MFA Conditional Access policy created enabled (the MA.L2-3.7.5.remote-mfa SET writes -State 'enabled' since PH-6, LOG-PH6-REG.md task 2)",
+        "request": {
+          "kind": "uri",
+          "method": "GET",
+          "uri": "/v1.0/identity/conditionalAccess/policies"
+        },
+        "select": {
+          "field": "displayName",
+          "equals": "CMMC-RemoteMaintenance-MFA"
+        },
+        "path": "state",
+        "assert": "equals",
+        "value": "enabled",
+        "ledger_object_type": "caPolicies"
+      },
+      {
+        "description": "MicrosoftAuthenticator auth-method config enabled",
+        "request": {
+          "kind": "uri",
+          "method": "GET",
+          "uri": "/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/MicrosoftAuthenticator"
+        },
+        "path": "state",
+        "assert": "equals",
+        "value": "enabled",
+        "ledger_object_type": "authenticationMethodsPolicyConfigurations"
+      },
+      {
+        "description": "Fido2 auth-method config enabled",
+        "request": {
+          "kind": "uri",
+          "method": "GET",
+          "uri": "/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/Fido2"
+        },
+        "path": "state",
+        "assert": "equals",
+        "value": "enabled",
+        "ledger_object_type": "authenticationMethodsPolicyConfigurations"
+      }
+    ]
+  },
+  "expected_ledger": {
+    "build_window": {
+      "from": "E1",
+      "before": "E2"
+    },
+    "no_writes_during": [
+      "E2",
+      "E6X",
+      "E7A"
+    ],
+    "allowed_write_windows": [
+      "E6"
+    ],
+    "min_writes_during": {
+      "E6": 1
+    },
+    "mutated": [
+      {
+        "objectType": "caPolicies",
+        "objectId": "CMMC-RemoteMaintenance-MFA"
+      },
+      {
+        "objectType": "caPolicies",
+        "objectId": "CMMC-AdminMFA-PhishingResistant"
+      },
+      {
+        "objectType": "csExternalAccessPolicy"
+      },
+      {
+        "objectType": "atpPolicyForO365"
+      },
+      {
+        "objectType": "adminAuditLogConfig"
+      },
+      {
+        "objectType": "transportConfig"
+      },
+      {
+        "objectType": "authenticationMethodsPolicyConfigurations"
+      },
+      {
+        "objectType": "caPolicies",
+        "objectId": "CMMC-MFA-CompliantDevice"
+      }
+    ]
+  },
+  "ao_coverage": {
+    "enabled": true,
+    "expected_total": 96
+  },
+  "adminops_ops": [],
+  "expected_improvements": [],
+  "allowed_reverts": [],
+  "drift_injection": [],
+  "postcheck_thresholds": {
+    "gates_max": 26,
+    "_note": "muster-partial has 26 manual-gate controls (no renderables after W3); S1 uses the default 24."
+  }
+}

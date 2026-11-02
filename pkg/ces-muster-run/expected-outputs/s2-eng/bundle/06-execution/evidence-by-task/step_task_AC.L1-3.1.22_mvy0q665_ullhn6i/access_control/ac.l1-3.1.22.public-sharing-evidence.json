@@ -1,0 +1,35 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"settings\",\r\n    \"sharingCapability\":  \"disabled\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "AC.L1-3.1.22.public-sharing-evidence",
+    "label": "Verify SharePoint External Sharing Controls",
+    "engine": "mgraph",
+    "layer_hint": 7,
+    "sequence_hint": 3,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "AC.L1-3.1.22"
+    ],
+    "get_command": "Invoke-MgGraphRequest -Method GET -Uri 'https://graph.microsoft.us/beta/admin/sharepoint/settings' | Select-Object sharingCapability | ConvertTo-Json -Depth 10",
+    "set_command": "",
+    "evidence_commands": [
+      "Invoke-MgGraphRequest -Method GET -Uri 'https://graph.microsoft.us/beta/admin/sharepoint/settings' | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AC.L1-3.1.22"
+    ],
+    "timestamp": "2026-11-01T16:05:42.800Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Verify SharePoint External Sharing Controls",
+    "sha256Hash": "7e32e0d8e74bb383b7468dd7a78d9dd6d2015dc6941e40f40805d6a6014b808b",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

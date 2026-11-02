@@ -1,0 +1,107 @@
+controlId: "AC.L1-3.1.1"
+relatedControlIds:
+  - "AC.L1-3.1.2"
+  - "AC.L2-3.1.5"
+  - "AC.L2-3.1.6"
+
+practiceStatement: "Limit system access to the types of transactions and functions that authorized users are permitted to execute."
+
+useCaseId: "A-04"
+useCaseTitle: "Role Change / Transfer"
+domain: "Identity & Access Management"
+priority: "P3 Medium"
+trigger: "PERSONNEL: Department transfer, promotion, or role change notification from HR"
+
+sodTier: "Tier 2 -- Config Manager"
+entraRolesRequired:
+  - "User Administrator"
+  - "Privileged Role Administrator"
+
+approvalRequired: true
+
+services:
+  - name: "Entra ID"
+    purpose: "Group membership management, user property updates"
+  - name: "PIM"
+    purpose: "Eligible role assignment changes"
+  - name: "Conditional Access"
+    purpose: "Policy targeting changes via group membership"
+  - name: "Intune"
+    purpose: "Device group targeting changes"
+  - name: "Microsoft Graph PowerShell"
+    modules:
+      - "Microsoft.Graph.Users"
+      - "Microsoft.Graph.Groups"
+      - "Microsoft.Graph.Identity.Governance"
+
+configurationSteps:
+  portalPath: "https://entra.microsoft.us > Identity > Users > All users > search user > Groups > document current memberships"
+
+  powershellCmdlets:
+    - cmdlet: "Connect-MgGraph"
+      parameters:
+        - "-Environment USGov"
+        - "-Scopes User.ReadWrite.All,Group.ReadWrite.All,RoleManagement.ReadWrite.Directory,Directory.ReadWrite.All"
+    - cmdlet: "Get-MgUserMemberOf"
+      parameters:
+        - "-UserId"
+    - cmdlet: "Remove-MgGroupMemberByRef"
+      parameters:
+        - "-GroupId"
+        - "-DirectoryObjectId"
+    - cmdlet: "Add-MgGroupMember"
+      parameters:
+        - "-GroupId"
+        - "-DirectoryObjectId"
+    - cmdlet: "New-MgRoleManagementDirectoryRoleEligibilityScheduleRequest"
+      parameters:
+        - "-BodyParameter"
+    - cmdlet: "Update-MgUser"
+      parameters:
+        - "-UserId"
+        - "-Department"
+        - "-JobTitle"
+
+  graphApiEndpoint: "GET https://graph.microsoft.us/v1.0/users/{userId}/memberOf"
+  graphApiPayloadExample: {}
+
+  requiredPermissions:
+    - "User.ReadWrite.All"
+    - "Group.ReadWrite.All"
+    - "RoleManagement.ReadWrite.Directory"
+
+evidenceArtifacts:
+  - type: "Azure AD Audit Logs"
+    retentionPeriod: "7 years"
+    storageLocation: "evidence-store/domain-a-identity/A-04/{year}/{month}/"
+    query: "Activity: Update user, Add/Remove group member"
+  - type: "Stamper Execution Evidence"
+    hashAlgorithm: "SHA-256"
+    storageLocation: "evidence-store/domain-a-identity/A-04/{year}/{month}/"
+    format: "JSON (before-state group list, after-state group list, PIM assignment changes)"
+    filenamePattern: "A-04_RoleChange_{YYYYMMDD}_{HHmmss}_{UPN}.json"
+
+gccHighSpecifics:
+  endpoints:
+    - "https://graph.microsoft.us"
+    - "https://entra.microsoft.us"
+  complianceBoundary: "FedRAMP High + CMMC L2"
+  endpointValidation: "All endpoints use .microsoft.us domains"
+  notes: "Conditional Access policy changes propagate within minutes of group membership updates. Document both before-state and after-state for audit evidence."
+
+relatedPolicies:
+  - "AC-001 Access Control Policy"
+
+odpValues: []
+
+dependencies:
+  hardDependencies:
+    - useCaseId: "A-01"
+      reason: "User must exist in the directory"
+  softDependencies:
+    - useCaseId: "A-09"
+      reason: "Privileged role review should have validated current PIM state"
+    - useCaseId: "A-10"
+      reason: "Standing privilege elimination should be in place"
+
+notes: "Audit-before-change approach prevents privilege accumulation where users retain access from previous roles while gaining access for new roles. Removing stale assignments enforces least privilege principle."

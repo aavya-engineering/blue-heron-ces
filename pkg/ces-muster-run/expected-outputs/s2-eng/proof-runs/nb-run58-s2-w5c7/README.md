@@ -1,0 +1,5 @@
+# Run 58 (2026-10-28): synthetic customer S2 (s2-eng), wave W5 cycle 7 proof (59 checks)
+
+58/59 after re-baseline; Stamper 110/110 (CMMC-MFA-CompliantDevice and CMMC-Time-Sync created and assigned); EO 89/1/0/20 SPRS 62 (was 87/3/0/20 SPRS 56): AC.L1-3.1.1 and AU.L2-3.3.7 -> met on CES's new policies, exactly as predicted; the last not-met is the personnel pair's PS.L2-3.9.2 (ledger) / PS.L2-3.9.1 not assessed. Directives 84/3/23. Scorecard 9/10 vs the S2 thresholds (SC-3a 99.6 %, SC-4 15.7 %, SC-5 6/6, SC-6 22/22); SC-8a 21/97 = 21.6 % (threshold 20). GAPS 312.
+
+V10 red: `%LOCALAPPDATA%\CES\pipeline\ces.db` was written at 21:34:42 during the run window by a concurrent process without the harness's pipeline root (the EvidenceOps agent's full jest suite, which opens the global default root), not by the run's own steps (whose AdminOps rows go to <WS>\pl\ces.db). Accepted with this explanation; EvidenceOps and Stamper test hygiene items filed so suites never touch the global root; the next S2 run must show V10 green.

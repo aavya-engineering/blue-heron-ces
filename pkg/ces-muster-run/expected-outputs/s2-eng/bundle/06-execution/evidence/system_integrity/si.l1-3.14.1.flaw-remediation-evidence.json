@@ -1,0 +1,35 @@
+{
+  "rawResponse": "{\r\n    \"secureScoreAvailable\":  true,\r\n    \"currentScore\":  72,\r\n    \"vulnerabilityControls\":  {\r\n\r\n                              },\r\n    \"maxScore\":  100\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "SI.L1-3.14.1.flaw-remediation-evidence",
+    "label": "Verify Defender Vulnerability Management Configuration",
+    "engine": "mgraph",
+    "layer_hint": 4,
+    "sequence_hint": 36,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "SI.L1-3.14.1"
+    ],
+    "get_command": "$scores = Get-MgSecuritySecureScore -Top 1 -ErrorAction SilentlyContinue; if ($scores) { @{ secureScoreAvailable = $true; currentScore = $scores[0].CurrentScore; maxScore = $scores[0].MaxScore } | ConvertTo-Json } else { $null }",
+    "set_command": "",
+    "evidence_commands": [
+      "$scores = Get-MgSecuritySecureScore -Top 1 -ErrorAction SilentlyContinue; $controls = if ($scores) { $scores[0].ControlScores | Where-Object { $_.ControlName -match 'Vuln|Patch|Update|Defender' } }; @{ secureScoreAvailable = [bool]$scores; currentScore = $scores[0].CurrentScore; maxScore = $scores[0].MaxScore; vulnerabilityControls = $controls } | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SI.L1-3.14.1"
+    ],
+    "timestamp": "2026-11-01T16:03:20.916Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Verify Defender Vulnerability Management Configuration",
+    "sha256Hash": "755daac53bd8b7384f550e1e85461eb35c91314884a7fe6385411ac4be04d3e4",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

@@ -1,0 +1,48 @@
+## Control {{controlId}}: Correlate Audit Record Review, Analysis, and Reporting Processes
+
+**Implementation Status:** {{status}}
+
+This organization correlates audit records from multiple sources within the {{tenantName}} M365 GCC High tenant for investigation and response to unauthorized activity, managed by {{variables.systemAdministrator}}.
+
+{{#if auditQueriesConfigured}}
+**Automated Correlation:**
+Microsoft Sentinel provides centralized audit record correlation:
+{{#if queries}}
+{{#each queries}}
+- **{{name}}**{{#if description}} — {{description}}{{/if}} — Source: {{dataSource}}
+{{/each}}
+{{/if}}
+
+Sentinel analytics rules correlate events across sign-in logs, directory audits, mailbox audits, and Defender alerts to detect multi-stage attack patterns and anomalous behavior.
+{{/if}}
+
+{{#if sentinelNotAvailable}}
+**Manual Correlation Procedures:**
+Microsoft Sentinel is not deployed in this environment. Audit record correlation is performed through manual analysis:
+
+**Correlation Sources:**
+- Entra ID sign-in logs (authentication events)
+- Directory audit logs (administrative actions)
+- Exchange Online mailbox audit logs (email access)
+- SharePoint access logs (file operations)
+- Microsoft Defender alerts (threat detections)
+
+**Operational Procedure:**
+- **Action:** Quarterly cross-source audit log review correlating sign-in anomalies with administrative actions and data access patterns. Suspicious findings escalated through incident response procedures.
+- **Frequency:** Quarterly comprehensive review; ad-hoc correlation upon security incident
+- **Responsible Party:** {{variables.systemAdministrator}}
+- **Documentation:** Audit Correlation Procedure AU-005
+{{/if}}
+
+**Review Frequency:** Quarterly by ISSO
+
+**Verification Method:** Examine correlation rule configurations (if Sentinel deployed), cross-source analysis reports, incident investigation records, and quarterly review documentation.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** Review correlation analysis records per procedure AU-005. {{evidenceArtifactUrl}}
+{{/if}}

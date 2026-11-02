@@ -1,0 +1,10 @@
+{
+  "_edit_me": "Editable source for the synthetic customer S3 (s3-def), deficient by design (PLAN section 2.1b). The organisation and roster live in the customer file named by `customer` (generated there by gen-customer.mjs); this config only holds scenario knobs. Then: node scripts/build-customer-scenario.mjs s3-def (regenerates scenarios/s3-def.json). tests/integration/customer-scenario-s3.test.ts fails if the generated scenario drifts from this config + the customer file.",
+  "slug": "s3-def",
+  "customer": "../../pkg/ces-muster-run/customers/s3-def/customer.json",
+  "stance": "m365_azure",
+  "seedSets": ["customer-history-s3"],
+  "description": "synthetic-customer S3 (FICTIONAL), DELIBERATELY DEFICIENT: a 56-person defence cable-harness and electronics manufacturer on GCC High G3 + E5 Security, cloud-only, whose tenant grew without management. 60 accounts (56 staff, 1 shared shop-floor login, 2 admin accounts of which one is a former technician's idle 140 days, 1 emergency account in no CA exclusion); 3 standing Global Administrators (one the owner's licensed account), no PIM; 4 enabled accounts idle beyond 90 days and 1 leaver still enabled; most staff without MFA registration; 2 report-only MFA CA policies and no legacy-authentication block; 34 Windows devices (6 non-compliant, 9 with an untracked critical CVE); an unassigned compliance policy; no DLP, no CUI label; the CUI site shared to anyone; training missing; 2 Defender alerts new for 20 days. Stance m365_azure (the only stance that takes seed sets) with no Azure resource seeded. Built through the real resolver path; history dated from the day-floored anchor.",
+  "osVersions": { "windows": "10.0.22631.4317", "ios": "17.6.1" },
+  "licensing": { "skuId": "sim-sku-g3-gcchigh", "skuPartNumber": "SIM_M365_G3_GCCHIGH", "displayName": "Microsoft 365 G3 (GCC High)", "prepaidUnits": 60 }
+}

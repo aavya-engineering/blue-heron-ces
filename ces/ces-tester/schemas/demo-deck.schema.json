@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ces-tester.local/schemas/demo-deck.schema.json",
+  "title": "ces-tester demo deck — normalized sheet rows",
+  "description": "Validates the rows produced by xlsx-loader.ts AFTER header normalization (lowercase, non-alphanumerics stripped, aliases mapped) and BEFORE grouping by slide number. Cell-level semantics that need a good message (tools membership, op id, image existence, unique-or-agree across a slide's rows) are checked in deck-validate.ts, not here.",
+  "type": "array",
+  "items": { "$ref": "#/definitions/normalizedRow" },
+  "definitions": {
+    "text": {
+      "type": ["string", "null"]
+    },
+    "normalizedRow": {
+      "type": "object",
+      "required": ["sheetRow", "slide"],
+      "properties": {
+        "sheetRow": {
+          "description": "1-based spreadsheet row the founder sees in Excel; the header occupies row 1, so data starts at 2.",
+          "type": "integer",
+          "minimum": 2
+        },
+        "slide": {
+          "description": "slide # — required, integer >= 1. Rows sharing a value group onto one slide.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "talktrack": { "$ref": "#/definitions/text" },
+        "feature": { "$ref": "#/definitions/text" },
+        "function": { "$ref": "#/definitions/text" },
+        "benefit": { "$ref": "#/definitions/text" },
+        "differentiator": { "$ref": "#/definitions/text" },
+        "tools": { "$ref": "#/definitions/text" },
+        "opmode": {
+          "description": "live | warm | staged; blank inherits from the slide's other rows.",
+          "type": ["string", "null"],
+          "enum": ["live", "warm", "staged", null]
+        },
+        "op": { "$ref": "#/definitions/text" },
+        "durationsec": {
+          "description": "Per-slide dwell in seconds; blank falls back to --default-dwell.",
+          "type": ["number", "null"],
+          "exclusiveMinimum": 0
+        },
+        "image": { "$ref": "#/definitions/text" },
+        "html": {
+          "description": "Path, relative to the deck directory, to a self-contained .html document rendered in place of the auto-rendered body. Existence, the path fence, precedence over `image` and the inline-every-asset lint live in deck-validate.ts.",
+          "type": ["string", "null"]
+        },
+        "params": {
+          "description": "The op's declared parameters, `key=value` one per line (Alt+Enter in Excel). Keys, types, enum values and defaults are published in docs/demo/OP-CATALOG.md and enforced in deck-validate.ts against op-catalog.ts.",
+          "type": ["string", "null"]
+        },
+        "theme": {
+          "description": "Path, relative to the deck directory, to a theme JSON file ({ tokens: {...}, logo?: 'x.svg' }). DECK-LEVEL: it resolves unique-or-agree across the whole deck, and two slides naming different themes is an error. Token whitelist and value forms live in theme.ts.",
+          "type": ["string", "null"]
+        },
+        "show": {
+          "description": "RESERVED presenter column: stage directions. Captured per row and NOT rendered — reserved so a deck may carry it without an 'ignored unknown column' warning on every load.",
+          "type": ["string", "null"]
+        },
+        "watchouts": {
+          "description": "RESERVED presenter column: cautions for the presenter, per row. Rendered under the talk track only behind the --watchouts flag, which defaults OFF.",
+          "type": ["string", "null"]
+        },
+        "features": {
+          "description": "Major features for this row's function, one per line within the cell. Per-row, not per-slide: rows of one slide concatenate rather than conflict. Splitting, trimming and the display cap live in deck-validate.ts. Typed inline rather than via $ref because draft-07 ignores keywords sitting beside a $ref.",
+          "type": ["string", "null"]
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

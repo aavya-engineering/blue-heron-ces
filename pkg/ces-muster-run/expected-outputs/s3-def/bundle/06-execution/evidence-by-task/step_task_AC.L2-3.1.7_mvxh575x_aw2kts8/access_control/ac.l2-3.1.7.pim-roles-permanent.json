@@ -1,0 +1,35 @@
+{
+  "rawResponse": "",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "AC.L2-3.1.7.pim-roles-permanent",
+    "label": "Verify No Permanent Privileged Role Assignments",
+    "engine": "mgraph",
+    "layer_hint": 1,
+    "sequence_hint": 0,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "AC.L2-3.1.7"
+    ],
+    "get_command": "Get-MgRoleManagementDirectoryRoleAssignmentSchedule -All | Where-Object { $_.RoleDefinitionId -in @('{globalAdminRoleDefId}', '{privilegedRoleAdminDefId}', '{securityAdminRoleDefId}') -and $_.ScheduleInfo.Expiration.Type -eq 'noExpiration' } | Select-Object PrincipalId,RoleDefinitionId,Status,DirectoryScopeId",
+    "set_command": "",
+    "evidence_commands": [
+      "Get-MgRoleManagementDirectoryRoleAssignmentSchedule -All | Where-Object { $_.RoleDefinitionId -in @('{globalAdminRoleDefId}', '{privilegedRoleAdminDefId}', '{securityAdminRoleDefId}') } | Select-Object PrincipalId,RoleDefinitionId,Status,DirectoryScopeId,ScheduleInfo | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AC.L2-3.1.7"
+    ],
+    "timestamp": "2026-11-01T06:55:22.349Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Verify No Permanent Privileged Role Assignments",
+    "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

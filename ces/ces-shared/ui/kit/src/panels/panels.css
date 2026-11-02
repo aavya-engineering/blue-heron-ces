@@ -1,0 +1,741 @@
+/*
+  SPDX-FileCopyrightText: Blue Heron Defense LLC and its licensors. All rights reserved.
+  SPDX-License-Identifier: LicenseRef-BHD-Proprietary
+  CONFIDENTIAL - TRADE SECRET. Unpublished work. Provided solely to perform work for Blue Heron Defense LLC at its direction.
+  Any other use, copying, disclosure, or reuse, in whole or in part, is prohibited.
+  Changes made to this file for Blue Heron Defense LLC are made on its behalf; it claims all rights in them.
+  Submitting a change to this repository means you accept TERMS.md.
+  Removing or altering this notice is prohibited (17 U.S.C. 1202). Ref: BHD-CES-MONO-2026A
+  See LICENSE and TERMS.md.
+*/
+
+/*
+ * ces-ui-kit panel styles (W8-KIT2). Design source: the legacy Stamper console
+ * (ces-stamper/public/index.html: #resourceLedgerPanel/.ledger-*, .summary-table,
+ * .report-links, .prereq-*, .error-log-*, .connection-log-row, #terminalList/.term-*).
+ * Tokens only (KIT1 palette table): every colour is a var(--co-*) or a color-mix() of them;
+ * legacy rgba(r,g,b,a) tints are color-mix(in srgb, var(<hue>) <a*100>%, transparent).
+ * Hue-coded parts set a local --ck-tone and paint from it, so the --co-term-* names
+ * appear only in custom-property declarations (see LOG-W8-KIT2, token guard note).
+ * Class prefix: ck- (kit).
+ */
+
+/* ── Shared panel frame (legacy .panel h2) ──────────────────────────────────── */
+.ck-panel {
+  padding: 16px 18px;
+}
+
+.ck-panel-title {
+  margin: 0 0 12px;
+  font-family: var(--co-font-display);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--co-text);
+}
+
+.ck-mono { font-family: var(--co-font-mono); }
+.ck-muted { color: var(--co-text-muted); }
+
+/* ── Resource Ledger (legacy #resourceLedgerPanel) ──────────────────────────── */
+.ck-ledger {
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  background: var(--co-surface);
+  border: 1px solid var(--co-border);
+  overflow: hidden;
+}
+
+.ck-ledger-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: var(--co-bg-elevated);
+  border-bottom: 1px solid var(--co-border);
+}
+
+.ck-ledger-header h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--co-text);
+}
+
+.ck-ledger-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 24px;
+  color: var(--co-text-muted);
+  background: transparent;
+  border: 0;
+  border-radius: var(--co-radius);
+  cursor: pointer;
+}
+
+.ck-ledger-close:hover {
+  color: var(--co-text);
+  background: color-mix(in srgb, var(--co-text) 10%, transparent);
+}
+
+.ck-ledger-filters {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--co-border);
+}
+
+.ck-ledger-filter-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.ck-ledger-filter-row label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--co-text);
+  cursor: pointer;
+}
+
+.ck-ledger-filter-row select,
+.ck-ledger-filter-row input[type="text"] {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 8px;
+  font-size: 11px;
+  color: var(--co-text);
+  background: var(--co-bg-elevated);
+  border: 1px solid var(--co-border);
+  border-radius: var(--co-radius);
+}
+
+.ck-ledger-filter-row select:focus-visible,
+.ck-ledger-filter-row input:focus-visible {
+  outline: 2px solid var(--co-primary-focus);
+  outline-offset: 1px;
+}
+
+.ck-ledger-count {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--co-text-muted);
+}
+
+.ck-ledger-body {
+  flex: 1;
+  min-height: 0;
+  max-height: 480px;
+  padding: 12px 16px;
+  overflow-y: auto;
+}
+
+.ck-ledger-section { margin-bottom: 16px; }
+
+.ck-ledger-section-header {
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--co-text-muted);
+}
+
+.ck-ledger-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ck-ledger-item {
+  margin-bottom: 4px;
+  padding: 8px 10px;
+  font-size: 11px;
+  background: var(--co-bg-elevated);
+  border-left: 3px solid var(--co-primary);
+}
+
+.ck-ledger-item-created { border-left-color: var(--co-compliant); }
+
+.ck-ledger-item-type {
+  margin-bottom: 2px;
+  font-weight: 600;
+  color: var(--co-text);
+}
+
+.ck-ledger-item-path {
+  margin-bottom: 2px;
+  font-family: var(--co-font-mono);
+  font-size: 10px;
+  color: var(--co-text);
+  word-break: break-all;
+}
+
+.ck-ledger-item-meta {
+  font-size: 10px;
+  color: var(--co-text-muted);
+}
+
+.ck-ledger-warning {
+  margin-bottom: 8px;
+  padding: 8px;
+  font-size: 12px;
+  color: var(--co-risk);
+  background: color-mix(in srgb, var(--co-risk) 10%, transparent);
+}
+
+.ck-ledger-empty {
+  padding: 20px;
+  text-align: center;
+  color: var(--co-text-muted);
+}
+
+.ck-ledger-exports {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--co-border);
+}
+
+/* Legacy: --accent-blue fill, white text. Ink fill with the constant-white token (palette row 1). */
+.ck-ledger-export {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--co-designation-text);
+  background: var(--co-primary);
+  border: 0;
+  border-radius: var(--co-radius);
+  cursor: pointer;
+}
+
+.ck-ledger-export:hover { background: var(--co-primary-hover); }
+
+[data-theme="dark"] .ck-ledger-export {
+  color: var(--co-bg);
+}
+
+.ck-ledger-close:focus-visible,
+.ck-ledger-export:focus-visible,
+.ck-ledger-body:focus-visible {
+  outline: 2px solid var(--co-primary-focus);
+  outline-offset: 2px;
+}
+
+/* ── Execution Results (legacy #results, .summary-table, .report-links) ─────── */
+.ck-summary-table,
+.ck-control-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ck-summary-table { font-size: 13px; }
+
+.ck-summary-table th,
+.ck-summary-table td {
+  padding: 6px 12px;
+  text-align: left;
+  color: var(--co-text);
+  border: 1px solid var(--co-border);
+}
+
+.ck-summary-table th,
+.ck-control-table th {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--co-text-muted);
+  background: var(--co-bg-elevated);
+}
+
+.ck-summary-table td:last-child { font-weight: 600; }
+
+.ck-report-links {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--co-text-muted);
+}
+
+.ck-report-links a {
+  color: var(--co-review);
+  word-break: break-all;
+}
+
+.ck-report-links a:hover { color: var(--co-primary-hover); }
+
+.ck-control-results {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--co-border);
+}
+
+.ck-control-results-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  font: inherit;
+  color: var(--co-text);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.ck-control-results-toggle:focus-visible,
+.ck-control-results-body:focus-visible {
+  outline: 2px solid var(--co-primary-focus);
+  outline-offset: 2px;
+}
+
+.ck-chevron {
+  display: inline-block;
+  font-size: 10px;
+  transition: transform 0.2s;
+}
+
+.ck-chevron-open { transform: rotate(90deg); }
+
+.ck-control-results-title {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.ck-control-results-count {
+  font-size: 11px;
+  color: var(--co-text-muted);
+}
+
+.ck-control-results-body {
+  max-height: 400px;
+  margin-top: 8px;
+  overflow-y: auto;
+}
+
+.ck-control-table { font-size: 11px; }
+
+.ck-control-table th,
+.ck-control-table td {
+  padding: 4px 6px;
+  text-align: left;
+  border-bottom: 1px solid var(--co-border);
+}
+
+.ck-control-table td.ck-mono { font-size: 11px; }
+
+/* Legacy .exec-metric-* tints at 10 %. */
+.ck-verdict {
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  --ck-tone: var(--co-text-muted);
+}
+
+.ck-verdict-sat,
+.ck-verdict-notsat,
+.ck-verdict-provisional,
+.ck-verdict-na {
+  color: var(--ck-tone);
+  background: color-mix(in srgb, var(--ck-tone) 10%, transparent);
+}
+
+.ck-verdict-sat { --ck-tone: var(--co-compliant); }
+.ck-verdict-notsat { --ck-tone: var(--co-violation); }
+.ck-verdict-provisional { --ck-tone: var(--co-term-purple); }
+.ck-verdict-na { --ck-tone: var(--co-risk); }
+
+.ck-evidence-file {
+  font-family: var(--co-font-mono);
+  font-size: 10px;
+  color: var(--co-text-muted);
+}
+
+/* ── Missing Prerequisites (legacy .prereq-panel) ───────────────────────────── */
+.ck-prereq {
+  margin: 8px 0;
+  padding: 12px 14px;
+  background: color-mix(in srgb, var(--co-risk) 10%, transparent);
+  border: 1px solid var(--co-risk);
+}
+
+.ck-prereq-title {
+  margin: 0 0 8px;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--co-risk);
+}
+
+.ck-prereq-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 11px;
+}
+
+.ck-prereq-name {
+  flex: 1;
+  color: var(--co-text);
+}
+
+.ck-prereq-status {
+  font-size: 10px;
+  color: var(--co-text-muted);
+}
+
+.ck-prereq-btn,
+.ck-prereq-all {
+  color: var(--co-risk);
+  background: transparent;
+  border: 1px solid var(--co-risk);
+  border-radius: var(--co-radius);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.ck-prereq-btn {
+  padding: 2px 10px;
+  font-size: 10px;
+}
+
+.ck-prereq-all {
+  margin-top: 8px;
+  padding: 4px 14px;
+  font-size: 11px;
+  background: color-mix(in srgb, var(--co-risk) 15%, transparent);
+}
+
+.ck-prereq-btn:hover:not(:disabled) { background: color-mix(in srgb, var(--co-risk) 20%, transparent); }
+.ck-prereq-all:hover:not(:disabled) { background: color-mix(in srgb, var(--co-risk) 30%, transparent); }
+
+.ck-prereq-btn:disabled,
+.ck-prereq-all:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ck-prereq-row[data-status="done"] .ck-prereq-btn {
+  color: var(--co-compliant);
+  border-color: var(--co-compliant);
+  opacity: 1;
+}
+
+.ck-prereq-pw {
+  width: 110px;
+  padding: 2px 8px;
+  font-family: var(--co-font-mono);
+  font-size: 10px;
+  color: var(--co-text);
+  background: var(--co-bg-console);
+  border: 1px solid var(--co-border);
+  border-radius: var(--co-radius);
+}
+
+.ck-prereq-pw:focus-visible {
+  outline: 2px solid var(--co-risk);
+  outline-offset: 0;
+}
+
+.ck-prereq-pw:disabled { opacity: 0.5; }
+
+.ck-prereq-btn:focus-visible,
+.ck-prereq-all:focus-visible {
+  outline: 2px solid var(--co-primary-focus);
+  outline-offset: 2px;
+}
+
+.ck-prereq-hint {
+  flex-basis: 100%;
+  font-size: 10px;
+  color: var(--co-risk);
+}
+
+/* ── Error Log (legacy #errorLogPanel, .error-log-*) ────────────────────────── */
+.ck-error-log-title { color: var(--co-violation); }
+
+.ck-error-entry {
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--co-violation) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--co-violation) 30%, transparent);
+}
+
+.ck-error-id {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.ck-error-control {
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--co-violation);
+  background: color-mix(in srgb, var(--co-violation) 15%, transparent);
+}
+
+.ck-error-sub {
+  font-family: var(--co-font-mono);
+  font-size: 10px;
+  color: var(--co-text-muted);
+}
+
+.ck-error-row { margin-bottom: 6px; }
+
+.ck-error-row-label {
+  margin-bottom: 2px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--co-text-muted);
+}
+
+/* Legacy rgba(0,0,0,0.2) well: a tint of the text colour, readable in both themes. */
+.ck-error-row-value {
+  max-height: 200px;
+  padding: 4px 8px;
+  overflow-y: auto;
+  font-family: var(--co-font-mono);
+  font-size: 11px;
+  color: var(--co-text);
+  white-space: pre-wrap;
+  word-break: break-all;
+  background: color-mix(in srgb, var(--co-text) 8%, transparent);
+}
+
+.ck-error-row-value:focus-visible {
+  outline: 2px solid var(--co-primary-focus);
+  outline-offset: 1px;
+}
+
+.ck-error-determination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Legacy .verdict-badge.verdict-fail: red fill, white text; text on a semantic fill is --co-surface (palette row 1). */
+.ck-verdict-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.ck-verdict-badge-fail {
+  color: var(--co-surface);
+  background: var(--co-violation);
+}
+
+.ck-error-reason {
+  font-size: 11px;
+  color: var(--co-text);
+}
+
+/* ── Console and Terminal (legacy #taskList, #terminalList) ─────────────────── */
+.ck-console-view,
+.ck-terminal-view {
+  height: 800px;
+  max-height: 70vh;
+  overflow-y: auto;
+  font-family: var(--co-font-mono);
+  font-size: 11px;
+  color: var(--co-text);
+  background: var(--co-bg-console);
+  scroll-behavior: smooth;
+}
+
+.ck-console-view { padding: 10px 0; }
+.ck-terminal-view { padding: 10px 14px; }
+
+.ck-console-view:focus-visible,
+.ck-terminal-view:focus-visible {
+  outline: 2px solid var(--co-primary-focus);
+  outline-offset: -2px;
+}
+
+.ck-console-view::-webkit-scrollbar,
+.ck-terminal-view::-webkit-scrollbar { width: 8px; }
+.ck-console-view::-webkit-scrollbar-track,
+.ck-terminal-view::-webkit-scrollbar-track { background: var(--co-bg-console); }
+.ck-console-view::-webkit-scrollbar-thumb,
+.ck-terminal-view::-webkit-scrollbar-thumb { background: var(--co-border); }
+.ck-console-view::-webkit-scrollbar-thumb:hover,
+.ck-terminal-view::-webkit-scrollbar-thumb:hover { background: var(--co-border-strong); }
+
+.ck-console-view > .ck-prereq { margin: 8px 14px; }
+
+.ck-log-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 14px;
+  line-height: 1.5;
+}
+
+.ck-log-time {
+  flex-shrink: 0;
+  font-size: 10px;
+  color: var(--co-text-muted);
+}
+
+.ck-log-icon {
+  flex-shrink: 0;
+  font-size: 12px;
+}
+
+.ck-log-msg {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.ck-log-info { color: var(--co-review); }
+.ck-log-success { color: var(--co-compliant); }
+.ck-log-warn { color: var(--co-risk); }
+.ck-log-error { color: var(--co-violation); }
+
+@keyframes ck-log-spin { to { transform: rotate(360deg); } }
+
+.ck-log-spinner {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-left: 6px;
+  vertical-align: middle;
+  border: 2px solid var(--co-border);
+  border-top-color: var(--co-review);
+  border-radius: 50%;
+  animation: ck-log-spin 0.8s linear infinite;
+}
+
+.ck-term-separator {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 8px 0 4px;
+  font-size: 10px;
+  color: var(--co-text-muted);
+  border-top: 1px solid var(--co-border);
+}
+
+.ck-term-sep-time { font-weight: 600; color: var(--co-risk); }
+.ck-term-sep-id { font-weight: 700; color: var(--co-review); }
+.ck-term-sep-label { color: var(--co-text); }
+
+.ck-term-action {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 6px 0 2px;
+  padding: 6px 0 3px;
+  font-size: 9px;
+  color: var(--co-text-muted);
+  border-top: 1px dotted color-mix(in srgb, var(--co-text-muted) 30%, transparent);
+}
+
+.ck-term-action-index { font-weight: 600; color: var(--co-risk); }
+.ck-term-action-id { font-weight: 600; color: var(--co-review); }
+.ck-term-action-label { color: var(--co-text); }
+.ck-term-action-engine { font-style: italic; color: var(--co-text-muted); }
+
+.ck-term-line {
+  margin: 2px 0;
+  padding: 3px 0 3px 12px;
+  border-left: 2px solid var(--co-border);
+}
+
+/* Phase badges: legacy rgba tints at 15 %; hues per the FG-1 palette table (rows 40-42 and set/evidence). */
+.ck-term-phase {
+  display: inline-block;
+  min-width: 70px;
+  margin-right: 6px;
+  padding: 1px 6px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--ck-tone);
+  background: color-mix(in srgb, var(--ck-tone) 15%, transparent);
+  --ck-tone: var(--co-review);
+}
+
+.ck-term-phase-precheck { --ck-tone: var(--co-term-cyan); }
+.ck-term-phase-get { --ck-tone: var(--co-risk); }
+.ck-term-phase-set { --ck-tone: var(--co-review); }
+.ck-term-phase-postset { --ck-tone: var(--co-term-purple); }
+.ck-term-phase-verify { --ck-tone: var(--co-term-indigo); }
+.ck-term-phase-evidence { --ck-tone: var(--co-compliant); }
+.ck-term-phase-save { --ck-tone: var(--co-term-purple); }
+
+.ck-term-cmd,
+.ck-term-out,
+.ck-term-err {
+  margin: 1px 0;
+  padding-left: 18px;
+  text-indent: -18px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.ck-term-cmd { margin: 2px 0; color: var(--co-text); }
+.ck-term-cmd::before { content: '\25B8 '; color: var(--co-risk); }
+
+.ck-term-out { color: var(--co-text-muted); }
+.ck-term-out::before { content: '\2190 '; color: var(--co-compliant); }
+
+.ck-term-err { color: var(--co-violation); }
+.ck-term-err::before { content: '\2190 '; color: var(--co-violation); }
+
+.ck-term-meta {
+  margin-top: 1px;
+  font-size: 10px;
+  text-align: right;
+  color: var(--co-text-muted);
+}
+
+.ck-term-verdict {
+  margin: 2px 0 6px;
+  padding: 2px 0 4px 12px;
+  font-size: 10px;
+  color: var(--co-text-muted);
+  border-bottom: 1px dotted color-mix(in srgb, var(--co-text-muted) 20%, transparent);
+}
+
+.ck-term-verdict-pass { color: var(--co-compliant); }
+.ck-term-verdict-fail { color: var(--co-violation); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ck-log-spinner { animation: none; }
+  .ck-chevron,
+  .ck-prereq-btn,
+  .ck-prereq-all { transition: none; }
+  .ck-console-view,
+  .ck-terminal-view { scroll-behavior: auto; }
+}
+
+@media (max-width: 720px) {
+  .ck-console-view,
+  .ck-terminal-view { height: 480px; }
+  .ck-ledger-filter-row { flex-wrap: wrap; }
+  .ck-term-phase { min-width: 0; }
+}

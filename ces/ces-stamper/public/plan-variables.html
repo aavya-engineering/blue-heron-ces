@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plan Variables</title>
+  <link rel="icon" type="image/svg+xml" href="./ces-favicon.svg">
+  <link rel="stylesheet" href="./ces-ui.css">
+  <script src="./ces-theme-toggle.js"></script>
+  <style>
+    /* =======================================
+       TOKEN ALIAS SHIM — maps Blueprint-Dark
+       local names to CES canonical --co-* vars.
+       ces-ui.css :root provides light defaults;
+       [data-theme="dark"] provides dark overrides.
+       ======================================= */
+    :root {
+      --bg-page:           var(--co-bg);
+      --bg-panel:          var(--co-surface);
+      --bg-elevated:       var(--co-bg-elevated);
+      --bg-console:        var(--co-bg-console);
+      --border:            var(--co-border);
+      --border-subtle:     var(--co-border);
+      --text-body:         var(--co-text);
+      --text-muted:        var(--co-text-muted);
+      --text-heading:      var(--co-text);
+      --accent-blue:       var(--co-primary);
+      --accent-blue-hover: var(--co-primary-hover);
+      --accent-blue-subtle:var(--co-primary-focus);
+      --accent-green:      var(--co-compliant);
+      --accent-green-hover:var(--co-compliant);
+      --accent-amber:      var(--co-risk);
+      --accent-red:        var(--co-violation);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--co-font-sans);
+      font-size: 14px;
+      letter-spacing: 0.01em;
+      background: var(--bg-page);
+      color: var(--text-body);
+      padding: 16px;
+      min-height: 100vh;
+    }
+
+    .header {
+      background: var(--bg-panel);
+      color: var(--text-heading);
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      border-bottom: 1px solid var(--border);
+      margin: -16px -16px 16px -16px;
+    }
+
+    .var-editor-scroll {
+      max-height: 520px;
+      overflow-y: auto;
+    }
+
+    .var-editor-scroll::-webkit-scrollbar { width: 6px; }
+    .var-editor-scroll::-webkit-scrollbar-track { background: var(--bg-panel); }
+    .var-editor-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: var(--co-radius); }
+
+    .var-editor-summary {
+      display: flex;
+      gap: 12px;
+      padding: 12px;
+      font-size: 11px;
+      color: var(--text-muted);
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: var(--co-radius);
+      margin-bottom: 12px;
+    }
+
+    .var-editor-summary .var-sum-count {
+      font-weight: 600;
+      color: var(--text-heading);
+    }
+
+    .var-editor-summary .var-sum-missing {
+      color: var(--accent-amber);
+      font-weight: 600;
+    }
+
+    .var-cat-badge {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: var(--co-radius);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      flex-shrink: 0;
+    }
+
+    .var-cat-badge.si  { background: var(--co-violation-bg); color: var(--co-violation); border: 1px solid var(--co-violation); }
+    .var-cat-badge.cui { background: var(--co-risk-bg); color: var(--co-risk); border: 1px solid var(--co-risk); }
+    .var-cat-badge.tcp { background: var(--co-review-bg); color: var(--co-review); border: 1px solid var(--co-review); }
+
+    .var-category-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: var(--co-radius);
+      margin-top: 8px;
+    }
+
+    .var-category-header:hover { color: var(--text-body); }
+
+    .var-category-toggle {
+      font-size: 10px;
+      width: 12px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .var-category-count {
+      margin-left: auto;
+      font-size: 10px;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+
+    .var-category-body {
+      padding: 8px 0;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 var(--co-radius) var(--co-radius);
+      margin-top: -6px;
+    }
+
+    .var-category-body.collapsed { display: none; }
+
+    .var-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 12px;
+    }
+
+    .var-row:hover { background: rgba(30,64,175,0.04); }
+
+    .var-row label {
+      margin: 0;
+      font-size: 11px;
+      font-family: var(--co-font-mono);
+      color: var(--text-body);
+      min-width: 220px;
+      flex-shrink: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .var-row input[type="text"],
+    .var-row input[type="password"] {
+      flex: 1;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-family: var(--co-font-mono);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--co-radius);
+      color: var(--text-body);
+      min-width: 0;
+    }
+
+    .var-row input:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 1px var(--accent-blue);
+    }
+
+    .var-row.var-missing input {
+      border-color: var(--accent-amber);
+      background: var(--co-risk-bg);
+    }
+
+    .var-row.var-missing label { color: var(--accent-amber); }
+
+    .var-row .var-eye {
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      width: 18px;
+      text-align: center;
+    }
+
+    .var-row .var-eye:hover { color: var(--text-body); }
+
+    .var-check-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: var(--co-radius);
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 13px;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      flex-shrink: 0;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .var-check-btn:hover { color: var(--accent-blue); border-color: var(--accent-blue); }
+    .var-check-btn:disabled { opacity: 0.4; cursor: default; }
+    .var-check-btn.resolved { color: var(--accent-green); border-color: var(--accent-green); }
+    .var-check-btn.failed { color: var(--accent-red); border-color: var(--accent-red); }
+
+    .var-editor-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+      padding: 12px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: var(--co-radius);
+    }
+
+    .btn-primary {
+      padding: 8px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--accent-blue);
+      border: 1px solid var(--accent-blue);
+      color: #fff;
+      border-radius: var(--co-radius);
+      cursor: pointer;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-blue-hover);
+      border-color: var(--accent-blue-hover);
+    }
+
+    .btn-secondary {
+      padding: 8px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      color: var(--text-body);
+      border-radius: var(--co-radius);
+      cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-panel);
+      border-color: var(--accent-blue);
+      color: var(--accent-blue-subtle);
+    }
+
+    .status-message {
+      padding: 10px 12px;
+      border-radius: var(--co-radius);
+      font-size: 12px;
+      font-weight: 500;
+      margin-bottom: 12px;
+      display: none;
+    }
+
+    .status-message.success {
+      background: var(--co-compliant-bg);
+      color: var(--co-compliant);
+      border: 1px solid var(--co-compliant);
+    }
+
+    .status-message.error {
+      background: var(--co-violation-bg);
+      color: var(--co-violation);
+      border: 1px solid var(--co-violation);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 24px;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header" style="display:flex;align-items:center;gap:8px;">
+    Plan Variables Editor
+    <button id="ces-theme-toggle" title="Toggle light/dark theme" style="margin-left:auto;padding:2px 6px;font-size:12px;background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-body);cursor:pointer;border-radius:var(--co-radius);">&#9680;</button>
+  </div>
+
+  <div class="status-message" id="statusMessage"></div>
+
+  <div id="loadingIndicator" class="loading">Loading variables...</div>
+
+  <div id="varEditorContainer" style="display:none;">
+    <div id="varEditorSummary" class="var-editor-summary"></div>
+    <div id="varEditorContent" class="var-editor-scroll"></div>
+    <div id="varEditorButtons" class="var-editor-buttons" style="display:none;">
+      <button class="btn-primary" onclick="saveVariables()">Save</button>
+      <button class="btn-secondary" onclick="cancelVariables()">Cancel</button>
+    </div>
+  </div>
+
+  <script>
+    // ---- Global State ----
+    var currentTenant = '';
+    var currentPlan = '';
+    var varsFilePath = null;
+    var varEditorData = null;
+    var varEditorOriginal = null;
+
+    // ---- Initialization ----
+    (function init() {
+      var params = new URLSearchParams(window.location.search);
+      currentTenant = params.get('tenant') || '';
+      currentPlan = params.get('plan') || '';
+
+      if (!currentPlan) {
+        showStatus('No plan specified. Please open this window from a loaded plan.', 'error');
+        document.getElementById('loadingIndicator').style.display = 'none';
+        return;
+      }
+
+      loadPlanVariables();
+    })();
+
+    // ---- Load Variables ----
+    function loadPlanVariables() {
+      var url = '/api/plan-variables?plan=' + encodeURIComponent(currentPlan);
+      if (varsFilePath) url += '&varsFile=' + encodeURIComponent(varsFilePath);
+
+      fetch(url)
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (!data.ok) {
+            showStatus('Failed to load variables: ' + data.error, 'error');
+            document.getElementById('loadingIndicator').style.display = 'none';
+            return;
+          }
+
+          varEditorData = data;
+          varEditorOriginal = JSON.stringify(data.variables.map(function(v) {
+            return { name: v.name, value: v.value };
+          }));
+
+          renderVariableEditor(data);
+
+          document.getElementById('loadingIndicator').style.display = 'none';
+          document.getElementById('varEditorContainer').style.display = 'block';
+        })
+        .catch(function(err) {
+          showStatus('Failed to load variables: ' + err.message, 'error');
+          document.getElementById('loadingIndicator').style.display = 'none';
+        });
+    }
+
+    // ---- Render Variables ----
+    function renderVariableEditor(data) {
+      var summary = document.getElementById('varEditorSummary');
+      var content = document.getElementById('varEditorContent');
+      var buttons = document.getElementById('varEditorButtons');
+
+      var missingLabel = data.counts.missing > 0
+        ? '<span class="var-sum-missing">' + data.counts.missing + ' missing</span>'
+        : '<span style="color:var(--accent-green);">0 missing</span>';
+
+      summary.innerHTML =
+        '<span><span class="var-sum-count">' + data.counts.total + '</span> variables</span>' +
+        '<span>' + missingLabel + '</span>' +
+        '<span><span class="var-cat-badge cui">CUI</span> ' + data.counts.cui + '</span>' +
+        '<span><span class="var-cat-badge tcp">TCP</span> ' + data.counts.tcp + '</span>' +
+        '<span><span class="var-cat-badge si">SI</span> ' + data.counts.si + '</span>';
+
+      // Group by category
+      var groups = { cui: [], tcp: [], si: [] };
+      for (var i = 0; i < data.variables.length; i++) {
+        var v = data.variables[i];
+        groups[v.category].push(v);
+      }
+
+      var catLabels = {
+        cui: 'Controlled Unclassified Information',
+        tcp: 'Tenant Configuration Parameters',
+        si: 'Sensitive Information'
+      };
+
+      var html = '';
+      var catOrder = ['cui', 'tcp', 'si'];
+      for (var ci = 0; ci < catOrder.length; ci++) {
+        var cat = catOrder[ci];
+        var items = groups[cat];
+        if (items.length === 0) continue;
+
+        var missingInCat = items.filter(function(v) { return v.missing; }).length;
+        var countSuffix = missingInCat > 0 ? ' — ' + missingInCat + ' missing' : '';
+
+        html += '<div class="var-category">';
+        html += '<div class="var-category-header" onclick="toggleVarCat(\'' + cat + '\')">';
+        html += '<span class="var-category-toggle" id="varCatToggle-' + cat + '">▼</span>';
+        html += '<span class="var-cat-badge ' + cat + '">' + cat.toUpperCase() + '</span>';
+        html += '<span>' + escHtml(catLabels[cat]) + '</span>';
+        html += '<span class="var-category-count">' + items.length + ' vars' + escHtml(countSuffix) + '</span>';
+        html += '</div>';
+        html += '<div class="var-category-body" id="varCatBody-' + cat + '">';
+
+        for (var j = 0; j < items.length; j++) {
+          var v = items[j];
+          var inputType = cat === 'si' ? 'password' : 'text';
+          var valStr = v.value === null || v.value === undefined ? '' : String(v.value);
+          var missingClass = v.missing ? ' var-missing' : '';
+          var eyeBtn = cat === 'si' ? '<span class="var-eye" onclick="toggleVarVisibility(this)" title="Show/hide">👁</span>' : '';
+          var checkBtn = v.resolvable ? '<button class="var-check-btn" data-var="' + escHtml(v.name) + '" onclick="checkVarFromTenant(\'' + escHtml(v.name) + '\')" title="Query tenant for this value">&#8635;</button>' : '';
+
+          html += '<div class="var-row' + missingClass + '">';
+          html += '<label title="' + escHtml(v.name) + '">' + escHtml(v.name) + '</label>';
+          html += '<input type="' + inputType + '" value="' + escHtml(valStr) + '" data-var="' + escHtml(v.name) + '" data-original="' + escHtml(valStr) + '" placeholder="(missing)" oninput="onVarEdit()" />';
+          html += checkBtn;
+          html += eyeBtn;
+          html += '</div>';
+        }
+
+        html += '</div>';
+        html += '</div>';
+      }
+
+      content.innerHTML = html;
+      buttons.style.display = 'none';
+    }
+
+    function toggleVarCat(cat) {
+      var body = document.getElementById('varCatBody-' + cat);
+      var toggle = document.getElementById('varCatToggle-' + cat);
+      if (!body) return;
+      if (body.classList.contains('collapsed')) {
+        body.classList.remove('collapsed');
+        if (toggle) toggle.textContent = '▼';
+      } else {
+        body.classList.add('collapsed');
+        if (toggle) toggle.textContent = '▶';
+      }
+    }
+
+    function toggleVarVisibility(eyeEl) {
+      var input = eyeEl.parentElement.querySelector('input');
+      if (input && input.type === 'password') {
+        input.type = 'text';
+      } else if (input && input.type === 'text') {
+        input.type = 'password';
+      }
+    }
+
+    function checkVarFromTenant(varName) {
+      if (!currentTenant) {
+        showStatus('No tenant selected', 'error');
+        return;
+      }
+
+      var btn = document.querySelector('.var-check-btn[data-var="' + varName + '"]');
+      if (!btn) return;
+
+      btn.disabled = true;
+      btn.textContent = '…';
+      btn.classList.remove('resolved', 'failed');
+
+      var payload = { variable: varName, tenant: currentTenant };
+      if (currentPlan) payload.plan = currentPlan;
+      if (varsFilePath) payload.varsFile = varsFilePath;
+
+      fetch('/api/resolve-variable', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+        .then(function(r) { return r.json(); })
+        .then(function(result) {
+          if (result.ok && result.resolved) {
+            for (var key in result.resolved) {
+              var input = document.querySelector('#varEditorContent input[data-var="' + key + '"]');
+              if (input) {
+                input.value = result.resolved[key];
+                onVarEdit();
+              }
+            }
+            btn.classList.add('resolved');
+            btn.innerHTML = '&#10003;';
+            setTimeout(function() { btn.innerHTML = '&#8635;'; btn.classList.remove('resolved'); }, 3000);
+          } else if (result.ok && result.ambiguous) {
+            btn.classList.add('failed');
+            btn.innerHTML = '&#8635;';
+            var names = (result.candidates || []).join(', ');
+            btn.title = 'Multiple found: ' + names;
+            setTimeout(function() { btn.classList.remove('failed'); btn.title = 'Query tenant for this value'; }, 5000);
+          } else {
+            btn.classList.add('failed');
+            btn.innerHTML = '&#8635;';
+            btn.title = result.error || 'Not found in tenant';
+            setTimeout(function() { btn.classList.remove('failed'); btn.title = 'Query tenant for this value'; }, 3000);
+          }
+        })
+        .catch(function(e) {
+          btn.classList.add('failed');
+          btn.innerHTML = '&#8635;';
+          btn.title = 'Error: ' + e.message;
+          setTimeout(function() { btn.classList.remove('failed'); btn.title = 'Query tenant for this value'; }, 3000);
+        })
+        .finally(function() {
+          btn.disabled = false;
+        });
+    }
+
+    function onVarEdit() {
+      var buttons = document.getElementById('varEditorButtons');
+      var inputs = document.querySelectorAll('#varEditorContent input[data-var]');
+      var dirty = false;
+      for (var i = 0; i < inputs.length; i++) {
+        if (inputs[i].value !== inputs[i].getAttribute('data-original')) {
+          dirty = true;
+          break;
+        }
+      }
+      buttons.style.display = dirty ? 'flex' : 'none';
+    }
+
+    // ---- Save Variables ----
+    function saveVariables() {
+      if (!currentPlan) return;
+
+      var inputs = document.querySelectorAll('#varEditorContent input[data-var]');
+      var updates = {};
+      for (var i = 0; i < inputs.length; i++) {
+        var name = inputs[i].getAttribute('data-var');
+        var val = inputs[i].value;
+        // Preserve type for booleans and numbers
+        if (val === 'true') val = true;
+        else if (val === 'false') val = false;
+        else if (val !== '' && !isNaN(Number(val)) && val.trim() === val) val = Number(val);
+        updates[name] = val;
+      }
+
+      var payload = { plan: currentPlan, variables: updates };
+      if (varsFilePath) payload.varsFile = varsFilePath;
+
+      fetch('/api/plan-variables', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+        .then(function(r) { return r.json(); })
+        .then(function(result) {
+          if (!result.ok) {
+            showStatus('Failed to save variables: ' + result.error, 'error');
+            return;
+          }
+          showStatus('Variables saved (' + result.updated + ' updated)', 'success');
+
+          // Reload to refresh original values
+          loadPlanVariables();
+
+          // Notify parent window
+          if (window.opener) {
+            window.opener.postMessage({ type: 'variables-saved' }, '*');
+          }
+        })
+        .catch(function(e) {
+          showStatus('Failed to save variables: ' + e.message, 'error');
+        });
+    }
+
+    function cancelVariables() {
+      var inputs = document.querySelectorAll('#varEditorContent input[data-var]');
+      for (var i = 0; i < inputs.length; i++) {
+        inputs[i].value = inputs[i].getAttribute('data-original');
+      }
+      document.getElementById('varEditorButtons').style.display = 'none';
+    }
+
+    // ---- Utilities ----
+    function escHtml(s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function showStatus(message, type) {
+      var statusEl = document.getElementById('statusMessage');
+      statusEl.textContent = message;
+      statusEl.className = 'status-message ' + type;
+      statusEl.style.display = 'block';
+
+      if (type === 'success') {
+        setTimeout(function() {
+          statusEl.style.display = 'none';
+        }, 5000);
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blueherondefense.example/ces/evidence-catalog.schema.json",
+  "title": "CES evidence catalog (one released batch)",
+  "description": "One row per evidence definition: one NIST SP 800-171A examine-list object for one requirement, pointing at one reusable form. This is the data shape BHD proposes for the 'catalog, not kit' approach (BHD response of 2026-10-26, section 5, workstream WS-1). Releases are governed (editor, approver, change log); the file is read by Muster and EvidenceOps and never edited through open CRUD.",
+  "type": "object",
+  "required": ["catalog_version", "released_on", "approved_by_role", "practice_id_convention", "definitions"],
+  "properties": {
+    "catalog_version": { "type": "string", "description": "Semantic version of the released batch set, e.g. 0.1.0" },
+    "released_on": { "type": "string", "format": "date" },
+    "approved_by_role": { "type": "string", "description": "Role, never a person's name" },
+    "practice_id_convention": {
+      "type": "string",
+      "enum": ["L2-guide-v2.13", "ces-shared-2021"],
+      "description": "Which practice-id spelling the file uses for the 17 Level 1 practices: 'L2-guide-v2.13' = AC.L2-3.1.1 (CMMC Assessment Guide Level 2 v2.13); 'ces-shared-2021' = AC.L1-3.1.1 (CES shared reference). BHD decides this under requirement R-4; readers must normalise the level away as CES code already does."
+    },
+    "change_log": {
+      "type": "array",
+      "items": { "type": "object", "required": ["version", "date", "summary", "role"], "properties": {
+        "version": { "type": "string" }, "date": { "type": "string", "format": "date" }, "summary": { "type": "string" }, "role": { "type": "string" } } }
+    },
+    "definitions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["definition_id", "requirement_id", "examine_index", "examine_text", "form_id", "emx_ids", "objective_ids", "tier", "production", "status"],
+        "properties": {
+          "definition_id": { "type": "string", "pattern": "^[A-Z]{2}\\.L[12]-3\\.[0-9]{1,2}\\.[0-9]{1,2}#E[0-9]{2}$", "description": "<practice id>#E<nn>, nn = 1-based position of the object in the 800-171A examine list (see nist-800-171a-examine-lists.json), so the id is reproducible from NIST." },
+          "requirement_id": { "type": "string", "description": "CMMC practice id, e.g. AC.L2-3.1.1" },
+          "nist_ref": { "type": "string", "pattern": "^3\\.[0-9]{1,2}\\.[0-9]{1,2}$" },
+          "examine_index": { "type": "integer", "minimum": 1 },
+          "examine_text": { "type": "string", "description": "The examine-list object verbatim from 800-171A" },
+          "form_id": { "type": "string", "pattern": "^[a-z0-9_]+$", "description": "Muster template_id (snake_case) for rendered forms and registers; the same id is reused across every requirement whose examine list names the same document type" },
+          "form_title": { "type": "string" },
+          "legacy_alias": { "type": "string", "description": "The id used in the 26 Oct package (e.g. ACP-001), kept for traceability only" },
+          "emx_ids": { "type": "array", "items": { "type": "string", "pattern": "^EMX-[A-Z]+-[0-9]{3}$" }, "description": "Evidence archetype ids (uppercase, from the Evidence Archetype Catalog). Empty means 'no archetype fits; propose one'." },
+          "emx_proposed_new": { "type": "array", "items": { "type": "string" }, "description": "Free-text proposals for archetypes the catalog lacks" },
+          "objective_ids": { "type": "array", "minItems": 1, "items": { "type": "string" }, "description": "Assessment objective ids this document evidences, e.g. AC.L1-3.1.1[a] (ces-shared assessment-objectives.reference.json)" },
+          "tier": { "type": "string", "enum": ["must_have", "nice_to_have"] },
+          "production": {
+            "type": "string",
+            "enum": ["signal", "capture", "rendered", "attested"],
+            "description": "signal = an existing automated tenant read evidences it; capture = exported from the tenant and rendered as a register; rendered = Muster renders the document from collected inputs; attested = a short human-completed form for facts outside the tenant"
+          },
+          "status_effect": { "type": "string", "const": "none", "description": "Attested and captured documents never change a control's status or enter the verified-artifact list (BHD decision DEC-7). Fixed value." },
+          "collection_guidance": { "type": "string", "description": "What the assessor or customer should check (the 26 Oct package's 'CES recommendation' text belongs here)" },
+          "gcc_high_checked": { "type": "boolean", "description": "For capture/signal rows: the Graph endpoint and permission were confirmed available in GCC High" },
+          "status": { "type": "string", "enum": ["draft", "released", "retired"] }
+        }
+      }
+    }
+  }
+}

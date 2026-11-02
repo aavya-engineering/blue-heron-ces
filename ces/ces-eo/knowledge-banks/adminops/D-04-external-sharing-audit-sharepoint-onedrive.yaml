@@ -1,0 +1,66 @@
+controlId: "AC.L1-3.1.20"
+relatedControlIds:
+  - "AC.L2-3.1.3"
+  - "SC.L1-3.13.1"
+  - "SC.L2-3.13.2"
+  - "MP.L2-3.8.1"
+  - "AC.L1-3.1.22"  # [VERIFY] mapping not yet confirmed
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: D-04
+useCaseTitle: "External Sharing Audit"
+domain: Data Protection & Information Management
+priority: P2 High
+trigger: 'SCHEDULE: Weekly'
+sodTier: Tier 2 -- Config Manager
+entraRolesRequired:
+- SharePoint Administrator
+- Compliance Administrator
+approvalRequired: false
+services:
+- name: SharePoint Admin Center
+  purpose: '`https://{tenant}-admin.sharepoint.us`'
+- name: SharePoint Online Management Shell
+  purpose: SPO PowerShell module
+- name: Microsoft Graph API
+  purpose: SharePoint sites, permissions
+- name: OneDrive for Business
+  purpose: user-level sharing settings
+- name: Purview Compliance Portal
+  purpose: '`https://compliance.microsoft.us`) -- DLP policy integration'
+- name: Entra ID -- B2B external collaboration settings
+  purpose: ''
+configurationSteps:
+  portalPath: //{tenant}-admin.sharepoint.us > **Policies** > **Sharing**.
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes Sites.Read.All
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/sites/{siteId}?$select=sharingCapabilities
+  graphApiPayloadExample: {}
+  requiredPermissions:
+  - Sites.Read.All
+  - Sites.ReadWrite.All
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-d-dataprotection/D-04/2026/03/
+  format: CSV (site sharing inventory), JSON (tenant sharing configuration snapshot)
+  filenamePattern: D-04_ExternalSharing_{YYYYMMDD}_{HHmmss}_Weekly.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://entra.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |-
+    - SharePoint Admin Center uses `https://{tenant}-admin.sharepoint.us` (not `.com`).
+    - The `Connect-SPOService` cmdlet in GCC High requires the `-Url` parameter pointing to the `.us` admin site.
+    - Anonymous sharing links should be globally disabled for GCC High tenants handling CUI. Set `Set-SPOTenant -SharingCapability ExistingExternalUserSharingOnly` at minimum, or `Disabled` for CUI-scoped sites.
+    - B2B external collaboration settings in Entra ID at `https://entra.microsoft.us` control the domain allowlist at the identity layer, complementing the SPO-level domain restriction.
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

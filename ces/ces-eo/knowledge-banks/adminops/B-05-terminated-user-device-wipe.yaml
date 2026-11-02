@@ -1,0 +1,88 @@
+controlId: "MP.L1-3.8.3"
+relatedControlIds:
+  - "MP.L2-3.8.1"
+  - "MP.L2-3.8.2"
+  - "AC.L1-3.1.1"
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: B-05
+useCaseTitle: "Terminated-User Device Wipe"
+domain: Device & Endpoint Management
+priority: P1 Critical
+trigger: 'PERSONNEL: User termination confirmed via A-02 (User Offboarding -- Disable)'
+sodTier: Tier 2 -- Config Manager
+entraRolesRequired:
+- Intune Administrator
+approvalRequired: true
+services:
+- name: Microsoft Intune
+  purpose: remote wipe -- full wipe and selective wipe, retire action
+- name: Windows Autopilot
+  purpose: device deregistration
+- name: Entra ID
+  purpose: device identity removal
+- name: Microsoft Graph API
+  purpose: managedDevices wipe and retire actions
+configurationSteps:
+  portalPath: https://intune.microsoft.us
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes DeviceManagementManagedDevices.PrivilegedOperations.All
+  - cmdlet: Get-MgDeviceManagementManagedDevice
+    parameters:
+    - -MgDeviceManagementManagedDevice
+    - -Filter
+    - -eq
+    - -MgDeviceManagementManagedDevice
+    - -ManagedDeviceId
+  - cmdlet: Get-MgDeviceManagementWindowsAutopilotDeviceIdentity
+    parameters:
+    - -MgDeviceManagementWindowsAutopilotDeviceIdentity
+    - -Filter
+    - -MgDeviceManagementWindowsAutopilotDeviceIdentity
+    - -WindowsAutopilotDeviceIdentityId
+    - -Output
+  - cmdlet: Remove-MgDeviceManagementWindowsAutopilotDeviceIdentity
+    parameters:
+    - -MgDeviceManagementWindowsAutopilotDeviceIdentity
+    - -WindowsAutopilotDeviceIdentityId
+    - -Output
+    - -MgDeviceManagementManagedDevice
+    - -ManagedDeviceId
+  - cmdlet: Remove-MgDeviceManagementManagedDevice
+    parameters:
+    - -MgDeviceManagementManagedDevice
+    - -ManagedDeviceId
+    - -Output
+    - -Sleep
+    - -Seconds
+  graphApiEndpoint: POST https://graph.microsoft.us/v1.0/deviceManagement/managedDevices/{managedDeviceId}/wipe
+  graphApiPayloadExample: {}
+  requiredPermissions:
+  - DeviceManagementManagedDevices.PrivilegedOperations.All
+  - DeviceManagementServiceConfig.ReadWrite.All
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-b-device/B-05/{year}/{month}/
+  format: JSON (wipe action confirmation), CSV (summary of all wiped devices for the terminated user)
+  filenamePattern: B-05_DeviceWipe_{YYYYMMDD}_{HHmmss}_{UserUPN}_{DeviceSerial}.json
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: Intune remote wipe and retire actions are fully supported in GCC High. The wipe command executes through the Intune
+    management channel; the device must be able to reach the GCC High Intune service endpoints to receive the command. If
+    the device is offline, the wipe command queues and executes upon next check-in. For devices that never check in (e.g.,
+    device is also physically lost), coordinate with B-06 (Lost/Stolen Device Wipe) for escalation. Autopilot device deletion
+    in GCC High uses the same Graph API endpoint structure with the `graph.microsoft.us` base URL.
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

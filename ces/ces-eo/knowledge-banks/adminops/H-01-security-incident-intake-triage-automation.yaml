@@ -1,0 +1,63 @@
+controlId: "IR.L2-3.6.1"
+relatedControlIds:
+  - "IR.L2-3.6.2"
+  - "AU.L2-3.3.1"
+  - "AU.L2-3.3.2"
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: H-01
+useCaseTitle: "Security Incident Intake"
+domain: Incident Response
+priority: P4 Standard
+trigger: 'INCIDENT: Sentinel alert or manual report'
+sodTier: Tier 2 -- Config Manager
+entraRolesRequired:
+- Security Administrator
+- Sentinel Contributor
+approvalRequired: false
+services:
+- name: Microsoft Sentinel
+  purpose: Azure Government
+- name: Microsoft Defender Portal
+  purpose: '`https://security.microsoft.us`'
+- name: Sentinel Automation Rules
+  purpose: ''
+- name: Sentinel Playbooks
+  purpose: Logic Apps in Azure Government
+- name: ITSM integration
+  purpose: ServiceNow or equivalent -- evaluate for your environment
+- name: Log Analytics Workspace
+  purpose: Azure Government
+configurationSteps:
+  portalPath: //security.microsoft.us
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes SecurityIncident.Read.All
+  graphApiEndpoint: PATCH https://graph.microsoft.us/v1.0/security/incidents/{incidentId}
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-h-incident/H-01/{year}/{month}/
+  format: JSON (incident detail export), CSV (triage queue)
+  filenamePattern: H-01_IncidentIntake_{YYYYMMDD}_{HHmmss}_{IncidentID}.json
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://security.microsoft.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: All Sentinel operations in GCC High use the Azure Government portal at `https://portal.azure.us` and the Defender
+    portal at `https://security.microsoft.us`. The Microsoft Graph Security API incidents endpoint is available at `https://graph.microsoft.us/v1.0/security/incidents`.
+    After March 2027, the standalone Sentinel experience in the Azure portal will be retired and all incident management will
+    occur through the unified Defender portal. ITSM connectors (ServiceNow, Jira) must be configured to communicate through
+    Azure Government endpoints. Verify that your ITSM connector supports GCC High c
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

@@ -1,0 +1,50 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"CMMC-MFA-CompliantDevice\",\r\n    \"displayName\":  \"CMMC-MFA-CompliantDevice\",\r\n    \"grantControls\":  {\r\n                          \"builtInControls\":  [\r\n                                                  \"mfa\",\r\n                                                  \"compliantDevice\"\r\n                                              ],\r\n                          \"operator\":  \"AND\"\r\n                      },\r\n    \"conditions\":  {\r\n                       \"clientAppTypes\":  [\r\n                                              \"browser\",\r\n                                              \"mobileAppsAndDesktopClients\"\r\n                                          ],\r\n                       \"users\":  {\r\n                                     \"excludeUsers\":  [\r\n                                                          \"user-50\"\r\n                                                      ],\r\n                                     \"includeGroups\":  [\r\n                                                           \"group-1\"\r\n                                                       ]\r\n                                 },\r\n                       \"applications\":  {\r\n                                            \"includeApplications\":  [\r\n                                                                        \"All\"\r\n                                                                    ]\r\n                                        }\r\n                   },\r\n    \"state\":  \"enabled\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "AC.L1-3.1.1.ca-mfa-compliant-device",
+    "label": "Conditional Access - Require MFA and a Compliant Device (CUI Users)",
+    "engine": "mgraph",
+    "layer_hint": 7,
+    "sequence_hint": 2,
+    "idempotency": "get-then-set",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "AC.L1-3.1.1"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/identity/conditionalAccess/policies').value | Where-Object { ($_.displayName -eq 'CMMC-MFA-CompliantDevice') -or (($_.state -eq 'enabled') -and ((@($_.conditions.users.includeUsers) -contains 'All') -or (@($_.conditions.users.includeGroups) -contains '{cuiGroupId}')) -and (@($_.conditions.applications.includeApplications) -contains 'All') -and ((@($_.conditions.clientAppTypes | Where-Object { $_ }).Count -eq 0) -or (@($_.conditions.clientAppTypes) -contains 'all') -or (@($_.conditions.clientAppTypes) -contains 'browser')) -and ((@($_.conditions.clientAppTypes | Where-Object { $_ }).Count -eq 0) -or (@($_.conditions.clientAppTypes) -contains 'all') -or (@($_.conditions.clientAppTypes) -contains 'mobileAppsAndDesktopClients')) -and ((@($_.conditions.platforms.includePlatforms | Where-Object { $_ }).Count -eq 0) -or (@($_.conditions.platforms.includePlatforms) -contains 'all')) -and ((@($_.conditions.locations.includeLocations | Where-Object { $_ }).Count -eq 0) -or (@($_.conditions.locations.includeLocations) -contains 'All')) -and (@($_.conditions.signInRiskLevels | Where-Object { $_ }).Count -eq 0) -and (@($_.conditions.userRiskLevels | Where-Object { $_ }).Count -eq 0) -and (@($_.grantControls.builtInControls) -contains 'mfa') -and (@($_.grantControls.builtInControls) -contains 'compliantDevice') -and ($_.grantControls.operator -eq 'AND')) } | Sort-Object { $_.displayName -ne 'CMMC-MFA-CompliantDevice' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
+    "set_command": "New-MgIdentityConditionalAccessPolicy -BodyParameter @{displayName='CMMC-MFA-CompliantDevice';state='enabled';conditions=@{users=@{includeGroups=@('{cuiGroupId}');excludeUsers=@('{breakGlassUserId}')};applications=@{includeApplications=@('All')};clientAppTypes=@('browser','mobileAppsAndDesktopClients')};grantControls=@{operator='AND';builtInControls=@('mfa','compliantDevice')}}",
+    "evidence_commands": [
+      "Get-MgIdentityConditionalAccessPolicy -Filter \"displayName eq 'CMMC-MFA-CompliantDevice'\" | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AC.L1-3.1.1"
+    ],
+    "timestamp": "2026-11-01T15:27:10.621Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "New-MgIdentityConditionalAccessPolicy -BodyParameter @{displayName='CMMC-MFA-CompliantDevice';state='enabled';conditions=@{users=@{includeGroups=@('{cuiGroupId}');excludeUsers=@('{breakGlassUserId}')};applications=@{includeApplications=@('All')};clientAppTypes=@('browser','mobileAppsAndDesktopClients')};grantControls=@{operator='AND';builtInControls=@('mfa','compliantDevice')}}",
+    "sha256Hash": "93143710d87fe269b9fcd6361a3138f4164ab610564663c2290fe6193a0ee756",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\r\n    \"id\":  \"CMMC-MFA-CompliantDevice\",\r\n    \"displayName\":  \"CMMC-MFA-CompliantDevice\",\r\n    \"grantControls\":  {\r\n                          \"builtInControls\":  [\r\n                                                  \"mfa\",\r\n                                                  \"compliantDevice\"\r\n                                              ],\r\n                          \"operator\":  \"AND\"\r\n                      },\r\n    \"conditions\":  {\r\n                       \"clientAppTypes\":  [\r\n                                              \"browser\",\r\n                                              \"mobileAppsAndDesktopClients\"\r\n                                          ],\r\n                       \"users\":  {\r\n                                     \"excludeUsers\":  [\r\n                                                          \"user-50\"\r\n                                                      ],\r\n                                     \"includeGroups\":  [\r\n                                                           \"group-1\"\r\n                                                       ]\r\n                                 },\r\n                       \"applications\":  {\r\n                                            \"includeApplications\":  [\r\n                                                                        \"All\"\r\n                                                                    ]\r\n                                        }\r\n                   },\r\n    \"state\":  \"enabled\"\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

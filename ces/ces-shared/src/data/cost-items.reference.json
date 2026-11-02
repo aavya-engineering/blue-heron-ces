@@ -1,0 +1,1640 @@
+{
+  "schema_version": "cost-items/1.0.0",
+  "description": "CG-2 (COST-GATE-SPEC.md §3.3): generated, do not edit by hand. Every Stamper registry entry that carries a cost_gate block (built by ces-stamper src/core/CostGate.ts buildStamperCostItems; drift test ces-stamper tests/registry/CostGateLint.test.ts, regenerate with UPDATE_COST_ITEMS=1). AdminOps ops (kind ao_op) are added by the AO side of the gate (CG-5). Muster reads this file and the price file, never the registries.",
+  "items": [
+    {
+      "item_id": "AU.L2-3.3.3.sentinel-connector",
+      "kind": "registry_entry",
+      "source": "ces-stamper:cmmc-l2-commands.registry.json",
+      "label": "Connect Office 365 Data Connector to Sentinel",
+      "control_ids": [
+        "AU.L2-3.3.3"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "free_source"
+      }
+    },
+    {
+      "item_id": "PS.L2-3.9.2.leaver-workflow",
+      "kind": "registry_entry",
+      "source": "ces-stamper:cmmc-l2-commands.registry.json",
+      "label": "Verify a scheduled leaver lifecycle workflow that disables or deletes the account",
+      "control_ids": [
+        "PS.L2-3.9.2"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "read_only",
+        "licence_dependency": {
+          "licence": "Entra ID Governance",
+          "cost_key": "entra.id_governance"
+        }
+      }
+    },
+    {
+      "item_id": "SC.L2-3.13.10.key-escrow",
+      "kind": "registry_entry",
+      "source": "ces-stamper:cmmc-l2-commands.registry.json",
+      "label": "Cryptographic Key Management Evidence (BitLocker recovery keys escrowed in Entra ID)",
+      "control_ids": [
+        "SC.L2-3.13.10"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "read_only"
+      }
+    },
+    {
+      "item_id": "SC.L2-3.13.10.key-vault",
+      "kind": "registry_entry",
+      "source": "ces-stamper:cmmc-l2-commands.registry.json",
+      "label": "Key Vault for CUI Encryption Keys, opt-in (purge protection, soft delete, enclave identities)",
+      "control_ids": [
+        "SC.L2-3.13.10"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.keyvault.operations",
+        "estimate_basis": "Standard vault, no standing charge, billed per operation (CQ-2); opt-in only",
+        "standard_alternative": [
+          "SC.L2-3.13.10.key-escrow"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-PREFLIGHT-001",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Register Required Azure Resource Providers",
+      "control_ids": [
+        "SC.L1-3.13.1"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter"
+      }
+    },
+    {
+      "item_id": "AZ-CTX-001",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Set Azure Subscription Context",
+      "control_ids": [
+        "SC.L1-3.13.1"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter"
+      }
+    },
+    {
+      "item_id": "AZ-FOUND-001",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Create Azure Resource Group",
+      "control_ids": [
+        "SC.L1-3.13.1"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter"
+      }
+    },
+    {
+      "item_id": "AZ-FOUND-002",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Assign CMMC L2 Azure Policy Initiative",
+      "control_ids": [
+        "CM.L2-3.4.1"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter"
+      }
+    },
+    {
+      "item_id": "AZ-FOUND-003",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Defender for Cloud at the free tier (Foundational CSPM)",
+      "control_ids": [
+        "SI.L1-3.14.1",
+        "SI.L2-3.14.6"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter"
+      }
+    },
+    {
+      "item_id": "AZ-LOG-001",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Create Log Analytics Workspace (90-day retention)",
+      "control_ids": [
+        "AU.L2-3.3.1"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.log_analytics.workspace",
+        "estimate_basis": "10 GB/month ingestion; 90-day retention (inside the free window)",
+        "standard_alternative": [
+          "AU.L2-3.3.1.audit-retention"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-LOG-002",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Create Immutable Log Storage Account",
+      "control_ids": [
+        "AU.L2-3.3.1"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.storage.log_account",
+        "estimate_basis": "50 GB LRS + operations",
+        "standard_alternative": [
+          "AU.L2-3.3.1.audit-retention"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-LOG-002a",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Assign System Managed Identity to Storage Account",
+      "control_ids": [
+        "SC.L2-3.13.10"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter",
+        "requires_entries": [
+          "AZ-LOG-002"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-LOG-002b",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Grant Storage MI Key Vault Crypto Service Encryption User Role",
+      "control_ids": [
+        "SC.L2-3.13.10"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter",
+        "requires_entries": [
+          "AZ-LOG-002a",
+          "AZ-KV-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-LOG-002c",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Enable CMK Encryption on Storage Account",
+      "control_ids": [
+        "SC.L2-3.13.10"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.keyvault.operations",
+        "estimate_basis": "customer-managed key: Key Vault operations billed per use",
+        "standard_alternative": [
+          "SC.L2-3.13.10.key-escrow"
+        ],
+        "requires_entries": [
+          "AZ-LOG-002",
+          "AZ-KV-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-LOG-003",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Set Storage Container Immutability Policy (WORM)",
+      "control_ids": [
+        "AU.L2-3.3.1"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.storage.immutability",
+        "estimate_basis": "storage only, cannot be undone while locked",
+        "irreversible": true,
+        "two_person": true,
+        "standard_alternative": [
+          "AU.L2-3.3.1.audit-retention"
+        ],
+        "requires_entries": [
+          "AZ-LOG-002"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-KV-001",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Create Key Vault (purge-protection enabled)",
+      "control_ids": [
+        "SC.L2-3.13.10"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.keyvault.operations",
+        "estimate_basis": "Standard vault, billed per operation (CQ-2)",
+        "standard_alternative": [
+          "SC.L2-3.13.10.key-escrow"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-KV-002",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Assign Key Vault Crypto Officer Role to EO Service Principal",
+      "control_ids": [
+        "SC.L2-3.13.10",
+        "AC.L1-3.1.1"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter",
+        "requires_entries": [
+          "AZ-KV-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-KV-003",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Create CMK Key in Key Vault (software RSA 4096)",
+      "control_ids": [
+        "SC.L2-3.13.10"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.keyvault.software_key",
+        "estimate_basis": "1 software RSA 4096 key, billed per use (CQ-2)",
+        "standard_alternative": [
+          "SC.L2-3.13.10.key-escrow"
+        ],
+        "requires_entries": [
+          "AZ-KV-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-KV-005",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Opt-in: HSM-protected CMK Key (Premium vault)",
+      "control_ids": [
+        "SC.L2-3.13.10"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.keyvault.hsm_key",
+        "estimate_basis": "opt-in: Premium vault + 1 HSM-protected RSA key version, billed per key version and per use",
+        "standard_alternative": [
+          "AZ-KV-003"
+        ],
+        "requires_entries": [
+          "AZ-KV-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-NET-001",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Create Virtual Network",
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6",
+        "SC.L1-3.13.5"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter"
+      }
+    },
+    {
+      "item_id": "AZ-NET-002",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Create Management Subnet",
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6",
+        "SC.L1-3.13.5"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter"
+      }
+    },
+    {
+      "item_id": "AZ-NET-003",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Create Workload Subnet",
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter"
+      }
+    },
+    {
+      "item_id": "AZ-NET-004",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Create AzureBastionHost Subnet",
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter"
+      }
+    },
+    {
+      "item_id": "AZ-NET-005",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Create AzureFirewall Subnet",
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter",
+        "last_resort": true,
+        "two_person": true,
+        "standard_alternative": [
+          "AZ-NSG-002",
+          "AZ-NSG-003",
+          "AZ-NSG-005",
+          "AZ-NSG-006",
+          "AZ-NSG-007",
+          "AZ-SEP-001",
+          "AZ-POL-001",
+          "AZ-VM-005",
+          "SC.L1-3.13.1.endpoint-firewall",
+          "SC.L1-3.13.1.nsg-boundary-rules"
+        ],
+        "requires_entries": [
+          "AZ-FW-002"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-NSG-001",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Create Network Security Group",
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L1-3.13.5"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter"
+      }
+    },
+    {
+      "item_id": "AZ-NSG-002",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Add NSG Rule — Deny All Inbound",
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L1-3.13.5",
+        "SC.L2-3.13.6"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter"
+      }
+    },
+    {
+      "item_id": "AZ-NSG-003",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Add NSG Rule — Deny All Outbound",
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L1-3.13.5"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter"
+      }
+    },
+    {
+      "item_id": "AZ-NSG-004",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Add NSG Rule — Allow Bastion Inbound",
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L1-3.13.5"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter",
+        "requires_entries": [
+          "AZ-BAS-002"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-NSG-005",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Associate NSG with Workload Subnet",
+      "control_ids": [
+        "SC.L1-3.13.1"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter"
+      }
+    },
+    {
+      "item_id": "AZ-NW-001",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Create Network Watcher",
+      "control_ids": [
+        "SC.L1-3.13.1"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter"
+      }
+    },
+    {
+      "item_id": "AZ-NW-002",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Enable NSG Flow Logs to Log Analytics",
+      "control_ids": [
+        "AU.L2-3.3.1"
+      ],
+      "retired": true,
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.network_watcher.flow_logs",
+        "estimate_basis": "NSG flow logs to storage (retired by Microsoft, June 2025)",
+        "standard_alternative": [
+          "AZ-NSG-002",
+          "AZ-NSG-003"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-FW-001",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Create Firewall Public IP",
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.public_ip.standard",
+        "estimate_basis": "1 static IP, only with the firewall",
+        "two_person": true,
+        "last_resort": true,
+        "standard_alternative": [
+          "AZ-NSG-002",
+          "AZ-NSG-003",
+          "AZ-NSG-005",
+          "AZ-NSG-006",
+          "AZ-NSG-007",
+          "AZ-SEP-001",
+          "AZ-POL-001",
+          "AZ-VM-005",
+          "SC.L1-3.13.1.endpoint-firewall",
+          "SC.L1-3.13.1.nsg-boundary-rules"
+        ],
+        "requires_entries": [
+          "AZ-FW-002"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-FW-002",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Create Azure Firewall",
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.firewall.premium",
+        "estimate_basis": "1 firewall x 730 h; data processed extra",
+        "two_person": true,
+        "last_resort": true,
+        "standard_alternative": [
+          "AZ-NSG-002",
+          "AZ-NSG-003",
+          "AZ-NSG-005",
+          "AZ-NSG-006",
+          "AZ-NSG-007",
+          "AZ-SEP-001",
+          "AZ-POL-001",
+          "AZ-VM-005",
+          "SC.L1-3.13.1.endpoint-firewall",
+          "SC.L1-3.13.1.nsg-boundary-rules"
+        ],
+        "requires_entries": [
+          "AZ-FW-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-BAS-001",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Create Bastion Public IP",
+      "control_ids": [
+        "SC.L1-3.13.1"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.public_ip.standard",
+        "estimate_basis": "1 static IP, only with Bastion",
+        "standard_alternative": [
+          "none: no VMs in a cloud-native enclave; administer through Azure Run Command under PIM"
+        ],
+        "requires_entries": [
+          "AZ-BAS-002"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-BAS-002",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Create Azure Bastion Host",
+      "control_ids": [
+        "SC.L1-3.13.1"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.bastion.standard",
+        "estimate_basis": "1 host x 730 h",
+        "two_person": true,
+        "standard_alternative": [
+          "none: no VMs in a cloud-native enclave; administer through Azure Run Command under PIM"
+        ],
+        "requires_entries": [
+          "AZ-BAS-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-PE-001",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Create Private Endpoint for Key Vault",
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.private_endpoint",
+        "estimate_basis": "1 endpoint x 730 h",
+        "standard_alternative": [
+          "AZ-KV-004"
+        ],
+        "requires_entries": [
+          "AZ-KV-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-PE-002",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Create Private Endpoint for Storage Account",
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.private_endpoint",
+        "estimate_basis": "1 endpoint x 730 h",
+        "standard_alternative": [
+          "AZ-LOG-002"
+        ],
+        "requires_entries": [
+          "AZ-LOG-002"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-AUTO-001",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Create Automation Account",
+      "control_ids": [
+        "AU.L2-3.3.1"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.automation.job_minutes",
+        "estimate_basis": "500 job-minutes free, then per minute",
+        "standard_alternative": [
+          "none: the CES runner scheduler"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-AUTO-002",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Assign System Managed Identity to Automation Account",
+      "control_ids": [
+        "AU.L2-3.3.1"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter",
+        "requires_entries": [
+          "AZ-AUTO-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-AUTO-003",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Grant Automation MI RBAC Roles (Security Reader, LAR on LAW, SBDC on Storage, KV Crypto User on KV)",
+      "control_ids": [
+        "AC.L1-3.1.1"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter",
+        "requires_entries": [
+          "AZ-AUTO-002",
+          "AZ-LOG-001",
+          "AZ-LOG-002",
+          "AZ-KV-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-SEN-001",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Onboard Sentinel to Log Analytics Workspace",
+      "control_ids": [
+        "AU.L2-3.3.1",
+        "AU.L2-3.3.3"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.sentinel.ingestion",
+        "estimate_basis": "10 GB/month billable; free sources $0",
+        "standard_alternative": [
+          "AU.L2-3.3.1.audit-retention",
+          "AU.L2-3.3.5.audit-search"
+        ],
+        "requires_entries": [
+          "AZ-LOG-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-SEN-002",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Enable Sentinel Azure Activity Data Connector",
+      "control_ids": [
+        "AU.L2-3.3.1"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "free_source",
+        "requires_entries": [
+          "AZ-SEN-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-SEN-003",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Enable Sentinel Microsoft Defender for Cloud Data Connector",
+      "control_ids": [
+        "SI.L1-3.14.1",
+        "AU.L2-3.3.1"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "free_source",
+        "requires_entries": [
+          "AZ-SEN-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-SEN-004",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Enable Sentinel Azure Key Vault Data Connector",
+      "control_ids": [
+        "AU.L2-3.3.1"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.diagnostic_setting",
+        "estimate_basis": "Key Vault diagnostic setting into the workspace",
+        "standard_alternative": [
+          "AU.L2-3.3.1.audit-retention"
+        ],
+        "requires_entries": [
+          "AZ-SEN-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-SEN-005",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Create Sentinel CMMC Analytics Rule - Privileged Identity Changes",
+      "control_ids": [
+        "SI.L2-3.14.6"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter",
+        "requires_entries": [
+          "AZ-SEN-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-SEN-006",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Create Sentinel CMMC Analytics Rule - Malware Detection",
+      "control_ids": [
+        "SI.L2-3.14.6"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter",
+        "requires_entries": [
+          "AZ-SEN-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-SEN-007",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Create Sentinel CMMC Analytics Rule - Excessive Failed Logins",
+      "control_ids": [
+        "AU.L2-3.3.2",
+        "AU.L2-3.3.3"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter",
+        "requires_entries": [
+          "AZ-SEN-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-SEN-008",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Create Sentinel CMMC Analytics Rule - Unauthorized Resource Deletion",
+      "control_ids": [
+        "AU.L2-3.3.1"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter",
+        "requires_entries": [
+          "AZ-SEN-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-VM-001",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Create Workload VM (no public IP, system managed identity, Trusted Launch, encryption at host)",
+      "control_ids": [
+        "SC.L1-3.13.1"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.vm.d2s_v5_windows",
+        "estimate_basis": "1 VM x 730 h + disk",
+        "two_person": true,
+        "standard_alternative": [
+          "none: a VM is a scope decision, not a control"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-VM-002",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "VM Encryption at Host (platform-managed keys, free)",
+      "control_ids": [
+        "SC.L2-3.13.16"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter",
+        "requires_entries": [
+          "AZ-VM-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-VM-003",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Assign DISA STIG Policy to VM",
+      "control_ids": [
+        "CM.L2-3.4.1",
+        "CM.L2-3.4.2"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter",
+        "requires_entries": [
+          "AZ-VM-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-VM-004",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Install Microsoft Defender for Endpoint VM Extension",
+      "control_ids": [
+        "SI.L1-3.14.1"
+      ],
+      "retired": true,
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.vm.mma_ingestion",
+        "estimate_basis": "SecurityEvent ingestion per VM (retired agent)",
+        "standard_alternative": [
+          "none: Azure Monitor Agent with a narrow data-collection rule"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-DIAG-001",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Set Diagnostic Setting — Subscription Activity Log",
+      "control_ids": [
+        "AU.L2-3.3.1",
+        "AU.L2-3.3.2"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "free_source",
+        "requires_entries": [
+          "AZ-LOG-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-DIAG-002",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Set Diagnostic Setting — Key Vault",
+      "control_ids": [
+        "AU.L2-3.3.1",
+        "AU.L2-3.3.2"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.diagnostic_setting",
+        "estimate_basis": "Key Vault logs into the workspace",
+        "standard_alternative": [
+          "AU.L2-3.3.1.audit-retention"
+        ],
+        "requires_entries": [
+          "AZ-KV-001",
+          "AZ-LOG-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-DIAG-003",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Set Diagnostic Setting — Network Security Group",
+      "control_ids": [
+        "AU.L2-3.3.1",
+        "AU.L2-3.3.2"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.diagnostic_setting",
+        "estimate_basis": "NSG logs into the workspace",
+        "standard_alternative": [
+          "AU.L2-3.3.1.audit-retention"
+        ],
+        "requires_entries": [
+          "AZ-LOG-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-DIAG-004",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Set Diagnostic Setting — Storage Account",
+      "control_ids": [
+        "AU.L2-3.3.1",
+        "AU.L2-3.3.2"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.diagnostic_setting",
+        "estimate_basis": "storage logs into the workspace",
+        "standard_alternative": [
+          "AU.L2-3.3.1.audit-retention"
+        ],
+        "requires_entries": [
+          "AZ-LOG-002",
+          "AZ-LOG-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-DIAG-005",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Set Diagnostic Setting — Virtual Machine",
+      "control_ids": [
+        "AU.L2-3.3.1",
+        "AU.L2-3.3.2"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.diagnostic_setting",
+        "estimate_basis": "VM logs into the workspace",
+        "standard_alternative": [
+          "AU.L2-3.3.1.audit-retention"
+        ],
+        "requires_entries": [
+          "AZ-VM-001",
+          "AZ-LOG-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-DIAG-006",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Set Diagnostic Setting — Subscription Activity Log",
+      "control_ids": [
+        "AU.L2-3.3.1",
+        "AU.L2-3.3.2"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "free_source",
+        "requires_entries": [
+          "AZ-LOG-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-ID-001",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Break-Glass Emergency Account",
+      "control_ids": [
+        "AC.L1-3.1.1"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "read_only"
+      }
+    },
+    {
+      "item_id": "AZ-ID-002",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Operator Admin Account",
+      "control_ids": [
+        "AC.L1-3.1.1",
+        "AC.L2-3.1.5"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "read_only"
+      }
+    },
+    {
+      "item_id": "AZ-ID-003",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "EO Automation Service Principal",
+      "control_ids": [
+        "AC.L1-3.1.1"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "read_only"
+      }
+    },
+    {
+      "item_id": "AZ-ID-004",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Security Defaults Disabled",
+      "control_ids": [
+        "AC.L1-3.1.1"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "read_only"
+      }
+    },
+    {
+      "item_id": "AZ-ID-005",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "PIM Eligible Role Assignment for Operator",
+      "control_ids": [
+        "AC.L2-3.1.5",
+        "AC.L2-3.1.7"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "read_only"
+      }
+    },
+    {
+      "item_id": "AZ-FOUND-004",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Resource Group CanNotDelete Lock",
+      "control_ids": [
+        "CM.L2-3.4.2"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.resource_lock.ratchet",
+        "estimate_basis": "locks the resource group that holds billable resources",
+        "irreversible": true,
+        "two_person": true,
+        "standard_alternative": [
+          "none: RBAC limits who can delete"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-DNS-001",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Private DNS Zone: Key Vault",
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.private_dns_zone",
+        "estimate_basis": "1 zone + queries",
+        "standard_alternative": [
+          "AZ-KV-004"
+        ],
+        "requires_entries": [
+          "AZ-PE-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-DNS-002",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Private DNS Zone: Blob Storage",
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.private_dns_zone",
+        "estimate_basis": "1 zone + queries",
+        "standard_alternative": [
+          "AZ-LOG-002"
+        ],
+        "requires_entries": [
+          "AZ-PE-002"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-DIAG-007",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Entra ID Diagnostic Settings",
+      "control_ids": [
+        "AU.L2-3.3.1",
+        "AU.L2-3.3.2"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "read_only",
+        "requires_entries": [
+          "AZ-LOG-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-DIAG-008",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Create Entra ID Diagnostic Settings",
+      "control_ids": [
+        "AU.L2-3.3.1",
+        "AU.L2-3.3.2"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.diagnostic_setting.entra",
+        "estimate_basis": "manual: Entra sign-in and audit logs into the workspace",
+        "standard_alternative": [
+          "AU.L2-3.3.1.audit-retention",
+          "AU.L2-3.3.2.signin-logs"
+        ],
+        "requires_entries": [
+          "AZ-LOG-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-SEN-009",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Sentinel CMMC 2.0 Content Hub Solution",
+      "control_ids": [
+        "AU.L2-3.3.1"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "read_only",
+        "requires_entries": [
+          "AZ-SEN-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-BOUNDARY-001",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Verify Network Security Group Boundary Rules",
+      "control_ids": [
+        "SC.L1-3.13.1"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "read_only"
+      }
+    },
+    {
+      "item_id": "AZ-SUBNET-001",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Verify VNet Subnet Segmentation",
+      "control_ids": [
+        "SC.L1-3.13.5"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "read_only"
+      }
+    },
+    {
+      "item_id": "AZ-MON-001",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Create Azure Monitor Action Group for CISO Alerts",
+      "control_ids": [
+        "AU.L2-3.3.4"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.monitor.action_group",
+        "estimate_basis": "1,000 emails free, then per message",
+        "standard_alternative": [
+          "none: Microsoft 365 alert policies email at no cost"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-LOG-004",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Apply CanNotDelete Lock to Sentinel Log Analytics Workspace",
+      "control_ids": [
+        "AU.L2-3.3.8"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.resource_lock.ratchet",
+        "estimate_basis": "locks the billable workspace",
+        "irreversible": true,
+        "two_person": true,
+        "standard_alternative": [
+          "none: RBAC limits who can delete"
+        ],
+        "requires_entries": [
+          "AZ-LOG-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-FW-000",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Create Azure Firewall Policy with Threat Intel Deny Mode",
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter",
+        "last_resort": true,
+        "two_person": true,
+        "standard_alternative": [
+          "AZ-NSG-002",
+          "AZ-NSG-003",
+          "AZ-NSG-005",
+          "AZ-NSG-006",
+          "AZ-NSG-007",
+          "AZ-SEP-001",
+          "AZ-POL-001",
+          "AZ-VM-005",
+          "SC.L1-3.13.1.endpoint-firewall",
+          "SC.L1-3.13.1.nsg-boundary-rules"
+        ],
+        "requires_entries": [
+          "AZ-FW-002"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-KV-004",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Restrict Key Vault Network Access to Azure Services Only",
+      "control_ids": [
+        "SC.L2-3.13.10"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter",
+        "requires_entries": [
+          "AZ-KV-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-SEN-010",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Enable Sentinel UEBA for Anomalous Behavior Detection",
+      "control_ids": [
+        "SI.L2-3.14.7"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.sentinel.ueba",
+        "estimate_basis": "BehaviorAnalytics and IdentityInfo ingestion",
+        "standard_alternative": [
+          "none: Entra ID Protection risk policies (G5)"
+        ],
+        "requires_entries": [
+          "AZ-SEN-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-FW-003",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Azure Firewall - Deallocate",
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "cost_reducing",
+        "requires_entries": [
+          "AZ-FW-002"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-FW-004",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Azure Firewall - Allocate",
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.firewall.premium",
+        "estimate_basis": "restarts the 730 h meter",
+        "two_person": true,
+        "last_resort": true,
+        "standard_alternative": [
+          "AZ-NSG-002",
+          "AZ-NSG-003",
+          "AZ-NSG-005",
+          "AZ-NSG-006",
+          "AZ-NSG-007",
+          "AZ-SEP-001",
+          "AZ-POL-001",
+          "AZ-VM-005",
+          "SC.L1-3.13.1.endpoint-firewall",
+          "SC.L1-3.13.1.nsg-boundary-rules"
+        ],
+        "requires_entries": [
+          "AZ-FW-002"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-NSG-006",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Add NSG Rules — CES Outbound 443 to Named Service Tags (SB-2)",
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter"
+      }
+    },
+    {
+      "item_id": "AZ-NSG-007",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Add NSG Rule — CES Outbound 443 to Microsoft 365 GCC High Ranges (SB-2/SB-3)",
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter"
+      }
+    },
+    {
+      "item_id": "AZ-SEP-001",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Storage Service Endpoint Policy for Named Accounts (SB-4)",
+      "control_ids": [
+        "SC.L2-3.13.6"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter",
+        "requires_entries": [
+          "AZ-LOG-002"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-POL-001",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Assign Policy — Network Interfaces Should Not Have Public IPs (SB-1)",
+      "control_ids": [
+        "SC.L1-3.13.5"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter"
+      }
+    },
+    {
+      "item_id": "AZ-VM-005",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Machine Configuration — CES VM Host Firewall Baseline, Apply and Autocorrect (SB-5)",
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "CM.L2-3.4.7"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "free_reason": "no_meter",
+        "requires_entries": [
+          "AZ-VM-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-NET-007",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Explicit Egress Public IP for the CES VM (SB outbound floor)",
+      "control_ids": [
+        "SC.L1-3.13.1"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.public_ip.standard",
+        "estimate_basis": "1 static Standard IP x 730 h on the CES VM network card; inbound denied",
+        "standard_alternative": [
+          "none: customer-owned egress when the tenant record names one (COST-GATE-SPEC 4.4)"
+        ],
+        "requires_entries": [
+          "AZ-VM-001"
+        ]
+      }
+    },
+    {
+      "item_id": "AZ-FOUND-005",
+      "kind": "registry_entry",
+      "source": "ces-stamper:infra-cmmc-l2-commands.registry.json",
+      "label": "Enable Microsoft Defender for Cloud Paid Plans (opt-in)",
+      "control_ids": [
+        "SI.L1-3.14.1",
+        "SI.L2-3.14.6"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.defender.paid_plans",
+        "estimate_basis": "Storage + ARM + CSPM paid plans, 0 VMs; Servers P2 per VM extra",
+        "standard_alternative": [
+          "AZ-FOUND-003"
+        ]
+      }
+    },
+    {
+      "item_id": "C-03",
+      "kind": "ao_op",
+      "source": "ces-ao:ao-commands.registry.json",
+      "label": "Key Vault Key Rotation",
+      "control_ids": [
+        "SC.L2-3.13.10"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.keyvault.hsm_key",
+        "estimate_basis": "1 HSM-protected key version per rotation, per month",
+        "two_person": false,
+        "irreversible": false,
+        "last_resort": false,
+        "standard_alternative": [
+          "SC.L2-3.13.10.key-escrow"
+        ]
+      }
+    },
+    {
+      "item_id": "E-01",
+      "kind": "ao_op",
+      "source": "ces-ao:ao-commands.registry.json",
+      "label": "Audit Log Retention",
+      "control_ids": [
+        "AU.L2-3.3.1"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.log_analytics.workspace",
+        "estimate_basis": "Log Analytics retention beyond the free 31/90 days, per GB per month",
+        "two_person": false,
+        "irreversible": false,
+        "last_resort": false,
+        "standard_alternative": [
+          "none: keep auditLogRetentionDays at 90 or less, which this op runs free of the gate"
+        ],
+        "recurring_when": {
+          "param": "auditLogRetentionDays",
+          "gt": 90
+        }
+      }
+    },
+    {
+      "item_id": "F-11",
+      "kind": "ao_op",
+      "source": "ces-ao:ao-commands.registry.json",
+      "label": "Azure Firewall Deallocate",
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "two_person": false,
+        "irreversible": false,
+        "last_resort": false,
+        "free_reason": "cost_reducing"
+      }
+    },
+    {
+      "item_id": "F-12",
+      "kind": "ao_op",
+      "source": "ces-ao:ao-commands.registry.json",
+      "label": "Azure Firewall Allocate",
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.firewall.premium",
+        "estimate_basis": "1 firewall x 730 h; data processed extra",
+        "two_person": true,
+        "irreversible": false,
+        "last_resort": true,
+        "standard_alternative": [
+          "AZ-NSG-006",
+          "AZ-NSG-007",
+          "AZ-SEP-001",
+          "AZ-VM-005",
+          "SC.L1-3.13.1.endpoint-firewall",
+          "F-13"
+        ]
+      }
+    },
+    {
+      "item_id": "F-13",
+      "kind": "ao_op",
+      "source": "ces-ao:ao-commands.registry.json",
+      "label": "Enclave Subnet Deny-by-Default Baseline",
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SC.L2-3.13.6"
+      ],
+      "cost_gate": {
+        "recurring": false,
+        "two_person": false,
+        "irreversible": false,
+        "last_resort": false,
+        "free_reason": "no_meter"
+      }
+    },
+    {
+      "item_id": "F-14",
+      "kind": "ao_op",
+      "source": "ces-ao:ao-commands.registry.json",
+      "label": "VNet Flow Logs + Sentinel Flow Analytics",
+      "control_ids": [
+        "SC.L1-3.13.1",
+        "SI.L2-3.14.6"
+      ],
+      "cost_gate": {
+        "recurring": true,
+        "cost_key": "azure.network_watcher.flow_logs",
+        "estimate_basis": "VNet flow log storage + Traffic Analytics processing per GB; workspace ingestion of NTANetAnalytics",
+        "two_person": false,
+        "irreversible": false,
+        "last_resort": false,
+        "standard_alternative": [
+          "none: no free network flow logging exists (NSG flow logs were retired in June 2025)"
+        ]
+      }
+    }
+  ]
+}

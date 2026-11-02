@@ -1,0 +1,2149 @@
+{
+  "family": "AC",
+  "family_name": "Access Control",
+  "practices": [
+    {
+      "id": "AC.L1-3.1.1",
+      "title": "Limit information system access to authorized users, processes acting on behalf of authorized users or devices (including other information systems).",
+      "approach": {
+        "what_assessor_does": "The assessor starts from the lists: who is allowed in, which service accounts and applications act for those people, and which devices may connect. They compare each list with what the tenant actually holds: enabled user accounts against the authorized-user list, app registrations and service principals against the process list, and enrolled or registered devices against the device inventory. They read the Conditional Access policies to see how access is actually limited, then pick a few names from each tenant list and ask who approved them. Testing usually means trying a sign-in from an account or device that is not on the list and watching it fail.",
+        "common_failure_modes": [
+          "The authorized-user list is missing, or it is an HR roster that does not match the enabled accounts in the tenant.",
+          "Service principals and app registrations are left out of the inventory, or several have no owner.",
+          "Leavers still have enabled accounts weeks after their last day.",
+          "Conditional Access policies exist but run in report-only mode or exclude large groups without a written reason.",
+          "Personal or unmanaged devices can sign in because no policy requires a compliant or registered device."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AC.L1-3.1.1[a]",
+          "determination": "authorized users are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Authorized user list with approver and date",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. A named list of people allowed to use the system, with who approved each one. Compare it against the enabled accounts in Entra."
+            },
+            {
+              "artifact_type": "New user provisioning record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps A-01 New User Provisioning: creates the account with its base groups, licence and Conditional Access targeting; registered against AC.L1-3.1.1 (evidence objectives [a], [d])."
+            },
+            {
+              "artifact_type": "Role change record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps A-04 Role Change / Transfer: audits and adjusts group memberships and PIM roles when a person moves; registered against AC.L1-3.1.1."
+            },
+            {
+              "artifact_type": "Key Vault access assignment audit",
+              "ces_source": "ao_row",
+              "notes": "AdminOps C-04 Key Vault RBAC Audit: lists who holds role assignments on each Key Vault; registered against AC.L1-3.1.1."
+            },
+            {
+              "artifact_type": "Account administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how a new person gets an account, who signs off, and how the list is kept in step with HR."
+            }
+          ]
+        },
+        {
+          "id": "AC.L1-3.1.1[b]",
+          "determination": "processes acting on behalf of authorized users are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Inventory of service accounts and applications",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Each app registration, service principal and service account that acts for users, with its owner and purpose."
+            },
+            {
+              "artifact_type": "Orphaned application and service principal report",
+              "ces_source": "ao_row",
+              "notes": "AdminOps C-08 Orphaned App/SPN Cleanup: finds apps with no owner, expired credentials or no sign-in activity; registered against AC.L1-3.1.1 (evidence objectives [b], [e])."
+            },
+            {
+              "artifact_type": "Application owner interview",
+              "ces_source": "interview",
+              "notes": "Ask the owner of a sampled app what it does, whose behalf it acts on and who approved its permissions."
+            }
+          ]
+        },
+        {
+          "id": "AC.L1-3.1.1[c]",
+          "determination": "devices (and other systems) authorized to connect to the system are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Authorized device inventory",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Laptops, desktops, mobile devices and other systems allowed to connect, with owner. Compare against the devices enrolled in Intune or registered in Entra."
+            },
+            {
+              "artifact_type": "Device compliance records",
+              "ces_source": "eo_store",
+              "notes": "EO evidence store records from collector collect.deviceCompliance: the managed devices the tenant knows about and their compliance state, for reconciling against the inventory."
+            },
+            {
+              "artifact_type": "Endpoint administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how a device is approved before it is enrolled and how lost or retired devices are removed."
+            }
+          ]
+        },
+        {
+          "id": "AC.L1-3.1.1[d]",
+          "determination": "system access is limited to authorized users",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Conditional Access policy export",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AC.L1-3.1.1 (caEnforcementEvaluator): Graph /identity/conditionalAccess/policies. Looks for an enabled policy that targets all users or named groups and requires MFA and a compliant device together."
+            },
+            {
+              "artifact_type": "Conditional Access policy review",
+              "ces_source": "ao_row",
+              "notes": "AdminOps A-13 CA Policy Review: exports all Conditional Access policies and runs a gap analysis against AC and SC requirements; registered against AC.L1-3.1.1 (evidence objectives [d], [f])."
+            },
+            {
+              "artifact_type": "MFA enrollment enforcement record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps A-07 MFA Enrollment Enforcement: requires MFA registration through Conditional Access and the authentication methods policy; registered against AC.L1-3.1.1."
+            },
+            {
+              "artifact_type": "Offboarding run records",
+              "ces_source": "eo_store",
+              "notes": "EO OffboardingWizardStore (collection eo_offboarding): each offboarding run and its steps, linked to AdminOps A-02 and A-03 rows for the same person. Shows access is removed when a person leaves."
+            },
+            {
+              "artifact_type": "Sign-in test with the account administrator",
+              "ces_source": "interview",
+              "notes": "Ask them to show that an account not on the authorized list, or a disabled account, cannot sign in."
+            }
+          ]
+        },
+        {
+          "id": "AC.L1-3.1.1[e]",
+          "determination": "system access is limited to processes acting on behalf of authorized users",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Orphaned application and service principal report",
+              "ces_source": "ao_row",
+              "notes": "AdminOps C-08 Orphaned App/SPN Cleanup; registered against AC.L1-3.1.1. Apps with no owner or stale credentials should be removed or disabled, not left able to sign in."
+            },
+            {
+              "artifact_type": "Application permission approvals",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Records showing who approved the API permissions each sampled app holds."
+            },
+            {
+              "artifact_type": "Application owner interview",
+              "ces_source": "interview",
+              "notes": "Ask how an app's credentials are rotated and what stops an unapproved app from getting a token."
+            }
+          ]
+        },
+        {
+          "id": "AC.L1-3.1.1[f]",
+          "determination": "system access is limited to authorized devices (including other systems)",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Conditional Access policy export",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AC.L1-3.1.1 (caEnforcementEvaluator): Graph /identity/conditionalAccess/policies. Looks for an enabled policy that targets all users or named groups and requires MFA and a compliant device together. The compliant-device requirement is what limits access to authorized devices."
+            },
+            {
+              "artifact_type": "Conditional Access policy review",
+              "ces_source": "ao_row",
+              "notes": "AdminOps A-13 CA Policy Review; registered against AC.L1-3.1.1. Look for exclusions that let unmanaged devices through."
+            },
+            {
+              "artifact_type": "Device sign-in test",
+              "ces_source": "interview",
+              "notes": "Ask the endpoint administrator to show a sign-in from an unenrolled device being blocked."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AC.L1-3.1.2",
+      "title": "Limit information system access to the types of transactions and functions that authorized users are permitted to execute.",
+      "approach": {
+        "what_assessor_does": "The assessor wants to see, in writing, what each kind of user is allowed to do: which roles exist, which applications and functions each role can use, and what ordinary users cannot do (for example register apps or create groups). They then compare that with the tenant: directory role memberships, group-based access to applications and the default user permissions. They sample a few users, read their actual rights and ask the manager whether those rights match the job. Testing means having an ordinary user try a function their role should not allow.",
+        "common_failure_modes": [
+          "Roles are named but the functions each role may use are never written down.",
+          "Default user settings still let anyone register applications, create security groups or invite guests.",
+          "Global Administrator is held by more people than the job needs.",
+          "Stale, suspended or guest accounts keep rights they no longer need.",
+          "Access is granted user by user instead of by role, so nobody can say what a role includes."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AC.L1-3.1.2[a]",
+          "determination": "the types of transactions and functions that authorized users are permitted to execute are defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Access control policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/access-control-policy.md (GateEvidence family AC). Should describe the roles and the transactions and functions each one may perform."
+            },
+            {
+              "artifact_type": "Role and permission matrix",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Maps each business role to the applications, directory roles and functions it may use."
+            },
+            {
+              "artifact_type": "Default user permission lockdown record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps A-18 Default User Permission Lockdown: blocks app registration, security-group creation and tenant creation for ordinary users; registered against AC.L1-3.1.2 (evidence objectives [a], [b])."
+            },
+            {
+              "artifact_type": "System owner interview",
+              "ces_source": "interview",
+              "notes": "Ask who decides what a role may do and when the matrix was last reviewed."
+            }
+          ]
+        },
+        {
+          "id": "AC.L1-3.1.2[b]",
+          "determination": "system access is limited to the defined types of transactions and functions for authorized users",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Directory role memberships",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AC.L1-3.1.2 (rbacEvidenceEvaluator): Graph /directoryRoles with members. Also checks the number of Global Administrators against the CES limit."
+            },
+            {
+              "artifact_type": "Account disable and removal records",
+              "ces_source": "ao_row",
+              "notes": "AdminOps A-02 User Offboarding -- Disable, A-03 User Offboarding -- Hard Delete, A-05 Leave of Absence -- Suspend and A-06 LOA Return -- Restore; all registered against AC.L1-3.1.2."
+            },
+            {
+              "artifact_type": "Stale account and guest reviews",
+              "ces_source": "ao_row",
+              "notes": "AdminOps A-11 Stale Account Detection (no sign-in for 90 days) and A-12 Guest / External User Audit; both registered against AC.L1-3.1.2."
+            },
+            {
+              "artifact_type": "Directory change records",
+              "ces_source": "eo_store",
+              "notes": "EO evidence store records from collector collect.directoryAudits: role and group membership changes, for tracing a sampled user's rights back to an approval."
+            },
+            {
+              "artifact_type": "Function test with a sampled user",
+              "ces_source": "interview",
+              "notes": "Ask an ordinary user to try a function outside their role, such as opening an admin portal or registering an app, and confirm it is refused."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AC.L2-3.1.3",
+      "title": "Control the flow of CUI in accordance with approved authorizations.",
+      "approach": {
+        "what_assessor_does": "The assessor looks for a written flow control policy that says where CUI may go: which networks, people, devices and connected systems are approved sources and destinations, and who authorizes a new flow. They read the data flow diagram and the CUI boundary in the SSP, then read the tenant mechanisms that enforce it: sensitivity labels, data loss prevention rules, sharing limits and membership of CUI sites. They sample a CUI site or Team and check that its members match an approval. Testing means trying to send or share labelled CUI to a destination the policy does not allow and seeing it blocked or flagged.",
+        "common_failure_modes": [
+          "No data flow diagram, or one that leaves out email, file sharing or a connected external system.",
+          "A CUI sensitivity label exists but no rule acts on it, so labelled files move freely.",
+          "Membership of CUI sites and Teams is never reviewed, and former project members still have access.",
+          "Contractor and guest access to CUI locations is granted without a recorded approval.",
+          "The policy names flow rules that no tenant setting actually enforces."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AC.L2-3.1.3[a]",
+          "determination": "information flow control policies are defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Access control policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/access-control-policy.md (GateEvidence family AC). Should state the rules for where CUI may flow and who may approve exceptions."
+            },
+            {
+              "artifact_type": "Information flow control policy or procedure",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. A separate flow control standard if the organization keeps one outside the family policy."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask who owns the flow rules and how a new flow, such as a new customer portal, gets approved."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.3[b]",
+          "determination": "methods and enforcement mechanisms for controlling the flow of CUI are defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Sensitivity label configuration",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AC.L2-3.1.3 (informationBarrierEvaluator): Graph /informationProtection/policy/labels. Checks that an active label marks CUI; it does not by itself show that rules act on the label."
+            },
+            {
+              "artifact_type": "Data loss prevention and sharing rule export",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. The rules that act on CUI labels or content (for example block external sharing or email to outside domains)."
+            },
+            {
+              "artifact_type": "Compliance administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask which mechanisms enforce each flow rule and walk through one rule end to end."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.3[c]",
+          "determination": "designated sources and destinations (e.g., networks, individuals, and devices) for CUI within the system and between interconnected systems are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "CUI data flow diagram and boundary description",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Shows approved sources and destinations for CUI, including interconnected systems. Should agree with the CUI boundary in the SSP."
+            },
+            {
+              "artifact_type": "Interconnection agreements",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Agreements for each external system that sends or receives CUI."
+            },
+            {
+              "artifact_type": "System owner interview",
+              "ces_source": "interview",
+              "notes": "Ask the owner to trace one CUI flow from source to destination on the diagram."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.3[d]",
+          "determination": "authorizations for controlling the flow of CUI are defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Access control policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/access-control-policy.md (GateEvidence family AC). Should name who authorizes access to CUI locations and flows."
+            },
+            {
+              "artifact_type": "Privileged role access review",
+              "ces_source": "ao_row",
+              "notes": "AdminOps A-09 Privileged Role Review (PIM): quarterly access review on privileged roles; registered against AC.L2-3.1.3."
+            },
+            {
+              "artifact_type": "CUI site membership recertification",
+              "ces_source": "ao_row",
+              "notes": "AdminOps D-05 CUI Site Membership Recertification: quarterly access review on CUI site groups; registered against AC.L2-3.1.3 (evidence objectives [d], [e])."
+            },
+            {
+              "artifact_type": "Data owner interview",
+              "ces_source": "interview",
+              "notes": "Ask a CUI data owner how they approve a new member or a new destination."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.3[e]",
+          "determination": "approved authorizations for controlling the flow of CUI are enforced",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "CUI site membership recertification",
+              "ces_source": "ao_row",
+              "notes": "AdminOps D-05 CUI Site Membership Recertification; registered against AC.L2-3.1.3. Removed members should actually lose access."
+            },
+            {
+              "artifact_type": "Contractor access recertification",
+              "ces_source": "ao_row",
+              "notes": "AdminOps G-08 Contractor Access Recertification: quarterly access review on guest and contractor accounts; registered against AC.L2-3.1.3."
+            },
+            {
+              "artifact_type": "Blocked flow test result",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. A record of a test where labelled CUI was sent or shared to an unapproved destination and was blocked."
+            },
+            {
+              "artifact_type": "Flow test with the compliance administrator",
+              "ces_source": "interview",
+              "notes": "Ask them to share a labelled test file outside the approved destinations and show the result."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AC.L2-3.1.4",
+      "title": "Separate the duties of individuals to reduce the risk of malevolent activity without collusion.",
+      "approach": {
+        "what_assessor_does": "The assessor asks which duties must not sit with one person (for example requesting and approving privileged access, making and approving changes, running and reviewing audit logs, creating and paying vendors). They want those pairs written down, a named person for each side, and tenant rights that keep the two sides apart. In the tenant they read the PIM policies to see whether activating a privileged role needs someone else's approval, and check that approvers are real people who are not also the requesters. In small organizations they accept compensating review where full separation is impossible, if it is written and done.",
+        "common_failure_modes": [
+          "No list of duties that need separation; the policy only repeats the requirement.",
+          "One administrator can request, approve and activate their own privileged role.",
+          "PIM approval is configured but the approver is a departed user or the same person as the requester.",
+          "In a very small team, no compensating review is written down or carried out.",
+          "Audit log review is done by the same people whose actions are being reviewed."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AC.L2-3.1.4[a]",
+          "determination": "the duties of individuals requiring separation are defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Access control policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/access-control-policy.md (GateEvidence family AC). Should list the duties that require separation."
+            },
+            {
+              "artifact_type": "Separation of duties matrix",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Pairs of conflicting duties and the role that owns each side."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask why each pair was chosen and what is done where the team is too small to separate fully."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.4[b]",
+          "determination": "responsibilities for duties that require separation are assigned to separate individuals",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Role assignments naming current people",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. The matrix with names, so the assessor can see no person holds both sides of a pair."
+            },
+            {
+              "artifact_type": "Role holder interviews",
+              "ces_source": "interview",
+              "notes": "Ask each side of a sampled pair what they do and who checks their work."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.4[c]",
+          "determination": "access privileges that enable individuals to exercise the duties that require separation are granted to separate individuals",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "PIM approval settings",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AC.L2-3.1.4 (pimApprovalEvaluator): Graph /policies/roleManagementPolicies with rules. Checks that role activation needs approval by a named approver who exists in the directory."
+            },
+            {
+              "artifact_type": "Privileged role activation records",
+              "ces_source": "eo_store",
+              "notes": "EO evidence store records from collector collect.pimActivations: who requested each activation, so the assessor can check the approver was a different person."
+            },
+            {
+              "artifact_type": "Activation test with an administrator",
+              "ces_source": "interview",
+              "notes": "Ask an administrator to request a privileged role and show it waits for someone else's approval."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AC.L2-3.1.5",
+      "title": "Employ the principle of least privilege, including for specific security functions and privileged accounts.",
+      "approach": {
+        "what_assessor_does": "The assessor wants a list of privileged accounts and of security functions (for example managing roles, Conditional Access, audit settings, Defender and Intune policy), with who may use each one and why. They compare the list with the tenant's role assignments, looking for standing Global Administrator or other high roles that should be eligible through PIM instead, and for people holding more roles than their job needs. They check that the only standing assignments are documented emergency accounts. They ask a few administrators what each of their roles is for.",
+        "common_failure_modes": [
+          "Several people hold permanent Global Administrator rights instead of eligible PIM assignments.",
+          "Security functions are never listed, so nobody can say who should manage audit or Conditional Access settings.",
+          "Administrators hold broad roles when a narrower built-in role would do the job.",
+          "Former administrators keep eligible or active role assignments.",
+          "Emergency (break-glass) accounts are not documented, so their standing rights look like ordinary over-privilege."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AC.L2-3.1.5[a]",
+          "determination": "privileged accounts are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Tenant privileged role assignments",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AC.L2-3.1.5 (leastPrivilegeEvaluator): Graph /roleManagement/directory/roleAssignments and /identity/conditionalAccess/policies. Lists standing privileged assignments and separates out break-glass accounts."
+            },
+            {
+              "artifact_type": "Admin account separation record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps A-17 Admin Account Separation: creates cloud-only admin accounts with no mailbox and PIM-only roles; registered against AC.L2-3.1.5 (evidence objectives [a], [b])."
+            },
+            {
+              "artifact_type": "Privileged account inventory",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Each privileged account with its owner, roles and reason."
+            },
+            {
+              "artifact_type": "Identity administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how a new privileged account is requested and recorded."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.5[b]",
+          "determination": "access to privileged accounts is authorized in accordance with the principle of least privilege",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Standing and eligible privileged assignments",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AC.L2-3.1.5 (leastPrivilegeEvaluator): standing privileged assignments outside break-glass are a finding; eligible PIM assignments for privileged roles are what least privilege should look like."
+            },
+            {
+              "artifact_type": "Standing privilege elimination record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps A-10 Standing Privilege Elimination: converts a standing Global Administrator assignment to a PIM-eligible one; registered against AC.L2-3.1.5."
+            },
+            {
+              "artifact_type": "Administrator interviews",
+              "ces_source": "interview",
+              "notes": "Ask sampled administrators what each of their roles is used for and when they last used it."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.5[c]",
+          "determination": "security functions are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Access control policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/access-control-policy.md (GateEvidence family AC). Should list the security functions (for example role management, Conditional Access, audit and logging settings, endpoint security policy)."
+            },
+            {
+              "artifact_type": "Security function list with owning role",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Each security function and the narrowest role that can perform it."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask who may change audit settings and Conditional Access, and why."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.5[d]",
+          "determination": "access to security functions is authorized in accordance with the principle of least privilege",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Tenant privileged role assignments",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AC.L2-3.1.5 (leastPrivilegeEvaluator). Compare the people holding security roles with the security function list."
+            },
+            {
+              "artifact_type": "Standing privilege elimination record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps A-10 Standing Privilege Elimination; registered against AC.L2-3.1.5."
+            },
+            {
+              "artifact_type": "Function test with an administrator",
+              "ces_source": "interview",
+              "notes": "Ask an administrator without the security role to open a security setting and confirm it is refused."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AC.L2-3.1.6",
+      "title": "Use non-privileged accounts or roles when accessing non-security functions.",
+      "approach": {
+        "what_assessor_does": "The assessor checks that people who hold administrator rights use a separate, unprivileged account for everyday work like email, web browsing and documents. They read the policy that says so, then compare the tenant's privileged accounts against licences and names: an admin account with a mailbox licence is usually someone's everyday account. They try to match each admin account to the same person's normal account. In interview they ask administrators which account they read email with.",
+        "common_failure_modes": [
+          "Administrators read email and browse the web with the same account that holds their admin roles.",
+          "Admin accounts carry productivity licences, so they work as everyday accounts.",
+          "Non-security functions are never described, so the rule has nothing to point at.",
+          "Third-party apps hold broad delegated permissions that act with administrator reach for everyday tasks."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AC.L2-3.1.6[a]",
+          "determination": "nonsecurity functions are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Access control policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/access-control-policy.md (GateEvidence family AC). Should say which everyday functions (email, web, office documents) must be done from a non-privileged account."
+            },
+            {
+              "artifact_type": "Third-party app consent audit",
+              "ces_source": "ao_row",
+              "notes": "AdminOps F-10 Third-Party App Consent Audit: permission inventory with high-risk permission detection; registered against AC.L2-3.1.6 (evidence objective [a]). Shows which apps reach beyond everyday use."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask how administrators are told which tasks need their normal account."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.6[b]",
+          "determination": "users are required to use non-privileged accounts or roles when accessing nonsecurity functions",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Dedicated admin account check",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AC.L2-3.1.6 (dedicatedAdminEvaluator): Graph /users with /roleManagement/directory/roleAssignments and roleEligibilitySchedules. A privileged account with a productivity licence that does not follow the stated admin naming convention is a finding."
+            },
+            {
+              "artifact_type": "Admin account register",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Each administrator's admin account and normal account side by side."
+            },
+            {
+              "artifact_type": "Administrator interviews",
+              "ces_source": "interview",
+              "notes": "Ask sampled administrators to show which account they are signed in to for email."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AC.L2-3.1.7",
+      "title": "Prevent non-privileged users from executing privileged functions and capture the execution of such functions in audit logs.",
+      "approach": {
+        "what_assessor_does": "The assessor wants a list of privileged functions and a definition of who counts as a non-privileged user. They check the tenant so that non-privileged accounts cannot reach those functions: no standing admin roles on everyday accounts, privileged roles activated through PIM, default user permissions restricted. They then look for audit records of privileged actions: role activations and directory changes with who, what and when. They pick a few privileged actions from the last month and find them in the logs, and check that emergency accounts are both excluded from blocking policies and tested.",
+        "common_failure_modes": [
+          "Privileged functions are not listed, so it is unclear what non-privileged users must be kept from.",
+          "Everyday licensed accounts hold standing privileged roles.",
+          "Role activations or admin changes are not in the audit log, or the log is kept too short to cover the sample.",
+          "The emergency account is never tested, or a Conditional Access policy would lock it out too."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AC.L2-3.1.7[a]",
+          "determination": "privileged functions are defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Access control policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/access-control-policy.md (GateEvidence family AC). Should list the privileged functions (for example changing roles, security settings or audit configuration)."
+            },
+            {
+              "artifact_type": "Break-glass Conditional Access exclusion record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps A-19 Break-Glass Conditional Access Exclusion: keeps the emergency account out of a blocking policy; registered against AC.L2-3.1.7 (evidence objective [a])."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask how the list of privileged functions was built and who keeps it current."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.7[b]",
+          "determination": "non-privileged users are defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Access control policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/access-control-policy.md (GateEvidence family AC). Should define non-privileged users and how they differ from administrators."
+            },
+            {
+              "artifact_type": "Account type register",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Which accounts are privileged, which are not, and which are emergency accounts."
+            },
+            {
+              "artifact_type": "Identity administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how a non-privileged account is kept from gaining a role."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.7[c]",
+          "determination": "non-privileged users are prevented from executing privileged functions",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Privileged roles on normal accounts",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AC.L2-3.1.7 (privilegedFunctionEvaluator): Graph /roleManagement/directory/roleAssignments and /users. Standing privileged roles on a licensed normal account or a shared login are a finding; designated break-glass accounts are listed as exempt."
+            },
+            {
+              "artifact_type": "Function test with an ordinary user",
+              "ces_source": "interview",
+              "notes": "Ask an ordinary user to open a privileged function and confirm it is refused."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.7[d]",
+          "determination": "the execution of privileged functions is captured in audit logs",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Privileged role activation records",
+              "ces_source": "eo_store",
+              "notes": "EO evidence store records from collector collect.pimActivations. The privilegedFunctionEvaluator checks that each activation request in the last 30 days carries principal, role, action and time."
+            },
+            {
+              "artifact_type": "Directory change records",
+              "ces_source": "eo_store",
+              "notes": "EO evidence store records from collector collect.directoryAudits: role, policy and setting changes, for tracing sampled privileged actions."
+            },
+            {
+              "artifact_type": "Break-glass validation",
+              "ces_source": "ao_row",
+              "notes": "AdminOps A-15 Break-Glass Validation: monthly test sign-in with alert check and exclusion check; registered against AC.L2-3.1.7 (evidence objective [d])."
+            },
+            {
+              "artifact_type": "Log review walk-through",
+              "ces_source": "interview",
+              "notes": "Ask the person who reviews logs to find a named privileged action from last month."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AC.L2-3.1.8",
+      "title": "Limit unsuccessful logon attempts.",
+      "approach": {
+        "what_assessor_does": "The assessor reads how the organization limits failed sign-ins: how many attempts, what happens next (lockout, delay, or a stronger challenge) and for how long. In Entra this is usually smart lockout, so they compare the documented threshold and lockout time with the tenant setting. They also check any other way into the system that has its own logon (local device accounts, VPN, line-of-business apps). Testing means repeated wrong passwords on a test account and confirming the lockout happens as written.",
+        "common_failure_modes": [
+          "No threshold or lockout time is written down, so the setting cannot be judged.",
+          "The documented values differ from the tenant's smart lockout settings.",
+          "Local device accounts or a separate VPN logon have no failed-attempt limit.",
+          "A lockout test was never run, so nobody has seen the control work."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AC.L2-3.1.8[a]",
+          "determination": "the means of limiting unsuccessful logon attempts is defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Access control policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/access-control-policy.md (GateEvidence family AC). Should state the failed-attempt threshold, the lockout duration and the systems they apply to."
+            },
+            {
+              "artifact_type": "Identity administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask which logon paths exist besides Entra sign-in and how each limits failed attempts."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.8[b]",
+          "determination": "the defined means of limiting unsuccessful logon attempts is implemented",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Account lockout settings",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AC.L2-3.1.8 (smartLockoutEvaluator). The registry names Graph /policies/authenticationMethodsPolicy, but the evaluator reads the directory setting Password Rule Settings (LockoutThreshold, LockoutDurationInSeconds), because the authentication methods policy does not hold lockout values."
+            },
+            {
+              "artifact_type": "Sign-in records",
+              "ces_source": "eo_store",
+              "notes": "EO evidence store records from collector collect.signIns: failed and locked sign-ins, for checking that lockouts happen at the stated threshold."
+            },
+            {
+              "artifact_type": "Lockout test result",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. A record of a test account locked after the stated number of failed attempts, and of local device or VPN lockout settings."
+            },
+            {
+              "artifact_type": "Lockout test with the identity administrator",
+              "ces_source": "interview",
+              "notes": "Ask them to show, or repeat, the lockout test on a test account."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AC.L2-3.1.9",
+      "title": "Provide privacy and security notices consistent with applicable Controlled Unclassified Information (CUI) rules.\nAssessment Objective:\n[a] privacy and security notices required by CUI-specified rules are identified, consistent, \nand associated with the specific CUI category; and\n[b] privacy and security notices are displayed.",
+      "approach": {
+        "what_assessor_does": "The assessor checks that the organization has worked out which notices its CUI requires (for example a system use banner, and any notice tied to a specific CUI category such as export-controlled or privacy data) and that the wording fits those categories. They then look for the notice where people actually meet it: at sign-in through Entra Terms of Use, on device logon screens, and on any other system that handles CUI. Testing means signing in and seeing the notice before access is given.",
+        "common_failure_modes": [
+          "A generic banner is used with no check of what the organization's CUI categories require.",
+          "The notice appears in the browser sign-in but not on device logon screens or other CUI systems.",
+          "Users can dismiss the Terms of Use without viewing it.",
+          "Banner wording differs between systems, or still names an old company or policy."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AC.L2-3.1.9[a]",
+          "determination": "privacy and security notices required by CUI-specified rules are identified, consistent, and associated with the specific CUI category",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Access control policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/access-control-policy.md (GateEvidence family AC). Should name the notices required for the organization's CUI categories and give the approved wording."
+            },
+            {
+              "artifact_type": "CUI category list and notice wording",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. The CUI categories the organization handles and the notice text each one needs."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask how the notice wording was checked against the CUI categories and who approved it."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.9[b]",
+          "determination": "privacy and security notices are displayed",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Terms of Use agreements",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AC.L2-3.1.9 (termsOfUseEvaluator): Graph /agreements. Checks that an agreement must be viewed before acceptance."
+            },
+            {
+              "artifact_type": "Device logon banner configuration and screenshots",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. The device configuration or screenshots showing the notice on Windows and other logon screens."
+            },
+            {
+              "artifact_type": "Sign-in test",
+              "ces_source": "interview",
+              "notes": "Ask a user to sign in to the tenant and to a device and show the notice appears before access."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AC.L2-3.1.10",
+      "title": "Use session lock with pattern-hiding displays to prevent access and viewing of data after a period of inactivity.",
+      "approach": {
+        "what_assessor_does": "The assessor reads the defined inactivity period and checks that devices lock after it and hide what was on the screen. In CES tenants this is an Intune device setting, so they read the device configuration or compliance policy for the inactivity timeout and compare it with the documented period. They check that the policy is assigned to all devices that handle CUI. Testing means leaving a device idle and seeing it lock to a screen that shows nothing from the session.",
+        "common_failure_modes": [
+          "No inactivity period is written down.",
+          "The Intune setting differs from the documented period, or is assigned to only some device groups.",
+          "Devices outside Intune (for example Macs or shared workstations) have no lock setting.",
+          "The lock screen still shows notifications or document content."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AC.L2-3.1.10[a]",
+          "determination": "the period of inactivity after which the system initiates a session lock is defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Access control policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/access-control-policy.md (GateEvidence family AC). Should state the inactivity period before a session lock."
+            },
+            {
+              "artifact_type": "Endpoint administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask where the period comes from and whether any device type uses a different value."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.10[b]",
+          "determination": "access to the system and viewing of data is prevented by initiating a session lock after the defined period of inactivity",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Screen lock device setting",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AC.L2-3.1.10 (sessionLockEvaluator): Graph /deviceManagement/deviceConfigurations, deviceCompliancePolicies and configurationPolicies. Reads the inactivity-before-lock setting and compares it with the expected period."
+            },
+            {
+              "artifact_type": "Lock settings for devices outside Intune",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Configuration or screenshots for any device that handles CUI but is not managed by Intune."
+            },
+            {
+              "artifact_type": "Idle test",
+              "ces_source": "interview",
+              "notes": "Ask a user to leave a sampled device idle past the period and show it locks."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.10[c]",
+          "determination": "previously visible information is concealed via a pattern-hiding display after the defined period of inactivity",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Screen lock device setting",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AC.L2-3.1.10 (sessionLockEvaluator). The lock should go to a screen that conceals the session."
+            },
+            {
+              "artifact_type": "Lock screen check",
+              "ces_source": "interview",
+              "notes": "On the idle test device, confirm the lock screen shows no document content or message previews."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AC.L2-3.1.11",
+      "title": "Terminate (automatically) user sessions after a defined condition.",
+      "approach": {
+        "what_assessor_does": "The assessor reads the conditions that end a session (for example a maximum session length, a change in user risk, or the account being disabled) and checks that the tenant applies them without anyone acting. In Entra this is mainly a Conditional Access sign-in frequency control, so they compare the documented limit with the policy and its assignment. They also ask how sessions end on applications outside Entra. Testing means waiting past the limit, or disabling a test account, and confirming the session is ended and a new sign-in is asked for.",
+        "common_failure_modes": [
+          "No conditions are written down, only a statement that sessions time out.",
+          "Sign-in frequency is not set, set longer than the documented limit, or applied to only some users.",
+          "Disabling an account does not end its existing sessions.",
+          "Applications that do not sign in through Entra keep sessions open indefinitely."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AC.L2-3.1.11[a]",
+          "determination": "conditions requiring a user session to terminate are defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Access control policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/access-control-policy.md (GateEvidence family AC). Should list the conditions that end a user session and the session length limit."
+            },
+            {
+              "artifact_type": "Identity administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask which systems end sessions on their own and which rely on Entra."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.11[b]",
+          "determination": "a user session is automatically terminated after any of the defined conditions occur",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Sign-in frequency session control",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AC.L2-3.1.11 (sessionTimeoutEvaluator): Graph /identity/conditionalAccess/policies. Looks for a policy covering users that ends sessions by sign-in frequency within the CES maximum of 8 hours; an answered value can tighten this but never relax it."
+            },
+            {
+              "artifact_type": "Session test",
+              "ces_source": "interview",
+              "notes": "Ask an administrator to show a test session ended after the limit or after the account is disabled."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AC.L2-3.1.12",
+      "title": "Monitor and control remote access sessions.",
+      "approach": {
+        "what_assessor_does": "The assessor checks whether remote access is allowed and, if so, which kinds (for example web sign-in to Microsoft 365 from home, VPN, remote desktop, vendor support tools). They read how each kind is controlled, such as Conditional Access with named locations and device rules, and how it is watched, such as sign-in logs that record where each session came from. They sample sign-ins from outside the office and check each was allowed by a rule and is visible in the logs. They also ask who reviews remote sign-ins and how often.",
+        "common_failure_modes": [
+          "The kinds of remote access in use are not listed, so a vendor support tool or remote desktop is missed.",
+          "Named locations are out of date and still trust old office ranges.",
+          "Admin portals can be reached from any address.",
+          "Sign-in logs are collected but nobody reviews them."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AC.L2-3.1.12[a]",
+          "determination": "remote access sessions are permitted",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Access control policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/access-control-policy.md (GateEvidence family AC). Should say whether remote access is allowed and under what conditions."
+            },
+            {
+              "artifact_type": "System owner interview",
+              "ces_source": "interview",
+              "notes": "Ask who may work remotely and how that is approved."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.12[b]",
+          "determination": "the types of permitted remote access are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "List of permitted remote access methods",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Each remote access method in use (web sign-in, VPN, remote desktop, vendor tools) with its owner."
+            },
+            {
+              "artifact_type": "Named location update",
+              "ces_source": "ao_row",
+              "notes": "AdminOps A-14 Named Location Update: maintains trusted IP ranges and country blocks for Conditional Access; registered against AC.L2-3.1.12 (evidence objectives [b], [c])."
+            },
+            {
+              "artifact_type": "Network administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask which remote access methods exist and whether any bypass Entra sign-in."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.12[c]",
+          "determination": "remote access sessions are controlled",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Named locations",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AC.L2-3.1.12 (namedLocationEvaluator): Graph /identity/conditionalAccess/namedLocations. Looks for trusted locations with IP ranges that match the expected values. The EO evidence explorer also lists this read as item signal:namedLocations."
+            },
+            {
+              "artifact_type": "Admin portal IP restriction",
+              "ces_source": "ao_row",
+              "notes": "AdminOps F-07 Admin Portal IP Restriction: Conditional Access policy that limits admin portals to trusted addresses; registered against AC.L2-3.1.12 (evidence objective [c])."
+            },
+            {
+              "artifact_type": "Named location update",
+              "ces_source": "ao_row",
+              "notes": "AdminOps A-14 Named Location Update; registered against AC.L2-3.1.12."
+            },
+            {
+              "artifact_type": "Remote access test",
+              "ces_source": "interview",
+              "notes": "Ask an administrator to show an admin portal sign-in from an untrusted address being blocked."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.12[d]",
+          "determination": "remote access sessions are monitored",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Sign-in log source addresses",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AC.L2-3.1.12 (namedLocationEvaluator): Graph /auditLogs/signIns. Checks that sign-in records carry the source address."
+            },
+            {
+              "artifact_type": "Sign-in records",
+              "ces_source": "eo_store",
+              "notes": "EO evidence store records from collector collect.signIns, for sampling remote sessions over the review period."
+            },
+            {
+              "artifact_type": "Log reviewer interview",
+              "ces_source": "interview",
+              "notes": "Ask who reviews remote sign-ins, how often, and what they did about the last odd one."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AC.L2-3.1.13",
+      "title": "Employ cryptographic mechanisms to protect the confidentiality of remote access sessions.",
+      "approach": {
+        "what_assessor_does": "The assessor wants to know which encryption protects each remote access method and whether it is in use. For Microsoft 365 the sessions run over TLS, so they look for legacy protocols and old TLS versions being refused; for VPN or remote desktop they read the configuration for the protocol and ciphers. They ask whether the cryptography uses FIPS-validated modules. Testing means connecting with an old protocol and seeing it refused.",
+        "common_failure_modes": [
+          "The encryption for VPN or remote desktop is not documented at all.",
+          "Legacy TLS clients or basic SMTP authentication are still allowed.",
+          "No one can say whether the VPN uses FIPS-validated cryptography.",
+          "A vendor remote support tool is used with no record of how its sessions are protected."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AC.L2-3.1.13[a]",
+          "determination": "cryptographic mechanisms to protect the confidentiality of remote access sessions are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Access control policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/access-control-policy.md (GateEvidence family AC). Should name the encryption required for each remote access method."
+            },
+            {
+              "artifact_type": "Remote access encryption description",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Protocol, TLS version, cipher settings and FIPS validation for each remote access method, including VPN and vendor tools."
+            },
+            {
+              "artifact_type": "Network administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask which encryption each remote access method uses and how they know it is FIPS validated."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.13[b]",
+          "determination": "cryptographic mechanisms to protect the confidentiality of remote access sessions are implemented",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Exchange transport TLS settings",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AC.L2-3.1.13 (tlsEnforcementEvaluator): Graph /admin/exchangeOnline/transportConfig. Checks that legacy TLS clients and basic SMTP AUTH are refused. It covers mail clients only, not VPN or remote desktop."
+            },
+            {
+              "artifact_type": "VPN or remote desktop configuration export",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Shows the encryption settings actually in force on other remote access paths."
+            },
+            {
+              "artifact_type": "Protocol test",
+              "ces_source": "interview",
+              "notes": "Ask the administrator to show a connection attempt with a legacy protocol being refused."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AC.L2-3.1.14",
+      "title": "Route remote access via managed access control points.",
+      "approach": {
+        "what_assessor_does": "The assessor checks that remote access enters through a small number of managed points, such as Entra sign-in with Conditional Access, a VPN gateway or a remote desktop gateway, and not straight to individual systems. They read the list of those points and the rules on each, then look for paths around them, like a server with remote desktop open to the internet. In the tenant they read the Conditional Access policy that blocks access from anywhere except approved locations or paths.",
+        "common_failure_modes": [
+          "The managed access points are not listed.",
+          "A server or device accepts remote desktop or SSH straight from the internet.",
+          "No Conditional Access policy blocks access from outside the approved locations.",
+          "Users can sign in to CUI resources from anywhere because location exclusions are too broad."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AC.L2-3.1.14[a]",
+          "determination": "managed access control points are identified and implemented",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Managed access control point list and network diagram",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Each point where remote access enters, with how it is managed."
+            },
+            {
+              "artifact_type": "Access control policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/access-control-policy.md (GateEvidence family AC). Should require remote access to go through the managed points."
+            },
+            {
+              "artifact_type": "Network administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask whether any system can be reached remotely without going through these points."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.14[b]",
+          "determination": "remote access is routed through managed network access control points",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Location block policy",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AC.L2-3.1.14 (blockUntrustedEvaluator): Graph /identity/conditionalAccess/policies. Looks for a policy that blocks all locations except the approved ones."
+            },
+            {
+              "artifact_type": "Firewall or exposure scan result",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Shows no remote access ports open to the internet outside the managed points."
+            },
+            {
+              "artifact_type": "Bypass test",
+              "ces_source": "interview",
+              "notes": "Ask the administrator to try reaching a system directly from outside and show it fails."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AC.L2-3.1.15",
+      "title": "Authorize remote execution of privileged commands and remote access to security-relevant information.",
+      "approach": {
+        "what_assessor_does": "The assessor wants a list of privileged commands that may be run remotely and of security information that may be viewed remotely (for example audit logs, security alerts, configuration), and who is authorized for each. They then check that remote privileged access requires a strong sign-in and that roles are activated through PIM with a reason. They sample a few remote privileged sessions or activations and match them to an authorized person.",
+        "common_failure_modes": [
+          "Remote privileged access is allowed but never listed or authorized in writing.",
+          "Admin roles can be used remotely without MFA or a phishing-resistant method.",
+          "Security logs and alerts can be read by people with no recorded need.",
+          "Role activations carry no reason, so their authorization cannot be checked."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AC.L2-3.1.15[a]",
+          "determination": "privileged commands authorized for remote execution are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Access control policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/access-control-policy.md (GateEvidence family AC). Should list the privileged commands that may be run remotely."
+            },
+            {
+              "artifact_type": "Remote privileged access authorization list",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. The privileged commands and roles authorized for remote use, with the people allowed."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask who decided which privileged commands may be run remotely."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.15[b]",
+          "determination": "security-relevant information authorized to be accessed remotely is identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Access control policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/access-control-policy.md (GateEvidence family AC). Should list the security-relevant information that may be viewed remotely."
+            },
+            {
+              "artifact_type": "Security information access list",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Which logs, alerts and configurations may be viewed remotely, and by whom."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask who may read audit logs and alerts from outside the office."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.15[c]",
+          "determination": "the execution of the identified privileged commands via remote access is authorized",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "MFA for privileged roles",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AC.L2-3.1.15 (adminMfaEvaluator): Graph /identity/conditionalAccess/policies. Looks for a policy that requires MFA or an authentication strength for privileged roles."
+            },
+            {
+              "artifact_type": "Privileged role activation records",
+              "ces_source": "eo_store",
+              "notes": "EO evidence store records from collector collect.pimActivations: who activated which role and when, to match against the authorization list."
+            },
+            {
+              "artifact_type": "Remote admin test",
+              "ces_source": "interview",
+              "notes": "Ask an administrator to activate a role remotely and show the strong sign-in step."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.15[d]",
+          "determination": "access to the identified security-relevant information via remote access is authorized",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "MFA for privileged roles",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AC.L2-3.1.15 (adminMfaEvaluator). Security information held behind admin roles inherits this sign-in requirement."
+            },
+            {
+              "artifact_type": "Role assignments for security readers",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Who holds roles such as Security Reader or audit log access, compared with the authorization list."
+            },
+            {
+              "artifact_type": "Access check",
+              "ces_source": "interview",
+              "notes": "Ask an unauthorized user to open the audit log or security alerts remotely and confirm it is refused."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AC.L2-3.1.16",
+      "title": "Authorize wireless access prior to allowing such connections.",
+      "approach": {
+        "what_assessor_does": "The assessor asks for a list of the organization's wireless access points and how a device is allowed to join them. They read the wireless configuration, looking for enterprise authentication (each device or user authenticates) rather than a shared password, and the Intune Wi-Fi profiles pushed to managed devices. Testing means trying to join from an unapproved device and seeing it refused.",
+        "common_failure_modes": [
+          "There is no list of access points, or a guest network is left off it.",
+          "Wireless uses a shared password known to staff and visitors alike.",
+          "Rogue or forgotten access points are found during a walk-through.",
+          "The organization says it has no wireless but staff connect to an office network anyway."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AC.L2-3.1.16[a]",
+          "determination": "wireless access points are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Wireless access point inventory",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Each access point and network name, its location and whether it can reach CUI."
+            },
+            {
+              "artifact_type": "Network administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how a new access point is approved and how rogue ones would be found."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.16[b]",
+          "determination": "wireless access is authorized prior to allowing such connections",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Intune Wi-Fi profiles",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AC.L2-3.1.16 (wifiProfileEvaluator): Graph /deviceManagement/deviceConfigurations. Looks for an enterprise-mode Wi-Fi profile, so devices authenticate before they connect."
+            },
+            {
+              "artifact_type": "Access control policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/access-control-policy.md (GateEvidence family AC). Should require approval before a device may join the wireless network."
+            },
+            {
+              "artifact_type": "Join test",
+              "ces_source": "interview",
+              "notes": "Ask an administrator to show an unapproved device failing to join."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AC.L2-3.1.17",
+      "title": "Protect wireless access using authentication and encryption.",
+      "approach": {
+        "what_assessor_does": "The assessor checks that wireless networks need authentication and encrypt traffic, normally WPA2 or WPA3, ideally enterprise mode. They read the access point configuration and the Intune Wi-Fi profiles and compare them. Guest networks must not reach CUI. Testing means looking at the network's security settings from a client and confirming an open network is not available.",
+        "common_failure_modes": [
+          "An open or WEP network is still broadcast.",
+          "The guest network can reach internal systems.",
+          "Access point settings and the Intune profiles disagree."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AC.L2-3.1.17[a]",
+          "determination": "wireless access to the system is protected using authentication",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Wi-Fi security type",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AC.L2-3.1.17 (wirelessProtectionEvaluator): Graph /deviceManagement/deviceConfigurations. Each Wi-Fi profile should use WPA authentication."
+            },
+            {
+              "artifact_type": "Access point security configuration",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Screenshots or export of each access point's authentication settings."
+            },
+            {
+              "artifact_type": "Network administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how wireless users or devices authenticate."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.17[b]",
+          "determination": "wireless access to the system is protected using encryption",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Wi-Fi security type",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AC.L2-3.1.17 (wirelessProtectionEvaluator). WPA profiles carry encryption; a profile without WPA is a finding."
+            },
+            {
+              "artifact_type": "Access point encryption settings",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. The encryption setting on each access point, including the guest network."
+            },
+            {
+              "artifact_type": "Client check",
+              "ces_source": "interview",
+              "notes": "Ask the administrator to show the network's security type from a client device."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AC.L2-3.1.18",
+      "title": "Control connection of mobile devices.",
+      "approach": {
+        "what_assessor_does": "The assessor wants a list of mobile devices that touch CUI and the rule for letting them connect. They compare the list with the phones and tablets enrolled in Intune, read the Conditional Access policy that only lets compliant devices or approved apps reach CUI, and check that connections are logged. Testing means trying to reach CUI from an unenrolled phone and seeing it blocked.",
+        "common_failure_modes": [
+          "No list of mobile devices that handle CUI.",
+          "Personal phones reach CUI mail through the native mail app without any device or app control.",
+          "The Conditional Access policy leaves out iOS or Android.",
+          "Mobile sign-ins are not logged or not reviewed."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AC.L2-3.1.18[a]",
+          "determination": "mobile devices that process, store, or transmit CUI are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Mobile device inventory",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Phones and tablets that process, store or transmit CUI, with owner."
+            },
+            {
+              "artifact_type": "Device compliance records",
+              "ces_source": "eo_store",
+              "notes": "EO evidence store records from collector collect.deviceCompliance, to compare enrolled mobile devices with the inventory."
+            },
+            {
+              "artifact_type": "Endpoint administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how a phone is approved before it can reach CUI."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.18[b]",
+          "determination": "mobile device connections are authorized",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Mobile device Conditional Access",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AC.L2-3.1.18 (mobileDeviceAccessEvaluator): Graph /identity/conditionalAccess/policies. Looks for a policy on iOS or Android that requires a compliant device or an approved app."
+            },
+            {
+              "artifact_type": "Non-compliant device block",
+              "ces_source": "ao_row",
+              "notes": "AdminOps B-07 Non-Compliant Device CA Block: Conditional Access policy requiring a compliant device, with a grace period; registered against AC.L2-3.1.18 (evidence objectives [a], [b])."
+            },
+            {
+              "artifact_type": "Mobile access test",
+              "ces_source": "interview",
+              "notes": "Ask a user to reach CUI mail from an unenrolled phone and show it is blocked."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.18[c]",
+          "determination": "mobile device connections are monitored and logged",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Sign-in records",
+              "ces_source": "eo_store",
+              "notes": "EO evidence store records from collector collect.signIns: mobile sign-ins with device and app details."
+            },
+            {
+              "artifact_type": "Log reviewer interview",
+              "ces_source": "interview",
+              "notes": "Ask who reviews mobile connections and what triggers follow-up."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AC.L2-3.1.19",
+      "title": "Encrypt CUI on mobile devices and mobile computing platforms.",
+      "approach": {
+        "what_assessor_does": "The assessor checks which mobile devices and platforms hold CUI and that CUI on them is encrypted. For managed phones that is device encryption enforced by compliance policy; for personal phones it is app protection that encrypts app data. They read the Intune app protection and compliance policies and compare them with the device list. They look at a sample device's compliance state.",
+        "common_failure_modes": [
+          "The list of mobile platforms with CUI is missing or leaves out laptops used on the road.",
+          "App protection does not encrypt app data, or covers iOS but not Android.",
+          "Compliance policy does not require device encryption."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AC.L2-3.1.19[a]",
+          "determination": "mobile devices and mobile computing platforms that process, store, or transmit CUI are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Mobile device and platform list",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Phones, tablets and laptops that hold CUI, by platform."
+            },
+            {
+              "artifact_type": "Device compliance records",
+              "ces_source": "eo_store",
+              "notes": "EO evidence store records from collector collect.deviceCompliance, to confirm the list matches enrolled devices."
+            },
+            {
+              "artifact_type": "Endpoint administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask which platforms are allowed to hold CUI."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.19[b]",
+          "determination": "encryption is employed to protect CUI on identified mobile devices and mobile computing platforms",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "App protection encryption",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AC.L2-3.1.19 (appProtectionEvaluator): Graph /deviceAppManagement/iosManagedAppProtectionPolicies. Looks for app data encryption, or a compliant device with backup blocked. The read covers iOS only."
+            },
+            {
+              "artifact_type": "Android app protection and device encryption settings",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Intune settings for platforms the iOS read does not cover."
+            },
+            {
+              "artifact_type": "Device check",
+              "ces_source": "interview",
+              "notes": "Ask a user to show the compliance state of a sampled mobile device."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AC.L1-3.1.20",
+      "title": "Verify and control/limit connections to and use of external information systems.",
+      "approach": {
+        "what_assessor_does": "The assessor wants to know which external systems connect to or are used with the organization's system: partner tenants, personal devices, cloud services, file-sharing sites. They check each is listed, that its security has been checked (for example by agreement or the provider's attestation), and that the tenant limits it: cross-tenant access defaults, guest and external sharing settings, public Teams, and app protection on personal devices. They sample external sharing and ask why it was allowed.",
+        "common_failure_modes": [
+          "No list of external systems, or personal devices and outside file-sharing services are left out.",
+          "The default cross-tenant setting allows all external users in.",
+          "SharePoint or Teams allows anonymous links or public teams.",
+          "Personal phones reach company data without app protection.",
+          "Nobody can show how an external system was checked before it was used."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AC.L1-3.1.20[a]",
+          "determination": "connections to external systems are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "External system connection list",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Each external system, tenant or service that connects to the organization's system, with purpose and owner."
+            },
+            {
+              "artifact_type": "System owner interview",
+              "ces_source": "interview",
+              "notes": "Ask which outside systems exchange data with the tenant."
+            }
+          ]
+        },
+        {
+          "id": "AC.L1-3.1.20[b]",
+          "determination": "the use of external systems is identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "External system use list",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Outside systems staff use to process company information, including personal devices and cloud services."
+            },
+            {
+              "artifact_type": "External sharing audit",
+              "ces_source": "ao_row",
+              "notes": "AdminOps D-04 External Sharing Audit: SharePoint sharing settings, anonymous links and domain limits; registered against AC.L1-3.1.20 (evidence objectives [b], [f])."
+            },
+            {
+              "artifact_type": "Staff interviews",
+              "ces_source": "interview",
+              "notes": "Ask sampled staff whether they use any outside service or personal device for work."
+            }
+          ]
+        },
+        {
+          "id": "AC.L1-3.1.20[c]",
+          "determination": "connections to external systems are verified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Agreements or attestations for connected systems",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. The agreement, provider attestation or review that shows each connection was checked."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask how a new connection is checked before it is allowed."
+            }
+          ]
+        },
+        {
+          "id": "AC.L1-3.1.20[d]",
+          "determination": "the use of external systems is verified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Access control policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/access-control-policy.md (GateEvidence family AC). Should state the terms on which external systems may be used, including personal devices."
+            },
+            {
+              "artifact_type": "External system use approvals",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Records showing each allowed outside system was checked against those terms."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask how the organization confirms an outside system meets its terms."
+            }
+          ]
+        },
+        {
+          "id": "AC.L1-3.1.20[e]",
+          "determination": "connections to external systems are controlled/limited",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Cross-tenant access defaults",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AC.L1-3.1.20 (crossTenantEvaluator): Graph /policies/crossTenantAccessPolicy/default. A default that allows all external users inbound is a finding."
+            },
+            {
+              "artifact_type": "BYOD app protection",
+              "ces_source": "ao_row",
+              "notes": "AdminOps B-09 BYOD Separation (MAM): app protection with data transfer blocking and selective wipe; registered against AC.L1-3.1.20 (evidence objectives [e], [f])."
+            },
+            {
+              "artifact_type": "Connection test",
+              "ces_source": "interview",
+              "notes": "Ask an administrator to show a sign-in from a non-approved tenant being blocked."
+            }
+          ]
+        },
+        {
+          "id": "AC.L1-3.1.20[f]",
+          "determination": "the use of external systems is controlled/limited",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "External sharing audit",
+              "ces_source": "ao_row",
+              "notes": "AdminOps D-04 External Sharing Audit; registered against AC.L1-3.1.20."
+            },
+            {
+              "artifact_type": "Public Teams detection",
+              "ces_source": "ao_row",
+              "notes": "AdminOps D-08 Public Teams Detection: finds public Teams and sets them private; registered against AC.L1-3.1.20."
+            },
+            {
+              "artifact_type": "Oversharing risk report",
+              "ces_source": "ao_row",
+              "notes": "AdminOps D-10 Oversharing Risk Report; registered against AC.L1-3.1.20."
+            },
+            {
+              "artifact_type": "Sharing test",
+              "ces_source": "interview",
+              "notes": "Ask a user to share a file outside the allowed domains and show it is refused."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AC.L2-3.1.21",
+      "title": "Limit use of portable storage devices on external systems.",
+      "approach": {
+        "what_assessor_does": "The assessor checks the organization has written down whether CUI may be carried on USB drives or other portable storage to outside systems, and the limits if so (for example only encrypted company drives, only with approval). They read the Intune setting that blocks or limits removable storage on managed devices and compare it with the rule. Testing means plugging a drive into a managed device and seeing what happens.",
+        "common_failure_modes": [
+          "The policy is silent on portable storage used with outside systems.",
+          "Removable storage is allowed on all managed devices.",
+          "Exceptions are granted informally with no record."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AC.L2-3.1.21[a]",
+          "determination": "the use of portable storage devices containing CUI on external systems is identified and documented",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Access control policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/access-control-policy.md (GateEvidence family AC). Should describe how portable storage holding CUI may be used on outside systems."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask when, if ever, staff take CUI on portable storage to an outside system."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.21[b]",
+          "determination": "limits on the use of portable storage devices containing CUI on external systems are defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Access control policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/access-control-policy.md (GateEvidence family AC). Should state the limits on that use (for example encrypted company drives only, with approval)."
+            },
+            {
+              "artifact_type": "Portable storage exception register",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Approved exceptions with person, device and reason."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask who approves exceptions and how they are recorded."
+            }
+          ]
+        },
+        {
+          "id": "AC.L2-3.1.21[c]",
+          "determination": "the use of portable storage devices containing CUI on external systems is limited as defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Removable storage device setting",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AC.L2-3.1.21 (removableStorageEvaluator): Graph /deviceManagement/deviceConfigurations. Checks that a device configuration blocks or limits removable storage."
+            },
+            {
+              "artifact_type": "USB test",
+              "ces_source": "interview",
+              "notes": "Ask a user to plug a non-approved drive into a managed device and show it is blocked or read-only."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AC.L1-3.1.22",
+      "title": "Control information posted or processed on publicly accessible\ninformation systems.",
+      "approach": {
+        "what_assessor_does": "The assessor asks which public systems the organization posts to (website, social media, public file links) and who may post. They want a written review step before anything is posted, a record of reviews, and a way to take down CUI if it slips out. In the tenant they check that SharePoint and OneDrive do not allow anonymous 'Anyone' links and look for anonymous link events in the audit log. They sample recent public posts and ask who reviewed them.",
+        "common_failure_modes": [
+          "No list of who may post to the website or social media.",
+          "Posts go out with no recorded review.",
+          "SharePoint allows anonymous 'Anyone' links, or the audit log shows them being created.",
+          "Nobody knows how to take down content if CUI is posted by mistake."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AC.L1-3.1.22[a]",
+          "determination": "individuals authorized to post or process information on publicly accessible systems are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Authorized poster list",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. The people allowed to post to each public system."
+            },
+            {
+              "artifact_type": "Communications lead interview",
+              "ces_source": "interview",
+              "notes": "Ask who can post to the website and social accounts and how that is controlled."
+            }
+          ]
+        },
+        {
+          "id": "AC.L1-3.1.22[b]",
+          "determination": "procedures to ensure CUI is not posted or processed on publicly accessible systems are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Access control policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/access-control-policy.md (GateEvidence family AC). Should state that CUI must not be posted publicly and how that is ensured."
+            },
+            {
+              "artifact_type": "Communications lead interview",
+              "ces_source": "interview",
+              "notes": "Ask what checks stop CUI from reaching a public post."
+            }
+          ]
+        },
+        {
+          "id": "AC.L1-3.1.22[c]",
+          "determination": "a review process is in place prior to posting of any content to publicly accessible systems",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Access control policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/access-control-policy.md (GateEvidence family AC). Should require a review before any public posting."
+            },
+            {
+              "artifact_type": "Pre-posting review records",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Sign-offs for a sample of recent public posts."
+            },
+            {
+              "artifact_type": "Reviewer interview",
+              "ces_source": "interview",
+              "notes": "Ask the reviewer what they check for and show a recent review."
+            }
+          ]
+        },
+        {
+          "id": "AC.L1-3.1.22[d]",
+          "determination": "content on publicly accessible systems is reviewed to ensure that it does not include CUI",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Anonymous sharing setting and link events",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AC.L1-3.1.22 (publicSharingEvaluator): Graph /admin/sharepoint/settings (sharingCapability) and PowerShell Search-UnifiedAuditLog for anonymous link events."
+            },
+            {
+              "artifact_type": "Unified audit log records",
+              "ces_source": "eo_store",
+              "notes": "EO evidence store records from collector collect.unifiedAuditLog: anonymous ('Anyone') link creation and use."
+            },
+            {
+              "artifact_type": "Content review walk-through",
+              "ces_source": "interview",
+              "notes": "Ask the reviewer to show the last periodic review of public content."
+            }
+          ]
+        },
+        {
+          "id": "AC.L1-3.1.22[e]",
+          "determination": "mechanisms are in place to remove and address improper posting of CUI",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Access control policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/access-control-policy.md (GateEvidence family AC). Should describe how improperly posted CUI is removed and reported."
+            },
+            {
+              "artifact_type": "Unified audit log records",
+              "ces_source": "eo_store",
+              "notes": "EO evidence store records from collector collect.unifiedAuditLog, to confirm a removed public link was actually taken down."
+            },
+            {
+              "artifact_type": "Takedown walk-through",
+              "ces_source": "interview",
+              "notes": "Ask the communications lead to describe the steps they would take if CUI were posted, and who they tell."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

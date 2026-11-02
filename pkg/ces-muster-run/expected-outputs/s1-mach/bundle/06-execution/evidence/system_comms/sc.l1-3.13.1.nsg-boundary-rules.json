@@ -1,0 +1,39 @@
+{
+  "rawResponse": "{\r\n    \"NSGName\":  \"nsg-s1-workload\",\r\n    \"SecurityRules\":  [\r\n                          {\r\n                              \"Name\":  \"AllowJumpBoxRdpFromOffice\",\r\n                              \"Protocol\":  \"Tcp\",\r\n                              \"SourceAddressPrefix\":  \"198.51.100.0/24\",\r\n                              \"DestinationAddressPrefix\":  null,\r\n                              \"DestinationPortRange\":  \"3389\",\r\n                              \"Access\":  \"Allow\",\r\n                              \"Priority\":  200,\r\n                              \"Direction\":  \"Inbound\"\r\n                          },\r\n                          {\r\n                              \"Name\":  \"DenyAllInbound\",\r\n                              \"Protocol\":  null,\r\n                              \"SourceAddressPrefix\":  null,\r\n                              \"DestinationAddressPrefix\":  null,\r\n                              \"DestinationPortRange\":  null,\r\n                              \"Access\":  \"Deny\",\r\n                              \"Priority\":  4096,\r\n                              \"Direction\":  \"Inbound\"\r\n                          },\r\n                          {\r\n                              \"Name\":  \"DenyAllOutbound\",\r\n                              \"Protocol\":  null,\r\n                              \"SourceAddressPrefix\":  null,\r\n                              \"DestinationAddressPrefix\":  null,\r\n                              \"DestinationPortRange\":  null,\r\n                              \"Access\":  \"Deny\",\r\n                              \"Priority\":  4096,\r\n                              \"Direction\":  \"Outbound\"\r\n                          }\r\n                      ],\r\n    \"DefaultSecurityRules\":  {\r\n\r\n                             }\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "SC.L1-3.13.1.nsg-boundary-rules",
+    "label": "NSG Boundary Protection Rules",
+    "engine": "az",
+    "layer_hint": 6,
+    "sequence_hint": 39,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "SC.L1-3.13.1",
+      "SC.L2-3.13.6",
+      "SC.L1-3.13.5"
+    ],
+    "get_command": "Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' | ForEach-Object { $nsg = $_; [PSCustomObject]@{ NSGName = $nsg.Name; SecurityRules = $nsg.SecurityRules | Select-Object Name,Protocol,SourceAddressPrefix,DestinationAddressPrefix,DestinationPortRange,Access,Priority,Direction; DefaultSecurityRules = $nsg.DefaultSecurityRules | Select-Object Name,Access,Priority,Direction } } | ConvertTo-Json -Depth 10",
+    "set_command": "",
+    "evidence_commands": [
+      "Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' | ForEach-Object { $nsg = $_; [PSCustomObject]@{ NSGName = $nsg.Name; SecurityRules = $nsg.SecurityRules | Select-Object Name,Protocol,SourceAddressPrefix,DestinationAddressPrefix,DestinationPortRange,Access,Priority,Direction; DefaultSecurityRules = $nsg.DefaultSecurityRules | Select-Object Name,Access,Priority,Direction } } | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SC.L1-3.13.1",
+      "SC.L2-3.13.6",
+      "SC.L1-3.13.5"
+    ],
+    "timestamp": "2026-11-01T15:27:36.621Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] NSG Boundary Protection Rules",
+    "sha256Hash": "89a743b9c8f41abb5560db831876a8ad38069cd3ba1692ab7b52fa0b1c3c7072",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

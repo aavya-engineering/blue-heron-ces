@@ -1,0 +1,91 @@
+{
+  "pass": true,
+  "scenario": "muster-partial",
+  "baseline": "summary.json",
+  "checks": [
+    {
+      "id": "V1",
+      "title": "All E-step exit codes are 0",
+      "pass": true,
+      "detail": "E1-E8 rc=0 (E2 raw exit -1073740791: libuv exit abort after ok:true, see log); E4 mode=api"
+    },
+    {
+      "id": "V2",
+      "title": "MP and TM parse with the ces-shared schemas",
+      "pass": true,
+      "detail": "MP ok; TM ok"
+    },
+    {
+      "id": "V3",
+      "title": "The MP has 110 control directives",
+      "pass": true,
+      "detail": "110 directives {\"implement\":75,\"manual\":28,\"validate\":7}"
+    },
+    {
+      "id": "V4",
+      "title": "Provenance: the plan came from discovery",
+      "pass": true,
+      "detail": "observations 331 (met 67, unknown 264) match discovery; auto_detected facts 25; MP posture {\"met\":7,\"partial\":0,\"not_met\":0,\"unknown\":24} = compiled results; no 1970 dates"
+    },
+    {
+      "id": "V5",
+      "title": "Stamper's picker regex matches all pushed files",
+      "pass": true,
+      "detail": "3 files; unmatched: none; IM present (expected)"
+    },
+    {
+      "id": "V6",
+      "title": "Translate exit 0; execute report exists; counts within baseline +/-2",
+      "pass": true,
+      "detail": "completed 105 (baseline 87), failed 5 (baseline 23), tolerance 2"
+    },
+    {
+      "id": "V7",
+      "title": "Only Stamper wrote to the sim ledger; discovery added zero writes",
+      "pass": true,
+      "detail": "647 entries; non-seed writes 50: during E6 (Stamper) 50, during E2 (discovery) 0, outside E6 0"
+    },
+    {
+      "id": "V8",
+      "title": "SSP sections, implementation count, TM and MP loaded",
+      "pass": true,
+      "detail": "all 14 sections; 110 implementations (baseline 110), status {\"not_met\":25,\"met\":69,\"not_assessed\":16} vs baseline {\"not_met\":20,\"met\":60,\"not_assessed\":30} (not asserted, K5); sources [\"Mission Plan\",\"Tenant Manifest\",\"Infrastructure Manifest\"]; DOCX 96258 bytes; POA&M ok; system name source: fallback (K4)"
+    },
+    {
+      "id": "V9",
+      "title": "The SSP's MP is the pushed MP",
+      "pass": true,
+      "detail": "EO loaded manual-mission-plan-muster-partial-2026-10-27T04-52-41-660Z.json; pushed manual-mission-plan-muster-partial-2026-10-27T04-52-41-660Z.json"
+    },
+    {
+      "id": "V10",
+      "title": "Nothing written outside the workspace (C:\\CES_Pipeline, ~/.ces, ~/.stamper)",
+      "pass": true,
+      "detail": "C:\\CES_Pipeline: 1811 files, unchanged; ~\\.ces: 5 files, unchanged; ~\\.stamper: 552 files, unchanged"
+    },
+    {
+      "id": "V11",
+      "title": "Unit-suite failures are a subset of known-failures.json",
+      "pass": true,
+      "detail": "4804 passed, 0 failed (0 known), 0 unexpected"
+    },
+    {
+      "id": "V14",
+      "title": "Three back-to-back EO assessments give identical counts",
+      "pass": true,
+      "detail": "3 runs identical: {\"controls_met\":69,\"controls_not_met\":25,\"controls_partial\":0,\"controls_not_assessed\":16,\"sprs_score\":-16,\"liveAssessmentCount\":107}"
+    },
+    {
+      "id": "V15",
+      "title": "Stamper evidence in the tenant folder, one record per task, found by EO, failures recorded",
+      "pass": true,
+      "detail": "113 evidence files; 142 task folders; evidence_collected 146; EO filesFound 113; 5 failure records checked"
+    },
+    {
+      "id": "V16",
+      "title": "No leftover {name} placeholders reached the sim; inactive-account task disabled only stale users",
+      "pass": true,
+      "detail": "no placeholders stored or sent; disabled [\"user-2\",\"user-4\"] ⊆ stale [\"user-2\",\"user-4\"] of 5 users"
+    }
+  ]
+}

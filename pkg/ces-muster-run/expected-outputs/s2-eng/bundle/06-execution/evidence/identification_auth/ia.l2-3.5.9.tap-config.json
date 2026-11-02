@@ -1,0 +1,50 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"TemporaryAccessPass\",\r\n    \"@odata.type\":  \"#microsoft.graph.temporaryAccessPassAuthenticationMethodConfiguration\",\r\n    \"state\":  \"enabled\",\r\n    \"isUsableOnce\":  true,\r\n    \"defaultLifetimeInMinutes\":  60,\r\n    \"minimumLifetimeInMinutes\":  60,\r\n    \"maximumLifetimeInMinutes\":  480,\r\n    \"defaultLength\":  8,\r\n    \"includeTargets\":  [\r\n                           {\r\n                               \"targetType\":  \"group\",\r\n                               \"id\":  \"all_users\",\r\n                               \"isRegistrationRequired\":  false\r\n                           }\r\n                       ],\r\n    \"excludeTargets\":  [\r\n\r\n                       ]\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Already compliant — state unchanged, evidence confirms resource exists",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "Already compliant — state unchanged, evidence confirms resource exists"
+  },
+  "registryEntry": {
+    "entry_id": "IA.L2-3.5.9.tap-config",
+    "label": "Configure Temporary Access Pass (One-Time Use, 60 Minutes)",
+    "engine": "mgraph",
+    "layer_hint": 1,
+    "sequence_hint": 14,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "IA.L2-3.5.9"
+    ],
+    "get_command": "Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/TemporaryAccessPass' | ConvertTo-Json -Depth 10",
+    "set_command": "$body = '{\"@odata.type\":\"#microsoft.graph.temporaryAccessPassAuthenticationMethodConfiguration\",\"state\":\"enabled\",\"isUsableOnce\":true,\"defaultLifetimeInMinutes\":60,\"minimumLifetimeInMinutes\":60,\"maximumLifetimeInMinutes\":480,\"defaultLength\":8}'; Invoke-MgGraphRequest -Method PATCH -Uri 'https://graph.microsoft.us/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/TemporaryAccessPass' -Body $body -ContentType 'application/json'",
+    "evidence_commands": [
+      "Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/TemporaryAccessPass' | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "IA.L2-3.5.9"
+    ],
+    "timestamp": "2026-11-01T16:03:12.584Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "$body = '{\"@odata.type\":\"#microsoft.graph.temporaryAccessPassAuthenticationMethodConfiguration\",\"state\":\"enabled\",\"isUsableOnce\":true,\"defaultLifetimeInMinutes\":60,\"minimumLifetimeInMinutes\":60,\"maximumLifetimeInMinutes\":480,\"defaultLength\":8}'; Invoke-MgGraphRequest -Method PATCH -Uri 'https://graph.microsoft.us/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/TemporaryAccessPass' -Body $body -ContentType 'application/json'",
+    "sha256Hash": "31b6deeff27d643d6f3206288e823d4fb83330ce5b137ad3a8b36ba451e960a1",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "{\r\n    \"id\":  \"TemporaryAccessPass\",\r\n    \"@odata.type\":  \"#microsoft.graph.temporaryAccessPassAuthenticationMethodConfiguration\",\r\n    \"state\":  \"enabled\",\r\n    \"isUsableOnce\":  true,\r\n    \"defaultLifetimeInMinutes\":  60,\r\n    \"minimumLifetimeInMinutes\":  60,\r\n    \"maximumLifetimeInMinutes\":  480,\r\n    \"defaultLength\":  8,\r\n    \"includeTargets\":  [\r\n                           {\r\n                               \"targetType\":  \"group\",\r\n                               \"id\":  \"all_users\",\r\n                               \"isRegistrationRequired\":  false\r\n                           }\r\n                       ],\r\n    \"excludeTargets\":  [\r\n\r\n                       ]\r\n}\r\n",
+    "postStateOutput": "{\r\n    \"id\":  \"TemporaryAccessPass\",\r\n    \"@odata.type\":  \"#microsoft.graph.temporaryAccessPassAuthenticationMethodConfiguration\",\r\n    \"state\":  \"enabled\",\r\n    \"isUsableOnce\":  true,\r\n    \"defaultLifetimeInMinutes\":  60,\r\n    \"minimumLifetimeInMinutes\":  60,\r\n    \"maximumLifetimeInMinutes\":  480,\r\n    \"defaultLength\":  8,\r\n    \"includeTargets\":  [\r\n                           {\r\n                               \"targetType\":  \"group\",\r\n                               \"id\":  \"all_users\",\r\n                               \"isRegistrationRequired\":  false\r\n                           }\r\n                       ],\r\n    \"excludeTargets\":  [\r\n\r\n                       ]\r\n}\r\n",
+    "stateChanged": false,
+    "postcheckMode": "state"
+  }
+}

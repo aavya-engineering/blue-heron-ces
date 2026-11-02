@@ -1,0 +1,39 @@
+## Control {{controlId}}: Prevent Remote Devices from Simultaneously Establishing Non-Remote Connections (Split Tunneling)
+
+**Implementation Status:** {{status}}
+
+This organization prevents split tunneling for remote devices accessing CUI within the {{tenantName}} M365 GCC High tenant through VPN configuration policies and Conditional Access location enforcement documented in "Remote Access Policy v1.0" maintained by {{variables.systemAdministrator}}.
+
+Remote access connections to the CUI environment require full-tunnel VPN configurations that route all traffic through the organizational network perimeter. This prevents remote devices from simultaneously maintaining connections to both the secure environment and untrusted external networks.
+
+{{#if namedLocationsConfigured}}
+**Network Location Enforcement:**
+Conditional Access policies restrict CUI access to {{namedLocationsCount}} authorized network locations, ensuring remote devices connect through the VPN tunnel before accessing organizational resources:
+{{#each locations}}
+- **{{displayName}}**{{#if isTrusted}} (Trusted){{/if}}
+{{/each}}
+{{/if}}
+
+{{#if conditionalAccessActive}}
+**Remote Access Controls:**
+{{caPoliciesTotalCount}} Conditional Access policies enforce location-based restrictions that complement VPN split tunnel prevention.
+{{/if}}
+
+**Operational Procedure:**
+- **Action:** VPN client configurations audited for full-tunnel enforcement; split tunnel exceptions require written ISSO approval
+- **Frequency:** Quarterly configuration review, continuous enforcement via VPN client policy
+- **Responsible Party:** {{variables.systemAdministrator}}
+- **Documentation:** Remote Access Policy v1.0, VPN Configuration Standard
+
+**Review Frequency:** Quarterly by ISSO
+
+**Verification Method:** Examine VPN configuration policies, Conditional Access location requirements, and quarterly configuration audit logs.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** Review VPN configuration documentation and Conditional Access policy exports. {{evidenceArtifactUrl}}
+{{/if}}

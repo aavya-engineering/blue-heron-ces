@@ -1,0 +1,25 @@
+{
+  "type": "ui-e2e",
+  "scenario_id": "s3-def-eo-ui-e2e",
+  "description": "FIN-35 EU-EO (V124): the EvidenceOps kit console (ces-eo public/app at /app/, FIN-31) on S3 (a fictional defence subcontractor), driven by FIN-31's watched spec ces-eo/ui/e2e/v124-watched-eo.spec.ts: assess, SSP and DOCX, an upload through the console (uploader token), a review by another person (GD-b), a second assess, the assessor view. EO and EC run on a private pipeline root (an online backup of ces.db, copies of the EC store, the tenant folder and out/eo); the sim store E7B assessed is restored. Record: out/ui-e2e-eo.json.",
+  "surface": "eo",
+  "sim_scenario": "s3-def",
+  "stance": "m365_azure",
+  "twin": "s3-def-e2e",
+  "variants": [
+    {
+      "id": "kit",
+      "base_path": "/app/",
+      "requires_built": "public/app/screens-ready.json"
+    }
+  ],
+  "steps": [
+    "connect",
+    "assess",
+    "ssp",
+    "docx",
+    "upload",
+    "review",
+    "assessor"
+  ]
+}

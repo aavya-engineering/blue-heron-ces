@@ -1,0 +1,35 @@
+{
+  "rawResponse": "[\r\n    {\r\n        \"activityDateTime\":  \"\\/Date(1787443200000)\\/\",\r\n        \"activityType\":  \"Patch DeviceCompliancePolicy\",\r\n        \"activityOperationType\":  \"Patch\"\r\n    },\r\n    {\r\n        \"activityDateTime\":  \"\\/Date(1789171200000)\\/\",\r\n        \"activityType\":  \"Patch DeviceCompliancePolicy\",\r\n        \"activityOperationType\":  \"Patch\"\r\n    },\r\n    {\r\n        \"activityDateTime\":  \"\\/Date(1790899200000)\\/\",\r\n        \"activityType\":  \"Patch DeviceCompliancePolicy\",\r\n        \"activityOperationType\":  \"Patch\"\r\n    },\r\n    {\r\n        \"activityDateTime\":  \"\\/Date(1788307200000)\\/\",\r\n        \"activityType\":  \"Patch DeviceCompliancePolicy\",\r\n        \"activityOperationType\":  \"Patch\"\r\n    },\r\n    {\r\n        \"activityDateTime\":  \"\\/Date(1788307200000)\\/\",\r\n        \"activityType\":  \"Patch DeviceConfiguration\",\r\n        \"activityOperationType\":  \"Patch\"\r\n    },\r\n    {\r\n        \"activityDateTime\":  \"\\/Date(1789603200000)\\/\",\r\n        \"activityType\":  \"Patch DeviceConfiguration\",\r\n        \"activityOperationType\":  \"Patch\"\r\n    },\r\n    {\r\n        \"activityDateTime\":  \"\\/Date(1790899200000)\\/\",\r\n        \"activityType\":  \"Patch DeviceConfiguration\",\r\n        \"activityOperationType\":  \"Patch\"\r\n    },\r\n    {\r\n        \"activityDateTime\":  \"\\/Date(1790035200000)\\/\",\r\n        \"activityType\":  \"Wipe ManagedDevice\",\r\n        \"activityOperationType\":  \"Action\"\r\n    },\r\n    {\r\n        \"activityDateTime\":  \"\\/Date(1791590400000)\\/\",\r\n        \"activityType\":  \"Retire ManagedDevice\",\r\n        \"activityOperationType\":  \"Action\"\r\n    }\r\n]\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "CM.L2-3.4.3.change-tracking",
+    "label": "Configuration Change Tracking via Intune Audit Log",
+    "engine": "mgraph",
+    "layer_hint": 4,
+    "sequence_hint": 9,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "CM.L2-3.4.3"
+    ],
+    "get_command": "Get-MgDeviceManagementAuditEvent -All -Property ActivityDateTime,ActivityType,ActivityOperationType,Actor,Resources | Where-Object {$_.ActivityDateTime -gt (Get-Date).AddDays(-90)} | Select-Object ActivityDateTime,ActivityType,ActivityOperationType | ConvertTo-Json -Depth 5",
+    "set_command": "",
+    "evidence_commands": [
+      "Get-MgDeviceManagementAuditEvent -All -Property ActivityDateTime,ActivityType,ActivityOperationType,Actor,Resources | Where-Object {$_.ActivityDateTime -gt (Get-Date).AddDays(-90)} | Select-Object ActivityDateTime,ActivityType,ActivityOperationType | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "CM.L2-3.4.3"
+    ],
+    "timestamp": "2026-11-01T15:27:25.104Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Configuration Change Tracking via Intune Audit Log",
+    "sha256Hash": "a0b903f72b33349d9f4105f132c077a0d83e8dcdcd11b542b0d00a9a1140e56d",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

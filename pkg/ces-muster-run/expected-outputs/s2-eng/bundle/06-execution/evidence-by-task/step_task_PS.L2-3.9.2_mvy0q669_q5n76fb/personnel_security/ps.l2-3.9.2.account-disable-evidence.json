@@ -1,0 +1,36 @@
+{
+  "rawResponse": "",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "PS.L2-3.9.2.account-disable-evidence",
+    "label": "Terminated User Account Disable Audit Evidence",
+    "engine": "mgraph",
+    "layer_hint": 7,
+    "sequence_hint": 53,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "PS.L2-3.9.2"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri \"https://graph.microsoft.us/v1.0/auditLogs/directoryAudits?`$filter=activityDisplayName eq 'Disable account'&`$top=5&`$orderby=activityDateTime desc\").value | Select-Object activityDisplayName,activityDateTime,initiatedBy,targetResources | ConvertTo-Json -Depth 10",
+    "set_command": "",
+    "evidence_commands": [
+      "(Invoke-MgGraphRequest -Uri \"https://graph.microsoft.us/v1.0/auditLogs/directoryAudits?`$filter=activityDisplayName eq 'Disable account'&`$top=10&`$orderby=activityDateTime desc\").value | ConvertTo-Json -Depth 10",
+      "(Invoke-MgGraphRequest -Uri \"https://graph.microsoft.us/v1.0/auditLogs/directoryAudits?`$filter=activityDisplayName eq 'Revoke sign in sessions'&`$top=10&`$orderby=activityDateTime desc\").value | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "PS.L2-3.9.2"
+    ],
+    "timestamp": "2026-11-01T16:06:07.931Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Terminated User Account Disable Audit Evidence",
+    "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

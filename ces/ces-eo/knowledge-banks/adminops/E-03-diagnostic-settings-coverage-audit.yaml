@@ -1,0 +1,60 @@
+controlId: "AU.L2-3.3.1"
+relatedControlIds:
+  - "AU.L2-3.3.2"
+  - "CM.L2-3.4.2"  # [VERIFY] mapping not yet confirmed
+practiceStatement: Create and retain system audit logs and records to the extent needed to enable the monitoring, analysis,
+  investigation, and reporting of unlawful or unauthorized system activity.
+useCaseId: E-03
+useCaseTitle: "Diagnostic Settings Coverage"
+domain: Audit & Logging
+priority: P4 Standard
+trigger: 'SCHEDULE: Weekly'
+sodTier: Tier 1
+entraRolesRequired:
+- Security Reader
+- Reports Reader (read audit); Tier 2 roles required if remediation is performed
+approvalRequired: true
+services:
+- name: Azure Monitor -- diagnostic settings on all resource types
+  purpose: Key Vault, Storage Accounts, App Services, SQL, NSGs, etc.
+- name: Azure Policy -- built-in policy initiative for diagnostic settings enforcement
+  purpose: ''
+- name: Microsoft Sentinel -- Log Analytics workspace as the destination
+  purpose: ''
+- name: Entra ID -- Entra diagnostic settings for sign-in and audit logs
+  purpose: ''
+configurationSteps:
+  portalPath: //entra.microsoft.us > Monitoring > Diagnostic settings. Verify that a diagnostic setting exists routing AuditLogs,
+    SignInLogs, NonInteractiveUserSignInLogs, ServicePrincipalSignInLogs, ManagedIdentitySignInLogs, ProvisioningLogs, and
+    RiskyUsers to the Sentinel Log Analytics workspace.
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes AuditLog.Read.All, Reports.Read.All
+  graphApiEndpoint: ''
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-e-audit/E-03/{year}/{month}/
+  format: CSV (resource inventory with diagnostic settings status), JSON (Entra diagnostic settings export)
+  filenamePattern: E-03_DiagSettingsAudit_{YYYYMMDD}_{HHmmss}_CoverageReport.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |-
+    - Azure Government uses the ARM endpoint `management.usgovcloudapi.net` instead of `management.azure.com`. All Azure Monitor REST calls must target this endpoint.
+    - Entra ID diagnostic settings in GCC High route to Log Analytics workspaces in Azure Government regions. Cross-cloud routing (GCC High Entra to commercial Log Analytics) is not supported.
+    - Azure Policy for diagnostic settings enforcement is fully available in Azure Government. The built-in policy definitions reference the same category groups as commercial.
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

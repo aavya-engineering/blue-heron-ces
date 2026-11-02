@@ -1,0 +1,45 @@
+## Control {{controlId}}: Protect the Confidentiality of CUI at Rest
+
+**Implementation Status:** {{status}}
+
+This organization protects the confidentiality of CUI at rest within the {{tenantName}} M365 GCC High tenant through sensitivity labels, BitLocker endpoint encryption, and Microsoft-managed service encryption administered by {{variables.systemAdministrator}}.
+
+{{#if dlpLabelsConfigured}}
+**Sensitivity Label Protection:**
+{{dlpLabelsCount}} sensitivity labels enforce confidentiality protections on CUI at rest across M365 workloads:
+{{#each labels}}
+- **{{name}}**{{#if isActive}} (Active){{else}} (Inactive){{/if}} — Priority: {{priority}}{{#if tooltip}} — {{tooltip}}{{/if}}
+{{/each}}
+
+Labels apply encryption, access restrictions, and visual markings to documents and emails containing CUI stored in SharePoint, OneDrive, and Exchange Online.
+{{else}}
+Sensitivity labels have not been configured. Automated CUI classification and encryption at rest is not active.
+{{/if}}
+
+{{#if bitLockerEnforced}}
+**Endpoint Encryption:**
+BitLocker Drive Encryption protects CUI stored on {{deviceCount}} managed endpoints. Full-disk encryption ensures data confidentiality even in cases of device loss or theft.
+{{#if devices}}
+{{#each devices}}
+- **{{displayName}}** ({{operatingSystem}}) — Compliant: {{#if isCompliant}}Yes{{else}}No{{/if}}
+{{/each}}
+{{/if}}
+{{else}}
+BitLocker encryption enforcement has not been confirmed across managed devices.
+{{/if}}
+
+**Cloud Storage Encryption:**
+M365 GCC High applies AES-256 service encryption to all data at rest using FIPS 140-2 validated cryptographic modules, providing baseline confidentiality for all tenant data stored in Microsoft datacenters.
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine sensitivity label configurations, BitLocker deployment reports, device compliance status, and Microsoft service encryption documentation.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

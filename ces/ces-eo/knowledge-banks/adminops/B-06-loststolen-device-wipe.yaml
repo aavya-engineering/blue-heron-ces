@@ -1,0 +1,70 @@
+controlId: "MP.L1-3.8.3"
+relatedControlIds:
+  - "MP.L2-3.8.1"
+  - "IR.L2-3.6.1"
+  - "AC.L1-3.1.1"
+  - "SC.L2-3.13.11"
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: B-06
+useCaseTitle: "Lost/Stolen Device Wipe"
+domain: Device & Endpoint Management
+priority: P4 Standard
+trigger: 'INCIDENT: User or manager reports device lost or stolen'
+sodTier: Tier 2 -- Config Manager
+entraRolesRequired:
+- Intune Administrator
+approvalRequired: true
+services:
+- name: Microsoft Intune
+  purpose: remote wipe, lost mode for iOS/Android, device locate
+- name: Microsoft Defender for Endpoint
+  purpose: device isolation as supplementary action
+- name: Entra ID
+  purpose: device identity, sign-in risk elevation
+- name: Microsoft Sentinel
+  purpose: incident creation for tracking
+- name: Microsoft Graph API
+  purpose: managedDevices wipe action
+configurationSteps:
+  portalPath: https://intune.microsoft.us
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes DeviceManagementManagedDevices.PrivilegedOperations.All
+  - cmdlet: Get-MgDeviceManagementManagedDevice
+    parameters:
+    - -MgDeviceManagementManagedDevice
+    - -Filter
+    - -MgDeviceManagementManagedDevice
+    - -ManagedDeviceId
+    - -Output
+  graphApiEndpoint: POST https://graph.microsoft.us/v1.0/deviceManagement/managedDevices/{managedDeviceId}/wipe
+  graphApiPayloadExample: {}
+  requiredPermissions:
+  - DeviceManagementManagedDevices.PrivilegedOperations.All
+  - DeviceManagementManagedDevices.Read.All
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-b-device/B-06/{year}/{month}/
+  format: JSON (device details and wipe confirmation), PDF (ITSM ticket printout)
+  filenamePattern: B-06_LostDeviceWipe_{YYYYMMDD}_{HHmmss}_{DeviceSerial}.json
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: 'Remote wipe in GCC High operates identically to commercial Intune. Lost mode for supervised iOS devices is supported
+    in GCC High. The critical dependency is network connectivity: if the device is offline, the wipe command queues until
+    the next check-in. BitLocker encryption (configured in B-01 with XTS-AES 256-bit) is the primary protection while the
+    device remains offline and un-wiped. For devices that never check in, document the wipe attempt and BitLocker encryption
+    status as evidence that CUI protection was in place at the time of loss. Sentinel manual incident creation is fully supported '
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

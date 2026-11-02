@@ -1,0 +1,7 @@
+# Run 49c (2026-10-28): synthetic customer S1 (s1-mach), wave W5 cycles 3-4 proof (58 checks)
+
+58/58 after re-baseline; Stamper 110/110 (S1's own equivalents verified instead of duplicated: S1-CA01, S1-CA02, S1-CA06, the Wi-Fi, removable-storage and Defender AV configurations, the built-in phishing-resistant MFA strength; every created Intune object assigned to the CUI group; one update ring; NSG read in 4 tasks); EO 88/2/0/20 SPRS 61 (was 86/2/0/22 SPRS 53 at run 48); scorecard 8/10 within (SC-1 7/7, SC-2 10/11, SC-3b, SC-4 15.9 %, SC-5 0/0, SC-6 22/22 + 15/15, SC-7, SC-8b 0/39); GAPS 416 incl. 4 policy-reconciliation rows (V57 compares 412 vs 506); 15 organisation records uploaded (E8.5). OUTSIDE UNCHANGED. Identical to run 49b (which only failed a stale tester expectation).
+
+Moves vs run 48: MA.L2-3.7.1 / 3.7.2 -> met (the assigned update ring). Ten controls that were met on Stamper records now rest on Tier 2 live reads of S1's own objects (AC.L2-3.1.12/16/17/21, MA.L2-3.7.4, MP.L2-3.8.7/8.8, SI.L1-3.14.2/4/5) and IA.L2-3.5.4 on the built-in strength; AC.L2-3.1.6 met on the role-holder test (4 privileged principals, each a dedicated account matched to its person's normal account).
+
+Still outside threshold: SC-3a 149/278 = 53.6 % (evidence coverage of automatable examine items); SC-8a 31/96 = 32.3 % (unsure discovery answers: Exchange policy/rule equivalence, admin-account / AZ-MON / audit-reduction lookups, predicates for the remaining reads).

@@ -1,0 +1,53 @@
+{
+  "rawResponse": "{\r\n    \"Id\":  \"/subscriptions/sim-sub/resourceGroups/s3-def-rg-security/providers/Microsoft.Network/networkSecurityGroups/nsg-workload-cmmc\",\r\n    \"ResourceGroupName\":  \"s3-def-rg-security\",\r\n    \"Name\":  \"nsg-workload-cmmc\",\r\n    \"Location\":  \"usgovvirginia\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "AZ-NSG-001",
+    "label": "Create Network Security Group",
+    "engine": "az",
+    "layer_hint": 6,
+    "sequence_hint": 15,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "SC.L1-3.13.1",
+      "SC.L1-3.13.5"
+    ],
+    "get_command": "Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'nsg-workload-cmmc' | ConvertTo-Json -Depth 5",
+    "set_command": "New-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'nsg-workload-cmmc' -Location '{location}'",
+    "evidence_commands": [
+      "Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'nsg-workload-cmmc' | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SC.L1-3.13.1",
+      "SC.L1-3.13.5"
+    ],
+    "timestamp": "2026-11-01T06:57:51.043Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "New-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' -Name 'nsg-workload-cmmc' -Location '{location}'",
+    "sha256Hash": "67062192d54d88ad9e2b4a872da82af64b7cab9ca45337191ea8e6f35502c11a",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\r\n    \"Id\":  \"/subscriptions/sim-sub/resourceGroups/s3-def-rg-security/providers/Microsoft.Network/networkSecurityGroups/nsg-workload-cmmc\",\r\n    \"ResourceGroupName\":  \"s3-def-rg-security\",\r\n    \"Name\":  \"nsg-workload-cmmc\",\r\n    \"Location\":  \"usgovvirginia\"\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "presence",
+    "presenceReason": "the NSG is a container with no state of its own to configure: AZ-NSG-002/003/006 assert its rules and AZ-NSG-005 its subnet binding (the simulator returns no ProvisioningState for it)"
+  }
+}

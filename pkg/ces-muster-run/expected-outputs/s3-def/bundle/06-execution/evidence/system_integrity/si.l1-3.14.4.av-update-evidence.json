@@ -1,0 +1,35 @@
+{
+  "rawResponse": "",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "SI.L1-3.14.4.av-update-evidence",
+    "label": "Verify Defender Automatic Update Configuration",
+    "engine": "mgraph",
+    "layer_hint": 4,
+    "sequence_hint": 38,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "SI.L1-3.14.4"
+    ],
+    "get_command": "Get-MgDeviceManagementDeviceConfiguration | Where-Object {$_.AdditionalProperties.'@odata.type' -like '*windowsUpdateForBusiness*'} | Select-Object DisplayName,Id",
+    "set_command": "",
+    "evidence_commands": [
+      "Get-MgDeviceManagementDeviceConfiguration | Where-Object {$_.AdditionalProperties.'@odata.type' -like '*windowsUpdateForBusiness*'} | Select-Object DisplayName,Id | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SI.L1-3.14.4"
+    ],
+    "timestamp": "2026-11-01T06:55:49.590Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Verify Defender Automatic Update Configuration",
+    "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

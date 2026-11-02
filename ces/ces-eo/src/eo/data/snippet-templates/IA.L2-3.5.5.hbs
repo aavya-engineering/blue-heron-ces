@@ -1,0 +1,39 @@
+## Control {{controlId}}: Manage Information System Identifiers (Assigning, Selecting, Reusing, Disabling)
+
+**Implementation Status:** {{status}}
+
+This organization manages information system identifiers within the {{tenantName}} M365 GCC High tenant through Entra ID user lifecycle management, account provisioning procedures, and periodic access reviews managed by {{variables.accessControlAdministrator}}.
+
+{{#if userCount}}
+**Identifier Inventory:**
+{{userCount}} user identifiers are managed in the tenant directory. User principal names (UPNs) serve as the unique identifier for all system access:
+{{#if users}}
+{{#each users}}
+- **{{displayName}}** ({{userPrincipalName}}) — {{#if accountEnabled}}Active{{else}}Disabled{{/if}} — Last sign-in: {{lastSignIn}}
+{{/each}}
+{{/if}}
+{{/if}}
+
+**Identifier Lifecycle Management:**
+- **Assignment:** Unique UPNs assigned upon account creation following naming convention [first.last]@{{primaryDomain}}. No identifier reuse for minimum 2 years after account deletion.
+- **Selection:** Identifiers follow organizational naming standards ensuring uniqueness and traceability to individual personnel.
+- **Disabling:** Accounts disabled within 24 hours of personnel termination per HR notification procedures. Disabled accounts retained for 90 days for audit purposes before deletion.
+- **Reuse Prevention:** Deleted UPNs are blocked from reassignment for a minimum retention period.
+
+{{#if cuiGroupExists}}
+**CUI Access Identifiers:**
+The "{{groupDisplayName}}" security group ({{memberCount}} members) tracks identifiers authorized for CUI access. Membership changes require approval from {{variables.accessControlAdministrator}}.
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Examine user directory, account provisioning procedures, disabled account reports, identifier reuse policy documentation, and CUI group membership logs.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

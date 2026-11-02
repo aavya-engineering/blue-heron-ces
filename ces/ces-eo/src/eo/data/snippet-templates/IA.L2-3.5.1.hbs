@@ -1,0 +1,50 @@
+## Control {{controlId}}: Identify Information System Users, Processes Acting on Behalf of Users, and Devices
+
+**Implementation Status:** {{status}}
+
+This organization identifies and authenticates all users, processes, and devices accessing CUI within the {{tenantName}} M365 GCC High tenant through Microsoft Entra ID, multi-factor authentication, and device registration managed by {{variables.accessControlAdministrator}}.
+
+{{#if mfaEnabled}}
+**User Authentication:**
+Microsoft Entra ID serves as the authoritative identity provider with {{authMethodsCount}} authentication methods configured:
+{{#if authMethods}}
+{{#each authMethods}}
+- **{{displayName}}** ({{state}})
+{{/each}}
+{{/if}}
+
+All users authenticate via multi-factor authentication before accessing CUI resources, combining something they know (password) with something they have (authenticator app, FIDO2 key) or something they are (biometric).
+{{else}}
+Multi-factor authentication has not been confirmed. User identification relies on single-factor authentication only.
+{{/if}}
+
+{{#if userCount}}
+**User Population:**
+{{userCount}} users are managed in the tenant directory. The most recently active users include:
+{{#if users}}
+{{#each users}}
+- **{{displayName}}** ({{userPrincipalName}}) — {{#if accountEnabled}}Active{{else}}Disabled{{/if}} — Last sign-in: {{lastSignIn}}
+{{/each}}
+{{/if}}
+{{/if}}
+
+{{#if conditionalAccessActive}}
+**Process and Device Identification:**
+{{caPoliciesTotalCount}} Conditional Access policies enforce device compliance and application identification requirements, ensuring only registered devices and authorized applications access CUI:
+{{#each policies}}
+- **{{displayName}}** ({{state}})
+{{/each}}
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Examine Entra ID authentication method configurations, user directory, Conditional Access policies, and device registration records.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

@@ -1,0 +1,43 @@
+## Control {{controlId}}: Review and Update Logged Events
+
+**Implementation Status:** {{status}}
+
+This organization reviews and updates logged events within the {{tenantName}} M365 GCC High tenant to ensure audit coverage remains adequate for detecting unauthorized activity, managed by {{variables.systemAdministrator}}.
+
+{{#if auditQueriesConfigured}}
+**Automated Audit Review:**
+Microsoft Sentinel audit queries provide automated review of logged events:
+{{#if queries}}
+{{#each queries}}
+- **{{name}}**{{#if description}} — {{description}}{{/if}} — Source: {{dataSource}}
+{{/each}}
+{{/if}}
+
+Audit query definitions are reviewed quarterly to ensure coverage of new threat vectors, system changes, and compliance requirements.
+{{/if}}
+
+{{#if sentinelNotAvailable}}
+**Manual Audit Review Process:**
+Microsoft Sentinel is not deployed in this environment. Logged event review is performed through manual procedures:
+
+**Operational Procedure:**
+- **Action:** Quarterly review of audit log categories, event types, and retention settings to ensure adequate coverage of CUI access, administrative actions, and security events
+- **Frequency:** Quarterly, or upon significant system changes
+- **Responsible Party:** {{variables.systemAdministrator}}
+- **Documentation:** Audit Event Review Policy v1.0
+
+Audit event categories reviewed include: sign-in events, directory modifications, mailbox access, SharePoint file operations, Teams activities, and Defender security alerts. Event types are updated when new M365 services are onboarded or threat landscape changes require additional monitoring.
+{{/if}}
+
+**Review Frequency:** Quarterly by ISSO
+
+**Verification Method:** Examine audit event category definitions, quarterly review records, event type update logs, and coverage gap analysis documentation.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** Review audit event review records per procedure AU-003. {{evidenceArtifactUrl}}
+{{/if}}

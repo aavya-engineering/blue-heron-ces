@@ -1,0 +1,518 @@
+{
+  "family": "PE",
+  "family_name": "Physical Protection",
+  "practices": [
+    {
+      "id": "PE.L1-3.10.1",
+      "title": "Limit physical access to organizational information systems, equipment, and the respective operating environments to authorized individuals.",
+      "approach": {
+        "what_assessor_does": "The assessor first settles which spaces are in scope: every office, server room, wiring closet or lab where CUI systems or the equipment that serves them sit, plus what is inherited from the cloud provider. For each space they read the list of people allowed in and compare it with the badge or key system and with current staff. On site they walk the entry points, check that doors lock, and try to get into a restricted room without a badge or escort. They ask the facility owner how a name is added to or removed from the list, and ask a few staff which rooms they can enter.",
+        "common_failure_modes": [
+          "There is no written list of who may enter each restricted space; access rests on who happens to hold a key.",
+          "People who left or changed jobs still appear in the badge system or still hold keys.",
+          "Network equipment sits in an unlocked closet or shared space even though the main office is controlled.",
+          "The organization claims everything is inherited from the cloud provider while staff still handle CUI in an office.",
+          "Doors that are meant to be locked are propped open or the lock is not working on the day of the visit."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "PE.L1-3.10.1[a]",
+          "determination": "authorized individuals allowed physical access are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Authorized physical access list by space",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Names each person allowed into each controlled space, with who approved them. The assessor compares it with the current staff list."
+            },
+            {
+              "artifact_type": "Physical protection policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/physical-protection-policy.md (GateEvidence family PE). Should say who approves physical access and how often the list is reviewed."
+            },
+            {
+              "artifact_type": "Facility owner interview",
+              "ces_source": "interview",
+              "notes": "Ask how a name is added or removed and when the list was last reviewed. Control signal registry maps PE.L1-3.10.1 to manualGateEvaluator: no tenant signal covers this objective."
+            }
+          ]
+        },
+        {
+          "id": "PE.L1-3.10.1[b]",
+          "determination": "physical access to organizational systems is limited to authorized individuals",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Facility map marking where CUI systems sit",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Shows every room holding endpoints, servers or network gear in scope, and how each is secured."
+            },
+            {
+              "artifact_type": "Shared responsibility row for physical access",
+              "ces_source": "eo_store",
+              "notes": "EO shared responsibility matrix (SharedResponsibilityMatrixGenerator, SSP section 2.4): the PE.L1-3.10.1/3/4/5 and PE.L2-3.10.2 rows are inherited only when the recorded physical_facility_count is 0. Any office, lab or server room the organization runs stays in scope as the organization's own responsibility."
+            },
+            {
+              "artifact_type": "Walk-through of entry points",
+              "ces_source": "interview",
+              "notes": "Ask staff to show how they enter the work area. The assessor tries a controlled door without a badge to confirm it stays locked."
+            }
+          ]
+        },
+        {
+          "id": "PE.L1-3.10.1[c]",
+          "determination": "physical access to equipment is limited to authorized individuals",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Equipment location and lock record",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: where network gear, servers and printers serving CUI systems are kept and how each space is locked."
+            },
+            {
+              "artifact_type": "Physical protection policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/physical-protection-policy.md (GateEvidence family PE). Should state that equipment rooms are restricted and who holds access."
+            },
+            {
+              "artifact_type": "IT lead interview and closet check",
+              "ces_source": "interview",
+              "notes": "Ask who can open each equipment room or rack. The assessor checks that the closet or cabinet is locked during the visit."
+            }
+          ]
+        },
+        {
+          "id": "PE.L1-3.10.1[d]",
+          "determination": "physical access to operating environments is limited to authorized individuals",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Badge or key system access export",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. The assessor reconciles the people holding access to each operating space against the authorized list and against the current staff list."
+            },
+            {
+              "artifact_type": "Shared responsibility row for physical access",
+              "ces_source": "eo_store",
+              "notes": "EO shared responsibility matrix (SharedResponsibilityMatrixGenerator, SSP section 2.4): the PE.L1-3.10.1/3/4/5 and PE.L2-3.10.2 rows are inherited only when the recorded physical_facility_count is 0. Any office, lab or server room the organization runs stays in scope as the organization's own responsibility."
+            },
+            {
+              "artifact_type": "Staff interviews",
+              "ces_source": "interview",
+              "notes": "Ask sampled staff which rooms their badge or key opens; answers should match the authorized list."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PE.L2-3.10.2",
+      "title": "Protect and monitor the physical facility and support infrastructure for organizational systems.",
+      "approach": {
+        "what_assessor_does": "The assessor looks at how the building and the rooms holding CUI systems are protected (locks, alarms, window and door hardening) and how the supporting services are protected (power, cooling, cabling, network demarcation). They then look at how both are watched: alarm monitoring, cameras, guard rounds or after-hours checks, and who reviews alerts. They read alarm and monitoring records for a recent period, ask the facility owner what happens when an alarm goes off, and on site confirm that cameras and sensors point at the places the plan says they cover. Where a landlord or data center provides the protection, they ask for the agreement that says so.",
+        "common_failure_modes": [
+          "Protection is described for the front door only; the equipment room, cabling and power feed are not covered.",
+          "Cameras or alarms exist but nobody reviews the footage or receives the alerts.",
+          "Protection depends on the landlord, with no agreement or report showing what the landlord does.",
+          "No monitoring record can be produced for the review period.",
+          "Support equipment such as a UPS or network panel sits where anyone in the building can reach it."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "PE.L2-3.10.2[a]",
+          "determination": "the physical facility where organizational systems reside is protected",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Physical protection policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/physical-protection-policy.md (GateEvidence family PE). Should describe the protections in place for the facility that holds CUI systems."
+            },
+            {
+              "artifact_type": "Facility security description or landlord agreement",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: locks, alarms and building controls, and which of them the landlord or data center provides."
+            },
+            {
+              "artifact_type": "Facility owner interview",
+              "ces_source": "interview",
+              "notes": "Ask what protects the facility after hours and who is called when something fails. Control signal registry maps PE.L2-3.10.2 to manualGateEvaluator: no tenant signal covers this objective."
+            }
+          ]
+        },
+        {
+          "id": "PE.L2-3.10.2[b]",
+          "determination": "the support infrastructure for organizational systems is protected",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Support infrastructure inventory",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: power, UPS, cooling, cabling paths and network demarcation serving CUI systems, and how each is protected."
+            },
+            {
+              "artifact_type": "Shared responsibility row for facility protection",
+              "ces_source": "eo_store",
+              "notes": "EO shared responsibility matrix (SharedResponsibilityMatrixGenerator, SSP section 2.4): the PE.L1-3.10.1/3/4/5 and PE.L2-3.10.2 rows are inherited only when the recorded physical_facility_count is 0. Any office, lab or server room the organization runs stays in scope as the organization's own responsibility."
+            },
+            {
+              "artifact_type": "IT lead walk-through",
+              "ces_source": "interview",
+              "notes": "Ask to see the UPS, network panel and cabling paths. The assessor checks they are inside a controlled space."
+            }
+          ]
+        },
+        {
+          "id": "PE.L2-3.10.2[c]",
+          "determination": "the physical facility where organizational systems reside is monitored",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Alarm and camera monitoring records",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: alarm event history, monitoring company reports or camera review log for a recent period."
+            },
+            {
+              "artifact_type": "Facility owner interview",
+              "ces_source": "interview",
+              "notes": "Ask who receives alarms, how fast they respond, and when footage was last reviewed. The assessor picks one alarm event and follows it to its response."
+            }
+          ]
+        },
+        {
+          "id": "PE.L2-3.10.2[d]",
+          "determination": "the support infrastructure for organizational systems is monitored",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Environmental and power monitoring records",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: UPS, temperature or water sensor alerts and who they reach."
+            },
+            {
+              "artifact_type": "IT lead interview",
+              "ces_source": "interview",
+              "notes": "Ask how a power or cooling fault in the equipment room would come to their attention, and show the last alert received."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PE.L1-3.10.3",
+      "title": "Escort visitors and monitor visitor activity.",
+      "approach": {
+        "what_assessor_does": "The assessor reads the visitor procedure to see who counts as a visitor, who may escort, and where visitors may and may not go. They examine the visitor log for a recent period and pick entries to check that each names a host and has sign-in and sign-out times. In interviews they ask reception and a few staff what they do when a visitor arrives and when they see an unescorted stranger. If allowed, the assessor arrives as a visitor and watches whether they are signed in, badged and kept with an escort.",
+        "common_failure_modes": [
+          "Visitors sign in but are then left to walk the office alone.",
+          "The visitor log has missing sign-out times or no named host.",
+          "Cleaning crews, delivery staff or contractors are not treated as visitors and go unescorted.",
+          "Staff do not know what to do when they see someone without a badge.",
+          "Visitor badges look the same as staff badges, so an escort lapse is hard to spot."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "PE.L1-3.10.3[a]",
+          "determination": "visitors are escorted",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Visitor procedure",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/physical-protection-policy.md (GateEvidence family PE). Should define visitors, who may escort them and which areas need an escort."
+            },
+            {
+              "artifact_type": "Visitor log for a recent period",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Each entry should name the host who escorted the visitor. Control signal registry maps PE.L1-3.10.3 to manualGateEvaluator: no tenant signal covers this objective."
+            },
+            {
+              "artifact_type": "Reception and host interviews",
+              "ces_source": "interview",
+              "notes": "Ask what happens from the moment a visitor arrives until they leave. The assessor, where permitted, enters as a visitor and watches the escort."
+            }
+          ]
+        },
+        {
+          "id": "PE.L1-3.10.3[b]",
+          "determination": "visitor activity is monitored",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Visitor log with sign-in and sign-out times",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. The assessor samples entries and checks times, host and areas visited."
+            },
+            {
+              "artifact_type": "Camera coverage of visitor areas",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector when cameras are used to watch visitor areas: coverage map and review record."
+            },
+            {
+              "artifact_type": "Staff interviews",
+              "ces_source": "interview",
+              "notes": "Ask what a staff member does on seeing an unescorted person, and whom they tell."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PE.L1-3.10.4",
+      "title": "Maintain audit logs of physical access.",
+      "approach": {
+        "what_assessor_does": "The assessor looks for a record of who entered the controlled spaces and when: badge system history, sign-in sheets, key logs or visitor logs. They check how long the records are kept, who can change them, and whether anyone reviews them. They pick a date and a person and ask the facility owner to pull that entry, and they compare a badge history excerpt with the staff list to look for entries by people who should no longer have access.",
+        "common_failure_modes": [
+          "Only visitors are logged; staff entry to controlled rooms leaves no record.",
+          "Logs are kept for a few weeks only, so the review period cannot be shown.",
+          "Paper logs have gaps, illegible entries or pages missing.",
+          "Nobody reviews the logs, so entries by departed staff go unnoticed.",
+          "Keys are used for the equipment room and no key log exists."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "PE.L1-3.10.4[a]",
+          "determination": "audit logs of physical access are maintained",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Badge system access history export",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector, covering a recent period. The assessor compares names in it with the current staff list. Control signal registry maps PE.L1-3.10.4 to manualGateEvaluator: no tenant signal covers this objective."
+            },
+            {
+              "artifact_type": "Visitor and key logs",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector when spaces use sign-in sheets or keys rather than badges."
+            },
+            {
+              "artifact_type": "Physical protection policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/physical-protection-policy.md (GateEvidence family PE). Should state what is logged, how long it is kept and who reviews it."
+            },
+            {
+              "artifact_type": "Shared responsibility row for physical access logs",
+              "ces_source": "eo_store",
+              "notes": "EO shared responsibility matrix (SharedResponsibilityMatrixGenerator, SSP section 2.4): the PE.L1-3.10.1/3/4/5 and PE.L2-3.10.2 rows are inherited only when the recorded physical_facility_count is 0. Any office, lab or server room the organization runs stays in scope as the organization's own responsibility."
+            },
+            {
+              "artifact_type": "Facility owner interview",
+              "ces_source": "interview",
+              "notes": "Ask the facility owner to pull the entry record for a date and person the assessor picks, and to say when the logs were last reviewed."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PE.L1-3.10.5",
+      "title": "Control and manage physical access devices.",
+      "approach": {
+        "what_assessor_does": "The assessor asks for the inventory of physical access devices: keys, badges, fobs, door codes and lock combinations. They check that each device is assigned to a named person, that lost devices are reported and disabled, and that codes and combinations change when someone who knew them leaves. They compare issued badges and keys with the staff list, ask the facility owner how a departing person's devices are recovered, and pick a recent leaver to confirm their badge was turned off.",
+        "common_failure_modes": [
+          "No inventory of keys or badges exists, or it lists devices without the person holding them.",
+          "Badges of departed staff are still active in the badge system.",
+          "Door codes or safe combinations have not changed in years, despite staff turnover.",
+          "Master or spare keys are kept in an unlocked drawer.",
+          "Lost badges are replaced without the old one being disabled."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "PE.L1-3.10.5[a]",
+          "determination": "physical access devices are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Physical access device inventory",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: each key, badge, fob, code and combination, and who holds it. Control signal registry maps PE.L1-3.10.5 to manualGateEvaluator: no tenant signal covers this objective."
+            },
+            {
+              "artifact_type": "Physical protection policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/physical-protection-policy.md (GateEvidence family PE). Should name the kinds of access device in use and who issues them."
+            },
+            {
+              "artifact_type": "Facility owner interview",
+              "ces_source": "interview",
+              "notes": "Ask which kinds of device open each controlled space."
+            }
+          ]
+        },
+        {
+          "id": "PE.L1-3.10.5[b]",
+          "determination": "physical access devices are controlled",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Issue and return records",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: device sign-out and return records, lost-device reports and disable actions."
+            },
+            {
+              "artifact_type": "Facility owner interview",
+              "ces_source": "interview",
+              "notes": "Ask where spare and master keys are kept and who can reach them. The assessor checks that storage during the visit."
+            }
+          ]
+        },
+        {
+          "id": "PE.L1-3.10.5[c]",
+          "determination": "physical access devices are managed",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Badge system export reconciled with staff list",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. The assessor picks a recent leaver and confirms their badge is disabled and keys returned."
+            },
+            {
+              "artifact_type": "Code and combination change record",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: dates door codes or combinations were changed and why."
+            },
+            {
+              "artifact_type": "Shared responsibility row for access devices",
+              "ces_source": "eo_store",
+              "notes": "EO shared responsibility matrix (SharedResponsibilityMatrixGenerator, SSP section 2.4): the PE.L1-3.10.1/3/4/5 and PE.L2-3.10.2 rows are inherited only when the recorded physical_facility_count is 0. Any office, lab or server room the organization runs stays in scope as the organization's own responsibility."
+            },
+            {
+              "artifact_type": "Facility owner interview",
+              "ces_source": "interview",
+              "notes": "Ask what triggers a code change and how a lost badge is handled."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PE.L2-3.10.6",
+      "title": "Enforce safeguarding measures for CUI at alternate work sites.",
+      "approach": {
+        "what_assessor_does": "The assessor reads the rules for working on CUI away from the main site, such as at home, at a customer site or while travelling: where CUI may be handled, how screens and printouts are protected, how devices are stored, and which connection methods are allowed. They then look for proof the rules are applied: signed telework agreements, device rules that apply to remote devices, and records of remote work approvals. In interviews they ask remote staff how they protect CUI at home, and they may ask one to show their setup over a video call.",
+        "common_failure_modes": [
+          "Remote work happens but no written safeguards exist for alternate work sites.",
+          "The rules exist but remote staff never signed or saw them.",
+          "Staff print CUI at home with no rule on storing or destroying the printouts.",
+          "Remote staff use personal devices that are not covered by the organization's device controls.",
+          "Staff describe practices in interview, such as working in public places, that the rules forbid."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "PE.L2-3.10.6[a]",
+          "determination": "safeguarding measures for CUI are defined for alternate work sites",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Alternate work site safeguards",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/physical-protection-policy.md (GateEvidence family PE). Should state where CUI may be handled away from the main site and the safeguards required there."
+            },
+            {
+              "artifact_type": "Telework policy or agreement template",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Control signal registry maps PE.L2-3.10.6 to manualGateEvaluator: no tenant signal covers this objective."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask which locations count as alternate work sites and who approves them."
+            }
+          ]
+        },
+        {
+          "id": "PE.L2-3.10.6[b]",
+          "determination": "safeguarding measures for CUI are enforced for alternate work sites",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Signed telework agreements",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. The assessor checks a sample of remote staff against the signed agreements."
+            },
+            {
+              "artifact_type": "Remote work approval records",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: who is approved to work remotely and when the approval was last reviewed."
+            },
+            {
+              "artifact_type": "Remote staff interviews",
+              "ces_source": "interview",
+              "notes": "Ask sampled remote staff how they store devices and papers and who can see their screen. Where possible the assessor asks one to show their setup over video."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

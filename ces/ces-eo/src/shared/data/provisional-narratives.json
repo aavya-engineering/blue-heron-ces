@@ -1,0 +1,70 @@
+{
+  "description": "FIN-11 (SSP truthfulness): reference text for 13 controls, used by SspGenerator only when no tenant signal renders the control's narrative. Each entry states what an assessor expects for the control and the evidence an assessor examines. It never states that this organisation has done anything: SspGenerator adds a status line (met: what decided it; not met or not assessed: not yet shown) and the evidence CES holds this run.",
+  "narratives": [
+    {
+      "control_id": "IA.L2-3.5.8",
+      "requirement": "This control requires that a password cannot be reused for a specified number of generations. In a Microsoft 365 tenant an assessor expects password reuse prevention through Microsoft Entra ID password policy and password protection, with the number of remembered passwords stated as an organisation-defined parameter, managed centrally in the Entra admin center.",
+      "expected_evidence": ["Entra ID password policy and password protection configuration export", "the organisation-defined password history parameter"]
+    },
+    {
+      "control_id": "CM.L2-3.4.4",
+      "requirement": "This control requires that the security impact of a change is analysed before the change is made. An assessor expects a documented security impact analysis procedure covering confidentiality, integrity and availability, the affected systems, the risk, the mitigations and the approver, and at least one completed analysis for a real change.",
+      "expected_evidence": ["security impact analysis procedure", "a completed security impact analysis with its approval"]
+    },
+    {
+      "control_id": "CM.L2-3.4.8",
+      "requirement": "This control requires a deny-by-exception (blacklisting) or permit-by-exception (whitelisting) policy for running authorised software. In a Microsoft 365 tenant an assessor expects application control through Microsoft Intune and Defender (App Control for Business or Attack Surface Reduction rules), with a documented exception approval workflow.",
+      "expected_evidence": ["Intune application control or app protection policy export", "Defender Attack Surface Reduction rule configuration", "the software exception approval records"]
+    },
+    {
+      "control_id": "AU.L2-3.3.6",
+      "requirement": "This control requires audit record reduction and report generation to support on-demand analysis and reporting. In a Microsoft 365 tenant an assessor expects audit search with filtering and export through Microsoft Purview Audit, and where used, Microsoft Sentinel workbooks that reduce and summarise audit events.",
+      "expected_evidence": ["a sample filtered audit log search and its export", "the report or workbook definitions used for audit reduction"]
+    },
+    {
+      "control_id": "CA.L2-3.12.2",
+      "requirement": "This control requires plans of action designed to correct deficiencies and reduce or eliminate vulnerabilities. An assessor expects a Plan of Action and Milestones (POA&M) that lists each control not yet fully satisfied, with its remediation actions, milestones, responsible party and target dates, and evidence that the plan is reviewed and kept current.",
+      "expected_evidence": ["the current POA&M", "a record of POA&M review"]
+    },
+    {
+      "control_id": "CA.L2-3.12.4",
+      "requirement": "This control requires a System Security Plan (SSP) that describes the system boundary, the operating environment, how each security requirement is met, and the relationships with or connections to other systems, updated periodically. An assessor expects the SSP to be reviewed and approved by the system owner, with the approval and review dates recorded.",
+      "expected_evidence": ["the System Security Plan", "the SSP review and approval record"]
+    },
+    {
+      "control_id": "RA.L2-3.11.2",
+      "requirement": "This control requires vulnerability scanning of systems and applications periodically and when new vulnerabilities are identified. In a Microsoft 365 and Azure environment an assessor expects scanning through Microsoft Defender for Cloud and Defender Vulnerability Management, with a stated scan frequency and retained scan results.",
+      "expected_evidence": ["the vulnerability scanning configuration and frequency", "recent scan results or a recommendations export"]
+    },
+    {
+      "control_id": "PS.L2-3.9.1",
+      "requirement": "This control requires that individuals are screened before they are authorised to access organisational systems containing CUI. An assessor expects a documented personnel screening procedure (screening criteria, responsible party, timing and rescreening conditions) and screening records for the people who hold access.",
+      "expected_evidence": ["personnel screening procedure", "screening records for the people with CUI access"]
+    },
+    {
+      "control_id": "RA.L2-3.11.3",
+      "requirement": "This control requires that vulnerabilities are remediated in accordance with risk assessments. An assessor expects a documented remediation procedure with timelines by severity, tracking of each finding to closure, and verification of remediation by a later scan.",
+      "expected_evidence": ["vulnerability remediation procedure with severity timelines", "a tracked remediation of a real finding, verified by re-scan"]
+    },
+    {
+      "control_id": "SI.L2-3.14.3",
+      "requirement": "This control requires monitoring of system security alerts and advisories and taking action in response. An assessor expects named advisory sources (for example Microsoft Security Response Center, the Microsoft 365 Message Center and CISA), a review cadence, an applicability assessment, and records of the actions taken.",
+      "expected_evidence": ["security advisory consumption procedure", "a recorded response to a real advisory"]
+    },
+    {
+      "control_id": "SI.L2-3.14.6",
+      "requirement": "This control requires monitoring of organisational systems, including inbound and outbound communications traffic, to detect attacks and indicators of potential attacks. In a Microsoft 365 tenant an assessor expects Microsoft Defender for Office 365 or Exchange Online Protection policies (anti-phishing, anti-malware and content filtering) and alerting on detections.",
+      "expected_evidence": ["anti-phishing, anti-malware and content filter policy configurations", "a threat or detection report for the period"]
+    },
+    {
+      "control_id": "SI.L2-3.14.7",
+      "requirement": "This control requires identification of unauthorised use of organisational systems. In a Microsoft 365 tenant an assessor expects detection rules for unauthorised-use patterns (for example impossible travel, mass download and external mail forwarding) in Microsoft Sentinel or Defender XDR, with the resulting alerts reviewed.",
+      "expected_evidence": ["the detection rule configurations", "an alert summary for the period with its review"]
+    },
+    {
+      "control_id": "PS.L2-3.9.2",
+      "requirement": "This control requires that organisational systems containing CUI are protected during and after personnel actions such as terminations and transfers. An assessor expects a documented process that, on termination, disables the person's accounts, revokes credentials and sessions and recovers equipment and CUI, and that, on transfer, reviews and adjusts the person's access to match the new role. In a Microsoft 365 tenant this is often automated with Microsoft Entra lifecycle workflows (leaver and mover).",
+      "expected_evidence": ["the termination and transfer procedure", "records of completed terminations and transfers (account disabled, access removed or adjusted, property returned)"]
+    }
+  ]
+}

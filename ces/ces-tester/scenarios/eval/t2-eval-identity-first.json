@@ -1,0 +1,50 @@
+{
+  "config_id": "eval-identity-first",
+  "description": "T2 (docs/demo/EVAL-CONFIGS.md) — identity CA work done, nothing else. Renames the default 3 seeded CA policies to the CMMC-named probes for session-timeout, block-untrusted-locations, and admin-MFA; no 4th/5th CA policy (mobile-device, remote-maintenance stay unknown) and no user-5 disable (PS.L2-3.9.2 stays unknown — no false credit bleeding from identity work into unrelated probes).",
+  "stacksim_seed": {
+    "stance": "m365_azure",
+    "countOverrides": {},
+    "steps": [
+      {
+        "kind": "uri",
+        "method": "PATCH",
+        "uri": "/v1.0/identity/conditionalAccess/policies/caPolicy-1",
+        "body": {
+          "displayName": "CMMC-SessionTimeout"
+        },
+        "note": "P1 AC.L2-3.1.11 session-timeout CA -> met"
+      },
+      {
+        "kind": "uri",
+        "method": "PATCH",
+        "uri": "/v1.0/identity/conditionalAccess/policies/caPolicy-2",
+        "body": {
+          "displayName": "CMMC-BlockUntrustedLocations"
+        },
+        "note": "P2 AC.L2-3.1.14 / SC.L2-3.13.7 block-untrusted CA -> met"
+      },
+      {
+        "kind": "uri",
+        "method": "PATCH",
+        "uri": "/v1.0/identity/conditionalAccess/policies/caPolicy-3",
+        "body": {
+          "displayName": "CMMC-AdminMFA-PhishingResistant"
+        },
+        "note": "P3 AC.L2-3.1.15 admin-MFA CA -> met"
+      }
+    ]
+  },
+  "expected_discovery": {
+    "AC.L2-3.1.11": "met",
+    "AC.L2-3.1.14": "met",
+    "SC.L2-3.13.7": "met",
+    "AC.L2-3.1.15": "met",
+    "MA.L2-3.7.5": "unknown",
+    "PS.L2-3.9.2": "met",
+    "IA.L2-3.5.5": "met",
+    "IA.L2-3.5.6": "met",
+    "AC.L1-3.1.20": "met",
+    "AC.L2-3.1.12": "unknown",
+    "IA.L2-3.5.4": "unknown"
+  }
+}

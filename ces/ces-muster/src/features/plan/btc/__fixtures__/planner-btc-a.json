@@ -1,0 +1,309 @@
+{
+  "note": "Planner reference for fixture (a) (MG-09): ces-planner's own runlistEngine, btcSICUIDerivation and btcOutputGenerator run over this fixture's planner-golden si-baseline.json and cui-boundary.json, with BTCWizard's siOutputs, its derived defaults and no evidence (no operator answers, no seeded placeholders). Planner's goldens carry no BTC artifact (plannerGoldens.ts passes btcConfirmation undefined), so this file is the BTC yardstick. Regenerate with the scratch script described in the MG-09 log.",
+  "activated_rules": [
+    "BTC-RULE-DEVOPS-NOT-IN-SCOPE",
+    "BTC-RULE-MANAGED-ONLY",
+    "BTC-RULE-EMAIL-FWD-NO"
+  ],
+  "decision_log": [
+    {
+      "rule_id": "BTC-RULE-BYOD-DIRECT",
+      "description": "If BYOD direct access is allowed, elevate device + CA/logging verification and flag boundary risk.",
+      "result": "skipped",
+      "inputs_evaluated": {
+        "cui.byod_model": "No BYOD"
+      }
+    },
+    {
+      "rule_id": "BTC-RULE-DEVOPS-SCOPE",
+      "description": "Activate DevOps topology verification only when DevOps is in the declared CUI boundary.",
+      "result": "skipped",
+      "inputs_evaluated": {
+        "cui.devops_in_scope": "No"
+      }
+    },
+    {
+      "rule_id": "BTC-RULE-BACKUP-OUT-OF-SCOPE",
+      "description": "If backups are out of scope, require explicit validation and add risk flag.",
+      "result": "skipped",
+      "inputs_evaluated": {
+        "cui.backup_model": "M365 native only"
+      }
+    },
+    {
+      "rule_id": "BTC-RULE-SHARED-IDENTITY",
+      "description": "If identity is shared/partial, increase identity and access verification depth and add risk flag.",
+      "result": "skipped",
+      "inputs_evaluated": {
+        "cui.shared_identity": "No"
+      }
+    },
+    {
+      "rule_id": "BTC-RULE-SI-NO-EXTERNAL",
+      "description": "If SI prohibits external collaboration, enforce full interconnection verification depth.",
+      "result": "skipped",
+      "inputs_evaluated": {
+        "si.external_collaboration_posture": "Controlled external sharing"
+      }
+    },
+    {
+      "rule_id": "BTC-RULE-DEVOPS-NOT-IN-SCOPE",
+      "description": "If DevOps is out of scope, reduce DevOps section to minimal confirmation or skip.",
+      "result": "matched",
+      "inputs_evaluated": {
+        "cui.devops_in_scope": "No"
+      }
+    },
+    {
+      "rule_id": "BTC-RULE-MANAGED-ONLY",
+      "description": "If managed devices required, substitute unmanaged-device question to focus on CA enforcement proof.",
+      "result": "matched",
+      "inputs_evaluated": {
+        "cui.managed_device_required": "Yes - managed only"
+      }
+    },
+    {
+      "rule_id": "BTC-RULE-NO-GUESTS",
+      "description": "If guests are not allowed, require confirmation that guest access is disabled and no guests exist.",
+      "result": "skipped",
+      "inputs_evaluated": {
+        "cui.guest_access_policy": "Yes - tightly controlled"
+      }
+    },
+    {
+      "rule_id": "BTC-RULE-EMAIL-FWD-NO",
+      "description": "If email forwarding is not permitted, require Exchange configuration proof.",
+      "result": "matched",
+      "inputs_evaluated": {
+        "cui.email_forwarding_posture": "No"
+      }
+    }
+  ],
+  "risk_flags": [],
+  "gate_status": {
+    "DV-01": {
+      "domain": "Identity Verification",
+      "pass": false,
+      "reason": "BTC.ID.001: not answered; BTC.ID.002: not answered; BTC.ID.003: not answered; BTC.ID.004: not answered"
+    },
+    "DV-02": {
+      "domain": "Device Verification",
+      "pass": false,
+      "reason": "BTC.DEV.001: not answered; BTC.DEV.002: not answered; BTC.DEV.003: not answered"
+    },
+    "DV-03": {
+      "domain": "Logging & Telemetry Verification",
+      "pass": false,
+      "reason": "BTC.LOG.001: not answered; BTC.LOG.002: not answered; BTC.LOG.003: not answered; BTC.LOG.004: not answered"
+    },
+    "DV-04": {
+      "domain": "DevOps Verification",
+      "pass": false,
+      "reason": "BTC.DEVOPS.001: evidence required but not provided; BTC.DEVOPS.002: evidence required but not provided; BTC.DEVOPS.003: evidence required but not provided"
+    },
+    "DV-05": {
+      "domain": "Interconnection Verification",
+      "pass": false,
+      "reason": "BTC.INT.001: not answered; BTC.INT.002: not answered; BTC.INT.003: not answered; BTC.INT.004: not answered"
+    },
+    "DV-06": {
+      "domain": "Exception & Governance Validation",
+      "pass": false,
+      "reason": "BTC.GOV.001: not answered; BTC.GOV.002: not answered; BTC.GOV.003: not answered; BTC.GOV.004: not answered"
+    }
+  },
+  "answers": {
+    "BTC.DEVOPS.001": "No",
+    "BTC.DEVOPS.002": "N/A – DevOps not in scope",
+    "BTC.DEVOPS.003": "N/A – DevOps not in scope"
+  },
+  "runlist": [
+    {
+      "question_id": "BTC.ID.001",
+      "section_id": "DV-01",
+      "mode": "full",
+      "required": true,
+      "evidence_required": true,
+      "activated_by_rules": []
+    },
+    {
+      "question_id": "BTC.ID.002",
+      "section_id": "DV-01",
+      "mode": "full",
+      "required": true,
+      "evidence_required": true,
+      "activated_by_rules": []
+    },
+    {
+      "question_id": "BTC.ID.003",
+      "section_id": "DV-01",
+      "mode": "full",
+      "required": true,
+      "evidence_required": true,
+      "activated_by_rules": []
+    },
+    {
+      "question_id": "BTC.ID.004",
+      "section_id": "DV-01",
+      "mode": "full",
+      "required": true,
+      "evidence_required": true,
+      "activated_by_rules": []
+    },
+    {
+      "question_id": "BTC.DEV.001",
+      "section_id": "DV-02",
+      "mode": "full",
+      "required": true,
+      "evidence_required": true,
+      "activated_by_rules": []
+    },
+    {
+      "question_id": "BTC.DEV.002",
+      "section_id": "DV-02",
+      "mode": "substitute",
+      "required": true,
+      "evidence_required": true,
+      "activated_by_rules": [
+        "BTC-RULE-MANAGED-ONLY"
+      ],
+      "substitute_source_id": "BTC.DEV.002.CA_ENFORCEMENT_PROOF"
+    },
+    {
+      "question_id": "BTC.DEV.003",
+      "section_id": "DV-02",
+      "mode": "full",
+      "required": true,
+      "evidence_required": true,
+      "activated_by_rules": []
+    },
+    {
+      "question_id": "BTC.LOG.001",
+      "section_id": "DV-03",
+      "mode": "full",
+      "required": true,
+      "evidence_required": true,
+      "activated_by_rules": []
+    },
+    {
+      "question_id": "BTC.LOG.002",
+      "section_id": "DV-03",
+      "mode": "full",
+      "required": true,
+      "evidence_required": true,
+      "activated_by_rules": []
+    },
+    {
+      "question_id": "BTC.LOG.003",
+      "section_id": "DV-03",
+      "mode": "full",
+      "required": true,
+      "evidence_required": true,
+      "activated_by_rules": []
+    },
+    {
+      "question_id": "BTC.LOG.004",
+      "section_id": "DV-03",
+      "mode": "full",
+      "required": true,
+      "evidence_required": true,
+      "activated_by_rules": []
+    },
+    {
+      "question_id": "BTC.DEVOPS.001",
+      "section_id": "DV-04",
+      "mode": "minimal",
+      "required": true,
+      "evidence_required": true,
+      "activated_by_rules": [
+        "BTC-RULE-DEVOPS-NOT-IN-SCOPE"
+      ]
+    },
+    {
+      "question_id": "BTC.DEVOPS.002",
+      "section_id": "DV-04",
+      "mode": "minimal",
+      "required": true,
+      "evidence_required": true,
+      "activated_by_rules": [
+        "BTC-RULE-DEVOPS-NOT-IN-SCOPE"
+      ]
+    },
+    {
+      "question_id": "BTC.DEVOPS.003",
+      "section_id": "DV-04",
+      "mode": "minimal",
+      "required": true,
+      "evidence_required": true,
+      "activated_by_rules": [
+        "BTC-RULE-DEVOPS-NOT-IN-SCOPE"
+      ]
+    },
+    {
+      "question_id": "BTC.INT.001",
+      "section_id": "DV-05",
+      "mode": "full",
+      "required": true,
+      "evidence_required": true,
+      "activated_by_rules": []
+    },
+    {
+      "question_id": "BTC.INT.002",
+      "section_id": "DV-05",
+      "mode": "full",
+      "required": true,
+      "evidence_required": true,
+      "activated_by_rules": []
+    },
+    {
+      "question_id": "BTC.INT.003",
+      "section_id": "DV-05",
+      "mode": "full",
+      "required": true,
+      "evidence_required": true,
+      "activated_by_rules": [
+        "BTC-RULE-EMAIL-FWD-NO"
+      ]
+    },
+    {
+      "question_id": "BTC.INT.004",
+      "section_id": "DV-05",
+      "mode": "full",
+      "required": true,
+      "evidence_required": true,
+      "activated_by_rules": []
+    },
+    {
+      "question_id": "BTC.GOV.001",
+      "section_id": "DV-06",
+      "mode": "full",
+      "required": true,
+      "evidence_required": false,
+      "activated_by_rules": []
+    },
+    {
+      "question_id": "BTC.GOV.002",
+      "section_id": "DV-06",
+      "mode": "full",
+      "required": true,
+      "evidence_required": false,
+      "activated_by_rules": []
+    },
+    {
+      "question_id": "BTC.GOV.003",
+      "section_id": "DV-06",
+      "mode": "full",
+      "required": true,
+      "evidence_required": false,
+      "activated_by_rules": []
+    },
+    {
+      "question_id": "BTC.GOV.004",
+      "section_id": "DV-06",
+      "mode": "full",
+      "required": true,
+      "evidence_required": false,
+      "activated_by_rules": []
+    }
+  ]
+}

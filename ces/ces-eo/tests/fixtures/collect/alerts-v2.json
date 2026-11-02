@@ -1,0 +1,51 @@
+{
+  "_note": "Recorded shape (Graph v1.0 security/alerts_v2, as the simulator serves it after B20); synthetic; scrubbed.",
+  "source": "GET /v1.0/security/alerts_v2?$filter=lastUpdateDateTime ge <start>",
+  "value": [
+    {
+      "id": "alert-0001",
+      "providerAlertId": "fixture-mdo-0001",
+      "incidentId": "inc-0001",
+      "title": "A potentially malicious URL click was detected",
+      "severity": "medium",
+      "status": "new",
+      "category": "InitialAccess",
+      "serviceSource": "microsoftDefenderForOffice365",
+      "detectionSource": "microsoftDefenderForOffice365",
+      "classification": null,
+      "determination": null,
+      "createdDateTime": "2026-10-24T10:00:00.000Z",
+      "lastUpdateDateTime": "2026-10-25T12:00:00.000Z",
+      "mitreTechniques": ["T1566.002"],
+      "evidence": [{ "@odata.type": "#microsoft.graph.security.userEvidence", "roles": ["impacted"], "userAccount": { "userPrincipalName": "user3@example.test" } }]
+    },
+    {
+      "id": "alert-0002",
+      "providerAlertId": "fixture-aadip-0001",
+      "incidentId": "inc-0001",
+      "title": "Anonymous IP address",
+      "severity": "medium",
+      "status": "inProgress",
+      "category": "InitialAccess",
+      "serviceSource": "azureAdIdentityProtection",
+      "detectionSource": "azureAdIdentityProtection",
+      "assignedTo": "analyst@example.test",
+      "createdDateTime": "2026-10-24T12:00:00.000Z",
+      "lastUpdateDateTime": "2026-10-26T12:00:00.000Z",
+      "mitreTechniques": ["T1078"]
+    },
+    {
+      "id": "alert-0003",
+      "incidentId": "inc-0002",
+      "title": "Suspicious account enumeration",
+      "severity": "low",
+      "status": "resolved",
+      "category": "Discovery",
+      "serviceSource": "microsoftDefenderForEndpoint",
+      "detectionSource": "microsoftDefenderForEndpoint",
+      "classification": "falsePositive",
+      "createdDateTime": "2026-10-20T08:00:00.000Z",
+      "lastUpdateDateTime": "2026-10-21T08:00:00.000Z"
+    }
+  ]
+}

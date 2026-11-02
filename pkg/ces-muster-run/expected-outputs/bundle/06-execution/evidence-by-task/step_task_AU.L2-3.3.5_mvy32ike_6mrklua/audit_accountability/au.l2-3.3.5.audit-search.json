@@ -1,0 +1,35 @@
+{
+  "rawResponse": "{\r\n    \"CreationDate\":  \"2026-10-27T17:00:00.000Z\",\r\n    \"UserIds\":  \"sim.user1@simtenant.onmicrosoft.us\",\r\n    \"Operations\":  \"Set-Mailbox\",\r\n    \"Status\":  null\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "AU.L2-3.3.5.audit-search",
+    "label": "Audit Log Search Evidence (Reduce/Review Capability)",
+    "engine": "exchange",
+    "layer_hint": 7,
+    "sequence_hint": 1,
+    "idempotency": "evidence-only",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "AU.L2-3.3.5"
+    ],
+    "get_command": "Search-UnifiedAuditLog -StartDate (Get-Date).AddDays(-7) -EndDate (Get-Date) -RecordType ExchangeAdmin -ResultSize 5000 -SessionCommand ReturnLargeSet | Select-Object CreationDate,UserIds,Operations,Status",
+    "set_command": "",
+    "evidence_commands": [
+      "Search-UnifiedAuditLog -StartDate (Get-Date).AddDays(-7) -EndDate (Get-Date) -RecordType ExchangeAdmin -ResultSize 5000 -SessionCommand ReturnLargeSet | Select-Object CreationDate,UserIds,Operations,Status | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AU.L2-3.3.5"
+    ],
+    "timestamp": "2026-11-01T17:11:47.878Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Audit Log Search Evidence (Reduce/Review Capability)",
+    "sha256Hash": "fe2582c56297a13d6980fed65b118727f60521e3bcf3db55bf0a1f9c69a196b5",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

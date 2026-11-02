@@ -1,0 +1,434 @@
+{
+  "family": "CA",
+  "family_name": "Security Assessment",
+  "practices": [
+    {
+      "id": "CA.L2-3.12.1",
+      "title": "Periodically assess the security controls in organizational systems to determine if the controls are effective in their application.",
+      "approach": {
+        "what_assessor_does": "The assessor reads the security assessment policy for a stated cycle for checking whether the controls work, and then looks for the reports of the most recent assessments against that cycle. A report should say which controls were checked, how (document review, interviews, technical checks), what was found and who did the work. They interview the person responsible about how the scope is chosen and what happened with the findings. Testing means taking a few controls the last report marked effective and checking them again now. CES has no tenant signal for this practice; an AdminOps benchmark report and Defender for Cloud compliance results can support it, but a configuration report alone is not a control assessment.",
+        "common_failure_modes": [
+          "No assessment cycle is written down.",
+          "The only assessment on file is the one done to prepare for certification.",
+          "A configuration or compliance-score report is offered in place of an assessment of the controls.",
+          "The report lists no findings and no method, so effectiveness cannot be judged.",
+          "Findings from the last assessment never reached the POA&M."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "CA.L2-3.12.1[a]",
+          "determination": "the frequency of security control assessments is defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Security assessment policy stating the cycle",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/security-assessment-policy.md (GateEvidence family CA). Should state how often security controls are assessed and what scope each assessment covers."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask what the assessment cycle is and who decided it. Control signal registry maps CA.L2-3.12.1 to manualGateEvaluator: no tenant signal covers this objective."
+            }
+          ]
+        },
+        {
+          "id": "CA.L2-3.12.1[b]",
+          "determination": "security controls are assessed with the defined frequency to determine if the controls are effective in their application",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Control assessment reports",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: internal or third-party assessment reports with date, scope, method, findings and assessor. Dates should match the stated cycle."
+            },
+            {
+              "artifact_type": "CES assessment snapshots",
+              "ces_source": "eo_store",
+              "notes": "EO AssessmentStore collection eo_assessments: dated per-control assessment snapshots with status and rationale. Shows repeated assessment over time; the assessor still wants the organization's own review of the results."
+            },
+            {
+              "artifact_type": "Azure Security Benchmark compliance report",
+              "ces_source": "ao_row",
+              "notes": "AdminOps F-05 Azure Security Benchmark Report (Defender for Cloud regulatory compliance); registered against CA.L2-3.12.1. Supports the technical part of the assessment only."
+            },
+            {
+              "artifact_type": "Assessment owner interview",
+              "ces_source": "interview",
+              "notes": "Ask the person who ran the last assessment how controls were sampled and tested, and what they did with the findings. Re-check two controls the report marked effective."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CA.L2-3.12.2",
+      "title": "Develop and implement plans of action (e.g., POA&M) designed to correct deficiencies and reduce or eliminate vulnerabilities in organizational systems.",
+      "approach": {
+        "what_assessor_does": "The assessor wants a plan of action that lists each known deficiency and vulnerability, where it came from (an assessment, a scan, an incident), what will be done about it, who owns it and by when. They compare the plan against the latest assessment results and scan findings to see that nothing found is missing from it. They then pick open and closed items and look for proof of progress: a fix, a changed setting, a closure record with evidence. In interviews they ask the owner how items get onto the plan, how often it is reviewed and what happens when a date slips. Testing means checking that an item marked closed is really fixed in the system.",
+        "common_failure_modes": [
+          "Findings from the last assessment or scan are missing from the plan of action.",
+          "Items have no owner, no planned action or no completion date.",
+          "Dates have slipped repeatedly with no recorded reason or new date.",
+          "Items are marked closed but the deficiency is still present in the system.",
+          "The plan is a document made once for the assessment and never updated."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "CA.L2-3.12.2[a]",
+          "determination": "deficiencies and vulnerabilities to be addressed by the plan of action are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "POA&M listing deficiencies and their sources",
+              "ces_source": "eo_store",
+              "notes": "EO PoamStore collection eo_poam (practice-level) and PoamLedgerStore collection eo_poam_ledger (objective-level, with lifecycle history). Each item should name the deficiency and where it was found."
+            },
+            {
+              "artifact_type": "Latest assessment results",
+              "ces_source": "eo_store",
+              "notes": "EO AssessmentStore collection eo_assessments: compare objectives not met in the latest snapshot with the items on the POA&M."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask how a new finding from an assessment, scan or incident gets onto the plan, and who decides. Control signal registry maps CA.L2-3.12.2 to manualGateEvaluator: no tenant signal covers this objective."
+            }
+          ]
+        },
+        {
+          "id": "CA.L2-3.12.2[b]",
+          "determination": "a plan of action is developed to correct identified deficiencies and reduce or eliminate identified vulnerabilities",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Plan of action document",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/poam.md (GateEvidence control mapping for CA.L2-3.12.2). Should give each item a planned action, owner, milestones and completion date."
+            },
+            {
+              "artifact_type": "POA&M items with milestones",
+              "ces_source": "eo_store",
+              "notes": "EO PoamLedgerStore collection eo_poam_ledger: check that each sampled item has a planned action and dates, not only a description."
+            },
+            {
+              "artifact_type": "POA&M owner interview",
+              "ces_source": "interview",
+              "notes": "Ask the owner to explain the planned action and milestones for two items and how the completion dates were set."
+            }
+          ]
+        },
+        {
+          "id": "CA.L2-3.12.2[c]",
+          "determination": "the plan of action is implemented to correct identified deficiencies and reduce or eliminate identified vulnerabilities",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "POA&M lifecycle history",
+              "ces_source": "eo_store",
+              "notes": "EO PoamLedgerStore collection eo_poam_ledger: status history per item, including auto-closed items. Shows the plan is being worked, not only written."
+            },
+            {
+              "artifact_type": "Evidence package assembly record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps E-09 C3PAO Evidence Package Assembly (ZIP with SHA-256 manifest, Key Vault signed); registered against CA.L2-3.12.2 with evidence objective CA.L2-3.12.2[c]."
+            },
+            {
+              "artifact_type": "Closure evidence for completed items",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector when the fix was made outside the tenant: change tickets, screenshots or reports showing the deficiency is gone."
+            },
+            {
+              "artifact_type": "POA&M owner interview",
+              "ces_source": "interview",
+              "notes": "Ask how often the plan is reviewed and what happens when a date is missed. Pick a closed item and confirm the fix in the system."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CA.L2-3.12.3",
+      "title": "Monitor security controls on an ongoing basis to ensure the continued effectiveness of the controls.\nAssessment Objective:\n[a] security controls are monitored on an ongoing basis to ensure the continued \neffectiveness of those controls.",
+      "approach": {
+        "what_assessor_does": "The assessor looks for a written monitoring approach: which controls are watched between full assessments, how (automated checks, log review, scan results, recurring reviews), how often, and who reviews the output. They examine recent monitoring output and look for evidence that a change for the worse was noticed and acted on. They interview the people who receive the monitoring output about what they look at and what they did with the last alert or drop. Testing means picking a control and showing that its current state is known from monitoring rather than from the last assessment. In CES, repeated assessment snapshots and drift records show changes over time, but the organization must show someone reviews them.",
+        "common_failure_modes": [
+          "Monitoring is described only as the yearly assessment.",
+          "Tools produce reports or alerts that nobody is named to review.",
+          "A control dropped from effective to not met and nothing was done about it.",
+          "Monitoring covers only technical settings; process controls such as training or access reviews are never checked between assessments."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "CA.L2-3.12.3[a]",
+          "determination": "security controls are monitored on an ongoing basis to ensure the continued effectiveness of those controls",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Continuous monitoring strategy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/security-assessment-policy.md (GateEvidence family CA). Should say which controls are monitored between assessments, how, how often and who reviews the results."
+            },
+            {
+              "artifact_type": "Assessment snapshots and drift records",
+              "ces_source": "eo_store",
+              "notes": "EO AssessmentStore collection eo_assessments, with the DriftDetector record drift.json written beside each snapshot (regressions, improvements and declines per control and per objective)."
+            },
+            {
+              "artifact_type": "Monitoring review records",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: meeting notes, tickets or sign-offs showing someone reviewed the monitoring output and acted on a regression."
+            },
+            {
+              "artifact_type": "Monitoring reviewer interview",
+              "ces_source": "interview",
+              "notes": "Ask the person who reviews monitoring output what they check, how often, and what they did about the most recent regression. Control signal registry maps CA.L2-3.12.3 to manualGateEvaluator: no tenant signal covers this objective."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CA.L2-3.12.4",
+      "title": "Develop, document and periodically update System Security Plans (SSPs) that describe system boundaries, system environments of operation, how security requirements are implemented and the relationships with or connections to other systems.",
+      "approach": {
+        "what_assessor_does": "The assessor reads the system security plan from start to finish. It must describe the boundary of the CUI environment (what is in and what is out), the environment it runs in (locations, hosting, the cloud tenant, users), how each of the 110 requirements is met, any requirement the organization treats as not applicable with the approval for that, and the connections to other systems and external providers. They compare the boundary and asset list with the network diagram, the tenant and what they see on site, and compare implementation statements with what they test elsewhere in the assessment. They check the plan's version history against the update cycle it states, and interview the plan owner about how it is kept current.",
+        "common_failure_modes": [
+          "The boundary is vague, or the asset list does not match the network diagram or the tenant.",
+          "Implementation statements repeat the requirement wording instead of saying how it is done here.",
+          "A requirement is treated as not applicable with no reason and no approval recorded.",
+          "Connections to external providers, cloud services or other internal systems are not listed.",
+          "No update cycle is written down, or the version history shows no update within it.",
+          "The plan describes settings that testing shows are not in place."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "CA.L2-3.12.4[a]",
+          "determination": "a system security plan is developed",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "System security plan",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-security-plan.md (GateEvidence control mapping for CA.L2-3.12.4). Rendered from the EO SSP generator; the policy-set manifest records its sha256."
+            },
+            {
+              "artifact_type": "SSP owner interview",
+              "ces_source": "interview",
+              "notes": "Ask who owns the plan, who approved it and when. Control signal registry maps CA.L2-3.12.4 to manualGateEvaluator: no tenant signal covers this objective."
+            }
+          ]
+        },
+        {
+          "id": "CA.L2-3.12.4[b]",
+          "determination": "the system boundary is described and documented in the system security plan",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "System security plan boundary section",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-security-plan.md (GateEvidence control mapping for CA.L2-3.12.4). Should list what is inside and outside the CUI boundary."
+            },
+            {
+              "artifact_type": "Network diagram and asset inventory",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. The assessor reconciles them with the boundary in the plan."
+            },
+            {
+              "artifact_type": "Risk assessment scope statement",
+              "ces_source": "eo_store",
+              "notes": "EO RiskAssessmentStore collection eo_risk_config, field scopeStatement. Should describe the same boundary as the plan."
+            },
+            {
+              "artifact_type": "SSP owner interview",
+              "ces_source": "interview",
+              "notes": "Ask how the boundary was drawn and how a new system or device is added to it."
+            }
+          ]
+        },
+        {
+          "id": "CA.L2-3.12.4[c]",
+          "determination": "the system environment of operation is described and documented in the system security plan",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "System security plan environment section",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-security-plan.md (GateEvidence control mapping for CA.L2-3.12.4). Should describe locations, hosting, the Microsoft 365 or Azure tenant and the user population."
+            },
+            {
+              "artifact_type": "SSP owner interview",
+              "ces_source": "interview",
+              "notes": "Ask the owner to describe where the system runs and who uses it; compare with what the assessor sees on site and in the tenant."
+            }
+          ]
+        },
+        {
+          "id": "CA.L2-3.12.4[d]",
+          "determination": "the security requirements identified and approved by the designated authority as non-applicable are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "System security plan not-applicable entries",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-security-plan.md (GateEvidence control mapping for CA.L2-3.12.4). Each requirement treated as not applicable should give the reason and who approved it."
+            },
+            {
+              "artifact_type": "Approval record for not-applicable requirements",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: the signed approval from the designated authority for each not-applicable requirement."
+            },
+            {
+              "artifact_type": "SSP owner interview",
+              "ces_source": "interview",
+              "notes": "Ask who has authority to approve a not-applicable decision and to explain the reason for one of them."
+            }
+          ]
+        },
+        {
+          "id": "CA.L2-3.12.4[e]",
+          "determination": "the method of security requirement implementation is described and documented in the system security plan",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "System security plan implementation statements",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-security-plan.md (GateEvidence control mapping for CA.L2-3.12.4). Each requirement should say how it is done in this environment, naming the tools and settings."
+            },
+            {
+              "artifact_type": "CES assessment results",
+              "ces_source": "eo_store",
+              "notes": "EO AssessmentStore collection eo_assessments: per-control status and rationale to compare with the plan's implementation statements."
+            },
+            {
+              "artifact_type": "Control owner interviews",
+              "ces_source": "interview",
+              "notes": "Ask the owners of sampled requirements to describe how each is met; answers should match the plan."
+            }
+          ]
+        },
+        {
+          "id": "CA.L2-3.12.4[f]",
+          "determination": "the relationship with or connection to other systems is described and documented in the system security plan",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "System security plan interconnection section",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-security-plan.md (GateEvidence control mapping for CA.L2-3.12.4). Should list connections to other systems and external service providers, with what flows over each."
+            },
+            {
+              "artifact_type": "Interconnection and service provider agreements",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: agreements or a provider list, for example the cloud provider and managed service provider."
+            },
+            {
+              "artifact_type": "SSP owner interview",
+              "ces_source": "interview",
+              "notes": "Ask which outside systems and providers connect to the CUI environment and how each connection is protected."
+            }
+          ]
+        },
+        {
+          "id": "CA.L2-3.12.4[g]",
+          "determination": "the frequency to update the system security plan is defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Security assessment policy or SSP stating the update cycle",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/security-assessment-policy.md (GateEvidence family CA). Or the plan itself (policies/system-security-plan.md). Should state how often the plan is reviewed and what changes trigger an update."
+            },
+            {
+              "artifact_type": "SSP owner interview",
+              "ces_source": "interview",
+              "notes": "Ask what the update cycle is and what kinds of change trigger an update in between."
+            }
+          ]
+        },
+        {
+          "id": "CA.L2-3.12.4[h]",
+          "determination": "system security plan is updated with the defined frequency",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "SSP version history",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-security-plan.md (GateEvidence control mapping for CA.L2-3.12.4). Version and date history, compared with the stated cycle; the policy-set manifest hash shows which version is current."
+            },
+            {
+              "artifact_type": "POA&M closure evidence",
+              "ces_source": "ao_row",
+              "notes": "AdminOps E-10 POA&M Evidence Closure; registered against CA.L2-3.12.4 with evidence objective CA.L2-3.12.4[h]. Closed items should be reflected in the plan's implementation statements."
+            },
+            {
+              "artifact_type": "SSP owner interview",
+              "ces_source": "interview",
+              "notes": "Ask when the plan was last updated and what changed; check a recent system change appears in it."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

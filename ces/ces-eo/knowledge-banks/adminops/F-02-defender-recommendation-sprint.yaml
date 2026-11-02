@@ -1,0 +1,66 @@
+controlId: "RA.L2-3.11.3"
+relatedControlIds:
+  - "CA.L2-3.12.1"
+  - "CA.L2-3.12.4"
+  - "RA.L2-3.11.1"  # [VERIFY] mapping not yet confirmed
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: F-02
+useCaseTitle: "Defender Recommendation Sprint"
+domain: Security Operations
+priority: P4 Standard
+trigger: 'SCHEDULE: Monthly (first business day of each month)'
+sodTier: Tier 2 (per SoD model in front matter)
+entraRolesRequired:
+- Security Administrator
+- Compliance Administrator
+approvalRequired: true
+services:
+- name: Microsoft Defender Portal -- Secure Score recommendations
+  purpose: ''
+- name: Microsoft Graph API -- `secureScoreControlProfiles` endpoint
+  purpose: ''
+- name: Microsoft Sentinel -- Log Analytics for remediation tracking
+  purpose: ''
+- name: ITSM -- ticket creation for each selected recommendation
+  purpose: ''
+- name: Azure Immutable Blob Storage -- evidence artifact storage
+  purpose: ''
+configurationSteps:
+  portalPath: //security.microsoft.us > Secure Score > Recommended actions.
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes SecurityEvents.Read.All
+  - cmdlet: Get-MgSecuritySecureScoreControlProfile
+    parameters:
+    - -MgSecuritySecureScoreControlProfile
+    - -All
+    - -Object
+    - -ne
+    - -Object
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/security/secureScoreControlProfiles?$orderby=maxScore
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-f-security/F-02/2026/03/
+  format: CSV
+  filenamePattern: F-02_DefenderSprint_{YYYYMMDD}_{HHmmss}_Top5.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |-
+    - The `secureScoreControlProfiles` endpoint is available in GCC High at `graph.microsoft.us`. Some control profiles may reference features not available in GCC High (e.g., Security Copilot integration). Mark those as "Not Applicable" in the sprint backlog rather than attempting remediation.
+    - Recommendation text may contain links to commercial documentation (`.com` URLs). Replace portal URLs with `.us` equivalents when following remediation steps.
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

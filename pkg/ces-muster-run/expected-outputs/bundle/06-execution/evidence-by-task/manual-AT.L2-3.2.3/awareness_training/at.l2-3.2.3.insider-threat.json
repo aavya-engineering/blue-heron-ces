@@ -1,0 +1,36 @@
+{
+  "rawResponse": "",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "AT.L2-3.2.3.insider-threat",
+    "label": "Insider Threat Awareness Program Evidence",
+    "engine": "ipps",
+    "layer_hint": 8,
+    "sequence_hint": 6,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "AT.L2-3.2.3"
+    ],
+    "get_command": "Get-InsiderRiskPolicy | Where-Object { $_.Name -like 'CMMC*' -or $_.Name -like '*Departing*' } | Select-Object Name,InsiderRiskScenario,Enabled",
+    "set_command": "",
+    "evidence_commands": [
+      "Get-InsiderRiskPolicy | Select-Object Name,IsEnabled,CreatedBy,CreatedDate | ConvertTo-Json"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AT.L2-3.2.3"
+    ],
+    "timestamp": "2026-11-01T17:12:07.302Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Insider Threat Awareness Program Evidence",
+    "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "gateContext": "manual_gate"
+  }
+}

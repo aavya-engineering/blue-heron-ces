@@ -1,0 +1,10 @@
+{
+  "_edit_me": "Editable source for the synthetic customer S2 (s2-eng). The organisation and roster live in the customer file named by `customer` (generated there by gen-customer.mjs); this config only holds scenario knobs. Then: node scripts/build-customer-scenario.mjs s2-eng (regenerates scenarios/s2-eng.json). tests/integration/customer-scenario-s2.test.ts fails if the generated scenario drifts from this config + the customer file.",
+  "slug": "s2-eng",
+  "customer": "../../pkg/ces-muster-run/customers/s2-eng/customer.json",
+  "stance": "m365_azure",
+  "seedSets": ["customer-history-s2"],
+  "description": "synthetic-customer S2 (FICTIONAL): a 29-person engineering services firm on GCC High G5 with HYBRID identity (Entra Connect, password hash sync: 26 synced staff; admin, break-glass, contractor and service accounts cloud-only). 35 accounts (26 staff, 3 contractors, 3 separate admin, 2 break-glass, 1 sync service), 12 groups incl. the 12-member CUI enclave, 42 Intune devices (30 Windows, 6 company iOS, 6 personal Android under app protection; 39 compliant), 3 enforced CA policies excluding break-glass (MFA all users, legacy-auth block, admin MFA), 2 DLP policies, the CUI label, Defender XDR without Sentinel, an Azure Government landing zone without a key vault or action group, and a 90-day history. Built through the real resolver path; history dated from the day-floored anchor.",
+  "osVersions": { "windows": "10.0.22631.4317", "ios": "17.6.1", "android": "14" },
+  "licensing": { "skuId": "sim-sku-g5-gcchigh", "skuPartNumber": "SIM_M365_G5_GCCHIGH", "displayName": "Microsoft 365 G5 (GCC High)", "prepaidUnits": 35 }
+}

@@ -1,0 +1,43 @@
+{
+  "scenario_id": "teams-external-baseline",
+  "description": "Teams-engine session-type coverage: external federation access disabled (Set-CsExternalAccessPolicy) - exercises the teams connect channel Stamper gained in G-STAMPER-STAB-1 M2 and the sim's cmdlet arg-state persistence.",
+  "target_level": "L2",
+  "lanes": ["sim"],
+  "stacksim_seed": {
+    "stance": "m365_azure",
+    "countOverrides": {},
+    "steps": []
+  },
+  "muster": {
+    "answer_map": {
+      "G-01": { "wizard": "sit", "answer_type": "enum", "value": "L2" },
+      "G-02": { "wizard": "sit", "answer_type": "enum", "value": "cui_present" },
+      "G-07": { "wizard": "sit", "answer_type": "enum", "value": "single_enclave" },
+      "TCP.LIC.001": { "wizard": "tcp", "answer_type": "single_select", "value": "Microsoft 365 G5" }
+    },
+    "mid_pipeline_assertions": [
+      {
+        "path": "outputs.human_readable_mission_plan.control_directives[?(@.control_id=='SC.L2-3.13.14')]",
+        "assert": "exists",
+        "array_path": "outputs.human_readable_mission_plan.control_directives",
+        "match_field": "control_id",
+        "match_value": "SC.L2-3.13.14"
+      }
+    ]
+  },
+  "stamper": { "execution_mode": "auto" },
+  "fault_injection": [],
+  "expected_state": {
+    "checks": [
+      {
+        "description": "Teams external federation access disabled (Set-CsExternalAccessPolicy -EnableFederationAccess $false)",
+        "request": { "kind": "cmdlet", "cmdlet": "Get-CsExternalAccessPolicy" },
+        "path": "EnableFederationAccess",
+        "assert": "equals",
+        "value": false,
+        "ledger_object_type": "csExternalAccessPolicy"
+      }
+    ]
+  },
+  "expected_evidence": []
+}

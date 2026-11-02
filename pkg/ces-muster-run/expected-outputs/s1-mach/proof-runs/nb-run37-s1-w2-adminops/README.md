@@ -1,0 +1,3 @@
+# Run 37 (2026-10-28): synthetic customer S1 (s1-mach), wave W2 proof: AdminOps acts inside the loop
+
+51/51; E7A: A-11 (read), A-02 (disable the still-enabled leaver user-7: dry run then apply, confirming read), A-09 (read), all through AdminOps' own CLI on the sim rail with a throwaway per-run certificate; 6 AdminOps evidence rows (3 dry-run + 3 executed) inside the E7A window, each with a C10 store record; E7 passes saw 0 rows (run window); E7B drift vs E7 pass 3: no improvements (as expected on S1), no regressions; E8F did not revert user-7; EO 84/3/0/23 SPRS 47 unchanged; OUTSIDE UNCHANGED.

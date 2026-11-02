@@ -1,0 +1,7 @@
+# gc-w9r2b-s1 (2026-10-31): s1-mach, W9-R2b
+
+Re-baselined from run-20261031T014213Z. Verify 84/86; SPRS 67 (E7 62 -> E7B 67, unchanged). Explained reds: V57 (294 GAPS rows vs 292 in nb-run65c, +2: the CM.L2-3.4.8 row and the SC-8a scorecard row) and V69 (SC-8a 15/97 = 15.5 % > 15 %, +0.5; accepted until DEPTH-7 or DEPTH-10 CM adds an application-control read). E9 red only as the roll-up of those.
+
+Reason: DEPTH-1a replaced `CM.L2-3.4.8.detected-apps` (it listed Conditional Access policies; it now reads Intune detected apps). The old Muster verdict predicate was a free pass for CM.L2-3.4.8 (deny/allow-by-exception); it now records "undecidable" (`expect: null`, ces-muster 80a13a5), so RR-ACT-CM_L2_3_4_8 is unsure and adds GAPS row G-840fcc0934. Founder chose option A (accept and re-baseline), 2026-10-30. First round with the Muster results loop retired (V86 RETIRED, V100 PASS).
+
+Legend: S1/S2/S3/MP = `s1-mach`/`s2-eng`/`s3-def`/`muster-partial`; W9-R2b = wave 9 proof round 2, rerun b; V-nn = verify checks (`PLAN.md` §5); V57 = GAPS row count never rises; V69 = SC-8a unsure-answer share at most 15 %; V86 = retired Muster results loop; V100 = Muster holds no execution results (ROLE-1/ROLE-3, the depth plan `DEPTH-REPORT-AND-PLAN.md`); E9 = overall run return code; SPRS = Supplier Performance Risk System score; option A = founder 2026-10-30 ruling accepting the honest CM.L2-3.4.8 change.

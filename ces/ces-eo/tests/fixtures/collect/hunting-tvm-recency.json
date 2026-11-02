@@ -1,0 +1,13 @@
+{
+  "_note": "Recorded shape (POST /v1.0/security/runHuntingQuery, DeviceTvmInfoGathering summarize; as the simulator serves it); synthetic; scrubbed.",
+  "source": "POST /v1.0/security/runHuntingQuery DeviceTvmInfoGathering | where Timestamp >= datetime(<start>) | summarize LastAssessed = max(Timestamp) by DeviceId, DeviceName",
+  "schema": [
+    { "name": "DeviceId", "type": "String" },
+    { "name": "DeviceName", "type": "String" },
+    { "name": "LastAssessed", "type": "DateTime" }
+  ],
+  "results": [
+    { "DeviceId": "dev-0001", "DeviceName": "wks-001", "LastAssessed": "2026-10-26T06:00:00.000Z" },
+    { "DeviceId": "dev-0002", "DeviceName": "wks-002", "LastAssessed": "2026-10-25T06:00:00.000Z" }
+  ]
+}

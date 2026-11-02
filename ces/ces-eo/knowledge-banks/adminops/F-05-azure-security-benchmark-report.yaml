@@ -1,0 +1,61 @@
+controlId: "CA.L2-3.12.1"
+relatedControlIds:
+  - "CM.L2-3.4.1"
+  - "CM.L2-3.4.2"
+practiceStatement: See CMMC 2.0 Assessment Guide for full practice statement.
+useCaseId: F-05
+useCaseTitle: "Azure Security Benchmark Report"
+domain: Security Operations
+priority: P4 Standard
+trigger: 'SCHEDULE: Monthly (second Monday of each month)'
+sodTier: Tier 1 (per SoD model in front matter)
+entraRolesRequired:
+- Security Reader
+- Reports Reader
+approvalRequired: false
+services:
+- name: Microsoft Defender for Cloud -- Regulatory compliance dashboard
+  purpose: ''
+- name: Azure Policy -- Azure Security Benchmark initiative assignments
+  purpose: ''
+- name: Azure Portal
+  purpose: '`portal.azure.us`) -- compliance overview'
+- name: Azure Resource Graph -- programmatic compliance state queries
+  purpose: ''
+- name: Azure Immutable Blob Storage -- evidence artifact storage
+  purpose: ''
+configurationSteps:
+  portalPath: //portal.azure.us > Microsoft Defender for Cloud > Regulatory compliance.
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes SecurityEvents.Read.All
+  graphApiEndpoint: ''
+  graphApiPayloadExample: {}
+  requiredPermissions: []
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-f-security/F-05/2026/03/
+  format: CSV (exports), PDF (portal report)
+  filenamePattern: F-05_ASBCompliance_{YYYYMMDD}_{HHmmss}_NonCompliant.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: "- Defender for Cloud is fully available in Azure Government (`portal.azure.us`). Regulatory compliance features,\
+    \ including Azure Security Benchmark assessments, are available.\n- The Azure Resource Manager endpoint for Azure Government\
+    \ is `management.usgovcloudapi.net` (not `management.azure.com`).\n- Azure Resource Graph queries work identically in\
+    \ Azure Government. Ensure the Azure CLI cloud context is set to `AzureUSGovernment` before running queries.\n- NIST SP\
+    \ 800-171 is available as a built-in regulatory compliance standard in Defender for Cloud. Consider adding it alongside\
+    \ ASB for direct "
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

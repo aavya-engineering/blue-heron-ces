@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ces-muster.invalid/schemas/config-fact.schema.json",
+  "title": "ConfigFact",
+  "description": "A fact produced by a CaptureRecipe, mapping recipe output to a question_id answer with captured provenance. FCA guardrail: answer 'yes' means the condition was probed and confirmed; 'no' means probed and denied; absence of a fact means the section was absent from the recipe output and must never be treated as confirmation.",
+  "type": "object",
+  "required": ["question_id", "answer", "provenance", "confidence", "captured_at", "source"],
+  "additionalProperties": false,
+  "properties": {
+    "question_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Question ID from the interview question graph (e.g. 'iam-001')"
+    },
+    "answer": {
+      "type": "string",
+      "enum": ["yes", "no"],
+      "description": "Captured answer. Only 'yes' or 'no' — unknown/unsure must not be emitted; use fact absence instead."
+    },
+    "provenance": {
+      "type": "string",
+      "const": "captured",
+      "description": "Always 'captured' for recipe-produced facts"
+    },
+    "confidence": {
+      "type": "string",
+      "const": "high",
+      "description": "Always 'high' for recipe-produced facts"
+    },
+    "captured_at": {
+      "type": "string",
+      "minLength": 1,
+      "description": "ISO 8601 timestamp of capture"
+    },
+    "source": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Source identifier in the form 'recipe:<name>@<version>'"
+    }
+  }
+}

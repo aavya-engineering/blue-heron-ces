@@ -1,0 +1,248 @@
+{
+  "fixture": "a",
+  "label": "GCC High + CUI, harden_existing, m365_azure (Sentinel + Azure workloads)",
+  "synthetic": true,
+  "note": "Synthetic customer: no real customer, person, domain or workstation identifiers. These are the answers Planner's wizards would hold (SIT, RRT preamble, TCP, CUI, policy inputs); ces-planner/scripts/generate-goldens.ts reads this file to produce planner-golden/.",
+  "org": "Simtenant Alpha Aerospace",
+  "planMode": "harden_existing",
+  "sit": {
+    "G-01": "L2",
+    "G-02": "cui_present",
+    "G-03": [
+      "Controlled Technical Information",
+      "Export Controlled"
+    ],
+    "G-04": "Export-controlled technical data is handled only inside the enclave",
+    "G-05": "certification",
+    "G-06": {
+      "goal_type": "by_date",
+      "by_date": "2026-12-31",
+      "driver": "synthetic contract milestone"
+    },
+    "G-07": "single_enclave",
+    "G-08": "cloud_only",
+    "S-11": 85,
+    "S-12": "teams_first",
+    "S-13": "not_allowed",
+    "S-16": "c3pao_ready",
+    "S-20": "gcc_high",
+    "SIT-020": "m365_azure",
+    "SIT-021": "g5",
+    "SIT-022": 85,
+    "SIT-024": 1,
+    "SIT-025": 0,
+    "S-24": "poam_if_allowed",
+    "S-25": "company_managed_only",
+    "S-26": "managed_wireless",
+    "S-27": "blocked",
+    "S-28": "cloud_native",
+    "S-29": "managed_nonlocal",
+    "S-30": "managed_endpoints"
+  },
+  "rrt": {
+    "preamble": {
+      "license_tier": "gcc_g5",
+      "security_archetype": "moderate_hardening",
+      "endpoint_management": "intune_enrolled",
+      "monitoring_siem": "sentinel_deployed",
+      "policy_doc_state": "some_policies_drafted"
+    },
+    "actionOverrides": {}
+  },
+  "tcp": {
+    "TCP.TI.001": "00000000-0000-4000-8000-00000000000a",
+    "TCP.TI.002": "simtenant-a.onmicrosoft.us",
+    "TCP.TI.003": [
+      "simtenant-a.onmicrosoft.us"
+    ],
+    "TCP.TI.004": "GCC High",
+    "TCP.TI.005": "Simtenant Alpha Aerospace GCC High Tenant",
+    "TCP.LIC.001": "Microsoft 365 G5",
+    "TCP.LIC.002": 85,
+    "TCP.LIC.003": [
+      "IDENTITY_THREAT_PROTECTION",
+      "CLOUD_APP_SECURITY"
+    ],
+    "TCP.LIC.004": [
+      "Exchange Online",
+      "SharePoint Online",
+      "Teams",
+      "Intune",
+      "Defender for Endpoint",
+      "Defender for Office 365",
+      "Defender for Identity",
+      "Purview Compliance",
+      "Sentinel"
+    ],
+    "TCP.IA.001": [
+      "breakglass1@simtenant-a.onmicrosoft.us",
+      "breakglass2@simtenant-a.onmicrosoft.us"
+    ],
+    "TCP.IA.002": "adm-{lastname}.{firstname}@simtenant-a.onmicrosoft.us",
+    "TCP.IA.003": "svc-{appname}@simtenant-a.onmicrosoft.us",
+    "TCP.IA.004": "Entra ID native (cloud-only)",
+    "TCP.IA.005": false,
+    "TCP.PA.001": [
+      "admin@simtenant-a.onmicrosoft.us"
+    ],
+    "TCP.PA.002": [
+      "secadmin@simtenant-a.onmicrosoft.us"
+    ],
+    "TCP.PA.003": [
+      "complianceadmin@simtenant-a.onmicrosoft.us"
+    ],
+    "TCP.PA.004": true,
+    "TCP.PA.005": "SG-BreakGlass-Exclusion",
+    "TCP.GA.001": "SG-{Department}-{Function}",
+    "TCP.GA.002": [
+      "CUI-Authorized-Users",
+      "CMMC-Operators",
+      "Evidence-Reviewers"
+    ],
+    "TCP.GA.003": "DL-{Department}",
+    "TCP.GA.004": "Dynamic (attribute-based)",
+    "TCP.CA.001": "CA-{Number}-{Purpose}",
+    "TCP.CA.002": [
+      "Simtenant Alpha Aerospace Approved IP Range",
+      "Simtenant Alpha Aerospace VPN"
+    ],
+    "TCP.CA.003": 6,
+    "TCP.DM.001": "Azure AD Join",
+    "TCP.DM.002": "SIMTENANT-A-{Type}-{Number}",
+    "TCP.DM.003": "CP-{Platform}-{Level}",
+    "TCP.DM.004": [
+      "Windows",
+      "macOS",
+      "iOS/iPadOS"
+    ],
+    "TCP.DP.001": "SIMTENANT-A-{Classification}-{Handling}",
+    "TCP.DP.002": [
+      "https://simtenant-a.sharepoint.us/sites/CUI"
+    ],
+    "TCP.DP.003": [
+      "CUI Operations",
+      "CMMC Compliance"
+    ],
+    "TCP.DP.004": "DLP-{Scope}-{Action}",
+    "TCP.MON.001": "simtenant-a-law-prod",
+    "TCP.MON.002": "simtenant-a-rg-security",
+    "TCP.MON.003": "00000000-0000-4001-8000-00000000000a",
+    "TCP.MON.004": [
+      "Azure Active Directory",
+      "Microsoft 365",
+      "Microsoft Defender for Endpoint",
+      "Microsoft Defender for Office 365",
+      "Microsoft Defender for Identity",
+      "Azure Activity",
+      "Windows Security Events"
+    ],
+    "TCP.MON.005": "AR-{Severity}-{Source}-{Description}"
+  },
+  "cui": {
+    "CUI.CAT.001": [
+      "Controlled Technical Information (CTI)"
+    ],
+    "CUI.CONTRACT.001": [
+      "Synthetic contract SIM-0001 (DFARS 252.204-7012)"
+    ],
+    "CUI.GEN.001": "Both",
+    "CUI.GEN.002": [
+      "Engineering",
+      "Program Management",
+      "Security/IT"
+    ],
+    "CUI.LC.ING.001": [
+      "Encrypted email",
+      "Prime/customer portal",
+      "Teams/SharePoint sharing"
+    ],
+    "CUI.LC.STO.001": [
+      "SharePoint Online (GCC High)",
+      "OneDrive (GCC High)",
+      "Exchange mailboxes",
+      "Teams file libraries"
+    ],
+    "CUI.LC.PROC.001": [
+      "Microsoft 365",
+      "SharePoint",
+      "Teams"
+    ],
+    "CUI.LC.EGR.001": "Yes – controlled external sharing",
+    "CUI.LC.RET.001": "Standard retention schedule",
+    "CUI.USR.001": [
+      "Engineers",
+      "Program Managers",
+      "IT Admins",
+      "Security Team"
+    ],
+    "CUI.USR.002": 40,
+    "CUI.ID.001": "Yes – fully isolated tenant",
+    "CUI.ID.002": "No",
+    "CUI.DEV.001": "Yes – managed only",
+    "CUI.DEV.002": "Planned",
+    "CUI.DEVOPS.001": "No",
+    "CUI.DEVOPS.002": [
+      "Azure DevOps (GCC High)"
+    ],
+    "CUI.INT.001": [
+      "SIEM"
+    ],
+    "CUI.INT.002": "No",
+    "CUI.INT.003": "No",
+    "CUI.BKP.001": "M365 native only",
+    "CUI.OOS.001": [
+      "Commercial tenant"
+    ],
+    "CUI.OOS.002": "Conditional Access policies restrict sign-in to compliant managed devices; CUI workloads are isolated in a dedicated GCC High tenant; DLP policies and sensitivity labels prevent unauthorized CUI egress.",
+    "CUI.ENF.001": [
+      "Conditional Access",
+      "Intune compliance enforcement",
+      "DLP policies",
+      "Sensitivity labels"
+    ]
+  },
+  "policy": {
+    "PI.ODP.001": 3,
+    "PI.ODP.002": 15,
+    "PI.ODP.003": 15,
+    "PI.ODP.004": 14,
+    "PI.ODP.005": 24,
+    "PI.ODP.006": 60,
+    "PI.ODP.007": 365,
+    "PI.ODP.008": "Monthly",
+    "PI.ODP.009": 14,
+    "PI.ODP.010": 30,
+    "PI.ODP.011": "Annually",
+    "PI.ODP.012": 72,
+    "PI.ODP.013": "Quarterly",
+    "PI.ODP.014": "Daily",
+    "PI.ODP.015": "NIST SP 800-88 Purge",
+    "PI.GOV.002": 12,
+    "PI.GOV.003": 1,
+    "PI.ORG.001": "Simtenant Alpha Aerospace LLC (synthetic)",
+    "PI.ORG.002": "100 Example Way",
+    "PI.ORG.003": "Testville",
+    "PI.ORG.004": "ZZ",
+    "PI.ORG.005": "00000",
+    "PI.ORG.006": "SIM0A",
+    "PI.ORG.007": "SIMUEI00000A",
+    "PI.ORG.008": "Subcontractor",
+    "PI.ORG.009": "Aerospace components (synthetic)",
+    "PI.ORG.010": "336413",
+    "PI.ORG.011": "None",
+    "PI.PER.001": "Fixture Person One, ISSO, person.one@simtenant-a.onmicrosoft.us",
+    "PI.PER.002": "Fixture Person Two, System Owner, person.two@simtenant-a.onmicrosoft.us",
+    "PI.PER.003": "Fixture Person Three, Compliance Officer, person.three@simtenant-a.onmicrosoft.us",
+    "PI.PER.004": "Fixture Person Four, IT Director, person.four@simtenant-a.onmicrosoft.us",
+    "PI.PER.005": "Fixture Person Five, HR Representative, person.five@simtenant-a.onmicrosoft.us",
+    "PI.PER.006": "Fixture Person Six, IR Lead, person.six@simtenant-a.onmicrosoft.us",
+    "PI.PER.007": "Fixture Person Seven, Facilities Manager, person.seven@simtenant-a.onmicrosoft.us",
+    "PI.PER.008": "Fixture Person Eight, Contracts Representative, person.eight@simtenant-a.onmicrosoft.us",
+    "PI.GOV.001": "2026-02-01",
+    "PI.PHY.001": [
+      "100 Example Way, Testville, ZZ 00000"
+    ],
+    "PI.PHY.002": "Badge readers on all enclave doors (synthetic)",
+    "PI.PHY.003": "Visitors sign in and are escorted (synthetic)"
+  }
+}

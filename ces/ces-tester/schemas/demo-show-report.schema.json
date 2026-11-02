@@ -1,0 +1,149 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ces-tester.local/schemas/demo-show-report.schema.json",
+  "title": "ces-tester demo:show run report",
+  "description": "One JSON artifact per operator `demo:show` run, written to runs/show/<runId>/report.json. It exists so deck content can be iterated on evidence rather than recollection: declared vs actual dwell per slide, how the operator moved, and what each op actually did. `demo:show --check` NEVER writes one — this is an operator-run artifact. This schema IS the documentation for the format.",
+  "type": "object",
+  "required": ["schemaVersion", "runId", "startedAt", "endedAt", "exitReason", "deck", "run", "slides", "ops"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "description": "Bumped only when a consumer would break. Additive optional fields do not bump it.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "runId": {
+      "description": "The run's identity, and the name of the directory holding this report and every screenshot it references.",
+      "type": "string",
+      "minLength": 1
+    },
+    "startedAt": { "description": "ISO-8601 UTC. When runShow began, before the deck loaded.", "type": "string", "format": "date-time" },
+    "endedAt": { "description": "ISO-8601 UTC. When the run ended, BEFORE teardown — a crash in teardown must not cost the report.", "type": "string", "format": "date-time" },
+    "exitReason": {
+      "description": "How the run ended. `key` = the operator pressed Esc/q or clicked exit; `signal` = SIGINT/SIGTERM; `error` = a fatal error in the runner. `end-of-deck` is reserved and NOT currently produced: the last slide is a wall, not a wrap (show-state.ts `next`), so a deck never exits itself — a run always ends by key, signal or error.",
+      "type": "string",
+      "enum": ["key", "signal", "end-of-deck", "error"]
+    },
+    "deck": {
+      "description": "What was presented.",
+      "type": "object",
+      "required": ["path", "title", "slideCount", "rowCount", "warnings"],
+      "additionalProperties": false,
+      "properties": {
+        "path": { "description": "The deck path exactly as the operator supplied it.", "type": "string" },
+        "title": { "description": "The .xlsx basename without its extension.", "type": "string" },
+        "slideCount": { "type": "integer", "minimum": 0 },
+        "rowCount": { "description": "Total narration rows across the deck — a slide may span several.", "type": "integer", "minimum": 0 },
+        "warnings": {
+          "description": "Every load-time warning, carried forward verbatim, so a report explains a deck that opened imperfectly.",
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "run": {
+      "description": "How the run was configured and how the operator drove it.",
+      "type": "object",
+      "required": ["defaultDwellSec", "slidesPort", "autoInitial", "presenterInitial", "toggles", "manualAdvances"],
+      "additionalProperties": false,
+      "properties": {
+        "defaultDwellSec": { "description": "--default-dwell, the fallback for a slide with a blank duration cell.", "type": "number", "exclusiveMinimum": 0 },
+        "slidesPort": { "description": "The port the slides server bound. 0 means an ephemeral port was requested — legal, and what the tests use.", "type": "integer", "minimum": 0 },
+        "autoInitial": { "description": "Auto-pacing at the START of the run. It is toggleable mid-run, so this is an initial value, never the whole truth — see `toggles`.", "type": "boolean" },
+        "presenterInitial": { "description": "Presenter band visible at the START of the run. Toggleable mid-run — see `toggles`.", "type": "boolean" },
+        "toggles": {
+          "description": "Every mid-run auto/presenter toggle, in order. Recorded as events because a single boolean would misreport any run where the operator pressed `t` or `a`.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["at", "what", "to"],
+            "additionalProperties": false,
+            "properties": {
+              "at": { "type": "string", "format": "date-time" },
+              "what": { "type": "string", "enum": ["auto", "presenter"] },
+              "to": { "type": "boolean" }
+            }
+          }
+        },
+        "manualAdvances": {
+          "description": "How many slide transitions came from an explicit next/prev rather than the auto-pacing tick. High counts mean the deck's declared durations are wrong.",
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "slides": {
+      "description": "One entry per deck slide, in deck order, whether or not it was ever visited.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["index", "slideNumber", "title", "declaredDurationSec", "effectiveDurationSec", "actualDwellMs", "visits"],
+        "additionalProperties": false,
+        "properties": {
+          "index": { "description": "0-based position in the deck.", "type": "integer", "minimum": 0 },
+          "slideNumber": { "description": "The `slide #` the author typed in Excel.", "type": "integer", "minimum": 1 },
+          "title": { "type": "string" },
+          "declaredDurationSec": {
+            "description": "The slide's own `duration (sec)`, or null when that cell was blank.",
+            "type": ["number", "null"],
+            "exclusiveMinimum": 0
+          },
+          "effectiveDurationSec": { "description": "declaredDurationSec, or the run default when it was blank. This is what the deck ASKED for.", "type": "number", "exclusiveMinimum": 0 },
+          "actualDwellMs": { "description": "What the slide actually GOT, summed across every visit. Compare against effectiveDurationSec to retime a deck.", "type": "integer", "minimum": 0 },
+          "visits": {
+            "description": "Every time this slide was on screen. A slide can be revisited by back-arrow or jump, so this is a list, not one pair.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["enteredAt", "leftAt", "dwellMs", "advance"],
+              "additionalProperties": false,
+              "properties": {
+                "enteredAt": { "type": "string", "format": "date-time" },
+                "leftAt": { "type": ["string", "null"], "format": "date-time" },
+                "dwellMs": { "type": "integer", "minimum": 0 },
+                "advance": {
+                  "description": "How this visit ended. `auto` = the pacing tick; `manual` = next/prev; `jump` = first/last/goto; `end` = the run ended on this slide.",
+                  "type": ["string", "null"],
+                  "enum": ["auto", "manual", "jump", "end", null]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "ops": {
+      "description": "One entry per op DISPATCH, in start order. A staged slide never dispatches, so it never appears here.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["index", "slideNumber", "opId", "mode", "startedAt", "endedAt", "durationMs", "status", "error", "artifacts"],
+        "additionalProperties": false,
+        "properties": {
+          "index": { "type": "integer", "minimum": 0 },
+          "slideNumber": { "type": "integer", "minimum": 1 },
+          "opId": { "description": "The registered op id the deck named.", "type": "string" },
+          "mode": { "description": "live | warm. `staged` ops are never dispatched.", "type": "string" },
+          "params": {
+            "description": "The op's declared parameters as resolved from the deck. Optional: it is emitted as {} until the params column exists.",
+            "type": "object"
+          },
+          "startedAt": { "type": "string", "format": "date-time" },
+          "endedAt": { "description": "null when the run ended while the op was still in flight.", "type": ["string", "null"], "format": "date-time" },
+          "durationMs": { "type": ["integer", "null"], "minimum": 0 },
+          "status": {
+            "description": "`running` means the run ended before the op did — that is a real, reportable outcome, not a gap.",
+            "type": "string",
+            "enum": ["running", "done", "failed"]
+          },
+          "error": { "description": "The failure message, verbatim, when status is `failed`.", "type": ["string", "null"] },
+          "artifacts": {
+            "description": "Evidence the op produced — screenshots, execution reports, readiness JSON. Paths are RELATIVE to the tester root, because a report is read on a different machine than it was written on.",
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "rawResponse": "",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "SC.L2-3.13.4.remote-access",
+    "label": "Conditional Access Policy for Remote Access Sessions",
+    "engine": "mgraph",
+    "layer_hint": 6,
+    "sequence_hint": 52,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "SC.L2-3.13.4"
+    ],
+    "get_command": "Get-MgIdentityConditionalAccessPolicy -All | Where-Object { $_.DisplayName -like '*Remote*' -or $_.DisplayName -like '*VPN*' } | Select-Object DisplayName,State,Conditions,GrantControls | ConvertTo-Json -Depth 3",
+    "set_command": "",
+    "evidence_commands": [
+      "Get-MgIdentityConditionalAccessPolicy -All | Where-Object { $_.DisplayName -like '*Remote*' } | ConvertTo-Json -Depth 4"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SC.L2-3.13.4"
+    ],
+    "timestamp": "2026-11-01T16:04:41.897Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Conditional Access Policy for Remote Access Sessions",
+    "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

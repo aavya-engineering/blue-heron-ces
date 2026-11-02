@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "note": "Allow-list for build-monorepo.mjs. Only secret rules and hygiene rules (identity-scan.ps1 pattern N) may appear here, each with a reason. The banned identity list (nb-tools/scan-tokens.txt, the workstation user name, --tokens-extra) can never be allow-listed; fix the source instead.",
+  "allow": [
+    { "path": "pkg/ces-muster-run/scripts/handoff/test/check.test.mjs", "rule": "JWT", "reason": "Test fixture for check.mjs (f): a made-up header.payload.signature string (payload {\"sub\":\"abcdef\"}), not a real token." },
+    { "path": "pkg/ces-muster-run/scripts/handoff/test/check.test.mjs", "rule": "identity-scan.ps1 pattern 1", "reason": "Test fixture for check.mjs (f): a fake profile path that the test expects the scan to catch." },
+    { "path": "pkg/ces-muster-run/scripts/identity-scan.ps1", "rule": "identity-scan.ps1 pattern 1", "reason": "The scanner's own comment that describes the doubled-backslash profile-path pattern; no real path." },
+    { "path": "pkg/ces-muster-run/scripts/identity-scan.ps1", "rule": "identity-scan.ps1 pattern 2", "reason": "The scanner's own comment that describes the slash-form profile-path pattern; no real path." },
+    { "path": "pkg/ces-muster-run/scripts/identity-scan.ps1", "rule": "identity-scan.ps1 pattern 5", "reason": "The scanner's own pattern list contains the keyword it scans for; no path." },
+    { "path": "pkg/ces-muster-run/scripts/dashboard.test.mjs", "rule": "identity-scan.ps1 pattern 1", "reason": "Test comment describing the JSON-escaped profile-path form the dashboard scan must catch; no real path." },
+    { "path": "pkg/ces-muster-run/scripts/dashboard.test.mjs", "rule": "identity-scan.ps1 pattern 2", "reason": "Planted leak fixture that the dashboard test expects the scan to catch." },
+    { "path": "ces/ces-tester/tests/flow-sim-only-guard.test.ts", "rule": "identity-scan.ps1 pattern 1", "reason": "Fake PSModulePath used to prove the sim-only guard; no real user." },
+    { "path": "ces/ces-tester/docs/demo/PLAN-ACT-HARNESS.md", "rule": "identity-scan.ps1 pattern 5", "reason": "Prose uses the scratch-folder keyword for a throwaway harness; no path." },
+    { "path": "ces/ces-tester/docs/PHASE0_FINDINGS.md", "rule": "identity-scan.ps1 pattern 5", "reason": "Prose uses the scratch-folder keyword for a temp folder; no path." },
+    { "path": "ces/ces-eo/data/fedramp-gcc-high-inheritance.README.md", "rule": "identity-scan.ps1 pattern 5", "reason": "Prose says the data was built in a session scratch folder; no path." }
+  ]
+}

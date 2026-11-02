@@ -1,0 +1,35 @@
+{
+  "rawResponse": "{\r\n    \"CreationDate\":  \"2026-10-28T04:33:00.000Z\",\r\n    \"Operations\":  \"Set-Mailbox\",\r\n    \"UserIds\":  \"adm-belmira.pennanmore@s3-def.simtenant.onmicrosoft.us\",\r\n    \"AuditData\":  \"{\\\"CreationTime\\\":\\\"2026-10-28T04:33:00\\\",\\\"Id\\\":\\\"53530000-00a1-4000-8000-00000000000b\\\",\\\"Operation\\\":\\\"Set-Mailbox\\\",\\\"OrganizationId\\\":\\\"sim-tenant-s3-def\\\",\\\"RecordType\\\":1,\\\"ResultStatus\\\":\\\"Succeeded\\\",\\\"UserKey\\\":\\\"user-58\\\",\\\"UserType\\\":2,\\\"Version\\\":1,\\\"Workload\\\":\\\"Exchange\\\",\\\"UserId\\\":\\\"adm-belmira.pennanmore@s3-def.simtenant.onmicrosoft.us\\\",\\\"ObjectId\\\":\\\"derwyn.latticecrest@s3-def.simtenant.onmicrosoft.us\\\",\\\"Parameters\\\":[{\\\"Name\\\":\\\"AuditEnabled\\\",\\\"Value\\\":\\\"True\\\"}]}\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "AU.L2-3.3.6.audit-report-evidence",
+    "label": "Renderable: Audit Log Search and Report Generation Evidence",
+    "engine": "exchange",
+    "layer_hint": 8,
+    "sequence_hint": 52,
+    "idempotency": "safe",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "AU.L2-3.3.6"
+    ],
+    "get_command": "Search-UnifiedAuditLog -StartDate (Get-Date).AddDays(-7) -EndDate (Get-Date) -RecordType ExchangeAdmin -ResultSize 10 | Select-Object CreationDate,Operations,UserIds | ConvertTo-Json -Depth 5",
+    "set_command": "",
+    "evidence_commands": [
+      "Search-UnifiedAuditLog -StartDate (Get-Date).AddDays(-7) -EndDate (Get-Date) -RecordType ExchangeAdmin -ResultSize 25 | Select-Object CreationDate,Operations,UserIds,AuditData | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AU.L2-3.3.6"
+    ],
+    "timestamp": "2026-11-01T06:58:43.052Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Renderable: Audit Log Search and Report Generation Evidence",
+    "sha256Hash": "9ec64f7d4a822d9e7bdd3854a80775e592cf29d7e885a581f34dcb82eaf4ce46",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

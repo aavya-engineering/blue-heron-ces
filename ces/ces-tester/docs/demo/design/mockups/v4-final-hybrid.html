@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<!--
+  SPDX-FileCopyrightText: Blue Heron Defense LLC and its licensors. All rights reserved.
+  SPDX-License-Identifier: LicenseRef-BHD-Proprietary
+  CONFIDENTIAL - TRADE SECRET. Unpublished work. Provided solely to perform work for Blue Heron Defense LLC at its direction.
+  Any other use, copying, disclosure, or reuse, in whole or in part, is prohibited.
+  Changes made to this file for Blue Heron Defense LLC are made on its behalf; it claims all rights in them.
+  Submitting a change to this repository means you accept TERMS.md.
+  Removing or altering this notice is prohibited (17 U.S.C. 1202). Ref: BHD-CES-TESTER-2026A
+  See LICENSE and TERMS.md.
+-->
+
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>V4 — Final Hybrid · BHD slide window mockup</title>
+<style>
+/* =============================================================================
+   V4 — FINAL HYBRID   (synthesis pass, per docs/context/CRITIQUE.md)
+
+   Base            V3 Mission Console — telemetry rail, Tell -> Show -> Tell
+                   stops, per-state gold rotation, cursor auto-hide, hold key.
+   Grafted from V1 the chrome DOM/ID structure and the ledger-row card layout,
+                   which is now the no-rail variant for slides without an op.
+   Rejected from V2 the gold-word-in-body-copy technique and the hero/hold-line
+                   type sizes that overflowed the stage. Nothing carried over.
+
+   Self-contained and fully offline: no CDNs, no external fonts, no image or
+   logo path references. The BHD mark is inlined verbatim from
+   docs/demo/design/brand/bhd-logo-white.svg.
+
+   ---------------------------------------------------------------------------
+   CRITIQUE FIXES APPLIED
+   ---------------------------------------------------------------------------
+   F1  Unit bug fixed. V3 shipped `.state{transform:translateY(14px)}` and
+       `.frag{translateY(8px)}` as raw px against its own "everything is a
+       multiple of --u" contract. Here they are calc(.73*var(--u)) and
+       calc(.42*var(--u)) — 14px and 8px at the 1920 canvas, and correct at
+       every other size. Search this file for a bare `px` in a transform: there
+       isn't one. (max(2px, ...) floors on hairlines are deliberate: a rule
+       thinner than one device pixel is a rule a projector eats.)
+
+   F2  Telemetry-rail data gap closed by CUTTING, not by a schema change.
+       `Tenant`, `Tier` and `Ledger: n writes` had no backing field anywhere in
+       deck-model.ts and are gone. Every readout below now names a field that
+       exists today:
+         Op      slide.op.opId            ('ao-registry')
+         Mode    slide.op.mode            (live | warm | staged)
+         Status  snapshot.opStatus        (none|pending|running|done|failed)
+         Tools   slide.op.tools           (stacksim|muster|stamper|ao|eo)
+         Dwell   snapshot.remainingSec / snapshot.auto
+         Slide   snapshot.index + 1 / snapshot.slideCount
+       `Elapsed` was considered and cut too: while an op holds, remainingSec is
+       null and durationSec has not started counting, so elapsed is NOT
+       derivable in the state that most wanted it. `Dwell: holding` is the
+       honest readout and it is production's exact clock expression.
+       The Tell->Show->Tell stops are field-traceable on the same standard:
+         Tell  = the slide title (feature) + func
+         Show  = op.opId driving the app pane
+         Tell  = benefit + differentiator
+       That is RESEARCH_SUMMARY 3's mapping, one-to-one onto the sheet columns.
+
+   F3  Chrome grafted onto production's own IDs, so the port is a CSS pass.
+       This file's chrome is #dots / #op / #pos / #clock / #mode — the exact ids
+       already in slide-render.ts's chrome div. (V1's #op-pill and #mode-pill
+       were renamed to the production names the critique actually cited.)
+       #pos is present but hidden and never written: founder feedback 2026-09-05
+       kept the dots as the SINGLE slide-position indicator and cut the numeric
+       "slide 07 / 08" counter. The id survives so draw()'s existing write to it
+       is harmless and the port stays a CSS pass rather than a renderer edit.
+       Production's draw() writes `opEl.textContent = ...`, which destroys child
+       nodes, so #op, #mode and #clock are SINGLE TEXT NODES here — the
+       running dot is an #op::before, not a child span. #op:empty hides itself,
+       matching draw()'s `opEl.textContent = ''` for a slide with no op.
+       One new chrome element is required and is flagged as such: the dwell bar
+       (#dwell). It costs draw() one line —
+         dwellEl.style.width = snap.remainingSec === null ? '0%'
+           : (snap.remainingSec / (slide.durationSec || DECK.defaultDwellSec)) * 100 + '%';
+       The telemetry rail is the other addition, and lives inside the slide body
+       where renderSlideHtml() already composes markup.
+
+   F4  Fifth reference state added — STATE 6, the body-split image slide that
+       renderSlideHtml() already emits (`bodyClass = 'body body-split'` when a
+       slide has both cards and images) and which no earlier mockup designed.
+       The image is an inline SVG placeholder standing exactly where production
+       puts `<img class="slide-image" src="/asset/<id>">`.
+
+   F5  Title slide is now an explicit render path, not a bespoke one-off.
+       STATE 1 carries `data-render="title"`; the rest carry
+       `data-render="content"`. Production change this implies, stated plainly:
+       add `readonly isTitle: boolean` to RenderedSlide, set it in
+       buildDeckView (slide index 0, or a `title` op mode), and branch in
+       renderSlideHtml() to a renderTitleHtml() that emits
+       `.title-head / h1.hero / .subtitle / .stat-row / .chips`. It is a second
+       branch over the SAME fields — no new columns.
+
+   ---------------------------------------------------------------------------
+   MARKUP CONTRACT — content states reuse production's emitted DOM verbatim
+   ---------------------------------------------------------------------------
+   .slide-head > .eyebrow + h1 + .subtitle
+   .body[.body-split] > .cards > section.card.fn > h3 + p (+ p ...)
+   The two-column ledger row is pure CSS grid placement over that flat h3+p —
+   `.card > h3{grid-row:1/-1}` — so no HTML restructuring is needed. Fragment
+   staggering is CSS :nth-child, not a .frag class the renderer would have to
+   emit. Both were the critique's stated portability claims for V1; this file
+   proves them against production's real output instead of a friendlier mockup
+   DOM. `--i` is used only inside the rail and the hold card, which are new
+   markup anyway.
+
+   ---------------------------------------------------------------------------
+   UNIT RULE — every size is a multiple of --u, one hundredth of the 16:9
+   stage's WIDTH, exactly as slide-render.ts does it. Authored at 1920x1080, so
+   px / 19.2 = u:  24px eyebrow = 1.25u . 28px floor = 1.46u . 36px body = 1.88u
+   48px subhead = 2.5u . 72px title = 3.75u . 154px h-margin = 8u.
+   Audience-facing copy never drops below 1.46u (28px). The rail readouts and
+   the chrome sit below that on purpose — they are for the driver, not the room.
+
+   ELEVATION RULE — no panel fills, anywhere. #243244 on #1a2332 is 1.21:1 and
+   vanishes on a projector. Every separation here is a 1px rgba(255,255,255,.10)
+   hairline. No gradients, no soft shadows, no pure black.
+
+   GOLD BUDGET — <=3 gold elements per state, never gold body copy. The two
+   always-on spends are counted FIRST, then the remainder is allocated:
+     always-on   the active deck dot . the dwell fill WHEN IT IS TICKING
+     state 1     active dot . dwell fill . title rule           (the "5" is
+                 --t1 white, not gold — with the dwell ticking, gold on it
+                 would have made four)
+     state 2     active dot . dwell fill . eyebrow rule
+     state 3     active dot . dwell fill . #mode "warm"         (eyebrow rule
+                 neutral; the done op pill is green, not gold)
+     state 4     active dot . #op "running"                     (dwell is
+                 dormant while holding, so it spends nothing — 2 of 3)
+     state 5     active dot . #op "running" . hold rule
+     state 6     active dot . dwell fill . eyebrow rule         (the founder's
+                 image never spends gold; the placeholder is neutral ramp)
+   Fail is AMBER #ffb454, never red — red reads as "broken" to a room. The mode
+   pill is never an alarm colour: production styles .pill.live red, which this
+   design overrides to neutral, because `live` describes a slide, it does not
+   report a fault.
+   ========================================================================== */
+
+:root{
+  /* Pure viewport math, so the mockup-only corner caption outside the stage
+     inherits the same unit the stage uses. */
+  --u:calc(min(100vw, 177.78vh) / 100);
+
+  /* BHD-BRAND.md palette */
+  --navy:#1a2332;
+  --navy-deep:#0f1923;   /* presenter band */
+  --navy-mid:#152030;    /* chrome bar */
+  --gold:#f5b74a;        /* THE accent. <=3 elements per state. */
+
+  /* Text ramp — computed WCAG on #1a2332 (RESEARCH_SUMMARY 4) */
+  --t1:#e8edf2;   /* 13.40:1 */
+  --t2:#c9d4e0;   /* 10.51:1 */
+  --t3:#8fa3b8;   /*  6.09:1 */
+  --t4:#7d8fa3;   /*  4.76:1 — the floor, nothing dimmer */
+
+  --pass:#4ade80;
+  --warn:#ffb454; /* amber, never red */
+
+  --hair:rgba(255,255,255,.10);
+  --hair-soft:rgba(255,255,255,.06);
+  --kbd-line:rgba(255,255,255,.18);
+
+  --ease-slide:cubic-bezier(.16,1,.3,1);  /* deck motion */
+  --ease-brand:cubic-bezier(.4,0,.2,1);   /* BHD chrome micro-interactions */
+  --slide-in:280ms;   /* slide change      */
+  --frag:180ms;       /* fragment reveal   */
+  --pill:240ms;       /* status transition */
+}
+
+*{box-sizing:border-box;}
+[hidden]{display:none !important;}
+html,body{
+  margin:0;padding:0;height:100%;
+  background:var(--navy-deep);      /* never pure black */
+  overflow:hidden;
+  user-select:none;-webkit-user-select:none;
+}
+body{
+  color:var(--t1);
+  font-family:'Roboto', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+  font-weight:400;
+}
+body.cursor-idle{cursor:none;}     /* auto-hide at 2500ms */
+
+/* ------------------------------------------------------------------ STAGE -- */
+.stage{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:min(100vw, 177.78vh);
+  height:min(56.25vw, 100vh);
+  background:var(--navy);
+  display:flex;flex-direction:column;overflow:hidden;
+  font-size:calc(1*var(--u));
+}
+
+/* Console texture + vignette: decorative only, never encodes meaning, held at
+   1.6-2.8% so a lifted-black projector cannot turn it into visible banding. */
+.texture{
+  position:absolute;inset:0;pointer-events:none;z-index:1;
+  background-image:
+    repeating-linear-gradient(0deg,  rgba(255,255,255,.028) 0 1px, transparent 1px calc(4*var(--u))),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.028) 0 1px, transparent 1px calc(4*var(--u))),
+    repeating-linear-gradient(0deg,  rgba(255,255,255,.016) 0 1px, transparent 1px 3px);
+}
+.vignette{
+  position:absolute;inset:0;pointer-events:none;z-index:1;
+  box-shadow:inset 0 0 calc(12*var(--u)) rgba(10,16,24,.45);
+}
+
+/* ------------------------------------------------------------- SLIDE AREA -- */
+.slide-area{position:relative;z-index:2;flex:1;min-height:0;}
+
+/* F1: translateY is .73u (14px @1920), not a raw px value. */
+.state{
+  position:absolute;inset:0;
+  padding:calc(3.2*var(--u)) calc(8*var(--u)) calc(2.2*var(--u));
+  display:flex;flex-direction:column;min-height:0;overflow:hidden;
+  opacity:0;transform:translateY(calc(.73*var(--u)));
+  pointer-events:none;visibility:hidden;
+  transition:opacity var(--slide-in) var(--ease-slide),
+             transform var(--slide-in) var(--ease-slide),
+             visibility 0s linear var(--slide-in);
+}
+.state.on{
+  opacity:1;transform:translateY(0);pointer-events:auto;visibility:visible;
+  transition:opacity var(--slide-in) var(--ease-slide),
+             transform var(--slide-in) var(--ease-slide),
+             visibility 0s linear 0s;
+}
+
+/* Fragment reveal — 180ms, .42u (8px) rise, 70ms stagger. 100ms reads as an
+   accident; 70ms reads as intent. Driven by :nth-child over production's own
+   markup, so renderSlideHtml() does not have to emit a .frag class. */
+@keyframes frag{from{opacity:0;transform:translateY(calc(.42*var(--u)));} to{opacity:1;transform:translateY(0);}}
+.state.anim .slide-head > *,
+.state.anim .cards > .card,
+.state.anim .images,
+.state.anim [data-i]{
+  animation:frag var(--frag) var(--ease-slide) both;
+}
+.state.anim .slide-head > *:nth-child(1){animation-delay:120ms;}
+.state.anim .slide-head > *:nth-child(2){animation-delay:190ms;}
+.state.anim .slide-head > *:nth-child(3){animation-delay:260ms;}
+.state.anim .cards > .card:nth-child(1){animation-delay:260ms;}
+.state.anim .cards > .card:nth-child(2){animation-delay:330ms;}
+.state.anim .cards > .card:nth-child(3){animation-delay:400ms;}
+.state.anim .images{animation-delay:330ms;}
+/* `data-i` is an ATTRIBUTE, and CSS cannot read one into var() — the index has
+   to be mapped to a custom property explicitly or every fragment fires at
+   120ms together. Same class of defect as V3's raw-px transform: a stated
+   contract the file did not actually honour. */
+[data-i="0"]{--i:0;} [data-i="1"]{--i:1;} [data-i="2"]{--i:2;} [data-i="3"]{--i:3;}
+.state.anim [data-i]{animation-delay:calc(var(--i,0) * 70ms + 120ms);}
+
+/* -------------------------------------------------------------- EYEBROW ---- */
+.slide-head{flex:0 0 auto;}
+.eyebrow{
+  display:flex;align-items:center;gap:calc(1.1*var(--u));
+  font-size:calc(1.25*var(--u));line-height:1;
+  text-transform:uppercase;letter-spacing:.14em;font-weight:700;
+  color:var(--t3);
+}
+.eyebrow .num{color:var(--t2);font-variant-numeric:tabular-nums;}
+.eyebrow .sep{color:var(--hair);}
+.rule{
+  flex:0 0 auto;
+  width:calc(3.2*var(--u));height:max(2px, calc(.16*var(--u)));
+  background:var(--t4);
+}
+/* GOLD — 2px not 1px: a scaled hairline lands on a half pixel, and a half-lit
+   gold line is exactly the low-luminance detail a projector eats. */
+.rule.gold{background:var(--gold);}
+
+/* Tool chips carry no gold — the budget is spent elsewhere on every state. */
+.chips{display:inline-flex;gap:calc(.6*var(--u));}
+.chip{
+  border:1px solid var(--hair);border-radius:calc(.28*var(--u));
+  padding:calc(.2*var(--u)) calc(.8*var(--u));
+  font-size:calc(1.05*var(--u));letter-spacing:.12em;font-weight:500;
+  color:var(--t3);
+}
+
+/* ----------------------------------------------------------- TYPOGRAPHY ---- */
+h1{
+  margin:calc(1.4*var(--u)) 0 0;
+  font-size:calc(3*var(--u));          /* 58px */
+  line-height:1.1;font-weight:700;letter-spacing:-.012em;
+  color:var(--t1);max-width:18ch;
+}
+h1.hero{
+  font-size:calc(4.6*var(--u));        /* 88px — sized to stay inside the
+                                          stage with the presenter band open,
+                                          which is what broke V2 */
+  line-height:1.06;max-width:14ch;margin-top:calc(2.4*var(--u));
+}
+.subtitle{
+  margin:calc(1.3*var(--u)) 0 0;
+  font-size:calc(1.88*var(--u));       /* 36px */
+  line-height:1.45;color:var(--t2);max-width:44ch;
+}
+.subtitle.lede{font-size:calc(2.2*var(--u));max-width:40ch;}
+
+/* --------------------------------------------------- LEDGER OF CARDS (V1) -- */
+/* Two-column ledger rows applied to production's FLAT `<h3> + <p>` output by
+   grid placement alone. No fills, no coloured left borders: a #243244 panel on
+   navy is 1.21:1 and disappears. Structure is a hairline and a label gutter,
+   which is also what makes it read as a typeset brief rather than a web card. */
+.body{flex:1;min-height:0;display:flex;gap:calc(3*var(--u));margin-top:calc(2*var(--u));overflow:hidden;}
+.body-split .cards{flex:1.15;min-width:0;}
+.body-split .images{flex:1;min-width:0;}
+.cards{flex:1;min-width:0;display:flex;flex-direction:column;}
+.card{
+  display:grid;
+  grid-template-columns:calc(11*var(--u)) minmax(0,1fr);
+  column-gap:calc(2.6*var(--u));
+  padding:calc(1.2*var(--u)) 0;
+  border-top:1px solid var(--hair);
+}
+.card:last-child{border-bottom:1px solid var(--hair);}
+.card > h3{
+  grid-column:1;grid-row:1 / -1;      /* the label gutter, all rows tall */
+  margin:0;padding-top:calc(.4*var(--u));
+  font-size:calc(1.25*var(--u));line-height:1.3;
+  text-transform:uppercase;letter-spacing:.14em;font-weight:700;
+  color:var(--t3);
+}
+.card > p{
+  grid-column:2;margin:0 0 calc(.6*var(--u));
+  font-size:calc(1.75*var(--u));      /* 33.6px — above the 28px floor */
+  line-height:1.45;color:var(--t1);
+}
+.card > p:last-child{margin-bottom:0;}
+.card.fn > p{color:var(--t2);}
+
+/* Production emits <img class="slide-image">; the inline SVG below stands in
+   the same box with the same constraints. */
+.images{display:flex;align-items:center;justify-content:center;min-height:0;}
+.slide-image{
+  max-width:100%;max-height:100%;object-fit:contain;
+  border:1px solid var(--hair);border-radius:calc(.6*var(--u));
+  background:transparent;
+}
+
+/* ---------------------------------------------------- TELEMETRY RAIL (V3) -- */
+/* Present only on slides that drive an op. A plain fact slide should not pay
+   the rail's horizontal cost — that is state 2. */
+.slide-grid{flex:1;min-height:0;display:flex;gap:calc(3*var(--u));}
+.rail{
+  flex:0 0 calc(15*var(--u));
+  border-right:1px solid var(--hair);
+  padding-right:calc(2*var(--u));
+  display:flex;flex-direction:column;min-height:0;
+}
+.rail-label{
+  font-size:calc(.92*var(--u));text-transform:uppercase;letter-spacing:.20em;
+  color:var(--t4);font-weight:700;
+  padding-bottom:calc(1.0*var(--u));
+  border-bottom:1px solid var(--hair-soft);
+}
+/* Tell -> Show -> Tell as instrument stops. Each stop's sub-label names the
+   sheet column it is derived from — no stop asserts data the deck cannot hold. */
+.stops{margin-top:calc(1.4*var(--u));position:relative;}
+.stops::before{
+  content:'';position:absolute;left:calc(.42*var(--u));
+  top:calc(.9*var(--u));bottom:calc(.9*var(--u));
+  width:1px;background:var(--hair);
+}
+.stop{position:relative;padding-left:calc(2.1*var(--u));margin-bottom:calc(1.3*var(--u));}
+.stop::before{
+  content:'';position:absolute;left:0;top:calc(.42*var(--u));
+  width:calc(.85*var(--u));height:calc(.85*var(--u));border-radius:50%;
+  background:var(--navy);border:1px solid var(--t4);
+  transition:background var(--pill) var(--ease-brand), border-color var(--pill) var(--ease-brand);
+}
+.stop.active::before{background:var(--t1);border-color:var(--t1);}
+.stop .s-kind{
+  display:block;font-size:calc(.95*var(--u));font-weight:700;
+  text-transform:uppercase;letter-spacing:.16em;color:var(--t4);
+  transition:color var(--pill) var(--ease-brand);
+}
+.stop.active .s-kind{color:var(--t1);}
+.stop .s-what{
+  display:block;font-size:calc(1*var(--u));color:var(--t4);
+  line-height:1.35;margin-top:calc(.25*var(--u));
+}
+.stop.active .s-what{color:var(--t3);}
+
+/* Readouts. Every key below names a field that exists in deck-model.ts or
+   show-state.ts's ShowSnapshot — see F2 in the header. */
+.readouts{margin-top:auto;padding-top:calc(1.2*var(--u));border-top:1px solid var(--hair-soft);}
+.ro{
+  display:flex;justify-content:space-between;align-items:baseline;gap:calc(.8*var(--u));
+  font-size:calc(1*var(--u));padding:calc(.28*var(--u)) 0;
+}
+.ro .k{
+  color:var(--t4);text-transform:uppercase;letter-spacing:.12em;
+  font-size:calc(.88*var(--u));font-weight:700;white-space:nowrap;
+}
+.ro .v{color:var(--t2);font-variant-numeric:tabular-nums;text-align:right;}
+.ro .v.ok{color:var(--pass);}
+.ro .v.hold{color:var(--t3);}
+.ro .chips{gap:calc(.4*var(--u));}
+.ro .chip{font-size:calc(.88*var(--u));padding:0 calc(.5*var(--u));}
+
+.main{flex:1;min-width:0;display:flex;flex-direction:column;min-height:0;}
+
+/* ------------------------------------------ "WHAT YOU'RE SEEING" CAPTION --- */
+/* Its text is the slide's `func` column. On a live-op slide the Function card
+   is promoted into this lozenge instead of being repeated below — Function IS
+   the "what you're seeing", which is the Tell -> Show hinge. */
+.now{
+  margin-top:calc(1.5*var(--u));align-self:flex-start;
+  display:inline-flex;align-items:center;gap:calc(.9*var(--u));
+  border:1px solid var(--hair);border-radius:calc(2*var(--u));
+  padding:calc(.5*var(--u)) calc(1.3*var(--u));
+  font-size:calc(1.46*var(--u));      /* 28px — the audience-facing floor */
+  line-height:1.35;color:var(--t2);max-width:52ch;
+}
+.now .lbl{
+  flex:0 0 auto;
+  font-size:calc(1*var(--u));text-transform:uppercase;letter-spacing:.16em;
+  color:var(--t4);font-weight:700;
+}
+.now .eye{
+  flex:0 0 auto;
+  width:calc(.7*var(--u));height:calc(.7*var(--u));border-radius:50%;
+  background:var(--t2);
+  animation:breathe 1.6s var(--ease-brand) infinite;
+}
+@keyframes breathe{0%,100%{opacity:.4} 50%{opacity:1}}
+.paused .now .eye{animation-play-state:paused;}
+
+/* ------------------------------------------------------- TITLE SLIDE (F5) -- */
+/* An explicit render path, not absolute positioning: three flex bands, so
+   nothing can collide when the founder's type reflows. */
+.state[data-render="title"]{justify-content:center;}
+.title-head{display:flex;align-items:center;gap:calc(2*var(--u));flex:0 0 auto;}
+.title-rule{flex:0 0 calc(6*var(--u));height:max(2px, calc(.16*var(--u)));background:var(--gold);}
+.title-org{
+  font-size:calc(1.25*var(--u));text-transform:uppercase;letter-spacing:.20em;
+  color:var(--t3);font-weight:700;
+}
+.stat-row{
+  margin-top:calc(2.2*var(--u));
+  display:flex;align-items:baseline;gap:calc(1.2*var(--u));flex-wrap:wrap;
+  font-size:calc(1.46*var(--u));color:var(--t3);
+  text-transform:uppercase;letter-spacing:.14em;font-weight:500;
+}
+/* Deliberately NOT gold: the dwell fill is already ticking on this state, and
+   gold on the key number would have made four spends. White carries it fine. */
+.stat-row .big{
+  font-size:calc(3*var(--u));font-weight:700;line-height:1;
+  color:var(--t1);font-variant-numeric:tabular-nums;letter-spacing:0;
+}
+.stat-row .sep{color:var(--t4);}
+
+/* ------------------------------------------------------------- LOGO -------- */
+.logo-mark svg{display:block;height:calc(1.67*var(--u));width:auto;}  /* 32px */
+.logo-mark.big svg{height:calc(3.4*var(--u));}                        /* title */
+.logo-corner{
+  position:absolute;right:calc(8*var(--u));bottom:calc(1.1*var(--u));
+  z-index:2;opacity:.8;                       /* 0.8 per RESEARCH_SUMMARY 4 */
+}
+/* The placeholder mark in bhd-logo-white.svg is centred in a 200x60 box, so a
+   third of its width is dead space on each side and it optically floats off the
+   right margin. Delete this nudge when the real tight-cropped lockup lands. */
+.logo-corner{margin-right:calc(-2.1*var(--u));}
+
+/* ---------------------------------------------------- HOLD CARD (>2.5s) ---- */
+/* The top rung of the research's hold ladder: 0-800ms nothing, 800ms-2.5s a
+   status pill, >2.5s auto-promote to this. Slow 2s opacity pulse only — a long
+   op then reads as a deliberate beat rather than a hang. */
+.state[data-render="hold"]{justify-content:center;align-items:flex-start;}
+.hold-kicker{
+  display:flex;align-items:center;gap:calc(1.1*var(--u));
+  font-size:calc(1.25*var(--u));text-transform:uppercase;letter-spacing:.16em;
+  color:var(--t3);font-weight:700;
+}
+.hold-line{
+  margin:calc(2.2*var(--u)) 0 0;
+  font-size:calc(2.6*var(--u));      /* 50px — V2 used 65px here and overflowed */
+  line-height:1.3;font-weight:400;color:var(--t1);
+  max-width:26ch;
+  animation:holdPulse 2s ease-in-out infinite;
+}
+@keyframes holdPulse{0%,100%{opacity:1} 50%{opacity:.72}}
+.paused .hold-line{animation-play-state:paused;}
+.hold-foot{margin-top:calc(2.2*var(--u));font-size:calc(1.46*var(--u));color:var(--t3);}
+.hold-rule{
+  margin-top:calc(1.2*var(--u));
+  width:calc(20*var(--u));height:max(2px, calc(.16*var(--u)));
+  background:var(--gold);
+}
+.ladder{
+  margin-top:calc(2.2*var(--u));
+  display:flex;gap:calc(1.3*var(--u));align-items:center;flex-wrap:wrap;
+  font-size:calc(.95*var(--u));text-transform:uppercase;letter-spacing:.14em;
+  color:var(--t4);
+}
+.ladder b{color:var(--t3);font-weight:700;}
+.ladder .arrow{opacity:.6;}
+
+/* ============================================================================
+   DWELL BAR — the calm linear instrument. Depleting, LINEAR, constant colour,
+   gold at 40%. No red, no pulse, no acceleration: those are precisely what make
+   a countdown stressful in a room.
+   While an op holds, FD-3 says the dwell has not started — so the bar is not
+   frozen mid-way, it is dormant at zero and the clock reads `holding`. That is
+   the state machine's actual semantics, drawn honestly.
+   ========================================================================== */
+.dwell{
+  flex:0 0 auto;position:relative;z-index:3;
+  height:max(3px, calc(.3*var(--u)));
+  background:rgba(255,255,255,.05);
+}
+.dwell i{
+  display:block;height:100%;width:0%;
+  background:rgba(245,183,74,.40);    /* GOLD at 40% */
+  transition:width 1000ms linear;
+}
+.dwell.holding i{width:0 !important;transition:none;}
+
+/* ============================================================================
+   CHROME — production's own IDs. Status is first-class UI, not a footnote.
+   #op / #mode / #clock are single text nodes, because production's draw()
+   assigns .textContent to them and that erases child elements. #pos is hidden
+   and unused — see F3.
+   ========================================================================== */
+.chrome{
+  flex:0 0 auto;position:relative;z-index:3;
+  background:var(--navy-mid);border-top:1px solid var(--hair);
+  padding:calc(1*var(--u)) calc(8*var(--u));
+  display:flex;align-items:center;gap:calc(1.6*var(--u));
+  font-size:calc(1*var(--u));color:var(--t3);letter-spacing:.06em;
+}
+.chrome .grow{flex:1;}
+/* The `.slide-pos` numeric counter rules were deleted with the counter itself
+   (founder feedback 2026-09-05: dots are the one position indicator). */
+#clock{
+  font-variant-numeric:tabular-nums;letter-spacing:.12em;text-transform:uppercase;
+  min-width:calc(6*var(--u));text-align:right;color:var(--t3);
+}
+
+/* Deck position dots — production already writes #dots via innerHTML, so child
+   spans here are on-contract. The active dot is gold: the research's "active
+   progress fill" gold-earner, and it replaces V3's separate top progress rail,
+   which was a top-level element production does not have. */
+#dots{display:inline-flex;gap:calc(.5*var(--u));align-items:center;}
+#dots .dot{
+  width:calc(.55*var(--u));height:calc(.55*var(--u));border-radius:50%;
+  background:rgba(255,255,255,.18);
+  transition:background var(--pill) var(--ease-slide), transform var(--pill) var(--ease-slide);
+}
+#dots .dot.on{background:var(--gold);transform:scale(1.3);}
+
+/* Status pills: 26px tall, 999px radius, 13px uppercase .08em, 240ms change. */
+.pill{
+  display:inline-flex;align-items:center;gap:calc(.55*var(--u));
+  height:calc(1.5*var(--u));padding:0 calc(1*var(--u));
+  border:1px solid var(--hair);border-radius:999px;
+  font-size:calc(.82*var(--u));letter-spacing:.09em;text-transform:uppercase;
+  font-weight:700;color:var(--t3);white-space:nowrap;
+  transition:color var(--pill) var(--ease-brand), border-color var(--pill) var(--ease-brand);
+}
+#op:empty{display:none;}                       /* draw() writes '' for no op */
+#op::before{
+  content:'';flex:0 0 auto;
+  width:calc(.5*var(--u));height:calc(.5*var(--u));border-radius:50%;
+  background:currentColor;
+}
+#op.none::before,#op.pending::before{opacity:.45;}
+#op.running{color:var(--gold);border-color:rgba(245,183,74,.35);}   /* GOLD */
+#op.running::before{animation:breathe 1.6s var(--ease-brand) infinite;}
+.paused #op.running::before{animation-play-state:paused;}
+#op.done{color:var(--pass);border-color:rgba(74,222,128,.35);}
+#op.failed{color:var(--warn);border-color:rgba(255,180,84,.35);}    /* amber */
+
+/* The mode pill describes the slide; it never reports a fault, so it is never
+   an alarm colour. Only `warm` earns gold, and only where the budget allows. */
+#mode.warm{color:var(--gold);border-color:rgba(245,183,74,.35);}    /* GOLD */
+#mode.live{color:var(--t2);}
+#mode.staged{color:var(--t4);}
+
+/* Keyboard advisories — V1's chrome-bar treatment, grafted verbatim per founder
+   feedback 2026-09-05 ("I like the advisories in the footer of 1"): the whole
+   group sits at .55 opacity so it never competes with the status pills, the key
+   caps are taller (line-height 1, .28u/.55u pad) so a chip reads as a KEY and
+   not as small text, and the label inherits the chrome's own --t3 rather than
+   being pushed down to the --t4 floor. Behaviour is unchanged from V4: auto-show
+   4s on launch then fade, `?` toggles. */
+.hints{display:inline-flex;align-items:center;gap:calc(.7*var(--u));opacity:.55;transition:opacity 300ms var(--ease-brand);}
+.hints.dim{opacity:0;}
+kbd{
+  font-family:inherit;font-size:calc(.72*var(--u));line-height:1;
+  padding:calc(.28*var(--u)) calc(.55*var(--u));
+  border:1px solid var(--kbd-line);border-radius:calc(.26*var(--u));
+  color:var(--t2);
+}
+.hint-txt{font-size:calc(.86*var(--u));color:inherit;letter-spacing:.1em;text-transform:uppercase;}
+
+/* ------------------------------------------------------- PRESENTER BAND ---- */
+/* Ships OPEN, matching createShowState's `presenter: opts.presenter ?? true`.
+   That is also the worst case for vertical fit, which is what killed V2 — every
+   state above is sized to survive it. */
+.presenter{
+  flex:0 0 auto;position:relative;z-index:3;
+  background:var(--navy-deep);border-top:1px solid var(--hair);
+  padding:calc(1.2*var(--u)) calc(8*var(--u));
+  display:grid;grid-template-columns:calc(11*var(--u)) minmax(0,1fr);gap:calc(2.6*var(--u));
+  max-height:22%;overflow:hidden;
+  transition:opacity var(--pill) var(--ease-brand);
+}
+.presenter .p-label{
+  font-size:calc(.95*var(--u));text-transform:uppercase;letter-spacing:.18em;
+  font-weight:700;color:var(--t4);padding-top:calc(.35*var(--u));
+}
+.presenter p{
+  margin:0 0 calc(.5*var(--u));font-size:calc(1.4*var(--u));line-height:1.42;
+  color:var(--t2);max-width:80ch;
+}
+.presenter p:last-child{margin-bottom:0;}
+.presenter.hidden{display:none;}
+
+/* -------------------------------------------------- MOCKUP-ONLY CAPTION ---- */
+.mock-caption{
+  position:fixed;top:calc(.8*var(--u));right:calc(1.2*var(--u));z-index:9;
+  font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--t4);opacity:.75;white-space:nowrap;
+  font-family:'Roboto', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+}
+.mock-caption b{color:var(--t3);font-weight:700;}
+
+/* ============================================================================
+   prefers-reduced-motion — 120ms opacity only, no transforms, no pulses.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce){
+  .state,#dots .dot,.pill,.stop::before,.stop .s-kind,.now,.presenter{
+    transition-duration:120ms !important;
+    transition-property:opacity !important;
+    transition-delay:0ms !important;
+  }
+  .state{transform:none !important;}
+  .state.anim .slide-head > *,
+  .state.anim .cards > .card,
+  .state.anim .images,
+  .state.anim [data-i]{
+    animation-duration:120ms !important;animation-delay:0ms !important;
+    animation-name:fragFade !important;
+  }
+  @keyframes fragFade{from{opacity:0} to{opacity:1}}
+  .hold-line,.now .eye,#op.running::before{animation:none !important;opacity:1 !important;}
+  .dwell i{transition:none !important;}
+}
+</style>
+</head>
+<body>
+
+<div class="stage" id="stage">
+  <div class="texture"></div>
+  <div class="vignette"></div>
+
+  <div class="slide-area">
+
+    <!-- ==================================================================== -->
+    <!-- STATE 1 — TITLE SLIDE                                                -->
+    <!-- F5: an explicit render path. data-render="title" stands in for the    -->
+    <!-- `isTitle` flag that RenderedSlide needs and the second branch that    -->
+    <!-- renderSlideHtml() needs. Same fields, different composition.          -->
+    <!-- Gold: title rule . active dot . dwell fill  (the "5" is white)        -->
+    <!-- ==================================================================== -->
+    <section class="state" data-state="1" data-render="title"
+             data-slide="1" data-op="none" data-mode="staged" data-clock="20s" data-dwell="0.22">
+      <div class="title-head">
+        <span class="logo-mark big">
+          <!-- Inlined verbatim from docs/demo/design/brand/bhd-logo-white.svg -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="200" height="60" viewBox="0 0 200 60">
+            <rect width="200" height="60" rx="8" fill="transparent"/>
+            <text x="100" y="37" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="700" fill="#ffffff" text-anchor="middle">BHD</text>
+          </svg>
+        </span>
+        <span class="title-rule"></span>
+        <span class="title-org">Blue Heron Defense &middot; Compliance Evidence System</span>
+      </div>
+
+      <h1 class="hero" data-i="0">CES in one run</h1>
+
+      <p class="subtitle lede" data-i="1">Weeks of assessment and remediation collapse into a single evidenced run.</p>
+
+      <div class="stat-row" data-i="2">
+        <span class="big">5</span><span>tools</span>
+        <span class="sep">/</span><span>8 slides</span>
+        <span class="sep">/</span><span>one ledger</span>
+      </div>
+
+      <div class="chips" data-i="3" style="margin-top:calc(2*var(--u));">
+        <span class="chip">stacksim</span><span class="chip">muster</span>
+        <span class="chip">stamper</span><span class="chip">ao</span><span class="chip">eo</span>
+      </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- STATE 2 — CONTENT SLIDE, NO OP  (the V1 ledger layout, no rail)       -->
+    <!-- A plain fact slide does not drive the app pane, so it has no Tell ->  -->
+    <!-- Show -> Tell to instrument and should not pay the rail's horizontal   -->
+    <!-- cost. This markup is renderSlideHtml()'s output unchanged.            -->
+    <!-- Gold: eyebrow rule . active dot . dwell fill                          -->
+    <!-- ==================================================================== -->
+    <section class="state" data-state="2" data-render="content"
+             data-slide="3" data-op="none" data-mode="staged" data-clock="41s" data-dwell="0.46">
+      <div class="slide-head">
+        <div class="eyebrow">
+          <span class="rule gold"></span>
+          <span class="num">03</span>
+          <span class="sep">/</span>
+          <span>Evidence Ledger</span>
+          <span class="chips"><span class="chip">stamper</span></span>
+        </div>
+        <h1>One append-only record per run</h1>
+        <div class="subtitle">Every action a tool takes lands in the same ledger, in the same shape.</div>
+      </div>
+
+      <div class="body">
+        <div class="cards">
+          <section class="card fn">
+            <h3>Function</h3>
+            <p>Each tool writes its outcome to a single append-only evidence ledger as it runs.</p>
+          </section>
+          <section class="card benefit">
+            <h3>Benefit</h3>
+            <p>The assessment package assembles itself while the work is happening.</p>
+          </section>
+          <section class="card diff">
+            <h3>Differentiator</h3>
+            <p>Nothing is reconstructed after the fact, so nothing has to be trusted after the fact.</p>
+          </section>
+        </div>
+      </div>
+
+      <span class="logo-corner logo-mark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="60" viewBox="0 0 200 60">
+          <rect width="200" height="60" rx="8" fill="transparent"/>
+          <text x="100" y="37" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="700" fill="#ffffff" text-anchor="middle">BHD</text>
+        </svg>
+      </span>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- STATE 3 — CONTENT SLIDE + TELEMETRY RAIL, warm mode / op done         -->
+    <!-- The op has reported `done`, so per FD-3 the dwell has STARTED and the -->
+    <!-- bar is ticking. Function is promoted into the "Now" lozenge.          -->
+    <!-- Gold: #mode "warm" . active dot . dwell fill  (eyebrow rule neutral,  -->
+    <!--        the done op pill is green)                                     -->
+    <!-- ==================================================================== -->
+    <section class="state" data-state="3" data-render="content"
+             data-slide="6" data-op="done" data-mode="warm" data-clock="62s" data-dwell="0.69">
+      <div class="slide-grid">
+
+        <aside class="rail">
+          <div class="rail-label">Telemetry</div>
+          <div class="stops">
+            <div class="stop active">
+              <span class="s-kind">Tell</span>
+              <span class="s-what">Title &amp; function</span>
+            </div>
+            <div class="stop">
+              <span class="s-kind">Show</span>
+              <span class="s-what">ao-registry, app pane</span>
+            </div>
+            <div class="stop">
+              <span class="s-kind">Tell</span>
+              <span class="s-what">Benefit &amp; differentiator</span>
+            </div>
+          </div>
+          <!-- Every key below is a real field. See F2 in the header comment. -->
+          <div class="readouts">
+            <div class="ro"><span class="k">Op</span><span class="v">ao-registry</span></div>
+            <div class="ro"><span class="k">Mode</span><span class="v">warm</span></div>
+            <div class="ro"><span class="k">Status</span><span class="v ok">done</span></div>
+            <div class="ro"><span class="k">Tools</span><span class="v chips"><span class="chip">ao</span></span></div>
+            <div class="ro"><span class="k">Dwell</span><span class="v">62s</span></div>
+            <div class="ro"><span class="k">Slide</span><span class="v">06 / 08</span></div>
+          </div>
+        </aside>
+
+        <div class="main">
+          <div class="slide-head">
+            <div class="eyebrow">
+              <span class="rule"></span>
+              <span class="num">06</span>
+              <span class="sep">/</span>
+              <span>AdminOps</span>
+              <span class="chips"><span class="chip">ao</span></span>
+            </div>
+            <h1>A tiered registry for day-two operations</h1>
+          </div>
+
+          <div class="now" data-i="0">
+            <span class="eye"></span>
+            <span class="lbl">Now</span>
+            <span>The AdminOps registry is warm and open in the app pane.</span>
+          </div>
+
+          <div class="body">
+            <div class="cards">
+              <section class="card benefit">
+                <h3>Benefit</h3>
+                <p>Routine tenant changes stop being ad-hoc scripts on somebody&rsquo;s laptop.</p>
+              </section>
+              <section class="card diff">
+                <h3>Differentiator</h3>
+                <p>Tier gating plus auto-collected evidence on every single execution.</p>
+              </section>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <span class="logo-corner logo-mark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="60" viewBox="0 0 200 60">
+          <rect width="200" height="60" rx="8" fill="transparent"/>
+          <text x="100" y="37" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="700" fill="#ffffff" text-anchor="middle">BHD</text>
+        </svg>
+      </span>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- STATE 4 — LIVE OP RUNNING, DWELL HOLDING                              -->
+    <!-- FD-3, precisely: a slide whose op is still running has not started    -->
+    <!-- its dwell. The bar is therefore dormant at zero, not frozen mid-way,  -->
+    <!-- and #clock reads `holding` — production's exact expression.           -->
+    <!-- Gold: #op "running" . active dot  (2 of 3; the dormant dwell spends   -->
+    <!--        nothing, which is the point)                                   -->
+    <!-- ==================================================================== -->
+    <section class="state" data-state="4" data-render="content"
+             data-slide="7" data-op="running" data-mode="live" data-clock="holding" data-dwell="hold">
+      <div class="slide-grid">
+
+        <aside class="rail">
+          <div class="rail-label">Telemetry</div>
+          <div class="stops">
+            <div class="stop">
+              <span class="s-kind">Tell</span>
+              <span class="s-what">Title &amp; function</span>
+            </div>
+            <div class="stop active">
+              <span class="s-kind">Show</span>
+              <span class="s-what">ao-registry, app pane</span>
+            </div>
+            <div class="stop">
+              <span class="s-kind">Tell</span>
+              <span class="s-what">Benefit &amp; differentiator</span>
+            </div>
+          </div>
+          <div class="readouts">
+            <div class="ro"><span class="k">Op</span><span class="v">ao-registry</span></div>
+            <div class="ro"><span class="k">Mode</span><span class="v">live</span></div>
+            <div class="ro"><span class="k">Status</span><span class="v">running</span></div>
+            <div class="ro"><span class="k">Tools</span><span class="v chips"><span class="chip">ao</span></span></div>
+            <!-- Not "elapsed": while the op holds, remainingSec is null and the
+                 dwell has not begun. `holding` is what the model actually knows. -->
+            <div class="ro"><span class="k">Dwell</span><span class="v hold">holding</span></div>
+            <div class="ro"><span class="k">Slide</span><span class="v">07 / 08</span></div>
+          </div>
+        </aside>
+
+        <div class="main">
+          <div class="slide-head">
+            <div class="eyebrow">
+              <span class="rule"></span>
+              <span class="num">07</span>
+              <span class="sep">/</span>
+              <span>AdminOps</span>
+              <span class="chips"><span class="chip">ao</span></span>
+            </div>
+            <h1>Live command execution</h1>
+          </div>
+
+          <div class="now" data-i="0">
+            <span class="eye"></span>
+            <span class="lbl">Now</span>
+            <span>A Tier-1 command is executing against the tenant.</span>
+          </div>
+
+          <div class="body">
+            <div class="cards">
+              <section class="card benefit">
+                <h3>Benefit</h3>
+                <p>Every operator action leaves an evidence record without the operator doing anything extra.</p>
+              </section>
+              <section class="card diff">
+                <h3>Differentiator</h3>
+                <p>The evidence is collected by the tool, not assembled afterwards by the human.</p>
+              </section>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <span class="logo-corner logo-mark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="60" viewBox="0 0 200 60">
+          <rect width="200" height="60" rx="8" fill="transparent"/>
+          <text x="100" y="37" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="700" fill="#ffffff" text-anchor="middle">BHD</text>
+        </svg>
+      </span>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- STATE 5 — FULL-SLIDE HOLD CARD  (the >2.5s rung of the ladder)        -->
+    <!-- The differentiator is promoted to the whole slide with a slow 2s      -->
+    <!-- pulse. The mark stays on: this is the moment the room stares longest, -->
+    <!-- so it is the last place to drop the branding (V2 dropped it here).    -->
+    <!-- Gold: #op "running" . active dot . hold rule                          -->
+    <!-- ==================================================================== -->
+    <section class="state" data-state="5" data-render="hold"
+             data-slide="7" data-op="running" data-mode="live" data-clock="holding" data-dwell="hold">
+      <div class="hold-kicker">
+        <span class="rule"></span>
+        <span>Hold &middot; live operation in progress</span>
+      </div>
+      <div class="hold-rule"></div>
+
+      <!-- Body copy, so not one gold word in it — this is the exact case the
+           gold rule exists to prevent, and the one V2 violated. -->
+      <p class="hold-line">The evidence is collected by the tool, not assembled afterwards by the human.</p>
+
+      <div class="hold-foot" data-i="0">AdminOps &middot; ao-registry &middot; slide 07 of 08</div>
+
+      <div class="ladder" data-i="1">
+        <span>0&ndash;800ms <b>silent</b></span>
+        <span class="arrow">&rarr;</span>
+        <span>0.8&ndash;2.5s <b>status pill</b></span>
+        <span class="arrow">&rarr;</span>
+        <span><b>&gt;2.5s hold card</b></span>
+      </div>
+
+      <span class="logo-corner logo-mark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="60" viewBox="0 0 200 60">
+          <rect width="200" height="60" rx="8" fill="transparent"/>
+          <text x="100" y="37" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="700" fill="#ffffff" text-anchor="middle">BHD</text>
+        </svg>
+      </span>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- STATE 6 — IMAGE SLIDE  (F4: the body-split layout production already  -->
+    <!-- emits and no earlier mockup designed). Cards left, founder image      -->
+    <!-- right. The image is the deck's own asset, so it never spends gold —   -->
+    <!-- the placeholder below is drawn entirely from the neutral text ramp.   -->
+    <!-- Gold: eyebrow rule . active dot . dwell fill                          -->
+    <!-- ==================================================================== -->
+    <section class="state" data-state="6" data-render="content"
+             data-slide="4" data-op="none" data-mode="staged" data-clock="28s" data-dwell="0.31">
+      <div class="slide-head">
+        <div class="eyebrow">
+          <span class="rule gold"></span>
+          <span class="num">04</span>
+          <span class="sep">/</span>
+          <span>Run Topology</span>
+          <span class="chips"><span class="chip">stacksim</span><span class="chip">muster</span></span>
+        </div>
+        <h1>Five tools, one run, one ledger</h1>
+      </div>
+
+      <div class="body body-split">
+        <div class="cards">
+          <section class="card fn">
+            <h3>Function</h3>
+            <p>One run drives all five tools in sequence against the same tenant.</p>
+          </section>
+          <section class="card benefit">
+            <h3>Benefit</h3>
+            <p>No hand-offs between tools, so no gaps between their records.</p>
+          </section>
+        </div>
+
+        <div class="images">
+          <!-- Stands exactly where production emits
+               <img class="slide-image" src="/asset/<id>" alt="...">.
+               Inline so this file stays offline; neutral ramp only. -->
+          <svg class="slide-image" viewBox="0 0 620 380" role="img"
+               aria-label="Five CES tools writing to one evidence ledger"
+               style="width:100%;height:auto;">
+            <defs>
+              <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5"
+                      markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" fill="#7d8fa3"/>
+              </marker>
+            </defs>
+
+            <text x="310" y="30" fill="#8fa3b8" font-family="Roboto, system-ui, sans-serif"
+                  font-size="15" font-weight="700" letter-spacing="2.2"
+                  text-anchor="middle">ONE RUN</text>
+
+            <!-- the five tools -->
+            <g font-family="Roboto, system-ui, sans-serif" font-size="17" fill="#c9d4e0" text-anchor="middle">
+              <rect x="26"  y="58" width="106" height="52" rx="5" fill="none" stroke="rgba(255,255,255,.18)"/>
+              <text x="79"  y="90">stacksim</text>
+              <rect x="146" y="58" width="106" height="52" rx="5" fill="none" stroke="rgba(255,255,255,.18)"/>
+              <text x="199" y="90">muster</text>
+              <rect x="266" y="58" width="106" height="52" rx="5" fill="none" stroke="rgba(255,255,255,.18)"/>
+              <text x="319" y="90">stamper</text>
+              <rect x="386" y="58" width="106" height="52" rx="5" fill="none" stroke="rgba(255,255,255,.18)"/>
+              <text x="439" y="90">ao</text>
+              <rect x="506" y="58" width="86"  height="52" rx="5" fill="none" stroke="rgba(255,255,255,.18)"/>
+              <text x="549" y="90">eo</text>
+            </g>
+
+            <!-- each writes down into the ledger -->
+            <g stroke="#7d8fa3" stroke-width="1.4" marker-end="url(#ar)">
+              <line x1="79"  y1="112" x2="79"  y2="196"/>
+              <line x1="199" y1="112" x2="199" y2="196"/>
+              <line x1="319" y1="112" x2="319" y2="196"/>
+              <line x1="439" y1="112" x2="439" y2="196"/>
+              <line x1="549" y1="112" x2="549" y2="196"/>
+            </g>
+
+            <!-- the ledger -->
+            <rect x="26" y="206" width="566" height="70" rx="5" fill="none" stroke="rgba(255,255,255,.28)"/>
+            <text x="310" y="238" fill="#e8edf2" font-family="Roboto, system-ui, sans-serif"
+                  font-size="20" font-weight="700" text-anchor="middle">Evidence ledger</text>
+            <text x="310" y="262" fill="#8fa3b8" font-family="Roboto, system-ui, sans-serif"
+                  font-size="15" text-anchor="middle">append-only &middot; one record per action</text>
+
+            <line x1="310" y1="276" x2="310" y2="312" stroke="#7d8fa3" stroke-width="1.4" marker-end="url(#ar)"/>
+
+            <rect x="176" y="318" width="268" height="46" rx="5" fill="none" stroke="rgba(255,255,255,.18)"/>
+            <text x="310" y="347" fill="#c9d4e0" font-family="Roboto, system-ui, sans-serif"
+                  font-size="17" text-anchor="middle">Assessment package</text>
+          </svg>
+        </div>
+      </div>
+
+      <span class="logo-corner logo-mark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="60" viewBox="0 0 200 60">
+          <rect width="200" height="60" rx="8" fill="transparent"/>
+          <text x="100" y="37" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="700" fill="#ffffff" text-anchor="middle">BHD</text>
+        </svg>
+      </span>
+    </section>
+
+  </div><!-- /.slide-area -->
+
+  <!-- The one new chrome element the port needs; see F3 in the header. -->
+  <div class="dwell" id="dwell-track"><i id="dwell"></i></div>
+
+  <!-- ====================================================================== -->
+  <!-- CHROME — production's IDs, in production's order.                       -->
+  <!-- slide-render.ts today:                                                  -->
+  <!--   <span id="dots"></span><span class="grow"></span><span id="op"></span> -->
+  <!--   <span>slide <b id="pos"></b></span><span id="clock"></span>            -->
+  <!--   <span class="pill" id="mode"></span>                                   -->
+  <!-- ====================================================================== -->
+  <div class="chrome">
+    <span id="dots"></span>
+    <span class="grow"></span>
+    <span class="hints" id="hints">
+      <kbd>&larr;</kbd><kbd>&rarr;</kbd><span class="hint-txt">slide</span>
+      <kbd>T</kbd><span class="hint-txt">talk track</span>
+      <kbd>P</kbd><span class="hint-txt">hold</span>
+      <kbd>?</kbd><span class="hint-txt">hints</span>
+    </span>
+    <span class="pill" id="op"></span>
+    <!-- #pos is intentionally unused per founder feedback 2026-09-05: the dots are the only slide-position indicator, but the production id is kept (hidden, never written) so the port stays a pure CSS pass. -->
+    <b id="pos" hidden></b>
+    <span id="clock"></span>
+    <span class="pill" id="mode"></span>
+  </div>
+
+  <div class="presenter" id="presenter">
+    <div class="p-label">Talk track</div>
+    <div id="talk"></div>
+  </div>
+
+</div><!-- /.stage -->
+
+<div class="mock-caption"><b>V4</b> &mdash; Final &middot; <span id="stateName">title slide</span></div>
+
+<script>
+(function(){
+  'use strict';
+
+  var SLIDE_COUNT = 8;
+
+  /* Talk track rows, as the founder authors them in the sheet's `talk track`
+     column. Never audience-facing — this band is the presenter's. */
+  var TALK = {
+    1:['Welcome. CES turns a CMMC assessment from a six-week consulting engagement into a repeatable run that leaves evidence behind.'],
+    2:['This is the spine of the whole system. Everything downstream reads from this one ledger.'],
+    3:['AdminOps is the day-two surface. It is already warm, so it opens the moment we need it.'],
+    4:['Here it is live — the real AdminOps GUI, driven exactly the way an operator drives it.'],
+    5:['Long op. Let it breathe — land the differentiator, then come back to the pane.'],
+    6:['One picture for the shape of a run. Five tools, one sequence, one record.']
+  };
+  var NAME = {
+    1:'title slide', 2:'content slide, no op', 3:'content + telemetry rail',
+    4:'live op, dwell holding', 5:'hold card', 6:'image slide (body-split)'
+  };
+
+  var $ = function(id){ return document.getElementById(id); };
+  var states    = Array.prototype.slice.call(document.querySelectorAll('.state'));
+  /* No posEl: #pos is intentionally unused per founder feedback 2026-09-05. */
+  var dotsEl    = $('dots'),  opEl    = $('op');
+  var clockEl   = $('clock'), modeEl  = $('mode'),  dwellEl = $('dwell');
+  var dwellTrack= $('dwell-track');
+  var hints     = $('hints'), stage   = $('stage');
+  var presEl    = $('presenter'), talkEl = $('talk'), stateName = $('stateName');
+
+  var current = 1;
+  /* Matches createShowState's `presenter: opts.presenter ?? true`. */
+  var presenterOn = true;
+  var paused = false;
+
+  dotsEl.innerHTML = new Array(SLIDE_COUNT + 1).join('<span class="dot"></span>');
+  var dots = dotsEl.querySelectorAll('.dot');
+
+  function show(n){
+    current = n;
+    var el    = states[n - 1];
+    var slide = parseInt(el.getAttribute('data-slide'), 10);
+    var op    = el.getAttribute('data-op');      /* ShowSnapshot.opStatus  */
+    var mode  = el.getAttribute('data-mode');    /* SlideOp.mode           */
+    var clock = el.getAttribute('data-clock');   /* the clock expression   */
+    var dwell = el.getAttribute('data-dwell');
+
+    states.forEach(function(s){ s.classList.remove('on','anim'); });
+    void el.offsetWidth;                          /* replay the stagger */
+    el.classList.add('on','anim');
+
+    for (var i = 0; i < dots.length; i++) dots[i].classList.toggle('on', i === slide - 1);
+
+    /* Single text node, exactly as production's draw() writes it. An empty
+       string hides the pill via #op:empty — the no-op case. */
+    opEl.textContent = (op === 'none') ? '' : ('ao-registry · ' + op);
+    opEl.className   = (op === 'none') ? 'pill' : ('pill ' + op);
+
+    clockEl.textContent = clock;
+    modeEl.textContent  = mode;
+    modeEl.className    = 'pill ' + mode;
+
+    /* The dwell bar. `hold` is not a frozen fraction — while an op runs the
+       dwell has not started, so the instrument is dormant at zero. */
+    dwellTrack.classList.toggle('holding', dwell === 'hold');
+    dwellEl.style.width = (dwell === 'hold' ? 0 : parseFloat(dwell) * 100) + '%';
+
+    stateName.textContent = NAME[n];
+    drawPresenter(n);
+  }
+
+  function drawPresenter(n){
+    presEl.classList.toggle('hidden', !presenterOn);
+    talkEl.innerHTML = '';
+    (TALK[n] || []).forEach(function(line){
+      var p = document.createElement('p');
+      p.textContent = line;
+      talkEl.appendChild(p);
+    });
+  }
+
+  /* Keyboard hints: auto-show 4s on launch, then fade; `?` toggles. */
+  var hintTimer = setTimeout(function(){ hints.classList.add('dim'); }, 4000);
+
+  document.addEventListener('keydown', function(e){
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === 'ArrowRight'){ show(current < states.length ? current + 1 : 1); }
+    else if (e.key === 'ArrowLeft'){ show(current > 1 ? current - 1 : states.length); }
+    else if (e.key === 't' || e.key === 'T'){ presenterOn = !presenterOn; drawPresenter(current); }
+    /* Manual hold. In production this is the EXISTING `toggle-auto` action in
+       show-state.ts — no backend gap, just wiring. Note the collision to
+       resolve at port time: keyToAction currently maps 'p' -> prev and 'a' ->
+       toggle-auto, so either rebind 'p' or ship the hold key as 'a'. */
+    else if (e.key === 'p' || e.key === 'P'){
+      paused = !paused;
+      stage.classList.toggle('paused', paused);
+    }
+    else if (e.key === '?'){ clearTimeout(hintTimer); hints.classList.toggle('dim'); }
+    else return;
+    e.preventDefault();
+  });
+
+  document.addEventListener('click', function(e){
+    show(e.clientX < window.innerWidth / 4
+      ? (current > 1 ? current - 1 : states.length)
+      : (current < states.length ? current + 1 : 1));
+  });
+  document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+
+  /* Cursor auto-hide at 2500ms — 5000 (reveal's default) is too long for a
+     live demo; the pointer sits on the slide for two full beats. */
+  var cursorTimer;
+  function wake(){
+    document.body.classList.remove('cursor-idle');
+    clearTimeout(cursorTimer);
+    cursorTimer = setTimeout(function(){ document.body.classList.add('cursor-idle'); }, 2500);
+  }
+  document.addEventListener('mousemove', wake);
+  wake();
+
+  show(1);
+})();
+</script>
+</body>
+</html>

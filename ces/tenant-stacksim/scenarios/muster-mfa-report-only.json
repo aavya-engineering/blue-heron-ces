@@ -1,0 +1,27 @@
+{
+  "name": "muster-mfa-report-only",
+  "description": "Edge case for MFA state detection: a CA policy with the mfa grant in report-only mode ('enabledForReportingButNotEnforced') — Graph's third policy state. Report-only does NOT enforce, so a correct detector reports 'no'.",
+  "stance": "m365_azure",
+  "steps": [
+    {
+      "kind": "uri",
+      "method": "PATCH",
+      "uri": "/v1.0/identity/conditionalAccess/policies/caPolicy-1",
+      "body": {
+        "state": "enabledForReportingButNotEnforced",
+        "grantControls": { "operator": "OR", "builtInControls": ["mfa"] }
+      },
+      "note": "MFA grant in report-only mode -> iam-001/iam-004 must stay 'no'"
+    }
+  ],
+  "expectedFacts": {
+    "RR-ACT-AC_L2_3_1_13": "no",
+    "RR-ACT-IA_L2_3_5_3": "no",
+    "RR-ACT-AC_L2_3_1_12": "no",
+    "RR-ACT-AC_L2_3_1_14": "no",
+    "RR-ACT-CM_L2_3_4_1": "yes",
+    "RR-ACT-CM_L2_3_4_2": "yes",
+    "RR-ACT-SI_L1_3_14_1": "yes",
+    "RR-ACT-SI_L2_3_14_2": "yes"
+  }
+}

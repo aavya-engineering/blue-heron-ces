@@ -1,0 +1,325 @@
+{
+  "family": "RA",
+  "family_name": "Risk Assessment",
+  "practices": [
+    {
+      "id": "RA.L2-3.11.1",
+      "title": "Periodically assess the risk to organizational operations (including mission, functions, image or reputation), organizational assets and individuals, resulting from the operation of organizational systems and the associated processing, storage or transmission of CUI.",
+      "approach": {
+        "what_assessor_does": "The assessor reads the risk assessment procedure for a stated cycle (for example yearly, and after major changes) and a scope that names the systems handling CUI. They then look at the most recent completed assessment and the one before it, checking the dates against the stated cycle and checking that the work covers threats to operations, assets and people, with likelihood and impact rated for each risk. They interview whoever owns the assessment about how it was done, who signed it off and what changed as a result. Testing means tracing a few risks from the register back to their source, such as a scan finding or an incident, and confirming the register has been touched since the last review. CES has no automated tenant signal for this practice; it rests on the risk register, the signed annual snapshot and interviews.",
+        "common_failure_modes": [
+          "No assessment cycle is written down, so there is nothing to measure the dates against.",
+          "The last completed assessment is older than the cycle the procedure states.",
+          "The scope never names the CUI systems, or describes a different environment from the SSP boundary.",
+          "The risk list is generic and rates no likelihood or impact for this organization.",
+          "The assessment was done once for the certification and the register has not been updated since.",
+          "Nobody signed the assessment off, or the person named cannot describe how it was done."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "RA.L2-3.11.1[a]",
+          "determination": "the frequency to assess risk to organizational operations (including mission, functions, image, or reputation), organizational assets, and individuals is defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Risk assessment policy stating the assessment cycle",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/risk-assessment-policy.md (GateEvidence family RA). Should state how often risk is assessed and what events trigger an extra assessment."
+            },
+            {
+              "artifact_type": "Risk register review schedule",
+              "ces_source": "eo_store",
+              "notes": "EO RiskAssessmentStore collection eo_risk_register: the register carries lastFullReviewDate and nextReviewDue. The next-due date should match the cycle in the policy."
+            },
+            {
+              "artifact_type": "Risk owner interview",
+              "ces_source": "interview",
+              "notes": "Ask who set the assessment cycle, why that cycle was chosen, and what would trigger an assessment between cycles. Control signal registry maps RA.L2-3.11.1 to manualGateEvaluator: no tenant signal covers this objective."
+            }
+          ]
+        },
+        {
+          "id": "RA.L2-3.11.1[b]",
+          "determination": "risk to organizational operations, organizational assets, and individuals resulting from the operation of an organizational system that processes, stores, or transmits CUI is assessed with the defined frequency",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Signed annual risk assessment snapshot",
+              "ces_source": "eo_store",
+              "notes": "EO RiskAssessmentStore collection eo_risk_snapshots (one record per assessment year, with signedOffDate). Compare the sign-off dates of the last two snapshots against the stated cycle."
+            },
+            {
+              "artifact_type": "Risk register with rated entries",
+              "ces_source": "eo_store",
+              "notes": "EO RiskAssessmentStore collection eo_risk_register, surfaced by the EO evidence router as item risk:register. Each entry should rate likelihood and impact; check that entries cover operations, assets and individuals."
+            },
+            {
+              "artifact_type": "Risk assessment scope statement",
+              "ces_source": "eo_store",
+              "notes": "EO RiskAssessmentStore collection eo_risk_config, field scopeStatement. Should name the systems that process, store or transmit CUI and agree with the SSP boundary."
+            },
+            {
+              "artifact_type": "Secure Score trend report",
+              "ces_source": "ao_row",
+              "notes": "AdminOps F-01 Secure Score Trend Report (Graph secureScores, weekly); registered against RA.L2-3.11.1. Shows the tenant posture input to the assessment, not the assessment itself."
+            },
+            {
+              "artifact_type": "Risk owner interview",
+              "ces_source": "interview",
+              "notes": "Ask the person who signed off the last assessment to walk through how risks were found and rated, and to name one change made because of it. Trace two register entries back to their source."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "RA.L2-3.11.2",
+      "title": "Scan for vulnerabilities in organizational systems and applications periodically and when new vulnerabilities affecting those systems and applications are identified.",
+      "approach": {
+        "what_assessor_does": "The assessor reads the vulnerability scanning procedure for a stated scan cycle that covers both systems (servers, endpoints, network devices) and applications, and for what happens when a new vulnerability is announced. They compare the scan results over recent months against that cycle and compare the list of scanned devices against the asset inventory. They ask the person who runs the scanner how a newly announced vulnerability leads to an extra scan or check, and ask for an example. Testing means picking a few devices and applications from the inventory and finding them in the latest results, and picking a recent public vulnerability and seeing whether the organization checked for it. In CES the device side is read from Microsoft Defender vulnerability management; applications outside Defender's software inventory need scan reports uploaded.",
+        "common_failure_modes": [
+          "The procedure gives no scan cycle, or gives one for systems but not for applications.",
+          "Scan results show gaps longer than the stated cycle.",
+          "Devices in the inventory never appear in any scan result.",
+          "Web or custom applications are never scanned; only operating systems are covered.",
+          "There is no process for checking a newly announced vulnerability before the next scheduled scan.",
+          "Scans run without credentials, so most findings on the host are missed."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "RA.L2-3.11.2[a]",
+          "determination": "the frequency to scan for vulnerabilities in organizational systems and applications is defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Risk assessment policy stating the scan cycle",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/risk-assessment-policy.md (GateEvidence family RA). Should state the scan cycle for systems and, separately, for applications."
+            },
+            {
+              "artifact_type": "Vulnerability management procedure",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector when the scanning procedure is kept outside the policy set. Should name the tools, the scan cycle and who runs the scans."
+            },
+            {
+              "artifact_type": "Vulnerability management owner interview",
+              "ces_source": "interview",
+              "notes": "Ask what the scan cycle is for systems and for applications, and where it is written down."
+            }
+          ]
+        },
+        {
+          "id": "RA.L2-3.11.2[b]",
+          "determination": "vulnerability scans are performed on organizational systems with the defined frequency",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Device vulnerability assessment recency",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry RA.L2-3.11.2 (vulnScanRecencyEvaluator): Defender vulnerability assessment recency via Graph /security/runHuntingQuery, compared with Graph /deviceManagement/managedDevices. Flags devices not assessed in the last 7 days and managed Windows or macOS devices missing from the assessment."
+            },
+            {
+              "artifact_type": "Vulnerability findings feed",
+              "ces_source": "stack_signal",
+              "notes": "EO evidence router items signal:vulnerabilities and signal:securitySignals, both mapped to RA.L2-3.11.2."
+            },
+            {
+              "artifact_type": "Scan reports for systems outside Defender",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: reports from any other scanner (network devices, servers not onboarded to Defender) covering the period under review."
+            },
+            {
+              "artifact_type": "Scanner operator interview",
+              "ces_source": "interview",
+              "notes": "Ask the person who runs the scans to show the schedule and the last few runs, and explain how devices missing from results are found."
+            }
+          ]
+        },
+        {
+          "id": "RA.L2-3.11.2[c]",
+          "determination": "vulnerability scans are performed on applications with the defined frequency",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Application scan reports",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: web application or code scan reports for the in-scope applications, dated across the period under review. Defender software inventory covers installed software only."
+            },
+            {
+              "artifact_type": "Installed software vulnerability records",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry RA.L2-3.11.2: the Defender advanced hunting read via Graph /security/runHuntingQuery covers vulnerabilities in software installed on onboarded devices."
+            },
+            {
+              "artifact_type": "Application owner interview",
+              "ces_source": "interview",
+              "notes": "Ask which applications handle CUI, which of them are scanned, with what tool and how often."
+            }
+          ]
+        },
+        {
+          "id": "RA.L2-3.11.2[d]",
+          "determination": "vulnerability scans are performed on organizational systems when new vulnerabilities are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Device vulnerability assessment recency",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry RA.L2-3.11.2 (vulnScanRecencyEvaluator). Defender reassesses onboarded devices continuously, so a current assessment date shows new vulnerabilities are checked; the assessor still wants the trigger process."
+            },
+            {
+              "artifact_type": "Vulnerability ingestion run records",
+              "ces_source": "eo_store",
+              "notes": "EO RiskAssessmentStore collection eo_risk_ingestion: one record per vulnerability ingestion run into the risk register. Run dates around a recent public vulnerability show whether it was checked."
+            },
+            {
+              "artifact_type": "Vulnerability management procedure",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Should say which advisory sources are watched and what triggers an extra scan."
+            },
+            {
+              "artifact_type": "Scanner operator interview",
+              "ces_source": "interview",
+              "notes": "Ask for a recent public vulnerability and what was done about it: when it was learned of, when systems were checked, what was found."
+            }
+          ]
+        },
+        {
+          "id": "RA.L2-3.11.2[e]",
+          "determination": "vulnerability scans are performed on applications when new vulnerabilities are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Ad hoc application scan reports",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: application scan reports run outside the normal cycle after a vulnerability was announced, with the advisory that prompted them."
+            },
+            {
+              "artifact_type": "Vulnerability management procedure",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Should cover the trigger for applications, not only operating systems."
+            },
+            {
+              "artifact_type": "Application owner interview",
+              "ces_source": "interview",
+              "notes": "Ask for an example where a new vulnerability in a library or platform led to a check of the applications, and when."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "RA.L2-3.11.3",
+      "title": "Remediate vulnerabilities in accordance with risk assessments.",
+      "approach": {
+        "what_assessor_does": "The assessor checks that scan findings become a tracked list of vulnerabilities, and that the order and deadline for fixing them follow the risk rating the organization gave them (for example critical within a set number of days). They read the remediation procedure for those deadlines, then pick a sample of findings from older scans and follow each one to a fix, a later clean scan, or a recorded decision to accept or defer it, with a POA&M entry where it stays open. They interview the person who assigns the fixes about how priority is set. Testing means comparing an earlier scan with a later one to see whether the sampled findings disappeared within the stated deadlines.",
+        "common_failure_modes": [
+          "Findings are left in the scanner console and never become a tracked item.",
+          "No remediation deadlines by severity are written down, so timeliness cannot be judged.",
+          "Critical findings stay open well past the stated deadline with no recorded reason.",
+          "Accepted or deferred vulnerabilities have no risk decision and no POA&M entry.",
+          "Patches are deployed but no later scan confirms the vulnerability is gone."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "RA.L2-3.11.3[a]",
+          "determination": "vulnerabilities are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Defender vulnerability records",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry RA.L2-3.11.3 (vulnRemediationEvaluator): Defender DeviceTvmSoftwareVulnerabilities rows via Graph /security/runHuntingQuery, with /deviceManagement/windowsUpdateForBusinessUpdateRings. A row is a vulnerability record when it names a CveId."
+            },
+            {
+              "artifact_type": "Prioritized Defender recommendations",
+              "ces_source": "ao_row",
+              "notes": "AdminOps F-02 Defender Recommendation Sprint (monthly top five recommendations); registered against RA.L2-3.11.3."
+            },
+            {
+              "artifact_type": "Vulnerabilities ingested into the risk register",
+              "ces_source": "eo_store",
+              "notes": "EO RiskAssessmentStore collections eo_risk_ingestion and eo_risk_register: scan findings brought into the register as rated entries."
+            },
+            {
+              "artifact_type": "Vulnerability management owner interview",
+              "ces_source": "interview",
+              "notes": "Ask where the current list of open vulnerabilities is kept and how a scan finding gets onto it."
+            }
+          ]
+        },
+        {
+          "id": "RA.L2-3.11.3[b]",
+          "determination": "vulnerabilities are remediated in accordance with risk assessments",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Remediation or tracking status per vulnerability",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry RA.L2-3.11.3 (vulnRemediationEvaluator): each vulnerability must be remediated or carry a mitigation or remediation status. A critical one counts as tracked only with its own status; Defender's recommended update alone does not count."
+            },
+            {
+              "artifact_type": "Remediation sprint record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps F-02 Defender Recommendation Sprint; registered against RA.L2-3.11.3. Shows which findings were chosen for fixing and in what order."
+            },
+            {
+              "artifact_type": "Risk assessment policy stating remediation deadlines",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/risk-assessment-policy.md (GateEvidence family RA). Should give remediation deadlines by severity or risk rating."
+            },
+            {
+              "artifact_type": "Open vulnerabilities on the POA&M",
+              "ces_source": "eo_store",
+              "notes": "EO PoamLedgerStore collection eo_poam_ledger: objective-level POA&M items with lifecycle history for vulnerabilities not yet fixed."
+            },
+            {
+              "artifact_type": "Patch lead interview",
+              "ces_source": "interview",
+              "notes": "Ask how the fix order is chosen and walk through two older findings: when found, rating, deadline, when fixed and how the fix was confirmed."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

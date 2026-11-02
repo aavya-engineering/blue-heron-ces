@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<!--
+  SPDX-FileCopyrightText: Blue Heron Defense LLC and its licensors. All rights reserved.
+  SPDX-License-Identifier: LicenseRef-BHD-Proprietary
+  CONFIDENTIAL - TRADE SECRET. Unpublished work. Provided solely to perform work for Blue Heron Defense LLC at its direction.
+  Any other use, copying, disclosure, or reuse, in whole or in part, is prohibited.
+  Changes made to this file for Blue Heron Defense LLC are made on its behalf; it claims all rights in them.
+  Submitting a change to this repository means you accept TERMS.md.
+  Removing or altering this notice is prohibited (17 U.S.C. 1202). Ref: BHD-CES-TESTER-2026A
+  See LICENSE and TERMS.md.
+-->
+
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>V1 — Command Brief · BHD slide window mockup</title>
+<style>
+/* =============================================================================
+   V1 — COMMAND BRIEF
+   Mockup of the demo:show slide window. Self-contained, fully offline.
+
+   Sizing follows the house pattern from src/demo/show/slide-render.ts: the 16:9
+   stage letterboxes itself into the viewport and --u is 1% of the stage WIDTH.
+   Every research number is authored at the 1920x1080 canvas, so px / 19.2 = u
+   (eyebrow 24px -> 1.25u, body 36px -> 1.875u, title 72px -> 3.75u, ...).
+   ========================================================================== */
+
+:root{
+  /* --- BHD brand tokens (docs/demo/design/BHD-BRAND.md) ------------------- */
+  --navy:#1a2332;          /* primary brand dark — the slide ground          */
+  --navy-deep:#0f1923;     /* darkest background — presenter band            */
+  --navy-mid:#152030;      /* mid background — chrome bar                    */
+  --gold:#f5b74a;          /* THE accent. <=3 elements per slide.            */
+
+  /* --- text ramp, WCAG-computed on #1a2332 (RESEARCH_SUMMARY §4) --------- */
+  --ink:#e8edf2;           /* primary   13.40:1 */
+  --ink-2:#c9d4e0;         /* secondary 10.51:1 */
+  --ink-3:#8fa3b8;         /* tertiary   6.09:1 */
+  --ink-floor:#7d8fa3;     /* floor      4.76:1 — nothing dimmer */
+
+  /* --- structure: hairlines, never fills (§1 dark-projector pitfall) ----- */
+  --rule:rgba(255,255,255,.10);
+  --rule-faint:rgba(255,255,255,.06);
+  --kbd-line:rgba(255,255,255,.18);
+
+  --pass:#4ade80;          /* op done */
+  --amber:#f0a93c;         /* op fail — amber, never red (§5) */
+
+  --ease:cubic-bezier(.16,1,.3,1);
+  --slide-in:280ms;        /* slide change  (§2) */
+  --frag:180ms;            /* fragment reveal (§2) */
+  --pill:240ms;            /* status-pill state change (§5) */
+}
+
+*{box-sizing:border-box;}
+html,body{
+  margin:0;padding:0;height:100%;
+  background:#080d14;overflow:hidden;
+  user-select:none;-webkit-user-select:none;
+}
+body{
+  color:var(--ink);
+  font-family:'Roboto','Roboto Regular',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
+  font-weight:400;
+}
+
+/* ---------------------------------------------------------------- STAGE -- */
+.stage{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:min(100vw,177.78vh);height:min(56.25vw,100vh);
+  --u:calc(min(100vw,177.78vh)/100);
+  background:var(--navy);
+  display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:0 24px 60px rgba(0,0,0,.5);
+}
+
+/* The slide area. Panels stack inside it and cross-fade. */
+.slide-area{position:relative;flex:1;min-height:0;}
+
+/* -------------------------------------------------- STRUCTURAL FURNITURE -- */
+/* A briefing sheet's rules: one vertical hairline on the content column edge
+   plus corner register ticks. Neutral only — no gold spent here. */
+.grid-marks{position:absolute;inset:0;pointer-events:none;}
+.grid-marks .v-rule{
+  position:absolute;top:calc(3*var(--u));bottom:calc(2.4*var(--u));
+  left:calc(8*var(--u));width:1px;background:var(--rule-faint);
+}
+.grid-marks .v-rule.right{left:auto;right:calc(8*var(--u));}
+.tick{position:absolute;width:calc(1.6*var(--u));height:calc(1.6*var(--u));}
+.tick::before,.tick::after{content:'';position:absolute;background:var(--rule);}
+.tick::before{width:100%;height:1px;} .tick::after{height:100%;width:1px;}
+.tick.tl{top:calc(3*var(--u));left:calc(8*var(--u));}
+.tick.tl::before{top:0;left:0;} .tick.tl::after{top:0;left:0;}
+.tick.tr{top:calc(3*var(--u));right:calc(8*var(--u));}
+.tick.tr::before{top:0;right:0;} .tick.tr::after{top:0;right:0;}
+.tick.bl{bottom:calc(2.4*var(--u));left:calc(8*var(--u));}
+.tick.bl::before{bottom:0;left:0;} .tick.bl::after{bottom:0;left:0;}
+.tick.br{bottom:calc(2.4*var(--u));right:calc(8*var(--u));}
+.tick.br::before{bottom:0;right:0;} .tick.br::after{bottom:0;right:0;}
+
+/* ---------------------------------------------------------------- PANEL -- */
+/* Slide change = opacity + translateY(14px) over 280ms cubic-bezier(.16,1,.3,1).
+   14px at the 1920 canvas = 0.73u. Nothing rotates, nothing zooms. */
+.panel{
+  position:absolute;inset:0;
+  padding:calc(5*var(--u)) calc(8*var(--u)) calc(3*var(--u));
+  display:flex;flex-direction:column;
+  opacity:0;transform:translateY(calc(.73*var(--u)));
+  transition:opacity var(--slide-in) var(--ease),
+             transform var(--slide-in) var(--ease),
+             visibility 0s linear var(--slide-in);
+  pointer-events:none;visibility:hidden;
+}
+.panel.on{
+  opacity:1;transform:translateY(0);pointer-events:auto;visibility:visible;
+  transition:opacity var(--slide-in) var(--ease),
+             transform var(--slide-in) var(--ease),
+             visibility 0s linear 0s;
+}
+
+/* --------------------------------------------------------------- EYEBROW -- */
+.eyebrow{
+  display:flex;align-items:center;gap:calc(1.4*var(--u));
+  font-size:calc(1.25*var(--u));line-height:1;
+  text-transform:uppercase;letter-spacing:.14em;font-weight:700;
+  color:var(--ink-3);
+}
+.eyebrow .num{color:var(--ink);font-variant-numeric:tabular-nums;}
+.eyebrow .sep{color:var(--rule);}
+.eyebrow .right{margin-left:auto;color:var(--ink-floor);font-weight:500;letter-spacing:.18em;}
+
+/* Tool chips: neutral hairline, NOT gold (gold budget is spent elsewhere). */
+.chips{display:inline-flex;gap:calc(.6*var(--u));}
+.chip{
+  border:1px solid var(--rule);border-radius:calc(.25*var(--u));
+  padding:calc(.35*var(--u)) calc(.75*var(--u));
+  font-size:calc(1.02*var(--u));letter-spacing:.12em;font-weight:500;
+  color:var(--ink-3);
+}
+
+/* GOLD #1 of 3 — the eyebrow rule. The signature of the Command Brief.
+   2px, not 1px: a scaled hairline lands on a half-pixel and a half-lit gold
+   line is exactly the low-luminance detail a projector eats (§1). */
+.gold-rule{height:2px;background:var(--gold);margin:calc(1.4*var(--u)) 0 0;flex:0 0 auto;}
+
+/* ------------------------------------------------------------ TYPOGRAPHY -- */
+h1.title{
+  font-size:calc(3.75*var(--u));line-height:1.08;font-weight:600;
+  letter-spacing:-.012em;margin:calc(2.6*var(--u)) 0 0;color:var(--ink);
+  max-width:calc(62*var(--u));
+}
+h1.hero{
+  font-size:calc(5.2*var(--u));line-height:1.04;font-weight:700;
+  letter-spacing:-.018em;margin:calc(1.8*var(--u)) 0 0;color:var(--ink);
+  max-width:calc(66*var(--u));
+}
+.deck-sub{
+  font-size:calc(2.5*var(--u));line-height:1.35;font-weight:400;
+  color:var(--ink-2);margin:calc(2.2*var(--u)) 0 0;max-width:calc(56*var(--u));
+}
+
+/* ------------------------------------------------------- LEDGER OF CARDS -- */
+/* No panel fill, no coloured left borders — a #243244 panel on navy is 1.21:1
+   and disappears on a projector (§1a). Structure comes from 1px hairlines and
+   a fixed label gutter, which is also what makes it read as a typeset brief. */
+.cards{margin-top:calc(2.6*var(--u));display:flex;flex-direction:column;}
+.card{
+  display:grid;grid-template-columns:calc(13*var(--u)) calc(46*var(--u));
+  gap:calc(3*var(--u));
+  padding:calc(1.35*var(--u)) 0;
+  border-top:1px solid var(--rule);
+}
+.card:last-child{border-bottom:1px solid var(--rule);}
+.card .label{
+  font-size:calc(1.25*var(--u));line-height:1.3;
+  text-transform:uppercase;letter-spacing:.14em;font-weight:700;
+  color:var(--ink-3);padding-top:calc(.42*var(--u));
+}
+.card p{
+  margin:0 0 calc(.7*var(--u));
+  font-size:calc(1.875*var(--u));line-height:1.45;color:var(--ink);
+}
+.card p:last-child{margin-bottom:0;}
+.card.fn p{color:var(--ink-2);}
+
+/* Fragment reveal: 180ms opacity + 8px(0.42u) translateY, 70ms stagger. */
+.frag{opacity:0;transform:translateY(calc(.42*var(--u)));}
+.panel.anim .frag{
+  animation:frag var(--frag) var(--ease) forwards;
+}
+.panel.anim .frag:nth-child(1){animation-delay:120ms;}
+.panel.anim .frag:nth-child(2){animation-delay:190ms;}
+.panel.anim .frag:nth-child(3){animation-delay:260ms;}
+@keyframes frag{to{opacity:1;transform:translateY(0);}}
+
+/* ----------------------------------------------------------- TITLE SLIDE -- */
+/* Three explicit bands — header rule, centred type block, footer — rather than
+   absolute positioning, so nothing can collide when the type reflows. */
+.title-body{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;}
+.title-foot{flex:0 0 auto;display:flex;align-items:center;gap:calc(2.4*var(--u));}
+.logo{height:calc(3.75*var(--u));display:block;}   /* 72px @1920 — title slide */
+.logo svg{height:100%;width:auto;display:block;}
+/* The placeholder mark in bhd-logo-white.svg is centred inside a 200x60 box, so
+   ~37% of its width is dead space on each side and it optically floats off the
+   right margin. These pull it back onto the rule; delete both when the real,
+   tightly-cropped BHD lockup replaces the placeholder. */
+.logo{margin-right:calc(-4.6*var(--u));}
+.logo-mark{margin-right:calc(-2.1*var(--u));}
+.logo-rule{flex:1;height:1px;background:var(--rule);}
+.logo-cap{
+  font-size:calc(1.05*var(--u));letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink-floor);white-space:nowrap;
+}
+.logo-mark{                                        /* 32px @1920, 0.8 opacity */
+  position:absolute;right:calc(8*var(--u));bottom:calc(.9*var(--u));
+  height:calc(1.7*var(--u));opacity:.8;
+}
+.logo-mark svg{height:100%;width:auto;display:block;}
+
+/* ------------------------------------------------------------- HOLD CARD -- */
+/* >2.5s on a live op auto-promotes to this. Opaque ground so nothing bleeds
+   through; only the inner block carries the slow 2s pulse. */
+.hold{background:var(--navy);justify-content:center;}
+.hold-inner{animation:holdpulse 2s ease-in-out infinite;max-width:calc(66*var(--u));}
+@keyframes holdpulse{0%,100%{opacity:1;}50%{opacity:.84;}}
+.hold .hold-eyebrow{
+  display:flex;align-items:center;gap:calc(1.1*var(--u));
+  font-size:calc(1.25*var(--u));text-transform:uppercase;letter-spacing:.16em;
+  font-weight:700;color:var(--ink-3);
+}
+.hold h2{
+  font-size:calc(3*var(--u));line-height:1.22;font-weight:600;
+  letter-spacing:-.008em;margin:calc(3*var(--u)) 0 0;color:var(--ink);
+}
+.hold .hold-foot{
+  margin-top:calc(3.4*var(--u));font-size:calc(1.4*var(--u));
+  letter-spacing:.1em;text-transform:uppercase;color:var(--ink-floor);
+}
+.hold .gold-rule{margin-top:calc(1.4*var(--u));width:calc(20*var(--u));}
+
+/* ------------------------------------------------------------ CHROME BAR -- */
+.chrome{
+  flex:0 0 auto;
+  background:var(--navy-mid);border-top:1px solid var(--rule);
+  padding:calc(1.05*var(--u)) calc(8*var(--u));
+  display:flex;align-items:center;gap:calc(1.8*var(--u));
+  font-size:calc(1*var(--u));color:var(--ink-3);letter-spacing:.06em;
+}
+.chrome .grow{flex:1;}
+.dots{display:inline-flex;gap:calc(.5*var(--u));align-items:center;}
+.dot{
+  width:calc(.55*var(--u));height:calc(.55*var(--u));border-radius:50%;
+  background:rgba(255,255,255,.18);
+  transition:background var(--pill) var(--ease),transform var(--pill) var(--ease);
+}
+.dot.on{background:var(--ink);transform:scale(1.25);}
+.pos{
+  font-variant-numeric:tabular-nums;letter-spacing:.14em;
+  text-transform:uppercase;opacity:.4;color:var(--ink);
+}
+.clock{font-variant-numeric:tabular-nums;letter-spacing:.12em;text-transform:uppercase;min-width:calc(6*var(--u));text-align:right;}
+
+.hints{display:inline-flex;align-items:center;gap:calc(.7*var(--u));opacity:.55;}
+kbd{
+  font-family:inherit;font-size:calc(.72*var(--u));line-height:1;
+  padding:calc(.28*var(--u)) calc(.55*var(--u));
+  border:1px solid var(--kbd-line);border-radius:calc(.26*var(--u));
+  color:var(--ink-2);
+}
+.hints span{font-size:calc(.86*var(--u));letter-spacing:.1em;text-transform:uppercase;}
+
+/* Status pills: 26px tall / 13px type @1920, nudged up a touch for legibility
+   in a windowed preview. Idle neutral; running gold; pass green; fail amber. */
+.pill{
+  display:inline-flex;align-items:center;gap:calc(.5*var(--u));
+  height:calc(1.5*var(--u));padding:0 calc(.95*var(--u));
+  border:1px solid var(--rule);border-radius:999px;
+  font-size:calc(.78*var(--u));letter-spacing:.1em;text-transform:uppercase;
+  font-weight:500;color:var(--ink-3);white-space:nowrap;
+  transition:color var(--pill) var(--ease),border-color var(--pill) var(--ease),opacity var(--pill) var(--ease);
+}
+.pill.done{color:var(--pass);border-color:rgba(74,222,128,.45);}
+.pill.failed{color:var(--amber);border-color:rgba(240,169,60,.45);}
+/* GOLD #2 of 3 — the running op pill. */
+.pill.running{color:var(--gold);border-color:rgba(245,183,74,.5);}
+.pill.hidden{opacity:0;}
+.pill .op-dot{width:calc(.35*var(--u));height:calc(.35*var(--u));border-radius:50%;background:currentColor;}
+.pill.running .op-dot{animation:oppulse 1.6s ease-in-out infinite;}
+@keyframes oppulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+/* --------------------------------------------------------- DWELL / DWELL -- */
+/* GOLD #3 of 3 — the depleting dwell bar. Linear, constant colour, 40% opacity;
+   no red, no pulse, no acceleration. It simply stops when the op holds. */
+.dwell{flex:0 0 auto;height:calc(.25*var(--u));background:rgba(255,255,255,.05);}
+.dwell i{
+  display:block;height:100%;width:0%;
+  background:rgba(245,183,74,.4);
+  transition:width 1000ms linear;
+}
+
+/* -------------------------------------------------------- PRESENTER BAND -- */
+.presenter{
+  flex:0 0 auto;background:var(--navy-deep);border-top:1px solid var(--rule);
+  padding:calc(1.3*var(--u)) calc(8*var(--u));
+  display:grid;grid-template-columns:calc(13*var(--u)) 1fr;gap:calc(3*var(--u));
+  transition:opacity var(--pill) var(--ease);
+}
+.presenter .label{
+  font-size:calc(1.05*var(--u));text-transform:uppercase;letter-spacing:.14em;
+  font-weight:700;color:var(--ink-floor);padding-top:calc(.3*var(--u));
+}
+.presenter p{
+  margin:0 0 calc(.5*var(--u));font-size:calc(1.5*var(--u));line-height:1.42;
+  color:var(--ink-2);max-width:calc(60*var(--u));
+}
+.presenter p:last-child{margin-bottom:0;}
+.presenter.hidden{display:none;}
+
+/* ------------------------------------------------------------- CAPTION ---- */
+/* Mockup annotation only — parked in the slide's top safe margin, which the
+   design itself never occupies, so it collides with nothing. */
+.caption{
+  position:fixed;left:14px;top:11px;z-index:5;
+  font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(185,195,212,.34);white-space:nowrap;
+}
+.caption b{color:rgba(232,237,242,.62);font-weight:500;}
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <div class="slide-area">
+    <div class="grid-marks">
+      <div class="v-rule"></div><div class="v-rule right"></div>
+      <div class="tick tl"></div><div class="tick tr"></div>
+      <div class="tick bl"></div><div class="tick br"></div>
+    </div>
+
+    <!-- ============================================ STATE 1 — TITLE SLIDE -->
+    <section class="panel title-panel" id="p-title">
+      <div class="eyebrow">
+        <span>Blue Heron Defense</span>
+        <span class="sep">/</span>
+        <span>Compliance Evidence System</span>
+        <span class="right">Capability Brief</span>
+      </div>
+      <div class="gold-rule"></div>
+
+      <div class="title-body">
+        <div class="logo-cap">Orchestrates five tools end to end against a live tenant</div>
+        <h1 class="hero">CES in one run</h1>
+        <p class="deck-sub">Weeks of assessment and remediation collapse into a single evidenced run.</p>
+      </div>
+
+      <div class="title-foot">
+        <span class="chips">
+          <span class="chip">stacksim</span><span class="chip">muster</span>
+          <span class="chip">stamper</span><span class="chip">ao</span><span class="chip">eo</span>
+        </span>
+        <span class="logo-rule"></span>
+        <!-- Inlined verbatim from docs/demo/design/brand/bhd-logo-white.svg.
+             72px @1920 = 3.75u — the full-size mark, title slide only. -->
+        <span class="logo">
+          <svg xmlns="http://www.w3.org/2000/svg" width="200" height="60" viewBox="0 0 200 60">
+            <rect width="200" height="60" rx="8" fill="transparent"/>
+            <text x="100" y="37" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="700" fill="#ffffff" text-anchor="middle">BHD</text>
+          </svg>
+        </span>
+      </div>
+    </section>
+
+    <!-- ================================ STATES 2 &amp; 3 — CONTENT SLIDE -->
+    <!-- One panel, deliberately: states 2 and 3 are the SAME slide. Only the
+         chrome changes, exactly as it does in the real renderer. -->
+    <section class="panel" id="p-content">
+      <div class="eyebrow">
+        <span class="num">07</span>
+        <span class="sep">/</span>
+        <span>AdminOps</span>
+        <span class="chips"><span class="chip">ao</span></span>
+        <span class="right">Live Segment</span>
+      </div>
+      <div class="gold-rule"></div>
+
+      <h1 class="title">Live command execution</h1>
+
+      <div class="cards">
+        <div class="card fn frag">
+          <div class="label">Function</div>
+          <div><p>Browse the registry, open a Tier-1 command, execute it against the tenant</p></div>
+        </div>
+        <div class="card benefit frag">
+          <div class="label">Benefit</div>
+          <div><p>Every operator action leaves an evidence record without the operator doing anything extra</p></div>
+        </div>
+        <div class="card diff frag">
+          <div class="label">Differentiator</div>
+          <div><p>The evidence is collected by the tool, not assembled afterwards by the human</p></div>
+        </div>
+      </div>
+
+      <span class="logo-mark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="60" viewBox="0 0 200 60">
+          <rect width="200" height="60" rx="8" fill="transparent"/>
+          <text x="100" y="37" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="700" fill="#ffffff" text-anchor="middle">BHD</text>
+        </svg>
+      </span>
+    </section>
+
+    <!-- ================================================ STATE 4 — HOLD CARD -->
+    <section class="panel hold" id="p-hold">
+      <div class="hold-inner">
+        <!-- Gold budget on this state is already spent: the hold rule, the
+             running pill in the chrome, and the frozen dwell bar. The "live"
+             signal here is the 2s pulse, not another gold mark. -->
+        <div class="hold-eyebrow">
+          <span>Hold &middot; live operation in progress</span>
+        </div>
+        <div class="gold-rule"></div>
+        <h2>The evidence is collected by the tool, not assembled afterwards by the human.</h2>
+        <div class="hold-foot">AdminOps &middot; ao-registry &middot; slide 07 of 08</div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ================================================== CHROME + PRESENTER -->
+  <div class="dwell"><i id="dwell-fill"></i></div>
+
+  <div class="chrome">
+    <span class="dots" id="dots"></span>
+    <span class="grow"></span>
+    <span class="hints">
+      <kbd>&larr;</kbd><kbd>&rarr;</kbd><span>state</span>
+      <kbd>T</kbd><span>presenter</span>
+    </span>
+    <span class="pill hidden" id="op-pill"><i class="op-dot"></i><span id="op-text"></span></span>
+    <span class="pos" id="pos">07 / 08</span>
+    <span class="clock" id="clock">manual</span>
+    <span class="pill" id="mode-pill">staged</span>
+  </div>
+
+  <div class="presenter hidden" id="presenter">
+    <div class="label">Talk track</div>
+    <div id="talk"></div>
+  </div>
+</div>
+
+<div class="caption">
+  <b>V1 &mdash; Command Brief</b> &nbsp;&middot;&nbsp; &larr; &rarr; walks the four states
+  &nbsp;&middot;&nbsp; T toggles presenter &nbsp;&middot;&nbsp; state 4 is the &gt;2.5&nbsp;s hold promotion
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* Real rows from scripts/make-demo-xlsx.mjs (STARTER_ROWS). */
+  var TALK = {
+    title:  ['Welcome. CES turns a CMMC assessment from a six-week consulting engagement into a repeatable run that leaves evidence behind.'],
+    content:['Here it is live — the real AdminOps GUI, driven exactly the way an operator drives it.']
+  };
+
+  /* The four mockup states. */
+  var STATES = [
+    { panel:'p-title',   talk:'title',   dot:0, pos:'01 / 08', mode:'staged',
+      op:null,                    clock:'20 s', dwell:1.00, ticking:false },
+    { panel:'p-content', talk:'content', dot:6, pos:'07 / 08', mode:'live',
+      op:{t:'ao-registry · done', c:'done'},       clock:null, dwell:null, ticking:true },
+    { panel:'p-content', talk:'content', dot:6, pos:'07 / 08', mode:'live',
+      op:{t:'ao-registry · running', c:'running'}, clock:'holding', dwell:null, ticking:false },
+    { panel:'p-hold',    talk:'content', dot:6, pos:'07 / 08', mode:'live',
+      op:{t:'ao-registry · running', c:'running'}, clock:'holding', dwell:null, ticking:false }
+  ];
+
+  var SLIDE_COUNT = 8, DWELL_TOTAL = 90;
+  var index = 0, presenter = false, remaining = 42, timer = null, lastPanel = null;
+
+  var $ = function(id){ return document.getElementById(id); };
+  var panels   = { 'p-title':$('p-title'), 'p-content':$('p-content'), 'p-hold':$('p-hold') };
+  var dotsEl   = $('dots'),   posEl   = $('pos'),   clockEl = $('clock');
+  var modeEl   = $('mode-pill'), opEl = $('op-pill'), opTextEl = $('op-text');
+  var dwellEl  = $('dwell-fill'), presEl = $('presenter'), talkEl = $('talk');
+
+  dotsEl.innerHTML = new Array(SLIDE_COUNT + 1).join('<span class="dot"></span>');
+  var dots = dotsEl.querySelectorAll('.dot');
+
+  function draw(){
+    var s = STATES[index];
+
+    /* Panels. Re-arming the fragment stagger only when the panel actually
+       changes is the point of states 2 -> 3 sharing one panel. */
+    for (var key in panels){
+      var el = panels[key], active = (key === s.panel);
+      el.classList.toggle('on', active);
+      if (active && lastPanel !== key){
+        el.classList.remove('anim');
+        void el.offsetWidth;           /* force reflow so the animation replays */
+        el.classList.add('anim');
+      }
+    }
+    lastPanel = s.panel;
+
+    /* Chrome. */
+    for (var i = 0; i < dots.length; i++) dots[i].classList.toggle('on', i === s.dot);
+    posEl.textContent = s.pos;
+    modeEl.textContent = s.mode;
+
+    if (s.op){
+      opEl.className = 'pill ' + s.op.c;
+      opTextEl.textContent = s.op.t;
+    } else {
+      opEl.className = 'pill hidden';
+      opTextEl.textContent = '';
+    }
+
+    clockEl.textContent = s.clock !== null ? s.clock : remaining + ' s';
+    dwellEl.style.width = (s.dwell !== null ? s.dwell * 100 : (remaining / DWELL_TOTAL) * 100) + '%';
+
+    /* Presenter band. */
+    presEl.classList.toggle('hidden', !presenter);
+    if (presenter){
+      var lines = TALK[s.talk] || [];
+      talkEl.innerHTML = '';
+      for (var j = 0; j < lines.length; j++){
+        var p = document.createElement('p');
+        p.textContent = lines[j];
+        talkEl.appendChild(p);
+      }
+    }
+
+    /* Dwell only depletes while the op is done and the slide is auto-pacing;
+       a live op holding freezes it, which is what "holding" means. */
+    if (timer) { clearInterval(timer); timer = null; }
+    if (s.ticking){
+      timer = setInterval(function(){
+        remaining = remaining > 0 ? remaining - 1 : DWELL_TOTAL;
+        clockEl.textContent = remaining + ' s';
+        dwellEl.style.width = (remaining / DWELL_TOTAL) * 100 + '%';
+      }, 1000);
+    }
+  }
+
+  document.addEventListener('keydown', function(e){
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === 'ArrowRight'){ index = (index + 1) % STATES.length; draw(); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft'){ index = (index + STATES.length - 1) % STATES.length; draw(); e.preventDefault(); }
+    else if (e.key === 't' || e.key === 'T'){ presenter = !presenter; draw(); e.preventDefault(); }
+  });
+  document.addEventListener('click', function(e){
+    index = e.clientX < window.innerWidth / 4
+      ? (index + STATES.length - 1) % STATES.length
+      : (index + 1) % STATES.length;
+    draw();
+  });
+  document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+
+  presenter = true;   /* the band ships visible so it can be judged; T hides it */
+  draw();
+})();
+</script>
+</body>
+</html>

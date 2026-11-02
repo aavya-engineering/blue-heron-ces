@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "description": "PowerShell modules each persistent session imports, in import order. requiredVersion pins a module to an exact version (rendered as -RequiredVersion); a module without it loads the highest installed version. Read by src/impl/session-factory.ts.",
+  "sessions": {
+    "graph": [
+      {
+        "name": "Microsoft.Graph.Authentication",
+        "requiredVersion": "2.35.1",
+        "why": "Load Authentication first at the installed Microsoft Graph SDK version so the typed command DLLs bind to the matching Authentication.Core assembly. Without the pin PowerShell loads the highest Authentication (for example a stray Beta 2.36.x) and the v1 cmdlets fail with 'Could not load ... Authentication.Core, Version=2.35.x'. tenant-stacksim's fake module declares ModuleVersion 2.35.1 to match."
+      },
+      { "name": "Microsoft.Graph.Identity.Governance" },
+      { "name": "Microsoft.Graph.Users" },
+      { "name": "Microsoft.Graph.Identity.DirectoryManagement" },
+      { "name": "Microsoft.Graph.Groups" },
+      { "name": "Microsoft.Graph.Identity.ConditionalAccess" },
+      { "name": "Microsoft.Graph.DeviceManagement" },
+      { "name": "Microsoft.Graph.Identity.SignIns" },
+      { "name": "Microsoft.Graph.Identity.Authentication" },
+      { "name": "Microsoft.Graph.Reports" },
+      { "name": "Microsoft.Graph.Domains" },
+      { "name": "Microsoft.Graph.Applications" },
+      { "name": "Microsoft.Graph.DirectoryObjects" }
+    ],
+    "exchange": [],
+    "purview": [],
+    "azure": [
+      { "name": "Az.Monitor" },
+      { "name": "Az.Storage" }
+    ],
+    "sharepoint": [
+      { "name": "Microsoft.Online.SharePoint.PowerShell" }
+    ],
+    "teams": []
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "ces": {
+    "artifact": "infrastructure_manifest",
+    "version": "1.0.0",
+    "generated_on": "2026-01-15T00:00:00.000Z",
+    "intent": "CMMC L2 Sentinel-only infrastructure specification for simtenant-a-rg-security"
+  },
+  "infrastructure_manifest": {
+    "identity": [],
+    "logging": [
+      {
+        "resource_id": "log-rg",
+        "resource_type": "resource_group",
+        "name": "simtenant-a-rg-security",
+        "control_ids": [
+          "AU.L2-3.3.1"
+        ],
+        "registry_entry_ids": [
+          "AZ-FOUND-001"
+        ],
+        "properties": {
+          "location": "usgovvirginia"
+        },
+        "depends_on": []
+      },
+      {
+        "resource_id": "log-law",
+        "resource_type": "log_analytics_workspace",
+        "name": "simtenant-a-law-prod",
+        "control_ids": [
+          "AU.L2-3.3.1",
+          "AU.L2-3.3.2",
+          "SI.L2-3.14.6"
+        ],
+        "registry_entry_ids": [
+          "AZ-LOG-001"
+        ],
+        "properties": {
+          "sku": "PerGB2018",
+          "retention_days": 365,
+          "location": "usgovvirginia",
+          "resource_group": "simtenant-a-rg-security"
+        },
+        "depends_on": [
+          "log-rg"
+        ]
+      },
+      {
+        "resource_id": "log-sentinel",
+        "resource_type": "sentinel_onboarding",
+        "name": "sentinel",
+        "control_ids": [
+          "AU.L2-3.3.1",
+          "SI.L2-3.14.1",
+          "SI.L2-3.14.6"
+        ],
+        "registry_entry_ids": [
+          "AZ-SEN-001"
+        ],
+        "properties": {
+          "workspace": "simtenant-a-law-prod",
+          "content_hub_solutions": [
+            "CMMC 2.0"
+          ]
+        },
+        "depends_on": [
+          "log-law"
+        ]
+      }
+    ],
+    "security": [],
+    "storage": [],
+    "network": [],
+    "automation": [],
+    "diagnostics": [],
+    "stamper_variable_map": {
+      "subscriptionId": "sub_mkeonpc0_shcnemm",
+      "resourceGroup": "simtenant-a-rg-security",
+      "location": "usgovvirginia",
+      "lawWorkspaceName": "simtenant-a-law-prod",
+      "storageAccountName": "",
+      "keyVaultName": "",
+      "cmkKeyName": "",
+      "vnetName": "",
+      "vnetCidr": "",
+      "subnetPeName": "",
+      "subnetPeCidr": "",
+      "nsgPeName": "",
+      "automationAccountName": "",
+      "eoAppDisplayName": "EvidenceOps-Automation",
+      "mgmtSubnetCidr": "",
+      "identitySubnetCidr": "",
+      "peSubnetCidr": "",
+      "fwSubnetCidr": ""
+    },
+    "registry_coverage": {
+      "total_infra_entries": 53,
+      "covered_entry_ids": [
+        "AZ-FOUND-001",
+        "AZ-LOG-001",
+        "AZ-SEN-001"
+      ],
+      "uncovered_entry_ids": [],
+      "coverage_pct": 6
+    },
+    "provenance": [
+      {
+        "field": "logging.law_name",
+        "value": "simtenant-a-law-prod",
+        "source": "tcp",
+        "rule": "From TCP monitoring.sentinel_workspace_name or convention {prefix}-law-prod"
+      },
+      {
+        "field": "logging.retention_days",
+        "value": 365,
+        "source": "tcp",
+        "rule": "WORM retention from SI evidence retention or default 2557"
+      },
+      {
+        "field": "infrastructure_model",
+        "value": "m365_sentinel",
+        "source": "si_baseline",
+        "rule": "Minimal Sentinel-only manifest per SI Baseline infrastructure_model"
+      }
+    ]
+  }
+}

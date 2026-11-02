@@ -1,0 +1,82 @@
+controlId: "AC.L1-3.1.20"
+relatedControlIds:
+  - "AC.L1-3.1.1"
+  - "AC.L2-3.1.3"
+  - "AC.L2-3.1.5"
+  - "SC.L1-3.13.1"
+  - "MP.L2-3.8.1"  # [VERIFY] mapping not yet confirmed
+practiceStatement: Limit system access to authorized users, processes acting on behalf of users, and devices.
+useCaseId: D-10
+useCaseTitle: "Oversharing Risk Report"
+domain: Data Protection & Information Management
+priority: P4 Standard
+trigger: 'SCHEDULE: Monthly'
+sodTier: Tier 2 -- Config Manager
+entraRolesRequired:
+- Compliance Administrator
+- SharePoint Administrator
+approvalRequired: false
+services:
+- name: Microsoft Purview Compliance Portal
+  purpose: '`https://compliance.microsoft.us`'
+- name: Microsoft Purview Data Security Posture Management
+  purpose: DSPM) for AI
+- name: Microsoft 365 Admin Center -- Copilot settings
+  purpose: ''
+- name: SharePoint Admin Center
+  purpose: '`https://{tenant}-admin.sharepoint.us`'
+- name: Microsoft Graph API
+  purpose: permissions and sharing endpoints
+- name: Entra ID
+  purpose: group membership, access reviews
+configurationSteps:
+  portalPath: '//compliance.microsoft.us > **Data Security Posture Management** (if available) > **Overview**. Review the
+    DSPM dashboard for oversharing indicators including: sites with "Everyone except external users" permissions, sites with
+    broad security group access, and unlabeled content in CUI-scoped locations.'
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes Sites.Read.All
+  - cmdlet: Get-MgGroup
+    parameters:
+    - -MgGroup
+    - -Filter
+    - -All
+    - -MgGroupMember
+    - -GroupId
+  - cmdlet: Get-MgGroupMember
+    parameters:
+    - -MgGroupMember
+    - -GroupId
+    - -All
+    - -gt
+    - -Large
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/sites/{siteId}/permissions
+  graphApiPayloadExample: {}
+  requiredPermissions:
+  - Sites.Read.All
+  - Application.Read.All
+  - Group.Read.All
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-d-dataprotection/D-10/2026/03/
+  format: JSON (oversharing risk report, CUI group membership report, risk summary), CSV (SPO sharing risk inventory)
+  filenamePattern: D-10_OversharingRisk_{YYYYMMDD}_{HHmmss}_Monthly.json
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://compliance.microsoft.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: |-
+    - **DSPM for AI:** Microsoft Purview Data Security Posture Management for AI is a relatively new capability. In GCC High, verify availability at `https://compliance.microsoft.us` > look for "Data Security Posture Management" in the left navigation. If DSPM is not yet available in GCC High, use the manual PowerShell-based permission audit approach documented above as the primary method.
+      - **Workaround if DSPM unavailable:** Run the PowerShell scripts above to identify sites with "Everyone except external users" permissions, large CUI group memberships, and external sharing enabled on CUI site
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

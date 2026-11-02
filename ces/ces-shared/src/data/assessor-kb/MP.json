@@ -1,0 +1,584 @@
+{
+  "family": "MP",
+  "family_name": "Media Protection",
+  "practices": [
+    {
+      "id": "MP.L2-3.8.1",
+      "title": "Protect (i.e., physically control and securely store) system media containing CUI, both paper and digital.",
+      "approach": {
+        "what_assessor_does": "The assessor checks that CUI on paper and on digital media (laptops, drives, USB sticks, discs, backup tapes) is kept physically under control and stored securely. They read the media protection policy, walk the spaces where CUI is handled to look at locked cabinets, safes and storage rooms, and check who holds the keys or codes. For digital CUI they look at where it is stored (the CUI sites and libraries, encrypted devices) and how it is labeled. In interviews they ask staff where they keep CUI paper at the end of the day and where CUI files may be saved. Testing means trying an unlocked drawer or a CUI library with an account that should not get in.",
+        "common_failure_modes": [
+          "CUI paper is left on desks or in open trays overnight.",
+          "Storage cabinets lock but keys are shared or hang next to the cabinet.",
+          "Digital CUI is saved to personal drives or unlabeled locations outside the CUI sites.",
+          "Sensitivity labels exist in the tenant but are not applied to the libraries that hold CUI.",
+          "Staff cannot say where CUI is allowed to be stored."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "MP.L2-3.8.1[a]",
+          "determination": "paper media containing CUI is physically controlled",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Media protection policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/media-protection-policy.md (GateEvidence family MP). Should say how CUI paper is handled, who may hold it and where it may go."
+            },
+            {
+              "artifact_type": "Photos of CUI paper storage and handling areas",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: locked cabinets, safes, clean-desk signage and the areas where CUI paper is used."
+            },
+            {
+              "artifact_type": "Staff interview and walk-through",
+              "ces_source": "interview",
+              "notes": "Ask a sampled employee where they keep CUI paper during and after work; try a cabinet that should be locked. No tenant signal covers paper media."
+            }
+          ]
+        },
+        {
+          "id": "MP.L2-3.8.1[b]",
+          "determination": "digital media containing CUI is physically controlled",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Sensitivity label policy for CUI",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry MP.L2-3.8.1 (sensitivityLabelEvaluator): Graph /informationProtection/policy/labels; also surfaced by the EO evidence router as item signal:dlpSignals. The evaluator checks that labels exist; the assessor still checks a CUI label is published and used."
+            },
+            {
+              "artifact_type": "Device and media inventory for CUI",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: list of laptops, drives and removable media that may hold CUI, with owner and location."
+            },
+            {
+              "artifact_type": "Staff interview",
+              "ces_source": "interview",
+              "notes": "Ask who holds CUI-bearing devices and media and where they are kept when not in use."
+            }
+          ]
+        },
+        {
+          "id": "MP.L2-3.8.1[c]",
+          "determination": "paper media containing CUI is securely stored",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Media protection policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/media-protection-policy.md (GateEvidence family MP). Should name the approved storage for CUI paper (locked container, controlled room) and who has access."
+            },
+            {
+              "artifact_type": "Key or combination access list for CUI storage",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: who holds keys or codes to each CUI cabinet, safe or room."
+            },
+            {
+              "artifact_type": "Walk-through test",
+              "ces_source": "interview",
+              "notes": "Check sampled CUI storage is locked and that only people on the access list can open it."
+            }
+          ]
+        },
+        {
+          "id": "MP.L2-3.8.1[d]",
+          "determination": "digital media containing CUI is securely stored",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "CUI repository onboarding record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps D-09 CUI Repository Onboarding: intake checklist for each new CUI SharePoint site, tied to the CUI security group; registered against MP.L2-3.8.1 (evidence objective MP.L2-3.8.1[d])."
+            },
+            {
+              "artifact_type": "Sensitivity label policy for CUI",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry MP.L2-3.8.1 (sensitivityLabelEvaluator): Graph /informationProtection/policy/labels; EO evidence router item signal:dlpSignals."
+            },
+            {
+              "artifact_type": "Administrator interview and access test",
+              "ces_source": "interview",
+              "notes": "Ask where digital CUI may be stored; open a CUI library with an account outside the CUI group and confirm access is refused."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MP.L2-3.8.2",
+      "title": "Limit access to CUI on system media to authorized users.\nAssessment Objective:\n[a] access to CUI on system media is limited to authorized users.",
+      "approach": {
+        "what_assessor_does": "The assessor checks that only authorized people can get at CUI held on media, both files in storage and removable or portable media. They compare the list of people authorized for CUI with who can actually open CUI libraries, labeled files and encrypted devices. They read the sensitivity label settings to see whether the CUI label encrypts content and limits it to the authorized group, and sample a few labeled files to see who has rights. Testing means trying to open a labeled CUI file or library with an account that is not authorized.",
+        "common_failure_modes": [
+          "The CUI label marks content but does not encrypt it or limit who can open it.",
+          "CUI libraries grant access to all staff or to guest users.",
+          "The authorized-user list and the CUI security group membership do not match.",
+          "Large parts of CUI content carry no label, so label-based access never applies."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "MP.L2-3.8.2[a]",
+          "determination": "access to CUI on system media is limited to authorized users",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Sensitivity label configuration",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry MP.L2-3.8.2 (mediaMarkingEvaluator): Graph /informationProtection/policy/labels; EO evidence router item signal:dlpSignals. The evaluator checks that labels exist, not who they allow."
+            },
+            {
+              "artifact_type": "CUI label encryption limited to the CUI-authorized group",
+              "ces_source": "ao_row",
+              "notes": "AdminOps D-11 CUI Label Protection Enablement: sets rights-based encryption on the published CUI label for the CUI-authorized group only; registered against MP.L2-3.8.2 (evidence objective MP.L2-3.8.2[a])."
+            },
+            {
+              "artifact_type": "Label coverage audit",
+              "ces_source": "ao_row",
+              "notes": "AdminOps D-01 Sensitivity Label Coverage: audits label coverage through Content Explorer and trainable classifiers; registered against MP.L2-3.8.2."
+            },
+            {
+              "artifact_type": "Authorized CUI user list",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. The assessor compares it with the CUI group and CUI library membership."
+            },
+            {
+              "artifact_type": "Access test",
+              "ces_source": "interview",
+              "notes": "Open a labeled CUI file with an unauthorized account and confirm it is refused; ask the administrator how authorization is granted and removed."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MP.L1-3.8.3",
+      "title": "Sanitize or destroy information system media containing Federal Contract Information (FCI) before disposal or release for reuse.",
+      "approach": {
+        "what_assessor_does": "The assessor checks that media holding CUI is wiped or destroyed before it is thrown away, and wiped before it is handed to someone else to reuse. They read the sanitization procedure for the methods allowed for each kind of media (paper, hard drives, solid-state drives, phones), then ask for disposal and reuse records for a sample of items: what it was, method used, who did it, when, and a destruction certificate where a vendor was used. They interview the person who handles disposal and check the wipe records for devices of departed or reassigned staff.",
+        "common_failure_modes": [
+          "Old drives and laptops sit in a closet or go to recycling with no wipe or destruction record.",
+          "Devices are reissued to a new user without a wipe.",
+          "CUI paper goes in the ordinary trash instead of a shredder or locked shred bin.",
+          "A destruction vendor is used but no certificates are kept.",
+          "The wipe method is not suited to the media (a quick format on a hard drive)."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "MP.L1-3.8.3[a]",
+          "determination": "system media containing CUI is sanitized or destroyed before disposal",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Device wipe records for departed users and lost devices",
+              "ces_source": "ao_row",
+              "notes": "AdminOps B-05 Terminated-User Device Wipe (full wipe of corporate devices, selective wipe for BYOD, Autopilot deregistration) and B-06 Lost/Stolen Device Wipe; both registered against MP.L1-3.8.3."
+            },
+            {
+              "artifact_type": "Media sanitization and destruction procedure",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/media-protection-policy.md (GateEvidence family MP). Should name the method allowed for each media type before disposal."
+            },
+            {
+              "artifact_type": "Disposal records and destruction certificates",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: disposal log and vendor certificates for sampled items. Control signal registry maps MP.L1-3.8.3 to manualGateEvaluator: no tenant signal covers this objective."
+            },
+            {
+              "artifact_type": "Interview with the person who handles disposal",
+              "ces_source": "interview",
+              "notes": "Ask them to walk through the last disposal of a drive or laptop and of CUI paper."
+            }
+          ]
+        },
+        {
+          "id": "MP.L1-3.8.3[b]",
+          "determination": "system media containing CUI is sanitized before it is released for reuse",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Device wipe records before reissue",
+              "ces_source": "ao_row",
+              "notes": "AdminOps B-05 Terminated-User Device Wipe: full wipe of the departed user's corporate devices before they are reused; registered against MP.L1-3.8.3 (evidence objective MP.L1-3.8.3[b])."
+            },
+            {
+              "artifact_type": "Wipe-before-reuse procedure",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/media-protection-policy.md (GateEvidence family MP). Should require a wipe before any media is reused or reassigned."
+            },
+            {
+              "artifact_type": "Reissue records",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: asset records showing each reassigned device and the wipe done before it moved."
+            },
+            {
+              "artifact_type": "IT staff interview",
+              "ces_source": "interview",
+              "notes": "Ask what happens to a laptop between one user and the next; check a sampled reissued device's wipe record."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MP.L2-3.8.4",
+      "title": "Mark media with necessary CUI markings and distribution limitations.",
+      "approach": {
+        "what_assessor_does": "The assessor checks that media holding CUI carries the right CUI marking and any limit on who it may be shared with. They read the marking procedure, look at a sample of CUI documents, emails, drives and printed material for the CUI banner, designation block and any dissemination control, and check the sensitivity label settings that add headers, footers or watermarks. In interviews they ask staff how they know when and how to mark something. Testing means creating a labeled test file and checking the marking appears.",
+        "common_failure_modes": [
+          "Documents carry the CUI label in metadata but no visible marking.",
+          "Removable media and printed copies holding CUI are not marked at all.",
+          "Distribution limits from the contract are never added to the marking.",
+          "Staff use old markings (FOUO, Proprietary) instead of CUI markings.",
+          "Nobody has written down which marking applies to which kind of CUI."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "MP.L2-3.8.4[a]",
+          "determination": "media containing CUI is marked with applicable CUI markings",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "CUI label automatic content marking",
+              "ces_source": "ao_row",
+              "notes": "AdminOps D-11 CUI Label Protection Enablement: turns on header, footer and watermark marking on the published CUI sensitivity label; registered against MP.L2-3.8.4 (evidence objective MP.L2-3.8.4[a])."
+            },
+            {
+              "artifact_type": "CUI marking procedure",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/media-protection-policy.md (GateEvidence family MP). Should describe the CUI markings required on documents, emails and physical media."
+            },
+            {
+              "artifact_type": "Sample of marked CUI documents and media",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: examples of marked files, printed copies and labeled drives. Control signal registry maps MP.L2-3.8.4 to manualGateEvaluator: no tenant signal covers this objective."
+            },
+            {
+              "artifact_type": "Staff interview and marking test",
+              "ces_source": "interview",
+              "notes": "Ask a sampled employee how they mark CUI; apply the CUI label to a test file and confirm the visible marking appears."
+            }
+          ]
+        },
+        {
+          "id": "MP.L2-3.8.4[b]",
+          "determination": "media containing CUI is marked with distribution limitations",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "CUI marking procedure covering distribution limits",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/media-protection-policy.md (GateEvidence family MP). Should say how distribution limits (dissemination controls, contract distribution statements) are added to marked media."
+            },
+            {
+              "artifact_type": "Sample of CUI media showing distribution limits",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: marked documents or media carrying the distribution limit that applies to them."
+            },
+            {
+              "artifact_type": "Contracts lead interview",
+              "ces_source": "interview",
+              "notes": "Ask which contracts set distribution limits and how those limits reach the marking on the media."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MP.L2-3.8.5",
+      "title": "Control access to media containing CUI and maintain accountability for media during transport outside of controlled areas.",
+      "approach": {
+        "what_assessor_does": "The assessor checks two things: access to CUI media is controlled, and CUI media taken outside controlled areas is tracked while in transit. They read the media protection policy, look at the device settings that limit use of removable storage, and ask for a media checkout or transport log showing who took what, when it left, by what route or carrier and when it came back or arrived. They interview the person who sends or carries media and sample log entries against the inventory.",
+        "common_failure_modes": [
+          "Anyone can copy CUI to a USB stick and walk out with it.",
+          "No log records CUI media leaving the site or arriving at its destination.",
+          "Couriers are used with no tracking or signed receipt.",
+          "The media inventory does not match what the transport log says went out."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "MP.L2-3.8.5[a]",
+          "determination": "access to media containing CUI is controlled",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Intune removable storage configuration",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry MP.L2-3.8.5 (mediaAccessEvaluator): Graph /deviceManagement/deviceConfigurations. The evaluator passes on any device configuration present; the assessor opens the policy to see that it actually limits removable storage."
+            },
+            {
+              "artifact_type": "Media protection policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/media-protection-policy.md (GateEvidence family MP). Should say who may access CUI media and how that access is granted."
+            },
+            {
+              "artifact_type": "Administrator interview and test",
+              "ces_source": "interview",
+              "notes": "Ask who may use removable media with CUI; try copying a file to a USB drive on a sampled machine."
+            }
+          ]
+        },
+        {
+          "id": "MP.L2-3.8.5[b]",
+          "determination": "accountability for media containing CUI is maintained during transport outside of controlled areas",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Media transport and checkout log",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: who took which media, when it left, route or carrier, signed receipt and return. No tenant signal covers transport accountability."
+            },
+            {
+              "artifact_type": "Media transport procedure",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/media-protection-policy.md (GateEvidence family MP). Should require each CUI media item leaving a controlled area to be logged and tracked."
+            },
+            {
+              "artifact_type": "Interview with the person who sends or carries media",
+              "ces_source": "interview",
+              "notes": "Ask them to walk through a recent shipment; compare sampled log entries with the media inventory."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MP.L2-3.8.6",
+      "title": "Implement cryptographic mechanisms to protect the confidentiality of CUI stored on digital media during transport unless otherwise protected by alternative physical safeguards.\nAssessment Objective:\n[a] the confidentiality of CUI stored on digital media is protected during transport using cryptographic mechanisms or alternative physical safeguards.",
+      "approach": {
+        "what_assessor_does": "The assessor checks that CUI on laptops, drives and other digital media that leave controlled areas is encrypted, or else protected by physical means that the organization has written down (a locked case carried by an authorized person, for example). They read the encryption policy and the device settings for full-disk and removable-drive encryption, check the encryption status of a sample of laptops and portable drives, and ask how staff carry media when encryption is not possible. Where encryption is used, they ask whether it is FIPS-validated.",
+        "common_failure_modes": [
+          "Laptops are encrypted but USB drives and external disks are not.",
+          "The encryption policy exists but is not assigned to all in-scope devices.",
+          "Encryption is not FIPS-validated and no alternative physical safeguard is documented.",
+          "Staff ship CUI drives with no encryption and no locked container."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "MP.L2-3.8.6[a]",
+          "determination": "the confidentiality of CUI stored on digital media is protected during transport using cryptographic mechanisms or alternative physical safeguards",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "BitLocker and removable-drive encryption configuration",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry MP.L2-3.8.6 (bitLockerPolicyEvaluator): Graph /deviceManagement/deviceConfigurations. The evaluator passes on any device configuration present; the assessor opens the policy and checks it covers removable drives and in-scope devices."
+            },
+            {
+              "artifact_type": "Media protection policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/media-protection-policy.md (GateEvidence family MP). Should require encryption of CUI on media in transport, or name the physical safeguard used instead."
+            },
+            {
+              "artifact_type": "Device encryption status report",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: Intune encryption report or BitLocker status for sampled laptops and portable drives."
+            },
+            {
+              "artifact_type": "Staff interview and device check",
+              "ces_source": "interview",
+              "notes": "Ask how CUI media is carried off site; check a sampled portable drive is encrypted."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MP.L2-3.8.7",
+      "title": "Control the use of removable media on system components.\t\nAssessment Objective:\n[a] the use of removable media on system components is controlled.",
+      "approach": {
+        "what_assessor_does": "The assessor checks that the organization decides which removable media may be used on its systems and enforces that choice. They read the removable media rules (blocked, read-only, or allowed only for approved devices), look at the device control settings in Intune, and test a sampled machine by plugging in an unapproved USB drive. They interview staff about how they move files and how exceptions are approved.",
+        "common_failure_modes": [
+          "The policy blocks removable media but no device setting enforces it.",
+          "The block applies to some devices or user groups and leaves others open.",
+          "Exceptions are granted informally and never reviewed.",
+          "Removable media is blocked on Windows but not on Mac or Linux machines in scope."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "MP.L2-3.8.7[a]",
+          "determination": "the use of removable media on system components is controlled",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Intune removable storage block",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry MP.L2-3.8.7 (removableMediaEvaluator): Graph /deviceManagement/deviceConfigurations; met when a device configuration blocks removable storage."
+            },
+            {
+              "artifact_type": "Media protection policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/media-protection-policy.md (GateEvidence family MP). Should state which removable media is allowed, on which systems, and how exceptions are approved."
+            },
+            {
+              "artifact_type": "Exception approvals for removable media",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: approved exceptions with owner, device and expiry date."
+            },
+            {
+              "artifact_type": "Plug-in test and staff interview",
+              "ces_source": "interview",
+              "notes": "Plug an unapproved USB drive into a sampled machine and confirm it is blocked; ask staff how they move files when they need to."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MP.L2-3.8.8",
+      "title": "Prohibit the use of portable storage devices when such devices have no identifiable owner.\nAssessment Objective:\n[a] the use of portable storage devices is prohibited when such devices have no identifiable owner.",
+      "approach": {
+        "what_assessor_does": "The assessor checks that portable storage devices with no known owner cannot be used on the organization's systems. They read the rule that bans unowned devices, look at the device control settings (a full block, or an allow list tied to registered owners), and check the register of issued portable devices. Testing means plugging an unregistered device into a sampled machine and seeing it refused.",
+        "common_failure_modes": [
+          "Found or giveaway USB drives can be plugged in and used.",
+          "Issued portable drives are not registered to a named owner.",
+          "The allow list is tied to device type rather than to specific registered devices.",
+          "Staff are not told what to do with a device they find."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "MP.L2-3.8.8[a]",
+          "determination": "the use of portable storage devices is prohibited when such devices have no identifiable owner",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Intune removable storage block or owner-based allow list",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry MP.L2-3.8.8 (unownedStorageEvaluator): Graph /deviceManagement/deviceConfigurations; a full removable-storage block counts. An owner-based allow list is not read by CES and must be examined directly."
+            },
+            {
+              "artifact_type": "Media protection policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/media-protection-policy.md (GateEvidence family MP). Should ban use of portable storage that has no identifiable owner."
+            },
+            {
+              "artifact_type": "Register of issued portable storage devices",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: each device with serial number and named owner."
+            },
+            {
+              "artifact_type": "Plug-in test and staff interview",
+              "ces_source": "interview",
+              "notes": "Plug an unregistered device into a sampled machine and confirm it is refused; ask staff what they do with a found device."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MP.L2-3.8.9",
+      "title": "Protect the confidentiality of backup CUI at storage locations.\nAssessment Objective:\n[a] the confidentiality of backup CUI is protected at storage locations.",
+      "approach": {
+        "what_assessor_does": "The assessor checks that backup copies of CUI are kept confidential wherever they are stored. They find out where backups live (cloud vault, backup appliance, off-site tapes), read how they are encrypted and who can reach them, and compare the backup operator list with the people who can actually read or restore. They look at the backup status and a recent restore test, and ask how off-site copies are carried and stored. Testing means checking the encryption setting on the backup store and trying access with an account that should not have it.",
+        "common_failure_modes": [
+          "Backups are taken but not encrypted at the storage location.",
+          "Too many people can read or restore backups, including general IT staff with no need.",
+          "Off-site tapes or drives are stored somewhere with no physical control.",
+          "Nobody knows where all the backup copies of CUI are kept."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "MP.L2-3.8.9[a]",
+          "determination": "the confidentiality of backup CUI is protected at storage locations",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Backup status and restore test results",
+              "ces_source": "ao_row",
+              "notes": "AdminOps H-07 Backup Integrity Verification: Azure Backup status for the Recovery Services vault and monthly restore test; registered against MP.L2-3.8.9. The assessor also checks the vault's encryption and access settings."
+            },
+            {
+              "artifact_type": "BCP/DR runbook and contact list",
+              "ces_source": "ao_row",
+              "notes": "AdminOps H-08 BCP/DR Contact List & Runbook: runbook review and contact currency; registered against MP.L2-3.8.9. Shows who may handle backup copies."
+            },
+            {
+              "artifact_type": "Backup encryption and access configuration",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: vault or appliance encryption settings and the list of accounts with backup read or restore rights. Control signal registry maps MP.L2-3.8.9 to manualGateEvaluator: no tenant signal covers this objective."
+            },
+            {
+              "artifact_type": "Media protection policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/media-protection-policy.md (GateEvidence family MP). Should require backup CUI to be encrypted or physically protected at every storage location."
+            },
+            {
+              "artifact_type": "Backup operator interview",
+              "ces_source": "interview",
+              "notes": "Ask where every backup copy is kept, how off-site copies travel, and who can restore; try backup access with an unauthorized account."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,545 @@
+{
+  "schema": "ces-muster-run/scorecard@1",
+  "scenario": "muster-partial",
+  "scenarioCode": "S1",
+  "runId": "run-20261028T153601Z",
+  "sspId": "6083370f-c5f0-44ae-a8fc-6390d27436d1",
+  "generatedAt": "2026-10-28T15:39:58.577Z",
+  "input": "run",
+  "thresholdSource": "PLAN.md §1 table (S1 column; slug is not a synthetic customer)",
+  "pass": false,
+  "rows": [
+    {
+      "id": "SC-1",
+      "title": "SSP-review P0 rows passing (REVIEW.md rows 1-7)",
+      "value": {
+        "passed": 5,
+        "of": 7,
+        "rows": [
+          {
+            "row": 1,
+            "pri": "P0",
+            "title": "Status agrees with narrative: no met control narrative hits the negation lexicon or carries a manual-input marker",
+            "pass": false,
+            "detail": "18 of 81 met controls contradict their status (e.g. AC.L2-3.1.4, AC.L2-3.1.5, AC.L2-3.1.6, CM.L2-3.4.1, CM.L2-3.4.2)"
+          },
+          {
+            "row": 2,
+            "pri": "P0",
+            "title": "DOCX status vocabulary (V31 rule): every not-assessed block checks \"Not Yet Assessed\" and never says Not Applicable",
+            "pass": true,
+            "detail": "24 not-assessed controls render \"Not Yet Assessed\""
+          },
+          {
+            "row": 3,
+            "pri": "P0",
+            "title": "Boundary is a boundary: >= 1 zone, no zone is a question key (snake_case or a boundary-fact key), the tenant is named",
+            "pass": true,
+            "detail": "5 zones; question-key zones 0; tenant id named in the boundary"
+          },
+          {
+            "row": 4,
+            "pri": "P0",
+            "title": "Inventory (V34 rule): SSP components = the pushed IM resources",
+            "pass": true,
+            "detail": "32 components vs 32 IM resources; missing 0, extra 0"
+          },
+          {
+            "row": 5,
+            "pri": "P0",
+            "title": "POA&M chapter (V35 rule): §14 = poam.json and every ledger-deficient control is an item, a blocker or no_poam",
+            "pass": true,
+            "detail": "§14 = poam.json (12 items, 17 blockers)"
+          },
+          {
+            "row": 6,
+            "pri": "P0",
+            "title": "Inheritance (V33 rule + content): §2.4 Shared set = the CRM Shared set, and the CRM is not all-customer",
+            "pass": true,
+            "detail": "§2.4 110 rows; Shared sets equal; CRM inherited 1, shared 108"
+          },
+          {
+            "row": 7,
+            "pri": "P0",
+            "title": "No assertion-only narrative: every control narrative >= 200 characters and none is the bare \"implemented and continuously verified\" line",
+            "pass": false,
+            "detail": "4 assertion-only narratives (MP.L2-3.8.4, MP.L2-3.8.9, CA.L2-3.12.1, CA.L2-3.12.3)"
+          }
+        ]
+      },
+      "detail": "5/7: 1✗ 2✓ 3✓ 4✓ 5✓ 6✓ 7✗",
+      "threshold": {
+        "minPassed": 7
+      },
+      "status": "fail"
+    },
+    {
+      "id": "SC-2",
+      "title": "SSP-review P1 rows passing (REVIEW.md rows 8-18)",
+      "value": {
+        "passed": 6,
+        "of": 11,
+        "rows": [
+          {
+            "row": 8,
+            "pri": "P1",
+            "title": "Per-objective statements: >= 90 % of ledger objectives carry their own rationale, not \"inherited from control assessment\"",
+            "pass": false,
+            "detail": "4 of 320 objectives have their own rationale (1.3 %)"
+          },
+          {
+            "row": 9,
+            "pri": "P1",
+            "title": "ODPs: >= 1 control carries odpValues, every entry has a parameter and a value, none is a bank default, §9 is not empty",
+            "pass": false,
+            "detail": "12 controls with odpValues; malformed 0; defaulted 15; §9 empty statement absent"
+          },
+          {
+            "row": 10,
+            "pri": "P1",
+            "title": "Responsible role: every control names one, and no narrative has a dangling \"managed by .\"",
+            "pass": true,
+            "detail": "0 controls without a responsible role; 0 dangling tokens"
+          },
+          {
+            "row": 11,
+            "pri": "P1",
+            "title": "Evidence pointers (metric 6 rule): >= 80 % of assessed controls carry an evidenceDetails entry with a SHA-256",
+            "pass": true,
+            "detail": "84 of 86 assessed controls (97.7 %)"
+          },
+          {
+            "row": 12,
+            "pri": "P1",
+            "title": "Not-assessed controls: no \"REQUIRES MANUAL INPUT\" narrative and each names a related policy",
+            "pass": false,
+            "detail": "24 not-assessed: 16 with a manual-input narrative, 0 without a related policy"
+          },
+          {
+            "row": 13,
+            "pri": "P1",
+            "title": "Data flows and interconnections: >= 1 CUI flow row, >= 1 interconnection, no \"[CUI data flows not configured]\"",
+            "pass": true,
+            "detail": "14 flow rows, 4 interconnections, stub absent"
+          },
+          {
+            "row": 14,
+            "pri": "P1",
+            "title": "Posture counts: the reconciliation block exists and its EO row equals the SSP status counts",
+            "pass": true,
+            "detail": "5 reconciliation rows; EO row {\"met\":81,\"partial\":0,\"notMet\":5,\"notAssessed\":24} vs SSP {\"not_met\":5,\"met\":81,\"not_assessed\":24}"
+          },
+          {
+            "row": 15,
+            "pri": "P1",
+            "title": "SPRS (V36 (a)+(c) rule): one assessed SPRS across eo-assess*, poam.json and §14; no \"Cannot determine SPRS\" beside it",
+            "pass": true,
+            "detail": "assessed SPRS values [38] from 5 sources; \"Cannot determine SPRS\" in 0 assess files"
+          },
+          {
+            "row": 16,
+            "pri": "P1",
+            "title": "Dates: no policy effective date after the SSP date, and a revision history exists",
+            "pass": false,
+            "detail": "19 of 20 policies effective after 2026-10-28 (e.g. 2026-12-30); 49 revision rows"
+          },
+          {
+            "row": 17,
+            "pri": "P1",
+            "title": "Counts agree: no count conflict across the inputs and no met narrative states zero users, devices or methods",
+            "pass": false,
+            "detail": "0 count conflicts (none); 5 met narratives state a zero count"
+          },
+          {
+            "row": 18,
+            "pri": "P1",
+            "title": "Scorecard measures what an assessor checks: every SC row is computed on this input",
+            "pass": true,
+            "detail": "all rows computed"
+          }
+        ]
+      },
+      "detail": "6/11: 8✗ 9✗ 10✓ 11✓ 12✗ 13✓ 14✓ 15✓ 16✗ 17✗ 18✓",
+      "threshold": {
+        "minPassed": 9
+      },
+      "status": "fail"
+    },
+    {
+      "id": "SC-3a",
+      "title": "Evidence coverage of automatable examine items (865 - documentary - SSP/POA&M)",
+      "value": {
+        "covered": 143,
+        "of": 278,
+        "pct": 51.4
+      },
+      "detail": "143/278 = 51.4 % (documentary 468, SSP/POA&M 119, examine items 865)",
+      "threshold": {
+        "minPct": 75
+      },
+      "status": "fail"
+    },
+    {
+      "id": "SC-3b",
+      "title": "Documentary examine items listed in GAPS or credited to a hashed Muster policy",
+      "value": {
+        "listed": 468,
+        "credited": 0,
+        "of": 468
+      },
+      "detail": "468/468 (GAPS rows 468, credited 0; credit rule lands in W5)",
+      "threshold": {
+        "all": true
+      },
+      "status": "pass"
+    },
+    {
+      "id": "SC-4",
+      "title": "Met controls whose deciding evaluator is presence-only",
+      "value": {
+        "presenceOnly": 55,
+        "met": 81,
+        "pct": 67.9
+      },
+      "detail": "55/81 = 67.9 %",
+      "threshold": {
+        "maxPct": 25
+      },
+      "status": "fail"
+    },
+    {
+      "id": "SC-5",
+      "title": "Placeholders (\"[MANUAL INPUT REQUIRED]\" + \"REQUIRES MANUAL INPUT\"), SSP JSON / DOCX",
+      "value": {
+        "json": 120,
+        "docx": 133
+      },
+      "detail": "120 / 133",
+      "threshold": {
+        "maxJson": 10,
+        "maxDocx": 10
+      },
+      "status": "fail"
+    },
+    {
+      "id": "SC-6",
+      "title": "Policy documents complete (owner and approver named, no [Name]) / 20; ODPs answered / 15",
+      "value": {
+        "policies": 0,
+        "policyDocs": 20,
+        "odps": 0,
+        "odpTotal": 15,
+        "docs": [
+          {
+            "file": "access-control-policy.md",
+            "complete": false,
+            "problems": [
+              "no named owner",
+              "no named approver"
+            ]
+          },
+          {
+            "file": "audit-accountability-policy.md",
+            "complete": false,
+            "problems": [
+              "no named owner",
+              "no named approver"
+            ]
+          },
+          {
+            "file": "awareness-training-policy.md",
+            "complete": false,
+            "problems": [
+              "no named owner",
+              "no named approver"
+            ]
+          },
+          {
+            "file": "configuration-management-policy.md",
+            "complete": false,
+            "problems": [
+              "no named owner",
+              "no named approver",
+              "1 × Not specified"
+            ]
+          },
+          {
+            "file": "identification-authentication-policy.md",
+            "complete": false,
+            "problems": [
+              "no named owner",
+              "no named approver"
+            ]
+          },
+          {
+            "file": "incident-response-plan.md",
+            "complete": false,
+            "problems": [
+              "no named owner",
+              "no named approver"
+            ]
+          },
+          {
+            "file": "incident-response-policy.md",
+            "complete": false,
+            "problems": [
+              "no named owner",
+              "no named approver"
+            ]
+          },
+          {
+            "file": "maintenance-policy.md",
+            "complete": false,
+            "problems": [
+              "no named owner",
+              "no named approver"
+            ]
+          },
+          {
+            "file": "media-protection-policy.md",
+            "complete": false,
+            "problems": [
+              "no named owner",
+              "no named approver"
+            ]
+          },
+          {
+            "file": "personnel-screening-policy.md",
+            "complete": false,
+            "problems": [
+              "no named owner",
+              "no named approver"
+            ]
+          },
+          {
+            "file": "personnel-security-policy.md",
+            "complete": false,
+            "problems": [
+              "no named owner",
+              "no named approver"
+            ]
+          },
+          {
+            "file": "personnel-termination-policy.md",
+            "complete": false,
+            "problems": [
+              "no named owner",
+              "no named approver"
+            ]
+          },
+          {
+            "file": "physical-protection-policy.md",
+            "complete": false,
+            "problems": [
+              "no named owner",
+              "no named approver"
+            ]
+          },
+          {
+            "file": "poam.md",
+            "complete": false,
+            "problems": [
+              "no named owner",
+              "no named approver"
+            ]
+          },
+          {
+            "file": "risk-assessment-policy.md",
+            "complete": false,
+            "problems": [
+              "no named owner",
+              "no named approver"
+            ]
+          },
+          {
+            "file": "risk-assessment-report.md",
+            "complete": false,
+            "problems": [
+              "no named owner",
+              "no named approver"
+            ]
+          },
+          {
+            "file": "security-assessment-policy.md",
+            "complete": false,
+            "problems": [
+              "no named owner",
+              "no named approver"
+            ]
+          },
+          {
+            "file": "system-communications-policy.md",
+            "complete": false,
+            "problems": [
+              "no named owner",
+              "no named approver"
+            ]
+          },
+          {
+            "file": "system-integrity-policy.md",
+            "complete": false,
+            "problems": [
+              "no named owner",
+              "no named approver"
+            ]
+          },
+          {
+            "file": "system-security-plan.md",
+            "complete": false,
+            "problems": [
+              "no named owner",
+              "no named approver",
+              "1 × Not specified"
+            ]
+          }
+        ],
+        "odpRows": [
+          {
+            "id": "PI.ODP.001",
+            "key": "account_lockout_threshold",
+            "answered": false,
+            "reason": "no answer in the answers file (bank default)"
+          },
+          {
+            "id": "PI.ODP.002",
+            "key": "account_lockout_duration_minutes",
+            "answered": false,
+            "reason": "no answer in the answers file (bank default)"
+          },
+          {
+            "id": "PI.ODP.003",
+            "key": "session_timeout_minutes",
+            "answered": false,
+            "reason": "no answer in the answers file (bank default)"
+          },
+          {
+            "id": "PI.ODP.004",
+            "key": "min_password_length",
+            "answered": false,
+            "reason": "no answer in the answers file (bank default)"
+          },
+          {
+            "id": "PI.ODP.005",
+            "key": "password_history_count",
+            "answered": false,
+            "reason": "no answer in the answers file (bank default)"
+          },
+          {
+            "id": "PI.ODP.006",
+            "key": "max_password_age_days",
+            "answered": false,
+            "reason": "no answer in the answers file (bank default)"
+          },
+          {
+            "id": "PI.ODP.007",
+            "key": "audit_log_retention_days",
+            "answered": false,
+            "reason": "no answer in the answers file (bank default)"
+          },
+          {
+            "id": "PI.ODP.008",
+            "key": "vuln_scan_frequency",
+            "answered": false,
+            "reason": "no answer in the answers file (bank default)"
+          },
+          {
+            "id": "PI.ODP.009",
+            "key": "critical_patch_timeline_days",
+            "answered": false,
+            "reason": "no answer in the answers file (bank default)"
+          },
+          {
+            "id": "PI.ODP.010",
+            "key": "high_patch_timeline_days",
+            "answered": false,
+            "reason": "no answer in the answers file (bank default)"
+          },
+          {
+            "id": "PI.ODP.011",
+            "key": "training_frequency",
+            "answered": false,
+            "reason": "no answer in the answers file (bank default)"
+          },
+          {
+            "id": "PI.ODP.012",
+            "key": "incident_reporting_hours",
+            "answered": false,
+            "reason": "no answer in the answers file (bank default)"
+          },
+          {
+            "id": "PI.ODP.013",
+            "key": "access_review_frequency",
+            "answered": false,
+            "reason": "no answer in the answers file (bank default)"
+          },
+          {
+            "id": "PI.ODP.014",
+            "key": "backup_frequency",
+            "answered": false,
+            "reason": "no answer in the answers file (bank default)"
+          },
+          {
+            "id": "PI.ODP.015",
+            "key": "media_sanitization_standard",
+            "answered": false,
+            "reason": "no answer in the answers file (bank default)"
+          }
+        ]
+      },
+      "detail": "0/20 documents; 0/15 ODPs (answers file absent)",
+      "threshold": {
+        "minPolicies": 20,
+        "minOdps": 15
+      },
+      "status": "fail"
+    },
+    {
+      "id": "SC-7",
+      "title": "SPRS arithmetic: 110 - weights of the controls not met = every assessed SPRS",
+      "value": {
+        "recomputed": 38,
+        "assessed": {
+          "eo-assess.json": 38,
+          "eo-assess-2.json": 38,
+          "eo-assess-3.json": 38,
+          "poam.json": 38,
+          "SSP §14": 38
+        }
+      },
+      "detail": "110 - 72 = 38; assessed eo-assess.json 38, eo-assess-2.json 38, eo-assess-3.json 38, poam.json 38, SSP §14 38",
+      "threshold": {
+        "exact": true
+      },
+      "status": "pass"
+    },
+    {
+      "id": "SC-8a",
+      "title": "\"unsure\" share among discovery-sourced RR-ACT readiness answers",
+      "value": {
+        "unsure": 73,
+        "of": 112,
+        "pct": 65.2
+      },
+      "detail": "73/112 = 65.2 %",
+      "threshold": {
+        "maxPct": 15
+      },
+      "status": "fail"
+    },
+    {
+      "id": "SC-8b",
+      "title": "Defaulted TCP fields / TCP bank; all defaulted inputs (plan-trace.json)",
+      "value": {
+        "tcp": 28,
+        "of": 39,
+        "all": 69
+      },
+      "detail": "28/39; 69 defaulted inputs",
+      "threshold": {
+        "maxTcp": 5
+      },
+      "status": "fail"
+    }
+  ],
+  "notes": []
+}

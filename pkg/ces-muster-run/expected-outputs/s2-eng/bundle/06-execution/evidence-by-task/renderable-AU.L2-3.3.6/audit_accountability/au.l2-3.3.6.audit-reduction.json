@@ -1,0 +1,35 @@
+{
+  "rawResponse": "",
+  "outcome": "partial_success",
+  "outcomeRationale": "Command completed but expected data output was empty",
+  "complianceVerdict": "NOT_SAT",
+  "verdictRationale": "Outcome 'partial_success' indicates compliance requirement is not yet satisfied",
+  "registryEntry": {
+    "entry_id": "AU.L2-3.3.6.audit-reduction",
+    "label": "Renderable: Audit Reduction via Compliance Search",
+    "engine": "ipps",
+    "layer_hint": 8,
+    "sequence_hint": 2,
+    "idempotency": "safe",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "AU.L2-3.3.6"
+    ],
+    "get_command": "Get-ComplianceSearch -Identity 'CMMC-AuditReduction-{tenantName}' | Select-Object Name,Status,Items,CreatedTime | ConvertTo-Json -Depth 10",
+    "set_command": "",
+    "evidence_commands": [
+      "Get-ComplianceSearch | Where-Object Name -like 'CMMC-Audit*' | Select-Object Name,Status,Items,CreatedTime | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AU.L2-3.3.6"
+    ],
+    "timestamp": "2026-11-01T16:06:19.368Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Renderable: Audit Reduction via Compliance Search",
+    "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

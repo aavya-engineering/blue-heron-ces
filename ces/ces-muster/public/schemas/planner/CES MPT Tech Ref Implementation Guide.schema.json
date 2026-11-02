@@ -1,0 +1,329 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/ces-mpt-tech-ref-implementation-guide.schema.json",
+  "title": "CES Tech Ref Implementation Guide Schema",
+  "description": "All 110 CMMC L2 controls with posture status, Microsoft implementation guidance, GCC High responsibilities, and evidence requirements.",
+  "type": "object",
+  "required": ["ces", "target_level", "posture_summary", "control_families"],
+  "additionalProperties": false,
+  "properties": {
+    "ces": {
+      "type": "object",
+      "required": ["artifact", "version", "generated_on"],
+      "additionalProperties": false,
+      "properties": {
+        "artifact": {
+          "type": "string",
+          "const": "tech_ref_implementation_guide"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "generated_on": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "target_level": {
+      "$ref": "#/$defs/level_enum"
+    },
+    "posture_summary": {
+      "$ref": "#/$defs/posture_summary"
+    },
+    "control_families": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/control_family"
+      }
+    }
+  },
+  "$defs": {
+    "level_enum": {
+      "type": "string",
+      "enum": ["L1", "L2", "L3"]
+    },
+    "status_enum": {
+      "type": "string",
+      "enum": ["MET", "PARTIAL", "NOT_MET", "UNKNOWN"]
+    },
+    "strength_enum": {
+      "type": "string",
+      "enum": ["strong", "adequate", "weak"]
+    },
+    "posture_summary": {
+      "type": "object",
+      "required": ["met", "partial", "not_met", "unknown"],
+      "additionalProperties": false,
+      "properties": {
+        "met": { "type": "integer", "minimum": 0 },
+        "partial": { "type": "integer", "minimum": 0 },
+        "not_met": { "type": "integer", "minimum": 0 },
+        "unknown": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "control_family": {
+      "type": "object",
+      "required": ["abbreviation", "name", "controls"],
+      "additionalProperties": false,
+      "properties": {
+        "abbreviation": {
+          "type": "string",
+          "minLength": 1,
+          "description": "CMMC domain abbreviation (e.g. AC, AT, AU)"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Full domain name (e.g. Access Control)"
+        },
+        "controls": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/control"
+          }
+        }
+      }
+    },
+    "control": {
+      "type": "object",
+      "required": [
+        "control_id",
+        "cmmc_level",
+        "practice",
+        "nist_mapping",
+        "status",
+        "assessment_objectives",
+        "primary_services",
+        "secondary_services",
+        "implementation_by_service",
+        "gcch_responsibilities",
+        "evidence"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "control_id": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}\\.L[1-3]-",
+          "description": "CMMC practice ID (e.g. AC.L2-3.1.1)"
+        },
+        "cmmc_level": {
+          "type": "integer",
+          "enum": [1, 2, 3]
+        },
+        "practice": {
+          "type": "string",
+          "description": "Full practice text from CMMC framework"
+        },
+        "nist_mapping": {
+          "type": "string",
+          "description": "NIST 800-171 and 800-53 cross-references"
+        },
+        "status": {
+          "$ref": "#/$defs/status_enum"
+        },
+        "assessment_objectives": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/assessment_objective"
+          }
+        },
+        "primary_services": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Primary Microsoft services that address this control"
+        },
+        "secondary_services": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Supporting Microsoft services"
+        },
+        "implementation_by_service": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/service_implementation"
+          }
+        },
+        "gcch_responsibilities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/gcch_responsibility"
+          },
+          "description": "GCC High customer responsibilities for this control"
+        },
+        "evidence": {
+          "$ref": "#/$defs/evidence_block"
+        }
+      }
+    },
+    "assessment_objective": {
+      "type": "object",
+      "required": ["id", "text"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Objective letter (e.g. a, b, c)"
+        },
+        "text": {
+          "type": "string"
+        }
+      }
+    },
+    "service_implementation": {
+      "type": "object",
+      "required": ["service_name", "paragraphs"],
+      "additionalProperties": false,
+      "properties": {
+        "service_name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Microsoft service name (e.g. Microsoft Entra ID)"
+        },
+        "paragraphs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/paragraph"
+          }
+        }
+      }
+    },
+    "paragraph": {
+      "type": "object",
+      "required": ["text", "text_with_links", "links"],
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "Plain text content"
+        },
+        "text_with_links": {
+          "type": "string",
+          "description": "Text with markdown-style [text](url) links"
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/doc_link"
+          }
+        }
+      }
+    },
+    "doc_link": {
+      "type": "object",
+      "required": ["text", "url"],
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "Link display text"
+        },
+        "url": {
+          "type": "string",
+          "description": "Documentation URL"
+        }
+      }
+    },
+    "gcch_responsibility": {
+      "type": "object",
+      "required": ["text", "text_with_links"],
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "text_with_links": {
+          "type": "string"
+        }
+      }
+    },
+    "evidence_block": {
+      "type": "object",
+      "required": ["assessor_methods", "archetypes", "anti_patterns"],
+      "additionalProperties": false,
+      "properties": {
+        "assessor_methods": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["examine", "interview", "test"]
+          }
+        },
+        "archetypes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidence_archetype"
+          }
+        },
+        "anti_patterns": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Evidence practices to avoid"
+        }
+      }
+    },
+    "evidence_archetype": {
+      "type": "object",
+      "required": [
+        "archetype_id",
+        "name",
+        "description",
+        "strength",
+        "strength_examples",
+        "acceptable_forms",
+        "collection_notes",
+        "retention_notes"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "archetype_id": {
+          "type": "string",
+          "pattern": "^EMX-",
+          "description": "Evidence archetype ID (e.g. EMX-IAM-001)"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "strength": {
+          "$ref": "#/$defs/strength_enum"
+        },
+        "strength_examples": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/strength_example"
+          },
+          "description": "Evidence quality tiers with descriptions"
+        },
+        "acceptable_forms": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Acceptable evidence formats (e.g. PDF, CSV export)"
+        },
+        "collection_notes": {
+          "type": "string"
+        },
+        "retention_notes": {
+          "type": "string"
+        }
+      }
+    },
+    "strength_example": {
+      "type": "object",
+      "required": ["strength", "description"],
+      "additionalProperties": false,
+      "properties": {
+        "strength": {
+          "$ref": "#/$defs/strength_enum"
+        },
+        "description": {
+          "type": "string",
+          "description": "What evidence at this quality level looks like"
+        }
+      }
+    }
+  }
+}

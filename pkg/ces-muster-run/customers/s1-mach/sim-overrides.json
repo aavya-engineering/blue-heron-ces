@@ -1,0 +1,27 @@
+{
+  "_about": "DEPRECATED (synthetic-customer W1): kept for the transition only. Muster now supplies these keys in the Tenant Manifest tenant_identity with provenance; scripts/overrides-gate.mjs reads this file only when MX_ALLOW_OVERRIDES=1 and the TM lacks keys, and never takes initialPassword from it (the harness mints that per run into the Stamper environment). To be deleted (PLAN section 10). Original note: S1 (s1-mach) sim-only operator values until W1 retires overrides; derived from customers/s1-mach/customer.json (LOG-W0-sim section 9 item 9).",
+  "_scope": "simulator only; never load against a live tenant",
+  "variables": {
+    "operatorUPN": "adm.dorrel.nettlecombe@s1-mach.simtenant.onmicrosoft.us",
+    "approverUPN": "adm.tamsel.kettlevane@s1-mach.simtenant.onmicrosoft.us",
+    "breakGlassUPN": "bg.access01@s1-mach.simtenant.onmicrosoft.us",
+    "breakGlassUserId": "user-50",
+    "adminUserName": "sim.admin",
+    "initialPassword": "SimOnly-Placeholder-Not-A-Secret-01",
+    "approvedIpRange": "198.51.100.0/24",
+    "subscriptionId": "51510000-00a2-4000-8000-000000000001",
+    "touFileName": "sim-terms-of-use.pdf",
+    "touFileBase64": "JVBERi0xLjQKJSBzaW0tb25seSB0ZXJtcyBvZiB1c2UgcGxhY2Vob2xkZXIK",
+    "baselineTemplateId": "5ec0ba5e-0000-4000-8000-000000000001",
+    "complianceRoleId": "17315797-102d-40b4-93e0-432062caca18",
+    "roleDefId": "62e90394-69f5-4237-9190-012177145e10"
+  },
+  "_notes": {
+    "complianceRoleId": "Entra built-in role template id for Compliance Administrator; whether the sim resolves it is to verify",
+    "roleDefId": "Entra built-in role template id for Global Administrator (PIM eligible-assignment target); to verify on the sim",
+    "subscriptionId": "placeholder GUID; the sim's Azure facade does not check subscription ids today; to verify",
+    "breakGlassUserId": "the sim id of sim.user5 (no registry entry produced it in run 4; supplied directly, and a GET lookup entry is being added on the Stamper side)",
+    "baselineTemplateId": "the simulator's seeded Intune security-baseline template (display name 'MDM Security Baseline for Windows 10 and later'); no registry entry names a template, so the id is supplied (CM.L2-3.4.1); a real tenant needs the operator to choose the template",
+    "runtime_captures": "operatorUserId, cuiGroupId and namedLocationId are captured at run time from producing entries; the translator now orders producers before consumers (CAPTURE_DEPENDENCY edges)"
+  }
+}

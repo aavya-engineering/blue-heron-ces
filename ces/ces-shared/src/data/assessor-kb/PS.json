@@ -1,0 +1,182 @@
+{
+  "family": "PS",
+  "family_name": "Personnel Security",
+  "practices": [
+    {
+      "id": "PS.L2-3.9.1",
+      "title": "Screen individuals prior to authorizing access to organizational systems containing CUI.\nAssessment Objective:\n[a] individuals are screened prior to authorizing access to organizational systems \ncontaining CUI.",
+      "approach": {
+        "what_assessor_does": "The assessor reads the screening procedure to see what checks are done before someone gets access to CUI systems, for example identity, right to work, references and a background check, and who decides the result. They take a sample of current account holders, including administrators and contractors, and compare the date screening finished with the date the account was created or added to CUI groups. Screening must come first. They ask HR and the security lead how screening is tracked, what happens when it is not finished, and how rescreening is handled when it is required.",
+        "common_failure_modes": [
+          "Accounts were created before screening finished, with the screening record dated later.",
+          "Contractors or administrators were never screened because they came through a third party.",
+          "Screening records exist in HR but cannot be tied to the accounts the person holds.",
+          "The procedure does not say what screening is required, so adequacy cannot be judged.",
+          "The decision to grant access after screening is not recorded or names no approver."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "PS.L2-3.9.1[a]",
+          "determination": "individuals are screened prior to authorizing access to organizational systems containing CUI",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Personnel security policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/personnel-security-policy.md (GateEvidence family PS). Should state what screening is required before access to CUI systems and who signs off."
+            },
+            {
+              "artifact_type": "Screening packages per person",
+              "ces_source": "eo_store",
+              "notes": "EO ScreeningElementStore (collection eo_screening): seven elements per person, from identity verification and citizenship to the CUI acknowledgment and the authorizing sign-off (element 7). The assessor checks the sign-off date is before the account was given CUI access."
+            },
+            {
+              "artifact_type": "Personnel roster with screening state",
+              "ces_source": "eo_store",
+              "notes": "EO PersonnelStore (collection eo_personnel), surfaced by the EO evidence router as personnel:<id> items mapped to PS.L2-3.9.1. Shows cleared, expiring, expired and unscreened people."
+            },
+            {
+              "artifact_type": "Uploaded screening records",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector as record kind personnel_screening (ces-org-record/1). When present, these rows decide the EO screening readiness."
+            },
+            {
+              "artifact_type": "HR and clearance roster sync",
+              "ces_source": "ao_row",
+              "notes": "AdminOps G-05 Personnel Screening Sync: imports the HR or clearance roster CSV and gates CUI access on it; registered against PS.L2-3.9.1. The assessor compares account creation dates with screening dates."
+            },
+            {
+              "artifact_type": "Insider risk report",
+              "ces_source": "ao_row",
+              "notes": "AdminOps G-07 Insider Threat Indicator Report (Purview Insider Risk Management, monthly); registered against PS.L2-3.9.1. Supports, but does not replace, screening before access."
+            },
+            {
+              "artifact_type": "HR and security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask how screening is tracked and what blocks an account until screening is done. Control signal registry maps PS.L2-3.9.1 to manualGateEvaluator: no tenant signal covers this objective."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PS.L2-3.9.2",
+      "title": "Ensure that organizational systems containing CUI are protected during and after personnel actions such as terminations and transfers.",
+      "approach": {
+        "what_assessor_does": "The assessor reads the offboarding and transfer procedure to see what happens to accounts, credentials, devices and CUI access when someone leaves or changes jobs, and how fast. They take recent leavers and movers from HR and check in the tenant that each leaver's account was disabled on time and that each mover lost access they no longer need. They look for leftover rights such as role assignments, group memberships, shared mailbox access or keys still held. They ask HR and IT how they hear about a personnel action, and they check that the tenant runs leaver and mover workflows on a schedule rather than by hand.",
+        "common_failure_modes": [
+          "HR does not tell IT about leavers in time, so accounts stay active for days or weeks.",
+          "Disabled accounts still hold administrator roles or group memberships.",
+          "Transfers keep all the rights from the old job because only terminations are handled.",
+          "Shared passwords, service accounts or physical keys known to the leaver are not changed.",
+          "Leaver workflows exist in the tenant but are disabled or only run on demand."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "PS.L2-3.9.2[a]",
+          "determination": "a policy and/or process for terminating system access and any credentials coincident with personnel actions is established",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Personnel security policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/personnel-security-policy.md (GateEvidence family PS). Should describe the steps and time limits for removing access and credentials on termination and transfer."
+            },
+            {
+              "artifact_type": "Leaver workflow scheduling record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps A-21 Leaver Lifecycle Workflow Scheduling: turns on scheduling for leaver workflows that disable or delete the account, and for the mover workflow; registered against PS.L2-3.9.2."
+            },
+            {
+              "artifact_type": "NDA and acceptable use acknowledgments",
+              "ces_source": "ao_row",
+              "notes": "AdminOps G-06 NDA/AUP Acknowledgment: SharePoint list with yearly re-acknowledgment; registered against PS.L2-3.9.2. Shows staff accepted the obligations that continue after they leave."
+            },
+            {
+              "artifact_type": "HR and IT interview",
+              "ces_source": "interview",
+              "notes": "Ask how IT learns of a termination or transfer and how long it takes to act."
+            }
+          ]
+        },
+        {
+          "id": "PS.L2-3.9.2[b]",
+          "determination": "system access and credentials are terminated consistent with personnel actions such as termination or transfer",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Lifecycle workflow and residual access check",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry PS.L2-3.9.2 (personnelActionAccessEvaluator): Graph /identityGovernance/lifecycleWorkflows/workflows, /users and /roleManagement/directory/roleAssignments. Looks for an enabled, scheduled leaver workflow that disables or deletes the account, and for disabled accounts still holding a directory role."
+            },
+            {
+              "artifact_type": "Offboarding run records",
+              "ces_source": "eo_store",
+              "notes": "EO OffboardingWizardStore (collection eo_offboarding): per-leaver steps from disabling the Entra account and revoking sessions to unassigning licenses and the 30-day CUI access review, with an SLA status."
+            },
+            {
+              "artifact_type": "Uploaded lifecycle records",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector as record kind personnel_lifecycle (ces-org-record/1): termination events and their steps. The assessor checks each leaver has an account-disable step marked done."
+            },
+            {
+              "artifact_type": "Leaver workflow scheduling record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps A-21 Leaver Lifecycle Workflow Scheduling; registered against PS.L2-3.9.2."
+            },
+            {
+              "artifact_type": "Sample of recent leavers",
+              "ces_source": "interview",
+              "notes": "The assessor picks recent leavers from the HR list, asks IT to show each account in the tenant, and compares the disable date with the last working day."
+            }
+          ]
+        },
+        {
+          "id": "PS.L2-3.9.2[c]",
+          "determination": "the system is protected during and after personnel transfer actions",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Mover workflow and residual access check",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry PS.L2-3.9.2 (personnelActionAccessEvaluator): checks for an enabled, scheduled mover workflow as well as the leaver workflow, through Graph /identityGovernance/lifecycleWorkflows/workflows."
+            },
+            {
+              "artifact_type": "Mover workflow scheduling record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps A-21 Leaver Lifecycle Workflow Scheduling also enables scheduling of the mover workflow; registered against PS.L2-3.9.2."
+            },
+            {
+              "artifact_type": "Transfer access review records",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: for recent transfers, the access removed from the old role and the access granted for the new one, with the approver."
+            },
+            {
+              "artifact_type": "Sample of recent transfers",
+              "ces_source": "interview",
+              "notes": "Ask a manager of a recently transferred person what access the person kept and why. The assessor compares the answer with the groups and roles the account holds today."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

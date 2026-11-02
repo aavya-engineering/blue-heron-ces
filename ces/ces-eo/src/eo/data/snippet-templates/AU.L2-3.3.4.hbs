@@ -1,0 +1,43 @@
+## Control {{controlId}}: Alert in the Event of an Audit Logging Process Failure
+
+**Implementation Status:** {{status}}
+
+This organization alerts on audit logging process failures within the {{tenantName}} M365 GCC High tenant to ensure continuous audit coverage, managed by {{variables.systemAdministrator}}.
+
+{{#if auditQueriesConfigured}}
+**Automated Failure Alerting:**
+Microsoft Sentinel monitoring rules detect audit logging failures:
+{{#if queries}}
+{{#each queries}}
+- **{{name}}** — Source: {{dataSource}}
+{{/each}}
+{{/if}}
+
+Alert rules trigger notifications to {{variables.systemAdministrator}} when audit data ingestion stops, log sources become unavailable, or retention policy failures occur.
+{{/if}}
+
+{{#if sentinelNotAvailable}}
+**Manual Failure Detection:**
+Microsoft Sentinel is not deployed in this environment. Audit logging failure detection is performed through operational procedures:
+
+**Operational Procedure:**
+- **Action:** Daily verification that audit log sources (sign-in logs, directory audits, mailbox audits) are actively collecting data. Gaps exceeding 4 hours trigger escalation to {{variables.systemAdministrator}}
+- **Frequency:** Daily automated health check via M365 Service Health dashboard; manual verification weekly
+- **Responsible Party:** {{variables.systemAdministrator}}
+- **Documentation:** Audit Logging Failure Response Procedure AU-004
+
+Alert notifications are sent via email to the Security Administrator and ISSO when audit logging failures are detected through M365 Service Health incidents or manual gap identification.
+{{/if}}
+
+**Review Frequency:** Monthly review of alert effectiveness by ISSO
+
+**Verification Method:** Examine audit failure alert configurations, notification records, service health monitoring procedures, and failure response documentation.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** Review audit failure response records per procedure AU-004. {{evidenceArtifactUrl}}
+{{/if}}

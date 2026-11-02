@@ -1,0 +1,39 @@
+## Control {{controlId}}: Deny Network Communications Traffic by Default and Allow by Exception
+
+**Implementation Status:** {{status}}
+
+This organization prevents unauthorized and unintended information transfer via shared system resources within the {{tenantName}} M365 GCC High tenant through Data Loss Prevention policies, sensitivity labels, and SharePoint sharing restrictions managed by {{variables.accessControlAdministrator}}.
+
+{{#if dlpLabelsConfigured}}
+**Sensitivity Label Enforcement:**
+{{dlpLabelsCount}} sensitivity labels classify and protect CUI across shared resources:
+{{#each labels}}
+- **{{name}}**{{#if isActive}} (Active){{else}} (Inactive){{/if}} — Priority: {{priority}}{{#if tooltip}} — {{tooltip}}{{/if}}
+{{/each}}
+
+Sensitivity labels enforce encryption, access restrictions, and visual markings on documents shared across M365 workloads (SharePoint, OneDrive, Exchange, Teams).
+{{else}}
+Sensitivity labels have not been configured. CUI classification and automated protection on shared resources is not active.
+{{/if}}
+
+{{#if sharepointConfigured}}
+**SharePoint Sharing Controls:**
+External sharing capability is set to **{{sharingCapability}}**. {{#if externalSharingEnabled}}External sharing is enabled with restrictions.{{else}}External sharing is disabled, preventing information transfer outside the tenant boundary.{{/if}}
+{{#if ippProtectionEnabled}}Information Protection Policy (IPP) enforcement is active on SharePoint sites.{{/if}}
+Default sharing link type: **{{defaultSharingLinkType}}**.
+{{else}}
+SharePoint sharing configuration has not been confirmed.
+{{/if}}
+
+**Responsible Party:** {{variables.accessControlAdministrator}}
+
+**Verification Method:** Examine sensitivity label policies, DLP rule configurations, SharePoint sharing settings, and external collaboration logs.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

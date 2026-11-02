@@ -1,0 +1,76 @@
+controlId: "CM.L2-3.4.1"
+relatedControlIds:
+  - "CM.L2-3.4.2"
+  - "MP.L2-3.8.1"
+  - "SC.L2-3.13.11"
+practiceStatement: Establish and maintain baseline configurations and inventories of organizational systems throughout the
+  respective system development life cycles.
+useCaseId: B-01
+useCaseTitle: "New Device Enrollment"
+domain: Device & Endpoint Management
+priority: P4 Standard
+trigger: 'ONBOARDING: New device procured or existing device assigned to user'
+sodTier: Tier 2 -- Config Manager
+entraRolesRequired:
+- Intune Administrator
+approvalRequired: false
+services:
+- name: Microsoft Intune
+  purpose: device enrollment, compliance policies, security baselines, configuration profiles
+- name: Windows Autopilot
+  purpose: zero-touch provisioning
+- name: Entra ID
+  purpose: device identity, dynamic device groups
+- name: BitLocker
+  purpose: XTS-AES 256-bit encryption via Intune configuration profile
+- name: Microsoft Defender for Endpoint
+  purpose: onboarding package delivered via Intune
+configurationSteps:
+  portalPath: https://intune.microsoft.us
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes DeviceManagementServiceConfig.ReadWrite.All
+  - cmdlet: New-MgDeviceManagementImportedWindowsAutopilotDeviceIdentity
+    parameters:
+    - -MgDeviceManagementImportedWindowsAutopilotDeviceIdentity
+    - -BodyParameter
+    - -MgDeviceManagementManagedDevice
+    - -Filter
+    - -Object
+  - cmdlet: Get-MgDeviceManagementManagedDevice
+    parameters:
+    - -MgDeviceManagementManagedDevice
+    - -Filter
+    - -Object
+    - -eq
+    - -Object
+  graphApiEndpoint: POST https://graph.microsoft.us/v1.0/deviceManagement/importedWindowsAutopilotDeviceIdentities
+  graphApiPayloadExample: {}
+  requiredPermissions:
+  - DeviceManagementServiceConfig.ReadWrite.All
+  - DeviceManagementManagedDevices.Read.All
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-b-device/B-01/{year}/{month}/
+  format: JSON (Autopilot device identity export), PNG (compliance policy screenshot)
+  filenamePattern: B-01_AutopilotEnrollment_{YYYYMMDD}_{HHmmss}_{SerialNumber}.json
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://intune.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: Windows Autopilot is fully supported in GCC High. Autopilot hardware hash registration uses the GCC High Intune endpoint
+    (`https://intune.microsoft.us`). The Autopilot self-deploying mode requires TPM 2.0 attestation; verify device firmware
+    compatibility. Security baselines in GCC High Intune may lag commercial availability by one to two release cycles; verify
+    the latest baseline version available in your tenant before deployment. BitLocker recovery keys are escrowed to Entra
+    ID in GCC High with no endpoint delta.
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

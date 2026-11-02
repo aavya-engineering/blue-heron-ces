@@ -1,0 +1,246 @@
+{
+  "type": "muster-e2e",
+  "scenario_id": "s1-mach-e2e",
+  "description": "Synthetic-customer W0: the MX run driven by ces-tester on the stacksim scenario s1-mach (S1, a fictional 45-person machining subcontractor on GCC High G5: 9 enforcing Conditional Access policies, Intune baseline and BitLocker, 3 DLP policies, Azure Government enclave; PLAN.md section 2.1). Steps as muster-partial-e2e.json. expected_facts are authored from the S1 shape and are PENDING reconciliation with the simulator's own expectedFacts (tenant-stacksim scenarios/s1-mach.json, not yet built when this file was written); expected_state and expected_ledger reuse the muster-partial checks for the settings Stamper writes on any tenant. Synthetic-customer W2: E7A runs three AdminOps ops (A-11 stale-account read, A-02 offboarding of the leaver whose account is still enabled, A-09 PIM role review read); E7B expects no status move (every control these ops map to is already met on S1, and B-07 is a no-op here because both compliant-device CA policies are already enabled), so those three move nothing. W7-TST: E7A also runs A-21 (leaver lifecycle workflow scheduling, T2, confirming read of the workflow's isSchedulingEnabled; resources.leaver_workflow_id discovered at E5), so expected_improvements is exactly PS.L2-3.9.2 not_met -> met (V47, V65); expected_ledger.mutated gains the leaver workflow (lifecycleWorkflows/51510000-001f-4000-8000-000000000003); ao_coverage.expected_total is 96 (the ces-ao registry gained A-21).",
+  "sim_scenario": "s1-mach",
+  "stance": "m365_azure",
+  "force_fail_entry": "SC.L2-3.13.15.anti-spam",
+  "eo_assess_runs": 3,
+  "ec_upload": {
+    "controlIds": [
+      "AC.L1-3.1.1"
+    ],
+    "source": "manual_upload",
+    "filename": "acp.pdf",
+    "mediaType": "application/pdf",
+    "contentBase64": "JVBERi0xLjQK",
+    "submittedByRole": "compliance_officer",
+    "form_id": "access_control_policy",
+    "emx_ids": [
+      "EMX-IAM-004"
+    ]
+  },
+  "expected_facts": {
+    "RR-ACT-IA_L2_3_5_3": "yes",
+    "RR-ACT-CM_L2_3_4_1": "yes",
+    "RR-ACT-CM_L2_3_4_2": "yes",
+    "RR-ACT-SI_L1_3_14_1": "yes",
+    "RR-ACT-SI_L2_3_14_2": "yes"
+  },
+  "expected_state": {
+    "checks": [
+      {
+        "description": "ATP enabled for SPO/Teams/ODB (Set-AtpPolicyForO365 -EnableATPForSPOTeamsODB $true)",
+        "request": {
+          "kind": "cmdlet",
+          "cmdlet": "Get-AtpPolicyForO365"
+        },
+        "path": "EnableATPForSPOTeamsODB",
+        "assert": "equals",
+        "value": true,
+        "ledger_object_type": "atpPolicyForO365"
+      },
+      {
+        "description": "Legacy TLS clients disallowed (Set-TransportConfig -AllowLegacyTLSClients $false)",
+        "request": {
+          "kind": "cmdlet",
+          "cmdlet": "Get-TransportConfig"
+        },
+        "path": "AllowLegacyTLSClients",
+        "assert": "equals",
+        "value": false,
+        "ledger_object_type": "transportConfig"
+      },
+      {
+        "description": "Unified audit log ingestion enabled (Set-AdminAuditLogConfig -UnifiedAuditLogIngestionEnabled $true)",
+        "request": {
+          "kind": "cmdlet",
+          "cmdlet": "Get-AdminAuditLogConfig"
+        },
+        "path": "UnifiedAuditLogIngestionEnabled",
+        "assert": "equals",
+        "value": true,
+        "ledger_object_type": "adminAuditLogConfig"
+      },
+      {
+        "description": "Teams external federation access disabled on the Global policy (the base seed has it enabled)",
+        "request": {
+          "kind": "cmdlet",
+          "cmdlet": "Get-CsExternalAccessPolicy"
+        },
+        "select": {
+          "field": "Identity",
+          "equals": "Global"
+        },
+        "path": "EnableFederationAccess",
+        "assert": "equals",
+        "value": false,
+        "ledger_object_type": "csExternalAccessPolicy"
+      },
+      {
+        "description": "Remote-maintenance MFA: S1's own all-users MFA policy is verified as the equivalent (W5 cycle 3 lookup; no CES policy created)",
+        "request": {
+          "kind": "uri",
+          "method": "GET",
+          "uri": "/v1.0/identity/conditionalAccess/policies"
+        },
+        "select": {
+          "field": "displayName",
+          "equals": "S1-CA01 Require MFA - all users"
+        },
+        "path": "state",
+        "assert": "equals",
+        "value": "enabled",
+        "ledger_object_type": "caPolicies"
+      },
+      {
+        "description": "MicrosoftAuthenticator auth-method config enabled",
+        "request": {
+          "kind": "uri",
+          "method": "GET",
+          "uri": "/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/MicrosoftAuthenticator"
+        },
+        "path": "state",
+        "assert": "equals",
+        "value": "enabled",
+        "ledger_object_type": "authenticationMethodsPolicyConfigurations"
+      },
+      {
+        "description": "Fido2 auth-method config enabled",
+        "request": {
+          "kind": "uri",
+          "method": "GET",
+          "uri": "/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/Fido2"
+        },
+        "path": "state",
+        "assert": "equals",
+        "value": "enabled",
+        "ledger_object_type": "authenticationMethodsPolicyConfigurations"
+      }
+    ]
+  },
+  "expected_ledger": {
+    "build_window": {
+      "from": "E1",
+      "before": "E2"
+    },
+    "no_writes_during": [
+      "E2",
+      "E6X"
+    ],
+    "allowed_write_windows": [
+      "EL",
+      "E6",
+      "E7A"
+    ],
+    "min_writes_during": {
+      "EL": 1,
+      "E6": 1,
+      "E7A": 1
+    },
+    "mutated": [
+      {
+        "objectType": "caPolicies",
+        "objectId": "CMMC-SessionTimeout"
+      },
+      {
+        "objectType": "csExternalAccessPolicy"
+      },
+      {
+        "objectType": "atpPolicyForO365"
+      },
+      {
+        "objectType": "adminAuditLogConfig"
+      },
+      {
+        "objectType": "transportConfig"
+      },
+      {
+        "objectType": "authenticationMethodsPolicyConfigurations"
+      },
+      {
+        "objectType": "users",
+        "objectId": "user-7"
+      },
+      {
+        "objectType": "caPolicies",
+        "objectId": "CMMC-MFA-CompliantDevice"
+      },
+      {
+        "objectType": "lifecycleWorkflows",
+        "objectId": "51510000-001f-4000-8000-000000000003"
+      }
+    ]
+  },
+  "ao_coverage": {
+    "enabled": true,
+    "expected_total": 96
+  },
+  "adminops_ops": [
+    {
+      "op": "A-11",
+      "tier": "T2",
+      "kind": "read",
+      "description": "Stale account detection (read). AO binds operatorUPN and breakGlassUPN from resources.operator_upn and resources.breakglass_upn (copied from the TM at E5)."
+    },
+    {
+      "op": "A-02",
+      "tier": "T2",
+      "kind": "write",
+      "description": "User offboarding (disable) of the leaver whose account is still enabled: resources.offboard_upn, discovered at E5 from the sim (employeeLeaveDateTime passed, accountEnabled true).",
+      "params": {
+        "upn": "resources.offboard_upn"
+      },
+      "confirm": {
+        "description": "AdminOps A-02: the leaver's account is disabled",
+        "request": {
+          "kind": "uri",
+          "method": "GET",
+          "uri": "/v1.0/users"
+        },
+        "select": {
+          "field": "userPrincipalName",
+          "equals": "{resources.offboard_upn}"
+        },
+        "path": "accountEnabled",
+        "assert": "equals",
+        "value": false,
+        "ledger_object_type": "users"
+      }
+    },
+    {
+      "op": "A-09",
+      "tier": "T2",
+      "kind": "read",
+      "description": "Privileged role review (PIM eligibility schedules for the Global, Privileged Role and Security Administrator roles). AO binds the role ids from resources.global_admin_role_def_id, else the built-in template ids."
+    },
+    {
+      "op": "A-21",
+      "tier": "T2",
+      "kind": "write",
+      "description": "W7-TST: leaver lifecycle workflow scheduling (PS.L2-3.9.2). resources.leaver_workflow_id is discovered at E5 from the sim: the enabled leaver workflow with a disable/delete-user-account task (S1 Leaver - disable account and remove access, 51510000-001f-4000-8000-000000000003, on demand in the seed). AO turns its scheduling on (the mover is already scheduled: no change); the op fails unless the bound id is such a leaver.",
+      "params": {
+        "leaverWorkflowId": "resources.leaver_workflow_id"
+      },
+      "confirm": {
+        "description": "AdminOps A-21: the leaver workflow is scheduled",
+        "request": {
+          "kind": "uri",
+          "method": "GET",
+          "uri": "/v1.0/identityGovernance/lifecycleWorkflows/workflows/{resources.leaver_workflow_id}"
+        },
+        "path": "isSchedulingEnabled",
+        "assert": "equals",
+        "value": true,
+        "ledger_object_type": "lifecycleWorkflows"
+      }
+    }
+  ],
+  "expected_improvements": [],
+  "allowed_reverts": [],
+  "drift_injection": [],
+  "postcheck_thresholds": {
+    "presence_max": 5,
+    "_note": "PH-6 R-REG (LOG-PH6-REG.md section 4): 5 Azure entries the simulator cannot read back or that have no state (PREFLIGHT-001, NET-001, FOUND-003, NSG-001) stay presence-only."
+  }
+}

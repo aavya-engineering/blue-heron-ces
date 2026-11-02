@@ -1,0 +1,447 @@
+schema_version: '1.0'
+module: BTC_Guidance_Help
+
+questions:
+  BTC.ID.001:
+    guidance:
+      description: 'Validates that the list of Global Administrators in Entra matches what was declared in the SI baseline and CUI boundary.'
+      why_it_matters: 'Undeclared Global Admins represent boundary integrity failures — anyone with GA can bypass controls, access all CUI, and modify security configurations.'
+      evidence_guidance: 'Export Global Admin role members from Entra > Roles and administrators. CSV or screenshot accepted. Include display name, UPN, and assignment type (permanent vs eligible).'
+      common_pitfalls:
+        - 'Forgetting service accounts or break-glass accounts that hold the GA role.'
+        - 'Not distinguishing between permanent and PIM-eligible GA assignments.'
+      implications: 'Any mismatch triggers a risk flag and must be resolved — either by updating the declared scope or remediating the unexpected assignment.'
+    options:
+      'Yes':
+        description: 'GA list matches declared scope exactly — all admins are documented and authorized.'
+      'No':
+        description: 'Mismatches found — undeclared admins discovered or expected admins missing.'
+        implication: 'Triggers risk flag; must be resolved before boundary can be confirmed.'
+
+  BTC.ID.002:
+    guidance:
+      description: 'Verifies that privileged role assignments in Entra match the declared privilege model.'
+      why_it_matters: 'Privilege sprawl — unexpected persistent role assignments — is one of the most common findings in CMMC assessments and a top attacker target.'
+      evidence_guidance: 'Export all privileged role assignments from Entra > Roles and administrators or PIM. Include role name, assignee, assignment type (permanent/eligible), and start date.'
+      common_pitfalls:
+        - 'Overlooking custom roles with elevated permissions that do not appear in standard role exports.'
+        - 'Not checking for persistent assignments that should be PIM-eligible (just-in-time).'
+      implications: 'Unexpected roles must be documented, justified, or removed. Persistent assignments should be converted to PIM-eligible where possible.'
+    options:
+      'No unexpected roles':
+        description: 'All privileged role assignments match the declared model — no surprises.'
+      'Yes - unexpected roles found':
+        description: 'Roles or assignments discovered that are not in the declared privilege model.'
+        implication: 'Triggers risk flag — each unexpected role must be investigated and resolved.'
+      'Unknown':
+        description: 'Privilege model has not been audited or exports are unavailable.'
+        implication: 'Cannot confirm boundary — must complete audit before proceeding.'
+
+  BTC.ID.003:
+    guidance:
+      description: 'Confirms that guest accounts in the tenant align with declared boundary policies for external access.'
+      why_it_matters: 'Guest accounts are external identities with potential CUI access. Misaligned guests may have broader access than intended.'
+      evidence_guidance: 'Query Entra for all guest users: filter by userType eq "Guest". Export UPN, creation date, invited by, and last sign-in. Cross-reference against approved guest list.'
+      common_pitfalls:
+        - 'Stale guest accounts from completed projects that retain access to CUI sites.'
+        - 'Guests invited by end users without admin approval via self-service B2B.'
+      implications: 'Misaligned guests must be either removed, access-scoped, or formally approved with documented justification.'
+    options:
+      'No guests':
+        description: 'No guest accounts exist in the tenant.'
+      'Guests present - aligned':
+        description: 'Guest accounts exist and all align with the declared external access policy.'
+      'Guests present - not aligned':
+        description: 'Guest accounts found that do not match the declared boundary policy.'
+        implication: 'Triggers risk flag — unauthorized external access to CUI environment.'
+      'Unknown':
+        description: 'Guest account alignment has not been audited.'
+
+  BTC.ID.004:
+    guidance:
+      description: 'Confirms that emergency access (break-glass) accounts are properly configured, protected, and documented.'
+      why_it_matters: 'Without break-glass accounts, a CA policy misconfiguration or admin lockout could permanently prevent access to the tenant. Assessors specifically look for this.'
+      evidence_guidance: 'Export CA policy exclusion lists showing break-glass accounts. Provide documentation of break-glass procedures, credential storage location, and last-tested date.'
+      common_pitfalls:
+        - 'Creating break-glass accounts but including them in Conditional Access policies that require MFA (defeating their purpose).'
+        - 'Not regularly testing break-glass procedures — credentials may have expired or been rotated.'
+      implications: 'Break-glass accounts must be excluded from CA, monitored for use, and have credentials stored securely (physical safe or equivalent).'
+    options:
+      'Yes':
+        description: 'Break-glass accounts are configured, excluded from CA, credentials secured, procedures documented.'
+      'Partially':
+        description: 'Break-glass accounts exist but documentation, testing, or CA exclusions are incomplete.'
+        implication: 'Must remediate gaps before boundary confirmation.'
+      'No':
+        description: 'No break-glass accounts configured.'
+        implication: 'Triggers risk flag — emergency access gap must be remediated immediately.'
+      'Unknown':
+        description: 'Break-glass account status has not been verified.'
+
+  BTC.DEV.001:
+    guidance:
+      description: 'Validates that all CUI users have compliant, managed devices enrolled in Intune.'
+      why_it_matters: 'Device compliance is a core boundary control — non-compliant devices may lack encryption, endpoint protection, or current patches.'
+      evidence_guidance: 'Export enrolled devices from Intune > Devices. Include device name, OS, compliance status, last check-in, and primary user. Cross-reference against CUI user list.'
+      common_pitfalls:
+        - 'Users with multiple devices where only one is enrolled — they may use the unenrolled device for CUI access.'
+        - 'Devices showing as "compliant" but with stale check-in dates (>30 days).'
+      implications: 'Gaps in device enrollment mean CUI users are accessing resources from unverified endpoints.'
+    options:
+      'Yes':
+        description: 'All CUI users have at least one compliant, recently-checked-in managed device.'
+      'No - gaps found':
+        description: 'Some CUI users lack compliant managed devices.'
+        implication: 'Triggers risk flag — must be remediated before boundary confirmation.'
+      'Unknown':
+        description: 'Device enrollment coverage has not been audited against CUI user list.'
+
+  BTC.DEV.002:
+    guidance:
+      description: 'Detects whether unmanaged or non-compliant devices are actually accessing CUI resources.'
+      why_it_matters: 'Even if the declared model is "managed-only," actual access logs may reveal unmanaged devices slipping through due to CA gaps or exceptions.'
+      evidence_guidance: 'Query Sentinel or Unified Audit Log for sign-in events to SharePoint, Teams, and Exchange. Filter for device compliance status "non-compliant" or "not registered."'
+      common_pitfalls:
+        - 'Only checking sign-in logs — also check SharePoint access logs for anonymous or app-based access.'
+        - 'Mobile device access via Outlook/Teams apps without MAM enrollment.'
+      implications: 'Any unmanaged device access indicates a boundary enforcement failure that must be investigated and closed.'
+    options:
+      'No':
+        description: 'No unmanaged device access detected in audit logs.'
+      'Yes':
+        description: 'Unmanaged devices are accessing CUI resources.'
+        implication: 'Triggers risk flag — must identify devices, users, and CA policy gaps.'
+      'Unknown':
+        description: 'Access logs have not been reviewed for device compliance status.'
+
+  BTC.DEV.003:
+    guidance:
+      description: 'Confirms that privileged admin devices are isolated and hardened per the declared PAW/SAW model.'
+      why_it_matters: 'Admin credentials on general-purpose devices are vulnerable to credential theft via malware, keyloggers, and browser exploits.'
+      evidence_guidance: 'Export PAW/SAW device configurations from Intune. Show CA policies restricting admin portal access to PAW devices only. Provide Defender for Endpoint health reports for PAW devices.'
+      common_pitfalls:
+        - 'Having PAWs deployed but not enforcing CA policies that restrict admin access to PAW devices only.'
+        - 'PAW devices not receiving timely security updates or Defender health checks.'
+      implications: 'Without PAW enforcement, the value of dedicated admin workstations is negated.'
+    options:
+      'Yes':
+        description: 'PAW/SAW devices deployed, CA-enforced for admin access, hardened configurations verified.'
+      'Partially':
+        description: 'PAWs exist but CA enforcement or hardening is incomplete.'
+        implication: 'Must remediate gaps to achieve full admin device isolation.'
+      'No':
+        description: 'No dedicated admin workstations — admins use general-purpose devices.'
+        implication: 'Triggers risk flag — credential isolation gap for highest-privilege accounts.'
+      'Unknown':
+        description: 'Admin device isolation status has not been verified.'
+
+  BTC.LOG.001:
+    guidance:
+      description: 'Confirms that the Unified Audit Log is enabled and actively capturing events across M365 services.'
+      why_it_matters: 'The Unified Audit Log is the foundational telemetry source for compliance evidence, incident investigation, and assessor review.'
+      evidence_guidance: 'Navigate to Purview > Audit and confirm audit is enabled. Run a sample search for the past 24 hours to prove ingestion. Export a sample showing event types and timestamps.'
+      common_pitfalls:
+        - 'Audit log is enabled but retention is set to the default 90 days instead of the required duration.'
+        - 'Some workloads (Teams, Power Platform) may not be ingesting even when audit is "enabled."'
+      implications: 'Without audit logging, there is no evidence trail for assessors and no detection capability for security incidents.'
+    options:
+      'Yes':
+        description: 'Unified Audit Log is enabled and actively ingesting events from all in-scope M365 services.'
+      'No':
+        description: 'Audit log is disabled or not ingesting.'
+        implication: 'Fundamental compliance gap — must be enabled immediately.'
+      'Unknown':
+        description: 'Audit log status has not been verified.'
+
+  BTC.LOG.002:
+    guidance:
+      description: 'Validates that Microsoft Sentinel is connected and receiving data from all required sources.'
+      why_it_matters: 'Sentinel provides the SIEM capability required for continuous monitoring, threat detection, and incident response — core CMMC requirements.'
+      evidence_guidance: 'Open Sentinel > Data connectors. Screenshot showing connected data sources and last data received timestamps. Include Entra, M365, Defender, and any custom connectors.'
+      common_pitfalls:
+        - 'Data connectors showing "connected" but with stale last-received timestamps (>24h gap).'
+        - 'Missing critical sources like Entra sign-in/audit logs or Defender for Endpoint alerts.'
+      implications: 'Partial ingestion means partial visibility — unmonitored sources are blind spots for threat detection.'
+    options:
+      'Yes':
+        description: 'Sentinel connected with all required data sources actively ingesting.'
+      'Partially':
+        description: 'Some data sources connected but gaps exist in coverage.'
+        implication: 'Must identify and connect missing data sources.'
+      'No':
+        description: 'Sentinel is not deployed or not connected to required sources.'
+        implication: 'Triggers risk flag — SIEM capability gap must be remediated.'
+      'Unknown':
+        description: 'Sentinel data source coverage has not been audited.'
+
+  BTC.LOG.003:
+    guidance:
+      description: 'Confirms that log retention settings match the declared retention policy for compliance and legal requirements.'
+      why_it_matters: 'Insufficient retention means evidence is lost before assessors can review it. Excessive retention without immutability means logs could be tampered with.'
+      evidence_guidance: 'Export retention policy configurations from Purview > Data lifecycle management. Show retention labels, durations, and scope. Include Sentinel workspace retention settings.'
+      common_pitfalls:
+        - 'M365 Unified Audit Log default retention (90 days) being treated as sufficient when contracts require 1+ years.'
+        - 'Sentinel workspace retention set differently from Purview retention — creating gaps.'
+      implications: 'Retention must match the declared policy and contractual requirements across all log sources.'
+    options:
+      'Yes':
+        description: 'Log retention matches declared policy across all sources — duration, immutability, and scope confirmed.'
+      'Partially':
+        description: 'Some retention settings match but gaps exist in duration or scope.'
+      'No':
+        description: 'Retention does not match declared policy.'
+        implication: 'Triggers risk flag — must be remediated before boundary confirmation.'
+      'Unknown':
+        description: 'Retention configuration has not been audited.'
+
+  BTC.LOG.004:
+    guidance:
+      description: 'Verifies that tamper protection is enabled to prevent unauthorized modification or disabling of security telemetry.'
+      why_it_matters: 'Without tamper protection, a compromised admin or attacker could disable logging, delete evidence, or modify security configurations undetected.'
+      evidence_guidance: 'Export Defender for Endpoint tamper protection status. Show Sentinel workspace diagnostic settings with immutable storage. Verify that audit log disabling generates alerts.'
+      common_pitfalls:
+        - 'Tamper protection enabled on endpoints but not on the Sentinel workspace or log analytics account.'
+        - 'Relying on RBAC alone without tamper protection — admins can still modify settings within their role.'
+      implications: 'Tamper protection ensures audit trail integrity — critical for incident investigation and assessor evidence.'
+    options:
+      'Yes':
+        description: 'Tamper protection enabled across endpoints, Sentinel workspace, and log storage.'
+      'Partially':
+        description: 'Tamper protection enabled in some areas but not comprehensively.'
+      'No':
+        description: 'Tamper protection not enabled.'
+        implication: 'Triggers risk flag — audit trail integrity cannot be guaranteed.'
+      'Unknown':
+        description: 'Tamper protection status has not been verified.'
+
+  BTC.DEVOPS.001:
+    guidance:
+      description: 'Determines whether any CUI-containing repositories are hosted on platforms outside the declared boundary.'
+      why_it_matters: 'Source code and documentation containing CUI on commercial platforms (GitHub.com, Azure DevOps commercial) is CUI at rest outside the controlled boundary.'
+      evidence_guidance: 'Provide a complete repository inventory from each Git platform. For each repo, indicate: platform, visibility, whether it contains CUI, and boundary status.'
+      common_pitfalls:
+        - 'Forks, mirrors, or feature branches of CUI repos existing on commercial platforms.'
+        - 'Archived or deprecated repos containing CUI that are no longer actively managed.'
+      implications: 'Repos outside the boundary must be migrated, archived securely, or documented with compensating controls and risk acceptance.'
+    options:
+      'No':
+        description: 'All CUI repositories are within the declared boundary.'
+      'Yes':
+        description: 'CUI repositories found outside the declared boundary.'
+        implication: 'Triggers risk flag — must be migrated or documented with compensating controls.'
+      'Unknown':
+        description: 'Repository inventory has not been completed.'
+
+  BTC.DEVOPS.002:
+    guidance:
+      description: 'Validates that CI/CD pipeline infrastructure operates entirely within the declared CUI boundary.'
+      why_it_matters: 'Build runners, artifact storage, and pipeline logs process and store CUI in derived forms. Pipelines outside the boundary expose CUI at rest and in transit.'
+      evidence_guidance: 'Document pipeline architecture: runner locations, artifact storage, log retention, and secrets management. Provide screenshots or exports showing infrastructure boundary status.'
+      common_pitfalls:
+        - 'Using Microsoft-hosted runners (which run in commercial Azure) for GCC High workloads.'
+        - 'Pipeline artifacts cached in commercial storage accounts.'
+      implications: 'All pipeline infrastructure touching CUI must operate within boundary-controlled environments.'
+    options:
+      'Yes':
+        description: 'All CI/CD infrastructure (runners, artifacts, logs) operates within the declared boundary.'
+      'Partially':
+        description: 'Some pipeline components are outside the boundary.'
+        implication: 'Must identify and remediate out-of-boundary components.'
+      'No':
+        description: 'CI/CD infrastructure is primarily outside the declared boundary.'
+        implication: 'Triggers risk flag — significant remediation required.'
+      'Unknown':
+        description: 'Pipeline infrastructure boundary status has not been audited.'
+
+  BTC.DEVOPS.003:
+    guidance:
+      description: 'Confirms that build artifacts (compiled binaries, packages, container images) are stored within the boundary with proper controls.'
+      why_it_matters: 'Build artifacts are derived CUI — compiled from CUI source code. They require the same boundary protections as the source.'
+      evidence_guidance: 'Document artifact storage locations, access controls, retention policies, and encryption status. Provide storage account or registry configurations.'
+      common_pitfalls:
+        - 'NuGet/npm packages published to public registries containing CUI-derived code.'
+        - 'Docker images pushed to Docker Hub or commercial container registries.'
+      implications: 'Artifact storage must be within the boundary with access controls matching source code protections.'
+    options:
+      'Yes':
+        description: 'Build artifacts stored within the boundary with proper access controls and retention.'
+      'Partially':
+        description: 'Some artifacts are properly stored but gaps exist.'
+      'No':
+        description: 'Artifacts stored outside boundary or without proper controls.'
+        implication: 'Triggers risk flag — derived CUI is unprotected.'
+      'Unknown':
+        description: 'Artifact storage status has not been audited.'
+
+  BTC.INT.001:
+    guidance:
+      description: 'Validates that all external SaaS integrations connecting to in-scope data are identified, assessed, and approved.'
+      why_it_matters: 'Each SaaS integration is a potential CUI egress path. Unapproved integrations bypass boundary controls and monitoring.'
+      evidence_guidance: 'Export enterprise application registrations from Entra. Include OAuth consent grants from Entra > Enterprise apps > User consent. Cross-reference against approved integration list.'
+      common_pitfalls:
+        - 'User-consented OAuth apps that bypass admin approval workflows.'
+        - 'Legacy app registrations from proof-of-concept projects that retain production access.'
+      implications: 'Unknown integrations must be investigated, approved, or removed before boundary can be confirmed.'
+    options:
+      'All identified and approved':
+        description: 'Complete integration inventory exists with all integrations formally approved and documented.'
+      'Some identified but not approved':
+        description: 'Integrations partially inventoried — some lack formal approval or assessment.'
+        implication: 'Must complete inventory and approval process for remaining integrations.'
+      'Unknown':
+        description: 'Integration inventory has not been completed.'
+        implication: 'Triggers risk flag — unknown data flows may bypass boundary controls.'
+
+  BTC.INT.002:
+    guidance:
+      description: 'Reviews service principals and API tokens for proper inventory, least-privilege scoping, and documentation.'
+      why_it_matters: 'Over-privileged service principals can access CUI without user interaction or MFA. They are invisible to standard user monitoring.'
+      evidence_guidance: 'Export service principal list from Entra > App registrations. For each, document: permissions (application vs delegated), secret/certificate expiry, owner, and business justification.'
+      common_pitfalls:
+        - 'Service principals with application-level Mail.Read or Sites.Read.All — they can read all CUI.'
+        - 'Expired secrets that have been replaced but old secrets not revoked.'
+      implications: 'Each service principal must follow least-privilege, have documented justification, and be monitored for anomalous activity.'
+    options:
+      'Yes':
+        description: 'Service principals inventoried, least-privilege confirmed, documentation complete.'
+      'Partially':
+        description: 'Inventory exists but permission review or documentation is incomplete.'
+      'No':
+        description: 'Service principals not inventoried or reviewed.'
+        implication: 'Triggers risk flag — automated CUI access without governance.'
+      'Unknown':
+        description: 'Service principal status has not been audited.'
+
+  BTC.INT.003:
+    guidance:
+      description: 'Confirms that email forwarding restrictions declared in the CUI boundary are actually enforced in Exchange configuration.'
+      why_it_matters: 'Email forwarding is the most accessible exfiltration vector. Declared restrictions that are not technically enforced provide false assurance.'
+      evidence_guidance: 'Export Exchange transport rules showing forwarding blocks. Run Get-Mailbox to check for individual forwarding rules. Provide DLP policy configurations for email channels.'
+      common_pitfalls:
+        - 'Transport rules blocking external forwarding but not checking Outlook client-side rules.'
+        - 'Shared mailboxes or distribution lists exempt from forwarding restrictions.'
+      implications: 'Enforcement must match declared policy across all mailbox types and rule mechanisms.'
+    options:
+      'Yes':
+        description: 'Email forwarding restrictions are enforced via transport rules and client-side rule blocking.'
+      'Partially':
+        description: 'Some restrictions in place but gaps exist in coverage.'
+      'No':
+        description: 'Forwarding restrictions are not enforced despite being declared.'
+        implication: 'Triggers risk flag — declared policy does not match actual configuration.'
+      'Unknown':
+        description: 'Forwarding enforcement has not been verified.'
+
+  BTC.INT.004:
+    guidance:
+      description: 'Verifies that backup storage locations align with the declared CUI boundary.'
+      why_it_matters: 'Backups contain full copies of CUI. If any backup falls outside the boundary, CUI at rest exists in an uncontrolled location.'
+      evidence_guidance: 'Document all backup destinations: M365 native, third-party platforms, and any on-premises backup storage. For each, confirm boundary status, encryption, and access controls.'
+      common_pitfalls:
+        - 'Third-party backup tools storing data in commercial Azure regions outside GCC High.'
+        - 'Backup admin accounts with access to CUI data not included in the boundary user scope.'
+      implications: 'Out-of-scope backup storage requires either boundary extension or compensating controls with formal risk acceptance.'
+    options:
+      'All in scope':
+        description: 'All backup storage locations are within the declared CUI boundary.'
+      'Some out of scope':
+        description: 'Some backup destinations fall outside the declared boundary.'
+        implication: 'Triggers risk flag — CUI at rest in uncontrolled locations.'
+      'Unknown':
+        description: 'Backup storage locations have not been fully mapped.'
+
+  BTC.GOV.001:
+    guidance:
+      description: 'Confirms whether a formal exception register exists to track deviations from boundary and control requirements.'
+      why_it_matters: 'Exceptions are inevitable — the question is whether they are tracked, justified, and managed or silently ignored.'
+      evidence_guidance: 'Provide the exception register document or system. Include exception ID, description, owner, compensating control, approval date, and review date.'
+      common_pitfalls:
+        - 'Tracking exceptions in email threads or meeting notes instead of a formal register.'
+        - 'Register exists but has not been reviewed or updated in >6 months.'
+      implications: 'Without a register, assessors cannot verify that deviations are intentional, approved, and compensated.'
+    options:
+      'Yes':
+        description: 'Formal exception register exists, is maintained, and includes all known deviations.'
+      'No':
+        description: 'No exception register exists.'
+        implication: 'Triggers risk flag — deviations are undocumented and unmanaged.'
+      'Unknown':
+        description: 'Exception register status is not known.'
+
+  BTC.GOV.002:
+    guidance:
+      description: 'Verifies that each registered exception has documented compensating controls with assigned owners and due dates.'
+      why_it_matters: 'An exception without a compensating control is an accepted vulnerability. Assessors expect each deviation to have a mitigation plan.'
+      evidence_guidance: 'For each exception in the register, provide: compensating control description, implementation status, responsible owner, target completion date, and last review date.'
+      common_pitfalls:
+        - 'Compensating controls documented but not actually implemented.'
+        - 'Due dates that have passed without completion or re-assessment.'
+      implications: 'Incomplete compensating controls indicate unmitigated risk that assessors will flag.'
+    options:
+      'Yes':
+        description: 'All exceptions have documented compensating controls with owners and due dates.'
+      'Partially':
+        description: 'Some exceptions have compensating controls but coverage is incomplete.'
+      'No':
+        description: 'No compensating controls documented for exceptions.'
+        implication: 'Triggers risk flag — gaps exist without mitigation or accountability.'
+      'Unknown':
+        description: 'Compensating control status has not been reviewed.'
+
+  BTC.GOV.003:
+    guidance:
+      description: 'Confirms that residual risk from boundary gaps is formally acknowledged and approved by authorized leadership.'
+      why_it_matters: 'Risk acceptance without executive sign-off means no one has taken accountability for the residual exposure. Assessors require documented approval.'
+      evidence_guidance: 'Provide risk acceptance documents with: risk description, residual risk level, accepting authority signature/approval, acceptance date, and review schedule.'
+      common_pitfalls:
+        - 'IT/security staff accepting risk on behalf of the organization without executive authority.'
+        - 'Risk acceptance that does not specify the residual risk level or conditions for re-assessment.'
+      implications: 'Unapproved risk acceptance means the organization has not formally decided to accept the exposure — a governance gap.'
+    options:
+      'Yes':
+        description: 'Risk acceptance formally documented and approved by authorized leadership.'
+      'Partially':
+        description: 'Some risks formally accepted but others lack documented approval.'
+      'No':
+        description: 'Risk acceptance not formally recorded or approved.'
+        implication: 'Triggers risk flag — residual risks exist without executive sign-off.'
+      'Unknown':
+        description: 'Risk acceptance status has not been reviewed.'
+
+  BTC.GOV.004:
+    guidance:
+      description: 'Validates that change governance processes are defined and enforced for boundary-affecting changes.'
+      why_it_matters: 'Uncontrolled changes to Conditional Access, DLP, or network configurations can silently degrade boundary integrity.'
+      evidence_guidance: 'Provide change management policy, recent change records, and evidence of approval workflows (e.g., Azure DevOps work items, ServiceNow tickets, or signed change requests).'
+      common_pitfalls:
+        - 'Change governance exists for infrastructure but not for security policy changes (CA, DLP, labels).'
+        - 'Emergency changes bypassing the approval process without after-the-fact review.'
+      implications: 'Weak change governance means boundary controls can be modified without oversight, audit, or rollback capability.'
+    options:
+      'Yes':
+        description: 'Change governance defined with approval workflows, rollback authority, and change windows enforced.'
+      'Partially':
+        description: 'Change governance exists but enforcement or coverage is incomplete.'
+      'No':
+        description: 'No formal change governance in place.'
+        implication: 'Triggers risk flag — unauthorized changes could degrade boundary integrity.'
+      'Unknown':
+        description: 'Change governance status has not been verified.'
+
+  BTC.DEV.002.CA_ENFORCEMENT_PROOF:
+    guidance:
+      description: 'Provides concrete proof that Conditional Access policies are actively blocking unmanaged and non-compliant devices from CUI resources.'
+      why_it_matters: 'CA policies in "report-only" mode or with broad exceptions provide no actual enforcement. This question demands proof of real blocking.'
+      evidence_guidance: 'Export CA policy configurations showing device compliance requirements for SharePoint, Teams, and Exchange. Provide sample sign-in logs showing blocked access attempts from non-compliant devices.'
+      common_pitfalls:
+        - 'CA policies in report-only mode — they log but do not block.'
+        - 'Exception groups that include too many users, effectively bypassing the device requirement.'
+      implications: 'Without CA enforcement proof, the declared device model is aspirational rather than operational.'
+    options:
+      'Proof provided (exports/screenshots)':
+        description: 'CA policy exports and sign-in logs demonstrating active device compliance enforcement.'
+      'Not enforced':
+        description: 'CA is not enforcing device compliance for CUI resource access.'
+        implication: 'Triggers risk flag — unmanaged devices can access CUI resources.'
+      'Unknown':
+        description: 'CA enforcement status has not been verified with evidence.'

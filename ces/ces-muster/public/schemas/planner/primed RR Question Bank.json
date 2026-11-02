@@ -1,0 +1,783 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/ces-rrt-readiness-recon.schema.json",
+  "title": "CES RRT Readiness Recon Bank (CMMC 2.0) Schema",
+  "type": "object",
+  "required": [
+    "ces"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "ces": {
+      "type": "object",
+      "required": [
+        "artifact",
+        "version",
+        "generated_on",
+        "intent",
+        "authoritative_sources",
+        "governance",
+        "sit_inputs_required",
+        "rrt_fields",
+        "activity_bank",
+        "mpt_readiness_gates",
+        "rrt_outputs_for_mpt"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "artifact": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "generated_on": {
+          "type": "string",
+          "format": "date"
+        },
+        "intent": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authoritative_sources": {
+          "type": "object",
+          "required": [
+            "government"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "government": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": [
+                  "id",
+                  "title",
+                  "url"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9_\\-]+$"
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "governance": {
+          "type": "object",
+          "required": [
+            "non_negotiables",
+            "provenance_rules"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "non_negotiables": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "provenance_rules": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": [
+                  "class",
+                  "required_sources"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "class": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "required_sources": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "sit_inputs_required": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 3
+          }
+        },
+        "rrt_fields": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 3
+            }
+          }
+        },
+        "activity_bank": {
+          "type": "object",
+          "required": [
+            "universal",
+            "level_specific"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "universal": {
+              "type": "object",
+              "required": [
+                "description",
+                "activities"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "description": {
+                  "type": "string"
+                },
+                "activities": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "$ref": "#/$defs/activity"
+                  }
+                }
+              }
+            },
+            "level_specific": {
+              "type": "object",
+              "required": [
+                "description",
+                "L1",
+                "L2",
+                "L3"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "description": {
+                  "type": "string"
+                },
+                "L1": {
+                  "$ref": "#/$defs/level_activity_block"
+                },
+                "L2": {
+                  "$ref": "#/$defs/level_activity_block"
+                },
+                "L3": {
+                  "$ref": "#/$defs/level_activity_block"
+                }
+              }
+            }
+          }
+        },
+        "mpt_readiness_gates": {
+          "type": "object",
+          "required": [
+            "description",
+            "checks"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "description": {
+              "type": "string"
+            },
+            "checks": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/mpt_gate"
+              }
+            }
+          }
+        },
+        "rrt_outputs_for_mpt": {
+          "type": "object",
+          "required": [
+            "description",
+            "outputs"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "description": {
+              "type": "string",
+              "minLength": 1
+            },
+            "outputs": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "scenario_derivation_rules": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "rules"
+          ],
+          "properties": {
+            "version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "rules": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "rule_id",
+                  "if",
+                  "then_add_tags"
+                ],
+                "properties": {
+                  "rule_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "if": {
+                    "type": "object",
+                    "description": "Applicability expression evaluated against SI Baseline + derived tags. Expression format defined by applicability_engine."
+                  },
+                  "then_add_tags": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "notes": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "description": "Deterministic rules for deriving scenario tags from SI Baseline outputs, used to select RR activities/questions."
+        },
+        "required_traceability": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "requirement_id_format",
+            "evidence_archetype_required",
+            "assessor_methods_required"
+          ],
+          "properties": {
+            "requirement_id_format": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Regex or format hint for requirement IDs (e.g., CMMC practice IDs) that RR activities/questions must reference."
+            },
+            "evidence_archetype_required": {
+              "type": "boolean"
+            },
+            "assessor_methods_required": {
+              "type": "boolean"
+            },
+            "notes": {
+              "type": "string"
+            }
+          },
+          "description": "Hard requirements for mapping RR activities/questions to CMMC requirements and assessor evidence expectations."
+        },
+        "question_set_output_contract": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema_id"
+          ],
+          "properties": {
+            "schema_id": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Schema ID for the Scenario-Specific RR Question Set output artifact."
+            }
+          },
+          "description": "Declares the output contract for generated Scenario-Specific RR Question Sets."
+        }
+      }
+    },
+    "applicability_engine": {
+      "type": "object",
+      "required": [
+        "description",
+        "supported_operators",
+        "boolean_structure",
+        "evaluation_notes"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "supported_operators": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "boolean_structure": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evaluation_notes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "level_enum": {
+      "type": "string",
+      "enum": [
+        "L1",
+        "L2",
+        "L3"
+      ]
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "primary"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "primary": {
+          "type": "string",
+          "enum": [
+            "government",
+            "vendor_primary",
+            "client_artifact",
+            "direct_observation",
+            "inference_tagged"
+          ]
+        },
+        "reference_sources": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "validates_block": {
+      "type": "object",
+      "required": [
+        "confirms",
+        "may_contradict"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "confirms": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 3
+          }
+        },
+        "may_contradict": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 3
+          }
+        }
+      }
+    },
+    "evidence_request": {
+      "type": "object",
+      "required": [
+        "id",
+        "evidence_type",
+        "description",
+        "acceptable_forms",
+        "collection_method",
+        "retention_notes",
+        "cmmc_attainment_impact",
+        "advisor_notes"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^EV\\-[A-Z0-9\\-]+$|^EV\\-[0-9]{2}$"
+        },
+        "evidence_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "acceptable_forms": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "collection_method": {
+          "type": "string",
+          "minLength": 1
+        },
+        "retention_notes": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cmmc_attainment_impact": {
+          "type": "string",
+          "minLength": 1
+        },
+        "advisor_notes": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "activity": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "applies_to_levels",
+        "produces_rrt_fields",
+        "validates_sit_its_fields",
+        "provenance",
+        "advisor_description",
+        "advisor_reason_rrt",
+        "advisor_cmmc_impact",
+        "steps",
+        "evidence_requests",
+        "outputs",
+        "mapped_requirements",
+        "expected_evidence_archetypes",
+        "assessor_methods"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^RR\\-[A-Z0-9\\-]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "applies_to_levels": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/level_enum"
+          }
+        },
+        "produces_rrt_fields": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 3
+          }
+        },
+        "validates_sit_its_fields": {
+          "$ref": "#/$defs/validates_block"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "advisor_description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "advisor_reason_rrt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "advisor_cmmc_impact": {
+          "type": "string",
+          "minLength": 1
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "evidence_requests": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidence_request"
+          }
+        },
+        "outputs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "conditional_run_if": {
+          "$ref": "#/$defs/condition_block"
+        },
+        "skip_if": {
+          "$ref": "#/$defs/condition_block"
+        },
+        "priority_rule": {
+          "$ref": "#/$defs/priority_rule"
+        },
+        "emit_if_sit_deferred": {
+          "$ref": "#/$defs/emit_if_sit_deferred"
+        },
+        "mapped_requirements": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "CMMC requirement/practice IDs that this RR activity supports."
+        },
+        "expected_evidence_archetypes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "evidence_matrix_id",
+              "archetype_id"
+            ],
+            "properties": {
+              "evidence_matrix_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "archetype_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "assessor_methods": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "examine",
+                    "interview",
+                    "test"
+                  ]
+                }
+              }
+            }
+          },
+          "description": "Assessor evidence archetypes and methods expected for this activity."
+        },
+        "assessor_methods": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "examine",
+              "interview",
+              "test"
+            ]
+          },
+          "description": "Primary assessor methods this activity supports."
+        }
+      }
+    },
+    "level_activity_block": {
+      "type": "object",
+      "required": [
+        "activities"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "activities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/activity"
+          }
+        }
+      }
+    },
+    "mpt_gate": {
+      "type": "object",
+      "required": [
+        "id",
+        "text",
+        "depends_on_rrt_fields",
+        "logic",
+        "fail_action"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^MPT\\-G\\-[0-9]{2}$|^MPT\\-G\\-[A-Z0-9\\-]+$"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "depends_on_rrt_fields": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 3
+          }
+        },
+        "logic": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": true
+        },
+        "fail_action": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "condition_atom": {
+      "type": "object",
+      "required": [
+        "field"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "type": "string",
+          "minLength": 1
+        },
+        "equals_any": {
+          "type": "array",
+          "minItems": 1
+        },
+        "not_equals_any": {
+          "type": "array",
+          "minItems": 1
+        },
+        "exists": {
+          "type": "boolean"
+        },
+        "missing": {
+          "type": "boolean"
+        },
+        "before_days": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "condition_block": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "all": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/condition_atom"
+          }
+        },
+        "any": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/condition_atom"
+          }
+        }
+      }
+    },
+    "priority_rule": {
+      "type": "object",
+      "required": [
+        "when",
+        "set_priority",
+        "else_priority"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "when": {
+          "$ref": "#/$defs/condition_atom"
+        },
+        "set_priority": {
+          "type": "string",
+          "minLength": 1
+        },
+        "else_priority": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "emit_if_sit_deferred": {
+      "type": "object",
+      "required": [
+        "field",
+        "emit_tasks"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "type": "string",
+          "minLength": 1
+        },
+        "emit_tasks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  },
+  "description": "[CES Enhancement] Added deterministic scenario_derivation_rules, required_traceability, question_set_output_contract; enhanced applicability_engine with input_contract and expression_language; tightened activity_bank activities to require mappings to requirements/evidence/methods."
+}

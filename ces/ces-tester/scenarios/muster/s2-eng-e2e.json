@@ -1,0 +1,284 @@
+{
+  "type": "muster-e2e",
+  "scenario_id": "s2-eng-e2e",
+  "description": "SIMULATED CUSTOMER (FICTIONAL): synthetic-customer W6. The MX run driven by ces-tester on the stacksim scenario s2-eng (S2, a fictional 29-person engineering services firm on GCC High G5 with hybrid identity: 26 staff synchronised from on-premises AD by Entra Connect with password hash sync; admin, break-glass, contractor and service accounts cloud-only; 3 enforcing Conditional Access policies (MFA all users, legacy-auth block, admin MFA without a phishing-resistant strength; no session, location or device policy); Intune baseline and BitLocker; personal Android phones under app protection; 2 DLP policies; Defender XDR without Sentinel; an Azure Government landing zone with no key vault and no action group; PLAN.md section 2.1, scoped by the W6 brief). Every organisation, person, id and address is invented. Steps as s1-mach-e2e.json. expected_facts copy S1's five RR-ACT answers: the reads their predicates judge (authentication methods, the Windows compliance policies, Secure Score, the anti-malware list) are seeded identically on S2. expected_state keeps the settings Stamper writes on any tenant and verifies S2's own all-users MFA policy as the remote-maintenance equivalent (no CES policy created). expected_ledger: Stamper creates CMMC-SessionTimeout (S2 has no session policy) and CMMC-AdminMFA-PhishingResistant (S2-CA03 grants plain MFA, so the admin-MFA lookup finds no phishing-resistant equivalent); E7A disables the cloud-only contractor leaver (user-28). E7A runs A-11 (stale-account read), A-02 (offboarding of that leaver, T2, confirming read) and A-09 (PIM role review read); W7-TST: E7A also runs A-21 (leaver lifecycle workflow scheduling, T2; resources.leaver_workflow_id discovered at E5, 52520000-001f-4000-8000-000000000003) and B-09 (BYOD separation, T2; resources.android_app_protection_policy_id and resources.ios_app_protection_policy_id discovered at E5 from the two app-protection lists; its confirming read is the Android policy's dataBackupBlocked, and the iOS write is checked through expected_ledger.mutated). A-11, A-02 and A-09 move nothing (as on S1); expected_improvements is exactly PS.L2-3.9.2 not_met -> met (A-21; V47, V65). B-09 maps to AC.L1-3.1.20, which is not in expected_improvements (no status move predicted, PLAN section 4: B-09 adds two ledger rows). ao_coverage.expected_total is 96 (the ces-ao registry gained A-21). scorecard_gate is off (report-only) until S2's thresholds hold (PLAN section 1, S2 column: SC-3a >= 65 %, SC-8a <= 20 %).",
+  "sim_scenario": "s2-eng",
+  "stance": "m365_azure",
+  "force_fail_entry": "SC.L2-3.13.15.anti-spam",
+  "eo_assess_runs": 3,
+  "ec_upload": {
+    "controlIds": [
+      "AC.L1-3.1.1"
+    ],
+    "source": "manual_upload",
+    "filename": "acp.pdf",
+    "mediaType": "application/pdf",
+    "contentBase64": "JVBERi0xLjQK",
+    "submittedByRole": "compliance_officer",
+    "form_id": "access_control_policy",
+    "emx_ids": [
+      "EMX-IAM-004"
+    ]
+  },
+  "expected_facts": {
+    "RR-ACT-IA_L2_3_5_3": "yes",
+    "RR-ACT-CM_L2_3_4_1": "yes",
+    "RR-ACT-CM_L2_3_4_2": "yes",
+    "RR-ACT-SI_L1_3_14_1": "yes",
+    "RR-ACT-SI_L2_3_14_2": "yes"
+  },
+  "expected_state": {
+    "checks": [
+      {
+        "description": "ATP enabled for SPO/Teams/ODB (Set-AtpPolicyForO365 -EnableATPForSPOTeamsODB $true)",
+        "request": {
+          "kind": "cmdlet",
+          "cmdlet": "Get-AtpPolicyForO365"
+        },
+        "path": "EnableATPForSPOTeamsODB",
+        "assert": "equals",
+        "value": true,
+        "ledger_object_type": "atpPolicyForO365"
+      },
+      {
+        "description": "Legacy TLS clients disallowed (Set-TransportConfig -AllowLegacyTLSClients $false)",
+        "request": {
+          "kind": "cmdlet",
+          "cmdlet": "Get-TransportConfig"
+        },
+        "path": "AllowLegacyTLSClients",
+        "assert": "equals",
+        "value": false,
+        "ledger_object_type": "transportConfig"
+      },
+      {
+        "description": "Unified audit log ingestion enabled (Set-AdminAuditLogConfig -UnifiedAuditLogIngestionEnabled $true)",
+        "request": {
+          "kind": "cmdlet",
+          "cmdlet": "Get-AdminAuditLogConfig"
+        },
+        "path": "UnifiedAuditLogIngestionEnabled",
+        "assert": "equals",
+        "value": true,
+        "ledger_object_type": "adminAuditLogConfig"
+      },
+      {
+        "description": "Teams external federation access disabled on the Global policy (the base seed has it enabled)",
+        "request": {
+          "kind": "cmdlet",
+          "cmdlet": "Get-CsExternalAccessPolicy"
+        },
+        "select": {
+          "field": "Identity",
+          "equals": "Global"
+        },
+        "path": "EnableFederationAccess",
+        "assert": "equals",
+        "value": false,
+        "ledger_object_type": "csExternalAccessPolicy"
+      },
+      {
+        "description": "Remote-maintenance MFA: S2's own all-users MFA policy is verified as the equivalent (lookup; no CES policy created)",
+        "request": {
+          "kind": "uri",
+          "method": "GET",
+          "uri": "/v1.0/identity/conditionalAccess/policies"
+        },
+        "select": {
+          "field": "displayName",
+          "equals": "S2-CA01 Require MFA - all users"
+        },
+        "path": "state",
+        "assert": "equals",
+        "value": "enabled",
+        "ledger_object_type": "caPolicies"
+      },
+      {
+        "description": "MicrosoftAuthenticator auth-method config enabled",
+        "request": {
+          "kind": "uri",
+          "method": "GET",
+          "uri": "/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/MicrosoftAuthenticator"
+        },
+        "path": "state",
+        "assert": "equals",
+        "value": "enabled",
+        "ledger_object_type": "authenticationMethodsPolicyConfigurations"
+      },
+      {
+        "description": "Fido2 auth-method config enabled",
+        "request": {
+          "kind": "uri",
+          "method": "GET",
+          "uri": "/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/Fido2"
+        },
+        "path": "state",
+        "assert": "equals",
+        "value": "enabled",
+        "ledger_object_type": "authenticationMethodsPolicyConfigurations"
+      }
+    ]
+  },
+  "expected_ledger": {
+    "build_window": {
+      "from": "E1",
+      "before": "E2"
+    },
+    "no_writes_during": [
+      "E2",
+      "E6X"
+    ],
+    "allowed_write_windows": [
+      "EL",
+      "E6",
+      "E7A"
+    ],
+    "min_writes_during": {
+      "EL": 1,
+      "E6": 1,
+      "E7A": 1
+    },
+    "mutated": [
+      {
+        "objectType": "caPolicies",
+        "objectId": "CMMC-SessionTimeout"
+      },
+      {
+        "objectType": "caPolicies",
+        "objectId": "CMMC-AdminMFA-PhishingResistant"
+      },
+      {
+        "objectType": "csExternalAccessPolicy"
+      },
+      {
+        "objectType": "atpPolicyForO365"
+      },
+      {
+        "objectType": "adminAuditLogConfig"
+      },
+      {
+        "objectType": "transportConfig"
+      },
+      {
+        "objectType": "authenticationMethodsPolicyConfigurations"
+      },
+      {
+        "objectType": "users",
+        "objectId": "user-28"
+      },
+      {
+        "objectType": "caPolicies",
+        "objectId": "CMMC-MFA-CompliantDevice"
+      },
+      {
+        "objectType": "lifecycleWorkflows",
+        "objectId": "52520000-001f-4000-8000-000000000003"
+      },
+      {
+        "objectType": "androidManagedAppProtections"
+      },
+      {
+        "objectType": "iosManagedAppProtections"
+      }
+    ]
+  },
+  "ao_coverage": {
+    "enabled": true,
+    "expected_total": 96
+  },
+  "adminops_ops": [
+    {
+      "op": "A-11",
+      "tier": "T2",
+      "kind": "read",
+      "description": "Stale account detection (read). AO binds operatorUPN and breakGlassUPN from resources.operator_upn and resources.breakglass_upn (copied from the TM at E5)."
+    },
+    {
+      "op": "A-02",
+      "tier": "T2",
+      "kind": "write",
+      "description": "User offboarding (disable) of the cloud-only contractor leaver whose account is still enabled: resources.offboard_upn, discovered at E5 from the sim (employeeLeaveDateTime passed, accountEnabled true). The leaver is cloud-only on purpose: a synchronised account's accountEnabled is mastered in on-premises AD and could not be changed from the cloud on a real hybrid tenant.",
+      "params": {
+        "upn": "resources.offboard_upn"
+      },
+      "confirm": {
+        "description": "AdminOps A-02: the leaver's account is disabled",
+        "request": {
+          "kind": "uri",
+          "method": "GET",
+          "uri": "/v1.0/users"
+        },
+        "select": {
+          "field": "userPrincipalName",
+          "equals": "{resources.offboard_upn}"
+        },
+        "path": "accountEnabled",
+        "assert": "equals",
+        "value": false,
+        "ledger_object_type": "users"
+      }
+    },
+    {
+      "op": "A-09",
+      "tier": "T2",
+      "kind": "read",
+      "description": "Privileged role review (PIM eligibility schedules for the Global, Privileged Role and Security Administrator roles). AO binds the role ids from resources.global_admin_role_def_id, else the built-in template ids."
+    },
+    {
+      "op": "A-21",
+      "tier": "T2",
+      "kind": "write",
+      "description": "W7-TST: leaver lifecycle workflow scheduling (PS.L2-3.9.2). resources.leaver_workflow_id is discovered at E5 from the sim: the enabled leaver workflow with a disable/delete-user-account task (S2 Leaver - disable account and remove access, 52520000-001f-4000-8000-000000000003, on demand in the seed). AO turns its scheduling on (the mover is already scheduled: no change); the op fails unless the bound id is such a leaver.",
+      "params": {
+        "leaverWorkflowId": "resources.leaver_workflow_id"
+      },
+      "confirm": {
+        "description": "AdminOps A-21: the leaver workflow is scheduled",
+        "request": {
+          "kind": "uri",
+          "method": "GET",
+          "uri": "/v1.0/identityGovernance/lifecycleWorkflows/workflows/{resources.leaver_workflow_id}"
+        },
+        "path": "isSchedulingEnabled",
+        "assert": "equals",
+        "value": true,
+        "ledger_object_type": "lifecycleWorkflows"
+      }
+    },
+    {
+      "op": "B-09",
+      "tier": "T2",
+      "kind": "write",
+      "description": "W7-TST: BYOD separation (MAM): blocks backup, save-as and org-data transfer on S2's Android and iOS app-protection policies. Both ids are AO-sourced (androidAppProtectionPolicyId / iosAppProtectionPolicyId -> resources.android_app_protection_policy_id / resources.ios_app_protection_policy_id); they are listed here so E5 discovers them (the customer, non-CMMC- policy of each list) and AO receives the same values the record holds.",
+      "params": {
+        "appProtectionPolicyId": "resources.android_app_protection_policy_id",
+        "iosAppProtectionPolicyId": "resources.ios_app_protection_policy_id"
+      },
+      "confirm": {
+        "description": "AdminOps B-09: the Android app-protection policy blocks backup",
+        "request": {
+          "kind": "uri",
+          "method": "GET",
+          "uri": "/v1.0/deviceAppManagement/androidManagedAppProtections"
+        },
+        "select": {
+          "field": "id",
+          "equals": "{resources.android_app_protection_policy_id}"
+        },
+        "path": "dataBackupBlocked",
+        "assert": "equals",
+        "value": true,
+        "ledger_object_type": "androidManagedAppProtections"
+      }
+    }
+  ],
+  "expected_improvements": [],
+  "allowed_reverts": [],
+  "drift_injection": [],
+  "postcheck_thresholds": {
+    "gates_max": 24,
+    "presence_max": 5,
+    "_note": "PH-6 R-REG (LOG-PH6-REG.md section 4): honest presence_max 5 for the Azure entries. Earlier: S2 uses the V55 defaults (PLAN section 5 W3): a prediction until the first run; re-baselined by the founder after it."
+  },
+  "scorecard_gate": false
+}

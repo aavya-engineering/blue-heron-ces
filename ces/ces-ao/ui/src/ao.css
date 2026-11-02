@@ -1,0 +1,81 @@
+/*
+ * SPDX-FileCopyrightText: Blue Heron Defense LLC and its licensors. All rights reserved.
+ * SPDX-License-Identifier: LicenseRef-BHD-Proprietary
+ * CONFIDENTIAL - TRADE SECRET. Unpublished work. Provided solely to perform work for Blue Heron Defense LLC at its direction.
+ * Any other use, copying, disclosure, or reuse, in whole or in part, is prohibited.
+ * Changes made to this file for Blue Heron Defense LLC are made on its behalf; it claims all rights in them.
+ * Submitting a change to this repository means you accept TERMS.md.
+ * Removing or altering this notice is prohibited (17 U.S.C. 1202). Ref: BHD-CES-MONO-2026A
+ * See LICENSE and TERMS.md.
+ */
+
+/* FIN-30: AO console layout. Instrument tokens only (--co-*, ces-ui.css); no hard-coded colours. */
+
+.ao-layout { display: grid; grid-template-columns: minmax(240px, 320px) 1fr; gap: 16px; margin-top: 12px; }
+@media (max-width: 760px) { .ao-layout { grid-template-columns: 1fr; } }
+
+.ao-commands { display: flex; flex-direction: column; gap: 6px; max-height: 78vh; overflow-y: auto; padding-right: 4px; }
+.ao-commands input[type='search'] { width: 100%; padding: 6px 8px; border: 1px solid var(--co-border); border-radius: var(--co-radius); background: var(--co-surface); color: var(--co-text); }
+.ao-search-results { font-size: 12px; }
+.ao-family { border-top: 1px solid var(--co-border); padding-top: 4px; }
+.ao-family-head { margin: 0; font-size: 12px; }
+.ao-family-toggle { width: 100%; text-align: left; background: none; border: 0; padding: 4px 0; color: var(--co-text); font: inherit; font-weight: 600; cursor: pointer; }
+.ao-family-letter { font-family: var(--co-font-mono); color: var(--co-primary); }
+.ao-cmd-list { list-style: none; margin: 0; padding: 0; }
+.ao-cmd { display: flex; gap: 8px; width: 100%; text-align: left; background: none; border: 0; border-radius: var(--co-radius); padding: 4px 6px; color: var(--co-text); font: inherit; font-size: 12.5px; cursor: pointer; }
+.ao-cmd:hover, .ao-cmd-active { background: var(--co-primary-subtle); }
+.ao-cmd:focus-visible, .ao-family-toggle:focus-visible { outline: 2px solid var(--co-primary-focus); outline-offset: 1px; }
+.ao-cmd-id { font-family: var(--co-font-mono); color: var(--co-primary); min-width: 40px; }
+
+.ao-main { min-width: 0; }
+.ao-form, .ao-blank { background: var(--co-surface); border: 1px solid var(--co-border); border-radius: var(--co-radius); padding: 14px 16px; }
+.ao-form h2 { margin: 0 0 6px; font-size: 16px; }
+.ao-overview { margin: 0 0 6px; color: var(--co-text-secondary); }
+.ao-meta { font-size: 12px; margin-bottom: 8px; }
+.ao-label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--co-text-secondary); margin: 6px 0 2px; }
+.ao-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 8px 0; }
+.ao-row .ao-label { margin: 0; }
+.ao-params { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px 12px; margin: 8px 0; }
+.ao-param label { display: block; font-size: 12px; margin-bottom: 2px; }
+.ao-param input, .ao-param select, .ao-form select, .ao-form input[type='text'], .ao-cost textarea {
+  width: 100%; max-width: 100%; padding: 6px 8px; border: 1px solid var(--co-border); border-radius: var(--co-radius); background: var(--co-bg-elevated); color: var(--co-text); font: inherit; font-size: 13px;
+}
+.ao-row select, .ao-row input[type='text'] { width: auto; min-width: 220px; }
+.ao-form input[readonly] { color: var(--co-text-muted); }
+.needs-selection { border-color: var(--co-risk) !important; }
+
+.ao-objectives ul, .ao-obj-list { list-style: none; margin: 2px 0 6px; padding: 0; font-size: 12px; }
+.ao-cost { border: 1px solid var(--co-risk); background: var(--co-risk-bg); border-radius: var(--co-radius); padding: 8px 12px; margin: 10px 0; }
+.ao-cost legend { font-size: 12px; font-weight: 600; padding: 0 4px; }
+.ao-cost p { margin: 0 0 6px; font-size: 12.5px; }
+.ao-check { display: flex; gap: 6px; align-items: center; font-size: 12.5px; }
+
+.ao-steps { list-style: none; display: flex; gap: 8px; padding: 0; margin: 12px 0 4px; }
+.ao-result { margin-top: 12px; border-top: 1px solid var(--co-border); padding-top: 10px; }
+.ao-result-head { display: flex; align-items: center; gap: 10px; }
+.ao-output { background: var(--co-bg-console); color: var(--co-text); font-family: var(--co-font-mono); font-size: 12px; padding: 8px 10px; border-radius: var(--co-radius); max-height: 320px; overflow: auto; white-space: pre-wrap; }
+.ao-evidence-summary { margin-top: 8px; }
+
+.state-badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: var(--co-radius); border: 1px solid var(--co-border); }
+.state-badge.allocated { color: var(--co-compliant); background: var(--co-compliant-bg); }
+.state-badge.deallocated { color: var(--co-violation); background: var(--co-violation-bg); }
+.status-badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: var(--co-radius); }
+.status-badge.success { color: var(--co-compliant); background: var(--co-compliant-bg); }
+.status-badge.refused, .status-badge.failed { color: var(--co-violation); background: var(--co-violation-bg); }
+.fw-warning { flex-basis: 100%; font-size: 12px; color: var(--co-risk); }
+
+.ao-evidence { margin-top: 16px; }
+.ao-section-title { font-size: 14px; margin: 0 0 6px; }
+.ao-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.ao-table th, .ao-table td { text-align: left; vertical-align: top; padding: 6px 8px; border-bottom: 1px solid var(--co-border); }
+.ao-table th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--co-text-secondary); }
+
+.ao-overlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: rgb(0 0 0 / 0.45); z-index: 50; }
+.ao-dialog { background: var(--co-surface); color: var(--co-text); border: 1px solid var(--co-border-strong); border-radius: var(--co-radius); box-shadow: var(--co-shadow-lg); padding: 16px 18px; max-width: 520px; width: calc(100% - 32px); }
+.ao-dialog-wide { max-width: 860px; max-height: 86vh; overflow-y: auto; }
+.ao-notice { font-size: 12.5px; }
+
+.ao-mono { font-family: var(--co-font-mono); }
+.ao-muted { color: var(--co-text-muted); }
+.ao-small { font-size: 11px; }
+.ao-visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

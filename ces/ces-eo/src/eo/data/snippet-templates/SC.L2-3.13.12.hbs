@@ -1,0 +1,40 @@
+## Control {{controlId}}: Prohibit Remote Activation of Collaborative Computing Devices and Provide Indication of Devices in Use
+
+**Implementation Status:** {{status}}
+
+This organization prohibits remote activation of collaborative computing devices within the {{tenantName}} M365 GCC High tenant through Teams meeting policies and device configuration controls documented in "Collaborative Computing Device Policy v1.0" maintained by {{variables.systemAdministrator}}.
+
+Microsoft Teams is the authorized unified communications platform for the CUI environment. The following controls prevent unauthorized remote activation of cameras, microphones, and screen sharing capabilities:
+
+**Teams Meeting Policies:**
+- Camera and microphone activation requires explicit user consent via on-screen indicators
+- Screen sharing restricted to authorized participants with visual notification to all attendees
+- External participant join requires lobby admission approved by meeting organizer
+- Recording and transcription require explicit organizer approval with visual/audio notification
+
+{{#if deviceConfigurationsActive}}
+**Endpoint Device Controls:**
+{{deviceConfigurationsCount}} device configuration policies enforce hardware-level protections:
+- Camera and microphone access controlled via Windows privacy settings deployed through Intune
+- Physical indicator lights required for camera activation (hardware enforcement)
+- Application-level camera/microphone permissions managed through app protection policies
+{{/if}}
+
+**Operational Procedure:**
+- **Action:** Review Teams meeting policies and device camera/microphone configurations for compliance with remote activation restrictions
+- **Frequency:** Quarterly policy review, continuous enforcement via Intune
+- **Responsible Party:** {{variables.systemAdministrator}}
+- **Documentation:** Collaborative Computing Device Policy v1.0, Teams Meeting Policy Configuration
+
+**Review Frequency:** Quarterly by ISSO
+
+**Verification Method:** Examine Teams meeting policy configurations, Intune device configuration profiles for camera/microphone restrictions, and user awareness training records.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** Review Teams admin center policy exports and Intune device configuration profiles. {{evidenceArtifactUrl}}
+{{/if}}

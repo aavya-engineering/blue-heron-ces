@@ -1,0 +1,838 @@
+artifact: ces_evidence_archetype_catalog
+version: 0.1.0
+generated_on: 2026-02-03
+intent: >-
+  Canonical evidence archetypes for CES RR expected_evidence_archetypes references
+  (vendor-neutral, assessor-aligned).
+id_format: "EMX-<DOMAIN>-<NNN>"
+domains:
+  - BOUNDARY
+  - DATAFLOW
+  - IAM
+  - ENDPOINT
+  - CONFIG
+  - LOG
+  - VULN
+  - RISK
+  - IR
+  - MEDIA
+  - SUPPLIER
+  - TRAINING
+  - DEVOPS
+evidence_archetypes:
+  - archetype_id: EMX-BOUNDARY-001
+    domain: BOUNDARY
+    name: Assessment boundary statement
+    description: Formal narrative defining the assessment/enclave boundary, inclusions/exclusions, and rationale.
+    assessor_methods_expected: [examine, interview]
+    acceptable_forms_examples:
+      - Boundary statement document (PDF/Word)
+      - Scope memo / charter
+      - SSP boundary section excerpt
+    collection_notes: >-
+      Confirm boundary aligns with contract/flowdowns and matches diagrams/inventories; verify exclusions are justified and controlled.
+    retention_notes_template: >-
+      Retain current version and prior version for change history; store approvals/sign-off records.
+    maps_to_cmmc_practices: []
+
+  - archetype_id: EMX-BOUNDARY-002
+    domain: BOUNDARY
+    name: Network boundary diagram
+    description: Diagram showing logical network segmentation, ingress/egress points, and boundary controls.
+    assessor_methods_expected: [examine]
+    acceptable_forms_examples:
+      - Network diagram (Visio/PDF)
+      - Cloud network topology export screenshot
+    collection_notes: >-
+      Diagram should match actual configs (firewall/VNet/subnet rules) and reference where CUI traverses/terminates.
+    retention_notes_template: >-
+      Retain diagram and source file; retain change log / approval ticket.
+    maps_to_cmmc_practices: []
+
+  - archetype_id: EMX-BOUNDARY-003
+    domain: BOUNDARY
+    name: In-scope asset inventory
+    description: Authoritative list of in-scope endpoints, servers, cloud services, and network components.
+    assessor_methods_expected: [examine, test]
+    acceptable_forms_examples:
+      - CMDB export
+      - MDM/Intune device inventory export
+      - Cloud resource inventory export
+    collection_notes: >-
+      Inventory must be current and reconcilable to management tooling; sample a subset for existence and ownership.
+    retention_notes_template: >-
+      Retain monthly snapshots for trending; retain inventory generation procedure.
+    maps_to_cmmc_practices: []
+
+  - archetype_id: EMX-BOUNDARY-004
+    domain: BOUNDARY
+    name: Interconnection / boundary agreements
+    description: Documentation of interconnections and shared responsibility across connected networks/tenants.
+    assessor_methods_expected: [examine]
+    acceptable_forms_examples:
+      - Interconnection agreement
+      - Shared responsibility matrix excerpt
+      - External connectivity register
+    collection_notes: >-
+      Clarify where controls are inherited vs customer-responsible; ensure agreements match actual integrations.
+    retention_notes_template: >-
+      Retain executed agreements and updates per audit window.
+    maps_to_cmmc_practices:
+      - CA.L2-3.12.1
+
+  - archetype_id: EMX-DATAFLOW-001
+    domain: DATAFLOW
+    name: CUI data flow diagram
+    description: Diagram depicting where CUI is created, stored, processed, and transmitted across systems and users.
+    assessor_methods_expected: [examine, interview]
+    acceptable_forms_examples:
+      - Data flow diagram (Visio/PDF)
+      - System context diagram
+    collection_notes: >-
+      Validate against actual workflows (Teams/SharePoint/repos/email); ensure boundary endpoints are explicit.
+    retention_notes_template: >-
+      Retain diagram and references used; update on material workflow changes.
+    maps_to_cmmc_practices: []
+
+  - archetype_id: EMX-DATAFLOW-002
+    domain: DATAFLOW
+    name: CUI location register
+    description: Register of systems/locations where CUI may reside, with handling rules per location.
+    assessor_methods_expected: [examine]
+    acceptable_forms_examples:
+      - CUI register spreadsheet
+      - SharePoint list export
+      - Data classification inventory export
+    collection_notes: >-
+      Include storage locations, access model, encryption state, sharing constraints, and owner.
+    retention_notes_template: >-
+      Retain current register and change history; ensure updates are controlled.
+    maps_to_cmmc_practices: []
+
+  - archetype_id: EMX-DATAFLOW-003
+    domain: DATAFLOW
+    name: CUI marking/labeling procedure and examples
+    description: Procedure and examples for identifying and marking CUI in primary workflows.
+    assessor_methods_expected: [examine, interview]
+    acceptable_forms_examples:
+      - Procedure document
+      - Training excerpt
+      - Sample marked documents (redacted)
+    collection_notes: >-
+      Validate that marking guidance is used consistently in primary workflows; capture exceptions handling.
+    retention_notes_template: >-
+      Retain procedure versions and sample artifacts per retention.
+    maps_to_cmmc_practices:
+      - MP.L2-3.8.2
+
+  - archetype_id: EMX-IAM-001
+    domain: IAM
+    name: MFA enforcement evidence
+    description: Proof that MFA is required for in-scope identities per policy and configuration.
+    assessor_methods_expected: [examine, test]
+    acceptable_forms_examples:
+      - Conditional Access/MFA policy export
+      - IdP policy screenshot
+      - Sign-in logs showing MFA challenge
+    collection_notes: >-
+      Include policy definition and a verification event; document exceptions (break-glass) and controls around them.
+    retention_notes_template: >-
+      Retain policy exports per change; retain sign-in log samples per audit window.
+    maps_to_cmmc_practices:
+      - IA.L2-3.5.3
+      - AC.L2-3.1.2
+
+  - archetype_id: EMX-IAM-002
+    domain: IAM
+    name: Legacy authentication blocked evidence
+    description: Proof that legacy/basic authentication is disabled or blocked for in-scope identities.
+    assessor_methods_expected: [examine, test]
+    acceptable_forms_examples:
+      - IdP policy export blocking legacy auth
+      - Tenant setting export
+      - Failed legacy sign-in log sample
+    collection_notes: >-
+      Demonstrate block by configuration and a denied attempt; document any allowed legacy protocols and compensating controls.
+    retention_notes_template: >-
+      Retain configuration exports and test evidence per major change.
+    maps_to_cmmc_practices:
+      - AC.L2-3.1.2
+      - IA.L2-3.5.3
+
+  - archetype_id: EMX-IAM-003
+    domain: IAM
+    name: Privileged role assignments report
+    description: List of privileged roles and accounts with justification and approvals.
+    assessor_methods_expected: [examine]
+    acceptable_forms_examples:
+      - Directory role assignments export
+      - PIM/PAM assignment report
+      - Privileged group membership export
+    collection_notes: >-
+      Ensure least privilege and time-bound elevation where available; retain approval/audit trail for role grants.
+    retention_notes_template: >-
+      Retain monthly snapshots and approval tickets; retain revocation records.
+    maps_to_cmmc_practices:
+      - AC.L2-3.1.5
+      - AC.L2-3.1.6
+
+  - archetype_id: EMX-IAM-004
+    domain: IAM
+    name: Joiner-mover-leaver (JML) procedure and samples
+    description: Documented account lifecycle process with sample tickets/records.
+    assessor_methods_expected: [examine, interview]
+    acceptable_forms_examples:
+      - Procedure document
+      - HR/IT tickets samples (redacted)
+      - Access removal evidence
+    collection_notes: >-
+      Verify timeliness and completeness; sample terminations to confirm access removal across systems.
+    retention_notes_template: >-
+      Retain procedure and sample records per audit period.
+    maps_to_cmmc_practices:
+      - AC.L2-3.1.2
+      - AC.L2-3.1.3
+
+  - archetype_id: EMX-IAM-005
+    domain: IAM
+    name: Access review evidence
+    description: Records of periodic access reviews for CUI systems and privileged roles.
+    assessor_methods_expected: [examine]
+    acceptable_forms_examples:
+      - Access review report
+      - Manager sign-off records
+      - Remediation actions and closure proof
+    collection_notes: >-
+      Must show scope, cadence, reviewers, findings, and remediation actions; sample a review cycle end-to-end.
+    retention_notes_template: >-
+      Retain reviews and remediation proof for defined retention period.
+    maps_to_cmmc_practices:
+      - AC.L2-3.1.5
+      - AC.L2-3.1.7
+
+  - archetype_id: EMX-IAM-006
+    domain: IAM
+    name: Authentication policy and standards
+    description: Written standards describing password policy, MFA requirements, and session constraints.
+    assessor_methods_expected: [examine]
+    acceptable_forms_examples:
+      - Policy document
+      - Standards document
+      - Exception management procedure
+    collection_notes: >-
+      Policy should align to actual configuration and include exception handling.
+    retention_notes_template: >-
+      Retain superseded versions and approval history.
+    maps_to_cmmc_practices:
+      - IA.L2-3.5.1
+      - IA.L2-3.5.2
+
+  - archetype_id: EMX-IAM-007
+    domain: IAM
+    name: Break-glass account controls evidence
+    description: Evidence that emergency accounts exist with documented protections and procedures.
+    assessor_methods_expected: [examine, test]
+    acceptable_forms_examples:
+      - Account configuration screenshot
+      - Exemption record
+      - Monitoring/alerting on use
+    collection_notes: >-
+      Document purpose and access constraints; verify monitoring on use and strong authentication where supported.
+    retention_notes_template: >-
+      Retain procedure and monitoring evidence; retain usage logs.
+    maps_to_cmmc_practices:
+      - IA.L2-3.5.3
+      - AC.L2-3.1.2
+
+  - archetype_id: EMX-ENDPOINT-001
+    domain: ENDPOINT
+    name: Device management enrollment report
+    description: Proof that in-scope endpoints are enrolled in management and meet baseline requirements.
+    assessor_methods_expected: [examine, test]
+    acceptable_forms_examples:
+      - MDM enrollment export
+      - Device compliance report
+      - Management scope screenshots
+    collection_notes: >-
+      Include totals and a sampled subset; reconcile to in-scope inventory.
+    retention_notes_template: >-
+      Retain monthly snapshots; retain enrollment procedure and exceptions.
+    maps_to_cmmc_practices:
+      - CM.L2-3.4.1
+      - AC.L2-3.1.1
+
+  - archetype_id: EMX-ENDPOINT-002
+    domain: ENDPOINT
+    name: Endpoint security baseline configuration
+    description: Evidence that required endpoint hardening settings are defined and applied.
+    assessor_methods_expected: [examine, test]
+    acceptable_forms_examples:
+      - Baseline policy export
+      - Configuration profile export
+      - Screenshot of settings in management console
+    collection_notes: >-
+      Demonstrate baseline definition and application scope; test a sample device for applied settings.
+    retention_notes_template: >-
+      Retain baseline version history and change approvals.
+    maps_to_cmmc_practices:
+      - CM.L2-3.4.1
+      - SC.L2-3.13.5
+
+  - archetype_id: EMX-ENDPOINT-003
+    domain: ENDPOINT
+    name: EDR/AV deployment and health report
+    description: Evidence that endpoint protection is deployed, active, and monitored.
+    assessor_methods_expected: [examine, test]
+    acceptable_forms_examples:
+      - EDR console export
+      - AV/EDR health dashboard screenshot
+      - Alert routing configuration
+    collection_notes: >-
+      Show deployment coverage and health; include alert routing and response expectations.
+    retention_notes_template: >-
+      Retain monthly coverage exports; retain incident records per retention policy.
+    maps_to_cmmc_practices:
+      - SI.L2-3.14.1
+
+  - archetype_id: EMX-ENDPOINT-004
+    domain: ENDPOINT
+    name: Patch compliance report
+    description: Evidence of patching cadence and compliance state for in-scope endpoints/servers.
+    assessor_methods_expected: [examine, test]
+    acceptable_forms_examples:
+      - Patch dashboard export
+      - Update compliance report
+      - Change ticket samples
+    collection_notes: >-
+      Include SLA/targets and exceptions; sample devices to verify patch state.
+    retention_notes_template: >-
+      Retain monthly reports and remediation tickets for audit period.
+    maps_to_cmmc_practices:
+      - SI.L2-3.14.2
+      - CM.L2-3.4.8
+
+  - archetype_id: EMX-ENDPOINT-005
+    domain: ENDPOINT
+    name: Disk encryption evidence
+    description: Proof of encryption at rest on endpoints and relevant storage.
+    assessor_methods_expected: [examine, test]
+    acceptable_forms_examples:
+      - Encryption status report
+      - Policy export requiring encryption
+      - Sample device encryption status
+    collection_notes: >-
+      Show enforcement and coverage; document exclusions and compensating controls.
+    retention_notes_template: >-
+      Retain reports per audit period; retain exception approvals.
+    maps_to_cmmc_practices:
+      - SC.L2-3.13.16
+
+  - archetype_id: EMX-ENDPOINT-006
+    domain: ENDPOINT
+    name: Removable media control enforcement
+    description: Evidence that removable media use is controlled per policy.
+    assessor_methods_expected: [examine, test]
+    acceptable_forms_examples:
+      - Device control policy export
+      - Audit log of blocked USB events
+      - Policy document
+    collection_notes: >-
+      Demonstrate technical enforcement or documented controls; include exceptions handling.
+    retention_notes_template: >-
+      Retain policy and event samples per retention.
+    maps_to_cmmc_practices:
+      - MP.L2-3.8.7
+
+  - archetype_id: EMX-ENDPOINT-007
+    domain: ENDPOINT
+    name: Local admin control evidence
+    description: Evidence that local admin rights are restricted and controlled.
+    assessor_methods_expected: [examine, test]
+    acceptable_forms_examples:
+      - Local admin group membership export
+      - Privilege management policy
+      - Sample device admin group check
+    collection_notes: >-
+      Show least privilege and elevation workflow; sample endpoints to confirm controls.
+    retention_notes_template: >-
+      Retain reports and workflow records per retention.
+    maps_to_cmmc_practices:
+      - AC.L2-3.1.5
+      - AC.L2-3.1.6
+
+  - archetype_id: EMX-CONFIG-001
+    domain: CONFIG
+    name: Configuration management policy and procedure
+    description: Policy and procedure governing baselines, changes, approvals, and documentation.
+    assessor_methods_expected: [examine, interview]
+    acceptable_forms_examples:
+      - Policy document
+      - Procedure document
+      - Change control standard
+    collection_notes: >-
+      Ensure change control scope includes CUI systems; verify roles and emergency change handling are defined.
+    retention_notes_template: >-
+      Retain versions and approvals; retain change records per audit period.
+    maps_to_cmmc_practices:
+      - CM.L2-3.4.1
+      - CM.L2-3.4.2
+
+  - archetype_id: EMX-CONFIG-002
+    domain: CONFIG
+    name: Change ticket samples and approvals
+    description: Representative change records demonstrating review, approval, testing, and implementation.
+    assessor_methods_expected: [examine]
+    acceptable_forms_examples:
+      - Ticket exports (redacted)
+      - CAB minutes excerpt
+      - Rollback plan sample
+    collection_notes: >-
+      Sample high-impact and routine changes; ensure evidence of approval and rollback planning exists.
+    retention_notes_template: >-
+      Retain tickets and approvals per retention; retain CAB schedule/records.
+    maps_to_cmmc_practices:
+      - CM.L2-3.4.2
+
+  - archetype_id: EMX-CONFIG-003
+    domain: CONFIG
+    name: Approved baseline standards (system hardening)
+    description: Documented configuration standards for systems in scope.
+    assessor_methods_expected: [examine]
+    acceptable_forms_examples:
+      - Baseline standard document
+      - Hardening guide excerpt
+      - Approved benchmark mapping
+    collection_notes: >-
+      Should be specific to OS/platform and map to how baselines are applied in tooling.
+    retention_notes_template: >-
+      Retain version history and approval records.
+    maps_to_cmmc_practices:
+      - CM.L2-3.4.1
+
+  - archetype_id: EMX-CONFIG-004
+    domain: CONFIG
+    name: POA&M tracking evidence
+    description: Evidence of POA&M process and tracking for identified gaps.
+    assessor_methods_expected: [examine]
+    acceptable_forms_examples:
+      - POA&M register export
+      - Remediation plan samples
+      - Closure evidence
+    collection_notes: >-
+      Ensure POA&M items have owners, dates, and closure proof; link to risk acceptance where applicable.
+    retention_notes_template: >-
+      Retain POA&M snapshots and closure artifacts per retention.
+    maps_to_cmmc_practices:
+      - CA.L2-3.12.2
+
+  - archetype_id: EMX-LOG-001
+    domain: LOG
+    name: Audit logging policy
+    description: Policy specifying what events are logged, retention, review, and protection of logs.
+    assessor_methods_expected: [examine]
+    acceptable_forms_examples:
+      - Policy document
+      - Logging standard document
+      - Review cadence record
+    collection_notes: >-
+      Policy should specify event categories, retention duration, and review cadence; align with actual log platform configuration.
+    retention_notes_template: >-
+      Retain current and prior versions; retain approvals.
+    maps_to_cmmc_practices:
+      - AU.L2-3.3.1
+      - AU.L2-3.3.2
+
+  - archetype_id: EMX-LOG-002
+    domain: LOG
+    name: Central log collection / SIEM ingestion proof
+    description: Evidence that relevant sources forward logs to a central repository/SIEM.
+    assessor_methods_expected: [examine, test]
+    acceptable_forms_examples:
+      - SIEM connector status screenshots
+      - Log ingestion metrics export
+      - Sample correlated event
+    collection_notes: >-
+      Include coverage (which sources) and health; test by generating an event and confirming ingestion.
+    retention_notes_template: >-
+      Retain monthly ingestion/health reports; retain connector configuration change records.
+    maps_to_cmmc_practices:
+      - AU.L2-3.3.1
+      - AU.L2-3.3.5
+
+  - archetype_id: EMX-LOG-003
+    domain: LOG
+    name: Log retention configuration evidence
+    description: Configuration proof showing retention meets policy for required log sources.
+    assessor_methods_expected: [examine]
+    acceptable_forms_examples:
+      - Retention settings screenshot
+      - Storage policy export
+      - Access control settings for logs
+    collection_notes: >-
+      Show retention duration and protection; include access controls on logs.
+    retention_notes_template: >-
+      Retain configuration exports per major change.
+    maps_to_cmmc_practices:
+      - AU.L2-3.3.1
+      - AU.L2-3.3.8
+
+  - archetype_id: EMX-LOG-004
+    domain: LOG
+    name: Security monitoring and alerting configuration
+    description: Evidence of alert rules, routing, and operational monitoring procedures.
+    assessor_methods_expected: [examine, interview, test]
+    acceptable_forms_examples:
+      - Alert rules export
+      - On-call routing config
+      - Sample alert and response ticket
+    collection_notes: >-
+      Demonstrate that alerts trigger and are handled; ensure escalation paths are documented.
+    retention_notes_template: >-
+      Retain alert configuration exports and sample response tickets.
+    maps_to_cmmc_practices:
+      - SI.L2-3.14.1
+      - IR.L2-3.6.2
+
+  - archetype_id: EMX-LOG-005
+    domain: LOG
+    name: Time synchronization evidence
+    description: Evidence systems synchronize time to an authoritative source for log integrity.
+    assessor_methods_expected: [examine, test]
+    acceptable_forms_examples:
+      - NTP configuration export
+      - Time sync policy screenshot
+      - Sample system time status
+    collection_notes: >-
+      Demonstrate consistent time settings for key systems; verify across representative samples.
+    retention_notes_template: >-
+      Retain configuration exports and test samples per audit window.
+    maps_to_cmmc_practices:
+      - AU.L2-3.3.7
+
+  - archetype_id: EMX-VULN-001
+    domain: VULN
+    name: Vulnerability scanning evidence
+    description: Reports showing vulnerability scanning performed at defined cadence and scope.
+    assessor_methods_expected: [examine, test]
+    acceptable_forms_examples:
+      - Vulnerability scan report export
+      - Scanner configuration screenshot
+      - Scope/target list export
+    collection_notes: >-
+      Include scan scope and cadence; sample remediation actions for high findings.
+    retention_notes_template: >-
+      Retain scan outputs and remediation tickets per audit window.
+    maps_to_cmmc_practices:
+      - RA.L2-3.11.2
+
+  - archetype_id: EMX-VULN-002
+    domain: VULN
+    name: Vulnerability remediation tracking
+    description: Evidence of tracking vulnerabilities to closure with prioritization and exceptions.
+    assessor_methods_expected: [examine]
+    acceptable_forms_examples:
+      - Ticket backlog export
+      - Remediation SLA policy
+      - Closure proof samples
+    collection_notes: >-
+      Show prioritization and closure evidence; include exceptions with documented risk acceptance.
+    retention_notes_template: >-
+      Retain remediation records and risk acceptances per retention.
+    maps_to_cmmc_practices:
+      - RA.L2-3.11.2
+      - CA.L2-3.12.2
+
+  - archetype_id: EMX-VULN-003
+    domain: VULN
+    name: Secure configuration scanning evidence
+    description: Evidence of configuration compliance scanning for baselines/benchmarks and remediation of drift.
+    assessor_methods_expected: [examine, test]
+    acceptable_forms_examples:
+      - Compliance scan report
+      - Benchmark policy export
+      - Drift remediation tickets
+    collection_notes: >-
+      Show scan cadence and remediation for drift; sample findings to closure.
+    retention_notes_template: >-
+      Retain scan outputs and remediation records.
+    maps_to_cmmc_practices:
+      - CM.L2-3.4.1
+      - RA.L2-3.11.2
+
+  - archetype_id: EMX-RISK-001
+    domain: RISK
+    name: Risk register and risk acceptance records
+    description: Risk register showing identified risks, owners, decisions, and acceptance approvals.
+    assessor_methods_expected: [examine, interview]
+    acceptable_forms_examples:
+      - Risk register export
+      - Risk acceptance memo samples
+      - Review meeting notes excerpt
+    collection_notes: >-
+      Ensure risks include scope/architecture/evidence gaps; approvals must be explicit for accepted risks.
+    retention_notes_template: >-
+      Retain register snapshots and acceptance approvals per policy.
+    maps_to_cmmc_practices:
+      - CA.L2-3.12.2
+
+  - archetype_id: EMX-RISK-002
+    domain: RISK
+    name: System Security Plan (SSP) completeness evidence
+    description: Evidence SSP exists, reflects current boundary, and is maintained.
+    assessor_methods_expected: [examine, interview]
+    acceptable_forms_examples:
+      - SSP document
+      - SSP update log
+      - Approval record
+    collection_notes: >-
+      SSP must align with inventories/diagrams and reflect control implementation and inheritance.
+    retention_notes_template: >-
+      Retain SSP versions and change log per policy.
+    maps_to_cmmc_practices:
+      - CA.L2-3.12.4
+
+  - archetype_id: EMX-IR-001
+    domain: IR
+    name: Incident response plan and procedures
+    description: Documented incident response plan with roles, communications, and escalation paths.
+    assessor_methods_expected: [examine, interview]
+    acceptable_forms_examples:
+      - IR plan document
+      - Runbook excerpts
+      - Contact list / escalation roster
+    collection_notes: >-
+      Confirm plan covers detection through recovery and aligns with tooling and responsibilities.
+    retention_notes_template: >-
+      Retain current and prior versions; retain approvals.
+    maps_to_cmmc_practices:
+      - IR.L2-3.6.1
+      - IR.L2-3.6.2
+
+  - archetype_id: EMX-IR-002
+    domain: IR
+    name: Incident response tabletop exercise evidence
+    description: Records of tabletop exercises with lessons learned and tracked actions.
+    assessor_methods_expected: [examine, interview]
+    acceptable_forms_examples:
+      - Tabletop agenda
+      - Attendance record
+      - After-action report
+    collection_notes: >-
+      Must show scenario, participants, outcomes, and remediation items with closure proof.
+    retention_notes_template: >-
+      Retain exercise artifacts and action closure proof.
+    maps_to_cmmc_practices:
+      - IR.L2-3.6.3
+
+  - archetype_id: EMX-IR-003
+    domain: IR
+    name: Incident ticket samples
+    description: Redacted incident records showing handling per policy.
+    assessor_methods_expected: [examine]
+    acceptable_forms_examples:
+      - Incident tickets
+      - Post-incident review excerpt
+      - Notification records excerpt
+    collection_notes: >-
+      Show timestamps, triage, actions, communications, and closure; demonstrate consistent procedure.
+    retention_notes_template: >-
+      Retain incident records per policy and contractual requirements.
+    maps_to_cmmc_practices:
+      - IR.L2-3.6.2
+
+  - archetype_id: EMX-MEDIA-001
+    domain: MEDIA
+    name: Encryption in transit evidence
+    description: Proof that data in transit is protected using approved mechanisms.
+    assessor_methods_expected: [examine, test]
+    acceptable_forms_examples:
+      - TLS configuration screenshot
+      - VPN configuration export
+      - Secure transport standard excerpt
+    collection_notes: >-
+      Demonstrate enforced secure channels for key services; verify protocol versions/ciphers where feasible.
+    retention_notes_template: >-
+      Retain configuration exports and test evidence per audit period.
+    maps_to_cmmc_practices:
+      - SC.L2-3.13.8
+
+  - archetype_id: EMX-MEDIA-002
+    domain: MEDIA
+    name: Media sanitization procedure and records
+    description: Procedure and records for sanitizing media prior to disposal or reuse.
+    assessor_methods_expected: [examine, interview]
+    acceptable_forms_examples:
+      - Sanitization procedure
+      - Sanitization log samples
+      - Disposal certificates
+    collection_notes: >-
+      Procedure must specify methods and verification; sample records for completed events.
+    retention_notes_template: >-
+      Retain records per policy and contractual requirements.
+    maps_to_cmmc_practices:
+      - MP.L2-3.8.3
+
+  - archetype_id: EMX-MEDIA-003
+    domain: MEDIA
+    name: Backup policy and restore test evidence
+    description: Backup policy and evidence of restore tests for critical systems.
+    assessor_methods_expected: [examine, test]
+    acceptable_forms_examples:
+      - Backup policy
+      - Restore test report
+      - Backup job status export
+    collection_notes: >-
+      Show backups run successfully and restore tests executed periodically; include RPO/RTO targets.
+    retention_notes_template: >-
+      Retain job status exports and restore test reports per retention.
+    maps_to_cmmc_practices:
+      - CP.L2-3.8.1
+
+  - archetype_id: EMX-SUPPLIER-001
+    domain: SUPPLIER
+    name: Third-party access inventory
+    description: Inventory of vendors/MSPs/subcontractors with access, including method and scope.
+    assessor_methods_expected: [examine]
+    acceptable_forms_examples:
+      - Vendor access register
+      - External account list export
+      - Approval records excerpt
+    collection_notes: >-
+      Include purpose, approval, expiration, and monitoring; verify least privilege and offboarding controls.
+    retention_notes_template: >-
+      Retain register snapshots and approvals per audit window.
+    maps_to_cmmc_practices:
+      - AC.L2-3.1.20
+
+  - archetype_id: EMX-SUPPLIER-002
+    domain: SUPPLIER
+    name: Supplier agreements and flowdown evidence
+    description: Contract clauses/agreement evidence that required security obligations are flowed down.
+    assessor_methods_expected: [examine]
+    acceptable_forms_examples:
+      - Contract excerpts
+      - Supplier security addendum
+      - Signed SOW/terms with security clauses
+    collection_notes: >-
+      Show obligations match CUI handling requirements and include reporting/incident clauses where required.
+    retention_notes_template: >-
+      Retain executed agreements and change history.
+    maps_to_cmmc_practices:
+      - CA.L2-3.12.1
+
+  - archetype_id: EMX-SUPPLIER-003
+    domain: SUPPLIER
+    name: Remote access control evidence
+    description: Evidence that remote access is controlled, monitored, and configured per policy.
+    assessor_methods_expected: [examine, test]
+    acceptable_forms_examples:
+      - Remote access policy
+      - VPN/remote gateway configuration export
+      - Remote access logs sample
+    collection_notes: >-
+      Demonstrate MFA, least privilege, and session controls; validate by sample access events.
+    retention_notes_template: >-
+      Retain configuration exports and log samples per audit period.
+    maps_to_cmmc_practices:
+      - AC.L2-3.1.12
+      - AC.L2-3.1.13
+
+  - archetype_id: EMX-SUPPLIER-004
+    domain: SUPPLIER
+    name: External user offboarding evidence
+    description: Evidence that external accounts are disabled/removed promptly when no longer needed.
+    assessor_methods_expected: [examine, test]
+    acceptable_forms_examples:
+      - External account list with last login
+      - Offboarding ticket samples
+      - Group/role removal proof
+    collection_notes: >-
+      Sample expired access; verify disablement and removal from groups/roles; confirm monitoring on residual access.
+    retention_notes_template: >-
+      Retain offboarding records and periodic audit results.
+    maps_to_cmmc_practices:
+      - AC.L2-3.1.2
+      - AC.L2-3.1.3
+
+  - archetype_id: EMX-TRAINING-001
+    domain: TRAINING
+    name: Security awareness training completion report
+    description: Evidence that users complete required awareness training on a defined cadence.
+    assessor_methods_expected: [examine]
+    acceptable_forms_examples:
+      - Training LMS completion export
+      - Attestation records
+      - Remediation reminders excerpt
+    collection_notes: >-
+      Include in-scope users, cadence, completion rates; sample late completions and corrective actions.
+    retention_notes_template: >-
+      Retain completion reports per audit window.
+    maps_to_cmmc_practices:
+      - AT.L2-3.2.1
+
+  - archetype_id: EMX-TRAINING-002
+    domain: TRAINING
+    name: Role-based training evidence
+    description: Evidence of additional training for privileged/technical roles.
+    assessor_methods_expected: [examine]
+    acceptable_forms_examples:
+      - Role-based training curriculum
+      - Completion export
+      - Role roster mapping
+    collection_notes: >-
+      Confirm privileged users receive training relevant to responsibilities and tooling; keep role roster aligned.
+    retention_notes_template: >-
+      Retain curriculum and completion evidence per policy.
+    maps_to_cmmc_practices:
+      - AT.L2-3.2.2
+
+  - archetype_id: EMX-DEVOPS-001
+    domain: DEVOPS
+    name: Repository access controls evidence
+    description: Evidence of access control and review processes for repositories in scope.
+    assessor_methods_expected: [examine, test]
+    acceptable_forms_examples:
+      - Repo permissions export
+      - Branch protection rules screenshot
+      - Access review record
+    collection_notes: >-
+      Ensure least privilege and protected branches; validate enforcement of PR approvals where applicable.
+    retention_notes_template: >-
+      Retain permission exports and protection settings per audit window.
+    maps_to_cmmc_practices:
+      - AC.L2-3.1.5
+      - CM.L2-3.4.2
+
+  - archetype_id: EMX-DEVOPS-002
+    domain: DEVOPS
+    name: CI/CD pipeline security evidence
+    description: Evidence pipelines are controlled, auditable, and protected when they touch CUI or CUI-derived artifacts.
+    assessor_methods_expected: [examine, test]
+    acceptable_forms_examples:
+      - Pipeline definition export
+      - Runner/agent inventory
+      - Pipeline audit logs sample
+    collection_notes: >-
+      Confirm secrets handling, logging, and artifact access controls; validate auditability and change control.
+    retention_notes_template: >-
+      Retain pipeline config and audit logs per retention policy.
+    maps_to_cmmc_practices:
+      - CM.L2-3.4.2
+      - AU.L2-3.3.1
+
+  - archetype_id: EMX-DEVOPS-003
+    domain: DEVOPS
+    name: Artifact storage access control evidence
+    description: Evidence build artifacts/packages are stored with appropriate access controls and retention.
+    assessor_methods_expected: [examine, test]
+    acceptable_forms_examples:
+      - Artifact repo access export
+      - Retention settings screenshot
+      - Sample artifact ACL
+    collection_notes: >-
+      Confirm artifacts are protected from unauthorized access and tampering; validate retention and deletion policies.
+    retention_notes_template: >-
+      Retain ACL exports and retention configs per audit period.
+    maps_to_cmmc_practices:
+      - AC.L2-3.1.1
+      - AU.L2-3.3.8

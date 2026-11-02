@@ -1,0 +1,115 @@
+[
+  {
+    "elementNumber": 1,
+    "title": "Identity Verification",
+    "description": "Verify the individual's identity using a government-issued photo ID.",
+    "artifactType": "id-verification",
+    "fields": [
+      { "name": "documentType", "label": "Document Type", "type": "select", "options": ["drivers_license", "passport", "state_id", "military_id", "other"] },
+      { "name": "documentNumber", "label": "Document Number", "type": "text" },
+      { "name": "issuingAuthority", "label": "Issuing Authority", "type": "text" },
+      { "name": "expirationDate", "label": "Expiration Date", "type": "date" },
+      { "name": "verifiedBy", "label": "Verified By", "type": "text" },
+      { "name": "verificationDate", "label": "Verification Date", "type": "date" },
+      { "name": "notes", "label": "Notes", "type": "textarea", "required": false }
+    ],
+    "hasTemplate": false
+  },
+  {
+    "elementNumber": 2,
+    "title": "Citizenship / Legal Work Authorization",
+    "description": "Verify citizenship status or legal work authorization documentation.",
+    "artifactType": "citizenship-doc",
+    "fields": [
+      { "name": "citizenshipStatus", "label": "Citizenship Status", "type": "select", "options": ["us_citizen", "permanent_resident", "work_visa", "other"] },
+      { "name": "documentType", "label": "Document Type", "type": "text" },
+      { "name": "documentNumber", "label": "Document Number", "type": "text" },
+      { "name": "expirationDate", "label": "Expiration Date", "type": "date", "required": false },
+      { "name": "verifiedBy", "label": "Verified By", "type": "text" },
+      { "name": "verificationDate", "label": "Verification Date", "type": "date" },
+      { "name": "notes", "label": "Notes", "type": "textarea", "required": false }
+    ],
+    "hasTemplate": false
+  },
+  {
+    "elementNumber": 3,
+    "title": "Verifiable Professional History",
+    "description": "Conduct reference checks to verify professional history and character.",
+    "artifactType": "reference-check",
+    "fields": [
+      { "name": "referenceName", "label": "Reference Name", "type": "text" },
+      { "name": "referenceTitle", "label": "Reference Title", "type": "text" },
+      { "name": "referenceOrganization", "label": "Reference Organization", "type": "text" },
+      { "name": "referenceEmail", "label": "Reference Email", "type": "text", "required": false },
+      { "name": "referencePhone", "label": "Reference Phone", "type": "text", "required": false },
+      { "name": "relationshipToSubject", "label": "Relationship to Subject", "type": "text" },
+      { "name": "yearsKnown", "label": "Years Known", "type": "number" },
+      { "name": "contactedDate", "label": "Contacted Date", "type": "date" },
+      { "name": "contactedBy", "label": "Contacted By", "type": "text" },
+      { "name": "outcome", "label": "Outcome", "type": "select", "options": ["positive", "negative", "inconclusive", "pending"] },
+      { "name": "notes", "label": "Notes", "type": "textarea", "required": false }
+    ],
+    "hasTemplate": false
+  },
+  {
+    "elementNumber": 4,
+    "title": "Direct-Knowledge Attestation",
+    "description": "A supervisor or principal attests to direct knowledge of the individual's character and suitability.",
+    "artifactType": "direct-knowledge-attestation",
+    "fields": [
+      { "name": "attestor_name", "label": "Attestor Name", "type": "text" },
+      { "name": "attestor_role", "label": "Attestor Role", "type": "text" },
+      { "name": "attestor_email", "label": "Attestor Email", "type": "text" },
+      { "name": "attestationDate", "label": "Attestation Date", "type": "date" },
+      { "name": "signedText", "label": "Signed Attestation Text", "type": "textarea" },
+      { "name": "notes", "label": "Notes", "type": "textarea", "required": false }
+    ],
+    "hasTemplate": true
+  },
+  {
+    "elementNumber": 5,
+    "title": "Self-Attestation / Background-Check Consent",
+    "description": "The individual consents to a background check and attests to the accuracy of information provided.",
+    "artifactType": "background-check",
+    "fields": [
+      { "name": "person_name", "label": "Person Name", "type": "text" },
+      { "name": "consentDate", "label": "Consent Date", "type": "date" },
+      { "name": "signedText", "label": "Signed Consent Text", "type": "textarea" },
+      { "name": "backgroundCheckVendor", "label": "Background Check Vendor", "type": "text", "required": false },
+      { "name": "backgroundCheckStatus", "label": "Background Check Status", "type": "select", "options": ["not_started", "pending", "completed", "failed"], "required": false },
+      { "name": "backgroundCheckDate", "label": "Background Check Date", "type": "date", "required": false },
+      { "name": "notes", "label": "Notes", "type": "textarea", "required": false }
+    ],
+    "hasTemplate": true
+  },
+  {
+    "elementNumber": 6,
+    "title": "CUI Acknowledgment",
+    "description": "The individual acknowledges CUI handling responsibilities per 32 CFR Part 2002.",
+    "artifactType": "cui-acknowledgment",
+    "fields": [
+      { "name": "person_name", "label": "Person Name", "type": "text" },
+      { "name": "acknowledgmentDate", "label": "Acknowledgment Date", "type": "date" },
+      { "name": "cui_source", "label": "CUI Registry Source URL", "type": "text" },
+      { "name": "signedText", "label": "Signed Acknowledgment Text", "type": "textarea" },
+      { "name": "notes", "label": "Notes", "type": "textarea", "required": false }
+    ],
+    "hasTemplate": true
+  },
+  {
+    "elementNumber": 7,
+    "title": "Authorizing Official Sign-Off",
+    "description": "The AO reviews all screening elements and makes a determination on CUI access.",
+    "artifactType": "authorization",
+    "fields": [
+      { "name": "ao_name", "label": "AO Name", "type": "text" },
+      { "name": "ao_email", "label": "AO Email", "type": "text" },
+      { "name": "ao_role", "label": "AO Role", "type": "text" },
+      { "name": "determination", "label": "Determination", "type": "select", "options": ["approve", "deny"] },
+      { "name": "signOffDate", "label": "Sign-Off Date", "type": "date" },
+      { "name": "signedText", "label": "Signed Determination Text", "type": "textarea" },
+      { "name": "notes", "label": "Notes", "type": "textarea", "required": false }
+    ],
+    "hasTemplate": true
+  }
+]

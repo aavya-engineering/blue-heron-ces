@@ -1,0 +1,35 @@
+{
+  "rawResponse": "[\r\n    {\r\n        \"id\":  \"MC900102\",\r\n        \"title\":  \"Action required: retire legacy authentication protocols for Exchange Online (GCC High)\",\r\n        \"severity\":  \"high\",\r\n        \"startDateTime\":  \"2026-10-23T00:00:00.000Z\",\r\n        \"lastModifiedDateTime\":  \"2026-10-25T00:00:00.000Z\",\r\n        \"category\":  \"planForChange\"\r\n    },\r\n    {\r\n        \"id\":  \"MC900104\",\r\n        \"title\":  \"Microsoft Purview: sensitivity label encryption change for co-authoring\",\r\n        \"severity\":  \"high\",\r\n        \"startDateTime\":  \"2026-10-05T00:00:00.000Z\",\r\n        \"lastModifiedDateTime\":  \"2026-10-07T00:00:00.000Z\",\r\n        \"category\":  \"preventOrFixIssue\"\r\n    }\r\n]\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "SI.L2-3.14.3.advisory-evidence",
+    "label": "Microsoft Service Health and Security Advisory Evidence",
+    "engine": "mgraph",
+    "layer_hint": 7,
+    "sequence_hint": 54,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "SI.L2-3.14.3"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/admin/serviceAnnouncement/messages?$top=5&$orderby=lastModifiedDateTime desc').value | Select-Object id,title,severity,startDateTime | ConvertTo-Json -Depth 5",
+    "set_command": "",
+    "evidence_commands": [
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/admin/serviceAnnouncement/messages?$top=25&$orderby=lastModifiedDateTime desc&$filter=severity eq ''high''').value | Select-Object id,title,severity,startDateTime,lastModifiedDateTime,category | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SI.L2-3.14.3"
+    ],
+    "timestamp": "2026-11-01T06:58:39.382Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Microsoft Service Health and Security Advisory Evidence",
+    "sha256Hash": "90a104f69aa777835d46654f979ae715faab9cc482496716e668b39321cac09a",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

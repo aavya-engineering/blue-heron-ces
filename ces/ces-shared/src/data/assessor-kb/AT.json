@@ -1,0 +1,297 @@
+{
+  "family": "AT",
+  "family_name": "Awareness and Training",
+  "practices": [
+    {
+      "id": "AT.L2-3.2.1",
+      "title": "Ensure that managers, system administrators and users of organizational systems are made aware of the security risks associated with their activities and of the applicable policies, standards and procedures related to the security of those systems.",
+      "approach": {
+        "what_assessor_does": "The assessor reads the awareness program description and the course material to confirm two things: it explains the risks that come with the organization's own work on CUI, and it points people to the security policies and procedures that apply to them. They then pick a sample of managers, administrators and ordinary users from the current account list and look for a completion record for each one inside the refresh cycle the policy states. In interviews they ask those people to name a risk from their own job and say where the security policies are kept. Testing means showing that the tracking method flags people who are overdue and picks up new accounts.",
+        "common_failure_modes": [
+          "An off-the-shelf course that never mentions CUI or the organization's own policies.",
+          "Completion records exist for only part of the workforce; administrators, contractors or part-time staff are missing.",
+          "No refresh cycle is written down, or the latest completions are older than the cycle the policy claims.",
+          "The risks were never identified in writing, so the course content is the only place they appear.",
+          "Interviewed staff cannot say where the security policies live or which ones apply to them."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AT.L2-3.2.1[a]",
+          "determination": "security risks associated with organizational activities involving CUI are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Risk assessment excerpt covering CUI handling activities",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. The assessor looks for risks tied to the work staff actually do with CUI, not a generic list."
+            },
+            {
+              "artifact_type": "Awareness and training policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/awareness-training-policy.md (GateEvidence family AT). Should name the risk topics the program covers and where they came from."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask who chose the risk topics for the awareness program and how often they are revisited."
+            }
+          ]
+        },
+        {
+          "id": "AT.L2-3.2.1[b]",
+          "determination": "policies, standards, and procedures related to the security of the system are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Awareness and training policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/awareness-training-policy.md (GateEvidence family AT). Should list the security policies and procedures the training points people to."
+            },
+            {
+              "artifact_type": "Security policy index with owner and version",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Cross-check that every policy the training references is current."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask how staff are pointed to the current version of each policy."
+            }
+          ]
+        },
+        {
+          "id": "AT.L2-3.2.1[c]",
+          "determination": "managers, systems administrators, and users of the system are made aware of the security risks associated with their activities",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Training coverage report by user",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AT.L2-3.2.1 (awarenessTrainingCoverageEvaluator): Graph /reports/security/getAttackSimulationTrainingUserCoverage compared with /users."
+            },
+            {
+              "artifact_type": "Course completion records and certificates",
+              "ces_source": "eo_store",
+              "notes": "EO TrainingStore courses dod-cyber-awareness-challenge-2026 and dod-cui-mandatory-training (both list AT.L2-3.2.1 in satisfies_controls), with refresh cycles of 365 and 730 days."
+            },
+            {
+              "artifact_type": "Training roster reconciliation",
+              "ces_source": "ao_row",
+              "notes": "AdminOps G-01 Annual Security Training Audit: imports the learning-system roster CSV and reconciles it with Entra users; registered against AT.L2-3.2.1."
+            },
+            {
+              "artifact_type": "Interviews with sampled managers, administrators and users",
+              "ces_source": "interview",
+              "notes": "Each person names at least one security risk that comes with their own work."
+            }
+          ]
+        },
+        {
+          "id": "AT.L2-3.2.1[d]",
+          "determination": "managers, systems administrators, and users of the system are made aware of the applicable policies, standards, and procedures related to the security of the system",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Terms of use acceptance records",
+              "ces_source": "stack_signal",
+              "notes": "Entra Terms of Use agreements, surfaced by the EO evidence router as item signal:agreements and mapped to AT.L2-3.2.1."
+            },
+            {
+              "artifact_type": "Policy acknowledgement records",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector when acknowledgements are kept outside the tenant (for example in the learning system)."
+            },
+            {
+              "artifact_type": "Interviews with sampled managers, administrators and users",
+              "ces_source": "interview",
+              "notes": "Each person says where the security policies are kept and names one that applies to their job."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AT.L2-3.2.2",
+      "title": "Ensure that personnel are trained to carry out their assigned information security- related duties and responsibilities.",
+      "approach": {
+        "what_assessor_does": "The assessor looks for a written list of security duties by role (for example who manages accounts, who reviews logs, who handles incidents, who approves changes) and checks that every role has a named person today. For each named person they want a training record that fits the role, not only the general awareness course everyone takes. They interview a few role holders about what their security duties are and what training prepared them, and compare the people holding privileged rights in the tenant against the role list. There is no automated signal for this practice in CES; it rests on documents, training records and interviews.",
+        "common_failure_modes": [
+          "Roles are described but nobody is named, or the names are stale after staff changes.",
+          "Role holders have only the general awareness course and nothing tied to their duties.",
+          "People with administrator rights in the tenant do not appear in the role list at all.",
+          "The policy does not say which training each role needs, so adequacy cannot be judged.",
+          "Role holders describe duties in interview that differ from what the documents say."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AT.L2-3.2.2[a]",
+          "determination": "information security-related duties, roles, and responsibilities are defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Security roles and responsibilities matrix",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Lists each security duty and the role that owns it."
+            },
+            {
+              "artifact_type": "Awareness and training policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/awareness-training-policy.md (GateEvidence family AT). Should state which training each security role requires."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask how the role list is kept current. Control signal registry maps AT.L2-3.2.2 to manualGateEvaluator: no tenant signal covers this objective."
+            }
+          ]
+        },
+        {
+          "id": "AT.L2-3.2.2[b]",
+          "determination": "information security-related duties, roles, and responsibilities are assigned to designated personnel",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Role assignments naming current personnel",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector (matrix with names, appointment letters or position descriptions). Compare against the people holding administrator rights in the tenant."
+            },
+            {
+              "artifact_type": "Role holder interviews",
+              "ces_source": "interview",
+              "notes": "Each sampled role holder describes their security duties; answers should match the matrix."
+            }
+          ]
+        },
+        {
+          "id": "AT.L2-3.2.2[c]",
+          "determination": "personnel are adequately trained to carry out their assigned information security-related duties, roles, and responsibilities",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Role-based course completion records",
+              "ces_source": "eo_store",
+              "notes": "EO TrainingStore courses cisa-learning-admin-track and cdse-cybersecurity-fundamentals (system_administrator role) and dod-cyber-awareness-challenge-2026, all listing AT.L2-3.2.2 in satisfies_controls."
+            },
+            {
+              "artifact_type": "New-hire training enforcement record",
+              "ces_source": "ao_row",
+              "notes": "AdminOps G-02 New Hire Training Enforcement: enrolls new users and blocks access by Conditional Access until training is complete; registered against AT.L2-3.2.2."
+            },
+            {
+              "artifact_type": "Phishing simulation results",
+              "ces_source": "ao_row",
+              "notes": "AdminOps G-04 Phishing Simulation Report; registered against AT.L2-3.2.2. Supports, but does not replace, role-based training records."
+            },
+            {
+              "artifact_type": "Role holder interviews",
+              "ces_source": "interview",
+              "notes": "Ask each sampled role holder what training prepared them for their duties and when they last took it."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "AT.L2-3.2.3",
+      "title": "Provide security awareness training on recognizing and reporting potential indicators of insider threat.",
+      "approach": {
+        "what_assessor_does": "The assessor checks that the organization has written down what warning signs of an insider threat look like in its setting (for example unusual data movement, attempts to get around controls, unexplained access requests) and that training teaches managers and employees to spot those signs and how to report them. They examine the course material and completion records for a sample of managers and staff, and in interviews ask people what they would do and whom they would tell if they saw a warning sign. Testing means confirming the reporting channel named in the training actually exists and reaches someone.",
+        "common_failure_modes": [
+          "Insider threat appears as a single slide in the general course with no list of warning signs.",
+          "The training never says how or to whom a concern should be reported, or names a person who has left.",
+          "Managers receive no coverage of their part in spotting and escalating warning signs.",
+          "Completion records for the insider threat course are missing for part of the workforce."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "AT.L2-3.2.3[a]",
+          "determination": "potential indicators associated with insider threats are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Insider threat warning-sign list or program document",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Should describe warning signs that fit this organization, not only a generic definition."
+            },
+            {
+              "artifact_type": "Awareness and training policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/awareness-training-policy.md (GateEvidence family AT). Should say that insider threat warning signs and reporting are covered."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask who wrote the warning-sign list and how a report is handled once received."
+            }
+          ]
+        },
+        {
+          "id": "AT.L2-3.2.3[b]",
+          "determination": "security awareness training on recognizing and reporting potential indicators of insider threat is provided to managers and employees",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Training coverage report by user",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry AT.L2-3.2.3 (insiderThreatTrainingEvaluator): Graph /reports/security/getAttackSimulationTrainingUserCoverage compared with /users."
+            },
+            {
+              "artifact_type": "Insider threat course completion records",
+              "ces_source": "eo_store",
+              "notes": "EO TrainingStore course cdse-insider-threat-int101 (lists AT.L2-3.2.3 in satisfies_controls, 365-day refresh), required for all users."
+            },
+            {
+              "artifact_type": "CUI-group training tracking",
+              "ces_source": "ao_row",
+              "notes": "AdminOps G-03 Role-Based CUI Training: tracks CUI group members separately from general training; registered against AT.L2-3.2.3."
+            },
+            {
+              "artifact_type": "Interviews with sampled managers and employees",
+              "ces_source": "interview",
+              "notes": "Each person names a warning sign and says how and to whom they would report it."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

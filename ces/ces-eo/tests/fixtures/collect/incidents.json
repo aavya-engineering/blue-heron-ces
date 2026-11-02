@@ -1,0 +1,33 @@
+{
+  "_note": "Recorded shape (Graph v1.0 security/incidents?$expand=alerts, as the simulator serves it after B20); synthetic; scrubbed.",
+  "source": "GET /v1.0/security/incidents?$expand=alerts&$filter=lastUpdateDateTime ge <start>",
+  "value": [
+    {
+      "id": "inc-0001",
+      "displayName": "Initial access involving one user (phishing click and risky sign-in)",
+      "severity": "medium",
+      "status": "active",
+      "classification": "unknown",
+      "determination": "unknown",
+      "assignedTo": "analyst@example.test",
+      "createdDateTime": "2026-10-24T10:00:00.000Z",
+      "lastUpdateDateTime": "2026-10-26T12:00:00.000Z",
+      "alerts": [
+        { "id": "alert-0001", "status": "new", "serviceSource": "microsoftDefenderForOffice365", "createdDateTime": "2026-10-24T10:00:00.000Z" },
+        { "id": "alert-0002", "status": "inProgress", "serviceSource": "azureAdIdentityProtection", "createdDateTime": "2026-10-24T12:00:00.000Z" }
+      ]
+    },
+    {
+      "id": "inc-0002",
+      "displayName": "Suspicious account enumeration on one device",
+      "severity": "low",
+      "status": "resolved",
+      "classification": "falsePositive",
+      "createdDateTime": "2026-10-20T08:00:00.000Z",
+      "lastUpdateDateTime": "2026-10-21T08:00:00.000Z",
+      "alerts": [
+        { "id": "alert-0003", "status": "resolved", "serviceSource": "microsoftDefenderForEndpoint", "createdDateTime": "2026-10-20T08:00:00.000Z" }
+      ]
+    }
+  ]
+}

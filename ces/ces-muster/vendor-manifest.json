@@ -1,0 +1,412 @@
+{
+  "pinnedSha": "4a00bee5d5e618cf55da2469ec12307ebc620418",
+  "plannerPinnedSha": "380b45f63312e27ec7e2ec5b964af8029200f120",
+  "hashMode": "sha256 of the file bytes with CRLF normalised to LF (RF-47). Any other byte change fails check:drift.",
+  "sourceRepo": "..",
+  "sourceRepoNote": "Sources are sibling folders of this repo inside ces-mono (../ces-planner). provenance[path].source is relative to the ces-muster root; never an absolute path. ces-shared is no longer vendored (DUP-4a, see note_dup4a). ces-planner code is no longer vendored either (DUP-4b, see note_dup4b); only its data, schema and template assets are pinned.",
+  "verifiedAgainst": {
+    "commit": "450bff3",
+    "date": "2026-10-27",
+    "note": "RF-47: every pin re-taken from the working copy and every copy compared with its sibling source at this ces-mono commit (ces-planner post-EVC.2). The per-file \"@ <sha>\" lines in vendored headers record the original copy commit and were left as is."
+  },
+  "copyDate": "2026-07-05",
+  "repin_2026_10_27": {
+    "reason": "RF-47: check:drift was red at the pin (51 of 114) and after EVC.2 (49 of 116). None of the 49 was a stale or changed copy of new source content. 38 = the BHD notice header added by commit 2dd6f4f (2026-10-10) without re-pinning (24 of them were also pinned on a CRLF checkout); 10 = public/knowledge files pinned on a CRLF checkout, byte-identical to ces-planner/public today; 1 = bulkAnswerDerivation.ts, notice header plus a BOM removed by the same commit. Re-pinned to the current bytes; true divergence from the sibling sources is recorded per file in provenance (kind adapted, note starting DIVERGENCE).",
+    "before": {
+      "checked": 116,
+      "drift": 49
+    },
+    "after": {
+      "checked": 116,
+      "drift": 0
+    }
+  },
+  "note_uiAssets": "public/ces-ui.css, public/ces-logo.svg and public/ces-favicon.svg are NO LONGER pinned here. They are pushed from the canonical ces-shared/ui/ by the mono-root `npm run sync-ui-assets` (ces/scripts/sync-ui-assets.mjs), which is now muster's drift mechanism for those three files. Pinning them would make every sync fail this check.",
+  "note_plannerStores": "2026-09-08 (founder directive): ces-planner's remaining public/data stores (SI/TCP/CUI/BTC/Policy question banks, help guidance, glossary, FedRAMP inheritance table, GCC High G5 tech ref, BTC activation package), its public/schemas output contracts (under public/schemas/planner/) and its policy templates (public/templates/policies/) copied byte-for-byte from ces-planner/public at the same pinned tree (planner untouched since 2026-06-13) so Muster can generate every Planner output. Consume, never fork.",
+  "note_evc3": "EVC.3 (2026-10-27): src/vendored/ces-planner/mpt/services/gapCompiler.ts and mpt/types.ts re-copied from ces-mono 81dbc98 (evidence_source / catalog_definitions on Gap, resolveEvidenceArchetypes, compileGapSet arg 9 evidenceCatalog); only the notice Ref and import paths differ (the new type import points at the vendored shared/services/evidenceCatalog.ts). Re-pinned.",
+  "note_evidenceCatalog": "EVC.1 (2026-10-27): the evidence catalog data (release log, release 0 = AC 3.1.1 example, NIST 800-171A examine lists, objective coverage buckets) copied byte-for-byte from ../ces-planner/public/data/evidence-catalog/ into src/vendored/ces-planner/data/evidence-catalog/ (Muster public/ is not used for it), plus the Planner seed loader (only import paths and the notice Ref differ). The ces-shared schema and types are imported from the ces-shared package (ces-shared/data/evidence-catalog-schema, ces-shared/types/evidence-catalog) since DUP-4a. To refresh the Planner-sourced files: copy them again, re-pin here, run check:drift --against-sibling. Pins for these seven files were taken from the ces-mono working copy ahead of its commit (HEAD 71f919e at the time), not at verifiedAgainst.commit.",
+  "note_dup4a": "DUP-4a (2026-10-30, GAP-CLOSURE-PLAN.md G-DUP): Muster depends on ces-shared directly. ces-muster/package.json has \"ces-shared\": \"file:../ces-shared\" and muster-api/package.json has \"file:../../ces-shared\"; imports use the subpath exports in ces-shared/package.json. src/vendored/ces-shared and muster-api/src/vendored/ces-shared were deleted (14 pins removed), with src/vendored/cesSharedSync.ts, its parity test and the check:ces-shared / sync:ces-shared scripts. After DUP-4a this manifest pinned ces-planner, ces-spine and other non-ces-shared copies only.",
+  "note_dup4b": "DUP-4b (2026-10-30, GAP-CLOSURE-PLAN.md G-DUP): Planner code is no longer vendored. All 59 files of src/vendored/ces-planner were still used (transitive closure from Muster importers), so all moved: mpt/services/gapCompiler.ts to src/features/gaps/gapCompiler.ts, everything else (code and the evidence-catalog data) to src/features/plan/engine/ with the same sub-paths. muster-api/src/vendored/ces-planner/mpt/services/validator.ts moved to muster-api/src/services/artifactAlignmentValidator.ts. 60 pins removed; the moved files are Muster-owned code now, not drift-checked copies. Still pinned from ces-planner (plannerPinnedSha): public/knowledge, public/schemas/planner, public/templates/policies, src/__fixtures__/builders.ts and the exportPlanShim.ts shim; ces-spine is unchanged.",
+  "files": {
+    "src/vendored/ces-spine/services/bulkAnswerDerivation.ts": "2ce1e451020e136602ba4fced0395c23b840c1d0571e41ad62a940ba247b261f",
+    "src/vendored/ces-spine/services/postureGenerator.ts": "fc234daac580104802eeee65d8df7b9b83b7847f1987f6d7f7ba2b4435019e0a",
+    "src/vendored/ces-spine/types/rrt.ts": "a3ba14986933dc4ba36d08068c94db070ad90ea80d636f14b91e0fe9cfebd021",
+    "src/vendored/ces-spine/types/domain.ts": "84fdd55ea98796a0ea591d7a4b04bd1b735b3735cfab97176d35715b7e1dd915",
+    "src/vendored/ces-spine/types/artifacts.ts": "302de929a4b01af24186bfbdcda96a82427a6cd06376470d2a3be0fb735b66f6",
+    "src/vendored/ces-spine/types/customer.ts": "b46e735fd84b6f100d42696e1837be7294313527a6c3f4573d0eea6fa82c78b8",
+    "src/vendored/ces-spine/types/techRefIndex.ts": "fba76b9a2fa6d8aa37c7dd80f77e75b7198402b085db30e0765f1dd6da066e26",
+    "src/vendored/ces-spine/utils/idGenerator.ts": "47701aa2824e736cf0c62eec7b0cb68969d23b559f6e9c43c2b207011275289c",
+    "src/vendored/ces-spine/utils/dateFormatter.ts": "e126e4661d42231c81e311108028971446db07b4aecf2cab18d0023684235b38",
+    "src/__fixtures__/builders.ts": "93bd4dbd9f9e2d7da25214741a7b412eccd83bc6e3af3d805bf85b0945ebb8ef",
+    "public/knowledge/domain CES CMMC Fundamental Requirements Store.yaml": "9bfffd74863b77fc9133af525f46ac154f07d3d4d88b4b4bab601fc02ad918d9",
+    "public/knowledge/domain Assessor Approach Knowledge Base.yaml": "852536e6bce5e5e179bae9abba59b111f4a2721dc913d83bb307a7bd416c04a2",
+    "public/knowledge/domain Assessor Evidence Matrix.yaml": "353eeaa5dbb1598a38d1d990808f2c74c4636a5b2e0307c1a5ffc8fe2dc095a1",
+    "public/knowledge/domain Capability Taxonomy.yaml": "f2619324ae06001fd04697d3ec316f066605924cd6b06c139748e0a445e44b62",
+    "public/knowledge/domain Evidence Archetype Catalog.yaml": "a3705a47de92dae9df7bf8120b75f8d72a1b23c3dcc666ae7ea13bb19665fe9d",
+    "public/knowledge/domain Implementation Patterns.yaml": "52bc08c243ecbac24b1831ce870eca3d1ff0512b128bdd1ed8098db0ab56899d",
+    "public/knowledge/domain Tech Stack Compliance Mapping.yaml": "02b046c64cc748c1a32d44667cbbc6cb8d72b94b94c3adb57087c61f8a54ca53",
+    "public/knowledge/primed RR Question Bank.yaml": "61a79685ce2b3bace304b90813ff2dd47651c4f9176f51ed9af20f500026f1cc",
+    "public/knowledge/CES RRT Readiness Posture.schema.json": "0c9c6ba1540a6c5308f8322f1fa6e03f940e86ffabb97e18f599dcdccd321994",
+    "public/knowledge/vendor playbook Microsoft 365.yaml": "92f188a3230d62a286a134de07f74d93497957c5367008c6e06ef57ac5456459",
+    "public/knowledge/CES BTC Activation Package.yaml": "5c1c841edaf2ae030f388103c150067db37adfe52ce2e1b08f9c822af76db664",
+    "public/knowledge/fedramp-inheritance-table.yaml": "94a9c3a2f53afe94ea6cde21c7d0e279f0e3298eabeb8d5f03a3700591329f0c",
+    "public/knowledge/gcc-high-g5-cmmc-2-tech-ref-structured.json": "9eeb47a740d82b2fe907cb9eb5495d59155198203f80eb1c7b365a1a0298b832",
+    "public/knowledge/help BTC Guidance.yaml": "7384eb861c925d70315c94421867c016c6b101d44dfdb37da3db775c47255010",
+    "public/knowledge/help CUI Boundary Guidance.yaml": "a014c8df1dc6824e078e2dbb9d100589e7b34a5d6ab3669af09e26e01c6537c0",
+    "public/knowledge/help Glossary.yaml": "042548b6b56f3b075f6f5027a6812a7690957c2439df997fe8b9b3627576f44d",
+    "public/knowledge/help TCP Guidance.yaml": "3f9b2ee10e483d713a13d1d00a4e95ce3cd4006988fd4aad6917dbe6f7a6d65f",
+    "public/knowledge/primed BTC Question Bank.yaml": "e97e1cd5f9e6d23adbe7d6e58b5beb06630c449c1a7462195bc041d267f1d5eb",
+    "public/knowledge/primed CUI Boundary Question Bank.yaml": "84bf7f331174449be3b8069f60c9cf4ab632296e056a8e47fd4aff3b4527eb70",
+    "public/knowledge/primed Policy Inputs Question Bank.yaml": "331b903cfd8156246a1624696c601e87c797ae1f9e743860da5a33424ca0f9ca",
+    "public/knowledge/primed SI Question Bank.yaml": "86c05d5ac9a9f6a57c969cc4f2516a7fd2da49e844c65caceaefcbd4fdd9cb01",
+    "public/knowledge/primed TCP Question Bank.yaml": "0303a68633457ef8bde6a6f692d6042b1ddeff3d4301df9abd4e4e051976460d",
+    "public/schemas/planner/CES CUI Boundary Output Contract.yaml": "3a322220817d24249e74623a58213686ad1718635252230429e6a8b99c5f9d14",
+    "public/schemas/planner/CES Infrastructure Manifest.schema.json": "6cb06c308cc66889881a20dc0ea69ee83926e3830f2e5c491246b8f0bd1fb6ef",
+    "public/schemas/planner/CES MPT Manual Mission Plan schema.json": "a776dbc330b4ce204187ef4a9c68cd31647e4298c5996e8a255e4ca7a49371ae",
+    "public/schemas/planner/CES MPT Proposal Schema.json": "adaba4c3238abadcbab31ba918d89e4c6e7116f6a208a032b65e073bc540c4a8",
+    "public/schemas/planner/CES MPT Tech Ref Implementation Guide.schema.json": "3585937ec15fa54431d583740e421a962bf4e0c1a055319f01d14a7d21d42b09",
+    "public/schemas/planner/CES RRT Readiness Posture.schema.json": "0c9c6ba1540a6c5308f8322f1fa6e03f940e86ffabb97e18f599dcdccd321994",
+    "public/schemas/planner/CES SI Output Contract.yaml": "e4570a7d05754d23bbe386589a7f1d85becd0435c3ca8008d4fed379c10d0d5e",
+    "public/schemas/planner/CES SIT Scenario-Specific Question Set.schema.json": "f23effa4cc7c3e6f3c7555c804f592e02350112ea1dedf7e54e41c37c8c239c8",
+    "public/schemas/planner/CES SIT Strategic Intent Baseline.schema.json": "3685acbefc048fc195169c6ab8a6754547fbdcf7ec61ad244c6504927ffc356b",
+    "public/schemas/planner/CES TCP Tenant Config Profile.schema.json": "5cccaa692eace1c436f9e5fb8780cf1581ddaca1d4fa3d089f6be931df1ebec3",
+    "public/schemas/planner/CES Tenant Manifest.schema.json": "fc6543f96a3aeab37ea0b6af398a7a1088fe2e1babe0597786b54225095abc93",
+    "public/schemas/planner/domain CES Assessor Approach Knowledge Base.schema.json": "ddd68253d48ee244c93078f34718b0ea2534dc9cba730132870713d6852eb785",
+    "public/schemas/planner/domain CES Assessor Evidence Matrix.schema.json": "cb46d6d34f5decaf7054ee60b74e4afe0699f5736cbc41793d661825dbf4d3c5",
+    "public/schemas/planner/domain CES CMMC Fundamental Requirements Store.schema.json": "d42cb77edcd9ef6a71ef935502b03c4df46550edeb8a2c9caa263c4fed22c87e",
+    "public/schemas/planner/domain CES Capability Taxonomy.schema.json": "9f3e70692b57114751c99bc8bf84b87461164393e53a0034927dda6337c82434",
+    "public/schemas/planner/domain CES Implementation Patterns.schema.json": "c9af1853d3ec7c4ae94201b8e99de48316b09b93f96579ad5cb25df2b587bddd",
+    "public/schemas/planner/domain CES Vendor Playbook.schema.json": "669cd932c1b37f3f9a0c5c081218fa331c93174844b5615d17eee921c36196e0",
+    "public/schemas/planner/domain Tech Stack Compliance Mapping schema.json": "cca973b0ed3751aefea4d8cf22231e69f8019cf524175c555bf65fe89715f836",
+    "public/schemas/planner/gcc-high-g5-cmmc-2-tech-ref-structured.yaml": "3759c7ddce3a4d22ac05004895a1cc0312cf44dc1d16feacdf41618093528488",
+    "public/schemas/planner/primed RR Question Bank.json": "ba498a7c73ec34ddd6d479e7d072949e8b7104a1780e7643d0d5dfc1f35daad5",
+    "public/schemas/planner/primed SI Question Bank.schema.json": "47a1f5d25e875083fb5de03691cedb2981e536d11087f69284cdff06f799386c",
+    "public/templates/policies/access-control-policy.md": "fcc32301ee21aae7f8e95ff0a59d11f5f30ed02bb8561c6f0364a13e5fcce9ae",
+    "public/templates/policies/audit-accountability-policy.md": "e09c9b8c6beb887bcbb09d78903006689ab932f47f34b1ec240d7cde1af78551",
+    "public/templates/policies/awareness-training-policy.md": "cf3afcbd29da3067addb2705f6f1b511218e6fc70237fa21bdf2986fe82e0154",
+    "public/templates/policies/configuration-management-policy.md": "8c99bfe16ced051e7aaab342e075afa6cdefdbabbf3253dd2084f6b7b18746a0",
+    "public/templates/policies/identification-authentication-policy.md": "c92acf7df20a6f95638fa9754093b940b7226f04b44fb123ea49f81251f7591d",
+    "public/templates/policies/incident-response-plan.md": "4d67d2941a75c6e700efa0f1c6b25f33ca16efbcb5768bc4eb8a182e17f1f639",
+    "public/templates/policies/incident-response-policy.md": "8d8d1448bad40b3cf0f561954d76aa55e7226891ad8deecaf65f9da6d5a078b6",
+    "public/templates/policies/maintenance-policy.md": "3833124eabec6b67c96d60b1f1596787d18abaa4ec951a391d868a6aefcd4e02",
+    "public/templates/policies/media-protection-policy.md": "e9202d94ef174342ef2fe25cd7f9500b88e1891e84d65ffb40e6721ca617760d",
+    "public/templates/policies/personnel-screening-policy.md": "7a90df20f107d036abb0657578d531330b668a607fce36738e8ed02a18889c47",
+    "public/templates/policies/personnel-security-policy.md": "354e43982f4253eecfa0a8774d6c41e60ff07f9ac28855a4d2f35ace2d11d066",
+    "public/templates/policies/personnel-termination-policy.md": "7bc04811173d97e4c42c92ec6cd89daaca9dab66b74e0e1d503c9674cbd44357",
+    "public/templates/policies/physical-protection-policy.md": "b418f7b782dd627bc88ff0772fc5c6ef156839a5d1645c20b7a3d236da02802b",
+    "public/templates/policies/poam.md": "9b5c8edec68292cfd78226c3d04458a1723296e11b939b983d0133433aa88dd5",
+    "public/templates/policies/registry.yaml": "f0447aef5ad6b53c5a1fc2fd27093e9ee78bfcb77d187e6db4bf4e38ea6b4489",
+    "public/templates/policies/risk-assessment-policy.md": "38e9dd5401940383aec64f2057214f9fe482c04a6936c253e52bc19c3972decc",
+    "public/templates/policies/risk-assessment-report.md": "1861b86cf2350acc94bcffc67b34cdf0f8fc400547423401f92e4215fcebc793",
+    "public/templates/policies/security-assessment-policy.md": "1d277672888b7dcd0cb3be8a03bfb6a4fc29df6b9630b8d018c806cd522d71b5",
+    "public/templates/policies/system-communications-policy.md": "49ad9dd799a919bf0c61d35183020db23ecddbbea74c3bc32a5c4aa99c33cd05",
+    "public/templates/policies/system-integrity-policy.md": "0a0258d1009b0561c7a4fc83d428672fe13c947305c3e8dcd0d402a0a7b8caab",
+    "public/templates/policies/system-security-plan.md": "3d2483c78e0b9763d45b9dd6c060534da824d9520ef3495562c3c04e4b2e38b2",
+    "src/features/plan/reports/exportPlanShim.ts": "a39e18142758ffc4036d640006688b621d8103e5bc72322d8c89ede1e7506da7"
+  },
+  "provenance": {
+    "src/vendored/ces-spine/services/bulkAnswerDerivation.ts": {
+      "source": "../ces-planner/src/features/rrt/services/bulkAnswerDerivation.ts",
+      "kind": "adapted",
+      "note": "Import paths adjusted (header). DIVERGENCE: two comment lines carry encoding damage from the original copy (arrow and em dash read as mojibake); code identical. Fix by re-copying those two lines; flagged, not fixed in RF-47 (vendored code out of the RF-47 write set)."
+    },
+    "src/vendored/ces-spine/services/postureGenerator.ts": {
+      "source": "../ces-planner/src/features/rrt/services/postureGenerator.ts",
+      "kind": "verbatim"
+    },
+    "src/vendored/ces-spine/types/rrt.ts": {
+      "source": "../ces-planner/src/features/rrt/types.ts",
+      "kind": "verbatim"
+    },
+    "src/vendored/ces-spine/types/domain.ts": {
+      "source": "../ces-planner/src/shared/types/domain.ts",
+      "kind": "verbatim"
+    },
+    "src/vendored/ces-spine/types/artifacts.ts": {
+      "source": "../ces-planner/src/shared/types/artifacts.ts",
+      "kind": "adapted",
+      "note": "PolicyInputsRecord.data typed Record<string, unknown> (policy types not vendored), per header."
+    },
+    "src/vendored/ces-spine/types/customer.ts": {
+      "source": "../ces-planner/src/shared/types/customer.ts",
+      "kind": "verbatim"
+    },
+    "src/vendored/ces-spine/types/techRefIndex.ts": {
+      "source": "../ces-planner/src/shared/services/techRefIndex.ts",
+      "kind": "verbatim"
+    },
+    "src/vendored/ces-spine/utils/idGenerator.ts": {
+      "source": "../ces-planner/src/shared/utils/idGenerator.ts",
+      "kind": "verbatim"
+    },
+    "src/vendored/ces-spine/utils/dateFormatter.ts": {
+      "source": "../ces-planner/src/shared/utils/dateFormatter.ts",
+      "kind": "verbatim"
+    },
+    "src/__fixtures__/builders.ts": {
+      "source": "../ces-planner/src/__fixtures__/builders.ts",
+      "kind": "verbatim"
+    },
+    "public/knowledge/domain CES CMMC Fundamental Requirements Store.yaml": {
+      "source": "../ces-planner/public/data/domain CES CMMC Fundamental Requirements Store.yaml",
+      "kind": "verbatim"
+    },
+    "public/knowledge/domain Assessor Approach Knowledge Base.yaml": {
+      "source": "../ces-planner/public/data/domain Assessor Approach Knowledge Base.yaml",
+      "kind": "verbatim"
+    },
+    "public/knowledge/domain Assessor Evidence Matrix.yaml": {
+      "source": "../ces-planner/public/data/domain Assessor Evidence Matrix.yaml",
+      "kind": "verbatim"
+    },
+    "public/knowledge/domain Capability Taxonomy.yaml": {
+      "source": "../ces-planner/public/data/domain Capability Taxonomy.yaml",
+      "kind": "verbatim"
+    },
+    "public/knowledge/domain Evidence Archetype Catalog.yaml": {
+      "source": "../ces-planner/public/data/domain Evidence Archetype Catalog.yaml",
+      "kind": "verbatim"
+    },
+    "public/knowledge/domain Implementation Patterns.yaml": {
+      "source": "../ces-planner/public/data/domain Implementation Patterns.yaml",
+      "kind": "verbatim"
+    },
+    "public/knowledge/domain Tech Stack Compliance Mapping.yaml": {
+      "source": "../ces-planner/public/data/domain Tech Stack Compliance Mapping.yaml",
+      "kind": "verbatim"
+    },
+    "public/knowledge/primed RR Question Bank.yaml": {
+      "source": "../ces-planner/public/data/primed RR Question Bank.yaml",
+      "kind": "verbatim"
+    },
+    "public/knowledge/CES RRT Readiness Posture.schema.json": {
+      "source": "../ces-planner/public/schemas/CES RRT Readiness Posture.schema.json",
+      "kind": "verbatim"
+    },
+    "public/knowledge/vendor playbook Microsoft 365.yaml": {
+      "source": "../ces-planner/public/data/vendor playbook Microsoft 365.yaml",
+      "kind": "verbatim"
+    },
+    "public/knowledge/CES BTC Activation Package.yaml": {
+      "source": "../ces-planner/public/data/CES BTC Activation Package.yaml",
+      "kind": "verbatim"
+    },
+    "public/knowledge/fedramp-inheritance-table.yaml": {
+      "source": "../ces-planner/public/data/fedramp-inheritance-table.yaml",
+      "kind": "verbatim"
+    },
+    "public/knowledge/gcc-high-g5-cmmc-2-tech-ref-structured.json": {
+      "source": "../ces-planner/public/data/gcc-high-g5-cmmc-2-tech-ref-structured.json",
+      "kind": "verbatim"
+    },
+    "public/knowledge/help BTC Guidance.yaml": {
+      "source": "../ces-planner/public/data/help BTC Guidance.yaml",
+      "kind": "verbatim"
+    },
+    "public/knowledge/help CUI Boundary Guidance.yaml": {
+      "source": "../ces-planner/public/data/help CUI Boundary Guidance.yaml",
+      "kind": "verbatim"
+    },
+    "public/knowledge/help Glossary.yaml": {
+      "source": "../ces-planner/public/data/help Glossary.yaml",
+      "kind": "verbatim"
+    },
+    "public/knowledge/help TCP Guidance.yaml": {
+      "source": "../ces-planner/public/data/help TCP Guidance.yaml",
+      "kind": "verbatim"
+    },
+    "public/knowledge/primed BTC Question Bank.yaml": {
+      "source": "../ces-planner/public/data/primed BTC Question Bank.yaml",
+      "kind": "verbatim"
+    },
+    "public/knowledge/primed CUI Boundary Question Bank.yaml": {
+      "source": "../ces-planner/public/data/primed CUI Boundary Question Bank.yaml",
+      "kind": "verbatim"
+    },
+    "public/knowledge/primed Policy Inputs Question Bank.yaml": {
+      "source": "../ces-planner/public/data/primed Policy Inputs Question Bank.yaml",
+      "kind": "verbatim"
+    },
+    "public/knowledge/primed SI Question Bank.yaml": {
+      "source": "../ces-planner/public/data/primed SI Question Bank.yaml",
+      "kind": "verbatim"
+    },
+    "public/knowledge/primed TCP Question Bank.yaml": {
+      "source": "../ces-planner/public/data/primed TCP Question Bank.yaml",
+      "kind": "verbatim"
+    },
+    "public/schemas/planner/CES CUI Boundary Output Contract.yaml": {
+      "source": "../ces-planner/public/schemas/CES CUI Boundary Output Contract.yaml",
+      "kind": "verbatim"
+    },
+    "public/schemas/planner/CES Infrastructure Manifest.schema.json": {
+      "source": "../ces-planner/public/schemas/CES Infrastructure Manifest.schema.json",
+      "kind": "verbatim"
+    },
+    "public/schemas/planner/CES MPT Manual Mission Plan schema.json": {
+      "source": "../ces-planner/public/schemas/CES MPT Manual Mission Plan schema.json",
+      "kind": "verbatim"
+    },
+    "public/schemas/planner/CES MPT Proposal Schema.json": {
+      "source": "../ces-planner/public/schemas/CES MPT Proposal Schema.json",
+      "kind": "verbatim"
+    },
+    "public/schemas/planner/CES MPT Tech Ref Implementation Guide.schema.json": {
+      "source": "../ces-planner/public/schemas/CES MPT Tech Ref Implementation Guide.schema.json",
+      "kind": "verbatim"
+    },
+    "public/schemas/planner/CES RRT Readiness Posture.schema.json": {
+      "source": "../ces-planner/public/schemas/CES RRT Readiness Posture.schema.json",
+      "kind": "verbatim"
+    },
+    "public/schemas/planner/CES SI Output Contract.yaml": {
+      "source": "../ces-planner/public/schemas/CES SI Output Contract.yaml",
+      "kind": "verbatim"
+    },
+    "public/schemas/planner/CES SIT Scenario-Specific Question Set.schema.json": {
+      "source": "../ces-planner/public/schemas/CES SIT Scenario-Specific Question Set.schema.json",
+      "kind": "verbatim"
+    },
+    "public/schemas/planner/CES SIT Strategic Intent Baseline.schema.json": {
+      "source": "../ces-planner/public/schemas/CES SIT Strategic Intent Baseline.schema.json",
+      "kind": "verbatim"
+    },
+    "public/schemas/planner/CES TCP Tenant Config Profile.schema.json": {
+      "source": "../ces-planner/public/schemas/CES TCP Tenant Config Profile.schema.json",
+      "kind": "verbatim"
+    },
+    "public/schemas/planner/CES Tenant Manifest.schema.json": {
+      "source": "../ces-planner/public/schemas/CES Tenant Manifest.schema.json",
+      "kind": "verbatim"
+    },
+    "public/schemas/planner/domain CES Assessor Approach Knowledge Base.schema.json": {
+      "source": "../ces-planner/public/schemas/domain CES Assessor Approach Knowledge Base.schema.json",
+      "kind": "verbatim"
+    },
+    "public/schemas/planner/domain CES Assessor Evidence Matrix.schema.json": {
+      "source": "../ces-planner/public/schemas/domain CES Assessor Evidence Matrix.schema.json",
+      "kind": "verbatim"
+    },
+    "public/schemas/planner/domain CES CMMC Fundamental Requirements Store.schema.json": {
+      "source": "../ces-planner/public/schemas/domain CES CMMC Fundamental Requirements Store.schema.json",
+      "kind": "verbatim"
+    },
+    "public/schemas/planner/domain CES Capability Taxonomy.schema.json": {
+      "source": "../ces-planner/public/schemas/domain CES Capability Taxonomy.schema.json",
+      "kind": "verbatim"
+    },
+    "public/schemas/planner/domain CES Implementation Patterns.schema.json": {
+      "source": "../ces-planner/public/schemas/domain CES Implementation Patterns.schema.json",
+      "kind": "verbatim"
+    },
+    "public/schemas/planner/domain CES Vendor Playbook.schema.json": {
+      "source": "../ces-planner/public/schemas/domain CES Vendor Playbook.schema.json",
+      "kind": "verbatim"
+    },
+    "public/schemas/planner/domain Tech Stack Compliance Mapping schema.json": {
+      "source": "../ces-planner/public/schemas/domain Tech Stack Compliance Mapping schema.json",
+      "kind": "verbatim"
+    },
+    "public/schemas/planner/gcc-high-g5-cmmc-2-tech-ref-structured.yaml": {
+      "source": "../ces-planner/public/schemas/gcc-high-g5-cmmc-2-tech-ref-structured.yaml",
+      "kind": "verbatim"
+    },
+    "public/schemas/planner/primed RR Question Bank.json": {
+      "source": "../ces-planner/public/schemas/primed RR Question Bank.json",
+      "kind": "verbatim"
+    },
+    "public/schemas/planner/primed SI Question Bank.schema.json": {
+      "source": "../ces-planner/public/schemas/primed SI Question Bank.schema.json",
+      "kind": "verbatim"
+    },
+    "public/templates/policies/access-control-policy.md": {
+      "source": "../ces-planner/public/templates/policies/access-control-policy.md",
+      "kind": "verbatim"
+    },
+    "public/templates/policies/audit-accountability-policy.md": {
+      "source": "../ces-planner/public/templates/policies/audit-accountability-policy.md",
+      "kind": "verbatim"
+    },
+    "public/templates/policies/awareness-training-policy.md": {
+      "source": "../ces-planner/public/templates/policies/awareness-training-policy.md",
+      "kind": "verbatim"
+    },
+    "public/templates/policies/configuration-management-policy.md": {
+      "source": "../ces-planner/public/templates/policies/configuration-management-policy.md",
+      "kind": "verbatim"
+    },
+    "public/templates/policies/identification-authentication-policy.md": {
+      "source": "../ces-planner/public/templates/policies/identification-authentication-policy.md",
+      "kind": "verbatim"
+    },
+    "public/templates/policies/incident-response-plan.md": {
+      "source": "../ces-planner/public/templates/policies/incident-response-plan.md",
+      "kind": "verbatim"
+    },
+    "public/templates/policies/incident-response-policy.md": {
+      "source": "../ces-planner/public/templates/policies/incident-response-policy.md",
+      "kind": "verbatim"
+    },
+    "public/templates/policies/maintenance-policy.md": {
+      "source": "../ces-planner/public/templates/policies/maintenance-policy.md",
+      "kind": "verbatim"
+    },
+    "public/templates/policies/media-protection-policy.md": {
+      "source": "../ces-planner/public/templates/policies/media-protection-policy.md",
+      "kind": "verbatim"
+    },
+    "public/templates/policies/personnel-screening-policy.md": {
+      "source": "../ces-planner/public/templates/policies/personnel-screening-policy.md",
+      "kind": "verbatim"
+    },
+    "public/templates/policies/personnel-security-policy.md": {
+      "source": "../ces-planner/public/templates/policies/personnel-security-policy.md",
+      "kind": "verbatim"
+    },
+    "public/templates/policies/personnel-termination-policy.md": {
+      "source": "../ces-planner/public/templates/policies/personnel-termination-policy.md",
+      "kind": "verbatim"
+    },
+    "public/templates/policies/physical-protection-policy.md": {
+      "source": "../ces-planner/public/templates/policies/physical-protection-policy.md",
+      "kind": "verbatim"
+    },
+    "public/templates/policies/poam.md": {
+      "source": "../ces-planner/public/templates/policies/poam.md",
+      "kind": "verbatim"
+    },
+    "public/templates/policies/registry.yaml": {
+      "source": "../ces-planner/public/templates/policies/registry.yaml",
+      "kind": "verbatim"
+    },
+    "public/templates/policies/risk-assessment-policy.md": {
+      "source": "../ces-planner/public/templates/policies/risk-assessment-policy.md",
+      "kind": "verbatim"
+    },
+    "public/templates/policies/risk-assessment-report.md": {
+      "source": "../ces-planner/public/templates/policies/risk-assessment-report.md",
+      "kind": "verbatim"
+    },
+    "public/templates/policies/security-assessment-policy.md": {
+      "source": "../ces-planner/public/templates/policies/security-assessment-policy.md",
+      "kind": "verbatim"
+    },
+    "public/templates/policies/system-communications-policy.md": {
+      "source": "../ces-planner/public/templates/policies/system-communications-policy.md",
+      "kind": "verbatim"
+    },
+    "public/templates/policies/system-integrity-policy.md": {
+      "source": "../ces-planner/public/templates/policies/system-integrity-policy.md",
+      "kind": "verbatim"
+    },
+    "public/templates/policies/system-security-plan.md": {
+      "source": "../ces-planner/public/templates/policies/system-security-plan.md",
+      "kind": "verbatim"
+    },
+    "src/features/plan/reports/exportPlanShim.ts": {
+      "kind": "shim",
+      "note": "MG-18 (2C): esc and escWithLinks copied verbatim from ../ces-planner/src/shared/utils/exportPlan.ts (the only exportPlan exports exportTechRefPlan uses); the rest of exportPlan.ts is not vendored."
+    }
+  },
+  "note_kb4": "KB-4 (2026-10-30): the gap compiler (src/features/gaps/gapCompiler.ts since DUP-4b) joins practice title, assessment objectives and evidence_minimum from ces-shared references (assessor-approach, assessment-objectives, assessor-evidence-matrix), never from Requirements Store rows; its former provenance notes on gapCompiler.ts and practiceReference.ts left with the pins in DUP-4b."
+}

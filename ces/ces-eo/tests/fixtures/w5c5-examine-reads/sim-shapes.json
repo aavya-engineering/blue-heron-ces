@@ -1,0 +1,69 @@
+{
+  "about": "W5 cycle 5 (SC-3a and the IA.L2-3.5.4 / screen-lock rules): the shapes the tenant simulator serves for S1 (fictional customer s1-mach), trimmed to a few rows each, as EvidenceOps's reads print them ({ value: [...] }). Source: LOG-W5c2-sim.md section 18 (follow-up 10) and the S1 seed code; ids are simulator ids. muster-partial serves the routes empty (or a 404), so its reads are the empty envelopes.",
+  "reads": {
+    "defenderProtectionStates": { "value": [
+      { "managedDeviceId": "device-1", "deviceName": "S1-WS-001", "windowsProtectionState": { "id": "device-1", "managedDeviceId": "device-1", "deviceName": "S1-WS-001", "malwareProtectionEnabled": true, "realTimeProtectionEnabled": true, "networkInspectionSystemEnabled": true, "tamperProtectionEnabled": true, "deviceState": "clean", "quickScanOverdue": false, "fullScanOverdue": false, "signatureUpdateOverdue": false, "productStatus": "noStatus", "engineVersion": "1.1.24090.11", "antiMalwareVersion": "4.18.24090.11", "signatureVersion": "1.421.1206.0", "signatureUpdateDateTime": "2026-10-28T13:12:00.000Z", "lastQuickScanDateTime": "2026-10-28T12:00:00.000Z", "lastFullScanDateTime": "2026-10-24T02:00:00.000Z", "lastReportedDateTime": "2026-10-28T15:23:00.000Z" } },
+      { "managedDeviceId": "device-39", "deviceName": "S1-WS-039", "windowsProtectionState": { "id": "device-39", "managedDeviceId": "device-39", "deviceName": "S1-WS-039", "malwareProtectionEnabled": true, "realTimeProtectionEnabled": true, "networkInspectionSystemEnabled": true, "tamperProtectionEnabled": true, "deviceState": "clean", "quickScanOverdue": true, "fullScanOverdue": true, "signatureUpdateOverdue": true, "productStatus": "asSignaturesOutOfDate", "engineVersion": "1.1.24090.11", "antiMalwareVersion": "4.18.24090.11", "signatureVersion": "1.421.1200.0", "signatureUpdateDateTime": "2026-10-25T05:40:00.000Z", "lastQuickScanDateTime": "2026-10-24T12:00:00.000Z", "lastFullScanDateTime": "2026-10-17T02:00:00.000Z", "lastReportedDateTime": "2026-10-25T09:00:00.000Z" } }
+    ] },
+    "windowsMalwareInformation": { "value": [
+      { "malware": { "id": "51510000-00ba-4000-8000-000000000001", "displayName": "PUA:Win32/SimBundler.FICTIONAL", "additionalInformationUrl": null, "severity": "low", "category": "potentiallyUnwantedSoftware", "lastDetectionDateTime": "2026-08-26T16:00:00.000Z" },
+        "deviceMalwareStates": [ { "id": "51510000-00ba-4000-8000-000000000001|device-6", "malwareId": "51510000-00ba-4000-8000-000000000001", "deviceName": "S1-WS-006", "managedDeviceId": "device-6", "executionState": "notRunning", "threatState": "quarantined", "initialDetectionDateTime": "2026-08-26T16:00:00.000Z", "lastStateChangeDateTime": "2026-08-27T16:00:00.000Z", "detectionCount": 1 } ] }
+    ] },
+    "touAcceptances": { "value": [
+      { "id": "touAgreement-1_user-1", "agreementId": "touAgreement-1", "agreementFileId": "51510000-00bb-4000-8000-000000000001", "userId": "user-1", "userPrincipalName": "user-1@s1-mach.simtenant.onmicrosoft.us", "state": "accepted", "recordedDateTime": "2025-12-02T16:00:00.000Z", "expirationDateTime": "2026-12-02T16:00:00.000Z" },
+      { "id": "touAgreement-1_user-2", "agreementId": "touAgreement-1", "agreementFileId": "51510000-00bb-4000-8000-000000000001", "userId": "user-2", "userPrincipalName": "user-2@s1-mach.simtenant.onmicrosoft.us", "state": "accepted", "recordedDateTime": "2025-12-15T16:00:00.000Z", "expirationDateTime": "2026-12-15T16:00:00.000Z" }
+    ] },
+    "accessReviews": { "value": [
+      { "definition": { "id": "51510000-00bc-4000-8000-000000000001", "displayName": "S1 Quarterly privileged role review", "status": "InProgress", "settings": { "instanceDurationInDays": 14, "autoApplyDecisionsEnabled": true, "justificationRequiredOnApproval": true, "recurrence": { "pattern": { "type": "absoluteMonthly", "interval": 3 } } } },
+        "instances": [ { "instance": { "id": "51510000-00bc-4000-8000-000000000002", "definitionId": "51510000-00bc-4000-8000-000000000001", "status": "Completed", "startDateTime": "2026-09-13T16:00:00.000Z", "endDateTime": "2026-09-27T16:00:00.000Z" },
+          "decisions": [
+            { "id": "51510000-00bc-4000-8000-000000000101", "decision": "Approve", "justification": "Intune Administrator still required for Systems Administrator", "applyResult": "AppliedSuccessfully", "principal": { "id": "user-46" }, "resource": { "id": "3a2c62db-5318-420d-8d74-23affee5d9d5", "displayName": "Intune Administrator", "type": "eligibleRoleAssignment" } },
+            { "id": "51510000-00bc-4000-8000-000000000107", "decision": "Approve", "justification": "Emergency access account, excluded from CA by design; sign-ins monitored", "applyResult": "AppliedSuccessfully", "principal": { "id": "user-50" }, "resource": { "id": "62e90394-69f5-4237-9190-012177145e10", "displayName": "Global Administrator", "type": "activeRoleAssignment" } }
+          ] } ] }
+    ] },
+    "remoteActionAudits": { "value": [
+      { "id": "remoteActionAudit-1", "deviceDisplayName": "S1-WS-RET-01", "action": "factoryReset", "actionState": "done", "requestDateTime": "2026-09-18T16:00:00.000Z", "initiatedByUserPrincipalName": "user-46@s1-mach.simtenant.onmicrosoft.us", "managedDeviceId": "device-ret-1", "deviceOperatingSystem": "Windows" },
+      { "id": "remoteActionAudit-2", "deviceDisplayName": "S1-IOS-RET-01", "action": "retire", "actionState": "done", "requestDateTime": "2026-10-06T16:00:00.000Z", "initiatedByUserPrincipalName": "user-46@s1-mach.simtenant.onmicrosoft.us", "managedDeviceId": "device-ret-2", "deviceOperatingSystem": "iOS" }
+    ] },
+    "intuneWipeAuditEvents": { "value": [
+      { "id": "deviceManagementAuditEvent-8", "activityType": "Wipe ManagedDevice", "activityOperationType": "Action", "category": "Device", "activityDateTime": "2026-09-18T16:00:00.000Z", "resources": [ { "displayName": "S1-WS-RET-01", "type": "ManagedDevice" } ] }
+    ] },
+    "protectionAlerts": [
+      { "Name": "Elevation of Exchange admin privilege", "Category": "AccessGovernance", "Severity": "Low", "Disabled": false, "IsSystemRule": true, "NotifyUser": ["secops@s1-mach.simtenant.onmicrosoft.us"] },
+      { "Name": "S1 Audit logging turned off or changed", "Category": "Others", "Severity": "High", "Disabled": false, "IsSystemRule": false, "Operation": ["Set-AdminAuditLogConfig"], "ThreatType": "Activity", "Filter": "Mailbox.Parameters -like '*UnifiedAuditLogIngestionEnabled*'", "NotifyUser": ["secops@s1-mach.simtenant.onmicrosoft.us"] }
+    ],
+    "configurationPolicies": { "value": [
+      { "id": "configurationPolicy-ntp", "name": "S1 Windows time synchronisation (NTP)", "platforms": "windows10", "technologies": "mdm",
+        "settings": [
+          { "id": "0", "settingInstance": { "@odata.type": "#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance", "settingDefinitionId": "device_vendor_msft_policy_config_admx_w32time_w32time_policy_enable_ntpclient", "choiceSettingValue": { "value": "device_vendor_msft_policy_config_admx_w32time_w32time_policy_enable_ntpclient_1", "children": [] } } },
+          { "id": "1", "settingInstance": { "@odata.type": "#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance", "settingDefinitionId": "device_vendor_msft_policy_config_admx_w32time_w32time_policy_configure_ntpclient", "choiceSettingValue": { "value": "device_vendor_msft_policy_config_admx_w32time_w32time_policy_configure_ntpclient_1", "children": [ { "@odata.type": "#microsoft.graph.deviceManagementConfigurationSimpleSettingInstance", "settingDefinitionId": "device_vendor_msft_policy_config_admx_w32time_w32time_policy_configure_ntpclient_w32time_ntpserver", "simpleSettingValue": { "@odata.type": "#microsoft.graph.deviceManagementConfigurationStringSettingValue", "value": "time.windows.com,0x9" } } ] } } }
+        ],
+        "assignments": [ { "id": "configurationPolicy-ntp_group-1", "target": { "@odata.type": "#microsoft.graph.groupAssignmentTarget", "groupId": "group-1" } } ] }
+    ] },
+    "sitePermissions": { "value": [
+      { "siteId": "s1-mach.sharepoint.us,51510000-00bd-4000-8000-000000000001,51510000-00bd-4000-8000-000000000002", "webUrl": "https://s1-mach.sharepoint.us/sites/cui-enclave", "displayName": "CUI Enclave",
+        "permissions": [ { "id": "51510000-00bd-4000-8000-000000000010", "roles": ["write"], "grantedToIdentitiesV2": [ { "application": { "id": "51510000-00bd-4000-8000-000000000020", "displayName": "S1 Drawing Sync (FICTIONAL)" } } ] } ] }
+    ] }
+  },
+  "conditionalAccess": [
+    { "id": "caPolicy-1", "displayName": "S1-CA01 Require MFA - all users", "state": "enabled", "conditions": { "users": { "includeUsers": ["All"], "excludeUsers": ["user-50", "user-51"] }, "applications": { "includeApplications": ["All"] } }, "grantControls": { "operator": "OR", "builtInControls": ["mfa"] } },
+    { "id": "caPolicy-2", "displayName": "S1-CA02 Phishing-resistant MFA - admin roles", "state": "enabled", "conditions": { "users": { "includeUsers": [], "includeRoles": ["62e90394-69f5-4237-9190-012177145e10", "e8611ab8-c189-46e8-94e1-60213ab1f814", "194ae4cb-b126-40b2-bd5b-6091b380977d", "3a2c62db-5318-420d-8d74-23affee5d9d5", "29232cdf-9323-42fd-ade2-1d097af3e4de"], "excludeUsers": ["user-50", "user-51"] }, "applications": { "includeApplications": ["All"] } }, "grantControls": { "operator": "OR", "builtInControls": [], "authenticationStrength": { "id": "00000000-0000-0000-0000-000000000004", "displayName": "Phishing-resistant MFA" } } }
+  ],
+  "musterPartialConditionalAccess": [
+    { "id": "caPolicy-1", "displayName": "Sim CA Policy 1", "state": "enabled", "conditions": { "users": { "includeUsers": ["All"], "excludeUsers": [] } } },
+    { "id": "caPolicy-2", "displayName": "Sim CA Policy 2", "state": "enabled", "conditions": { "users": { "includeUsers": ["All"], "excludeUsers": [] } } },
+    { "id": "caPolicy-3", "displayName": "Sim CA Policy 3", "state": "enabled", "conditions": { "users": { "includeUsers": ["All"], "excludeUsers": [] } } }
+  ],
+  "musterPartialAfterStamper": { "id": "caPolicy-cmmc-admin-mfa", "displayName": "CMMC-AdminMFA-PhishingResistant", "state": "enabled", "conditions": { "users": { "includeRoles": ["62e90394-69f5-4237-9190-012177145e10", "f28a1f50-f6e7-4571-818b-6a12f2af6b6c"], "excludeUsers": ["user-2"] }, "applications": { "includeApplications": ["All"] }, "clientAppTypes": ["all"] }, "grantControls": { "operator": "AND", "authenticationStrength": { "id": "00000000-0000-0000-0000-000000000004" } } },
+  "authStrength": [
+    { "id": "00000000-0000-0000-0000-000000000004", "displayName": "Phishing-resistant MFA", "policyType": "builtIn", "requirementsSatisfied": "mfa", "allowedCombinations": ["windowsHelloForBusiness", "fido2", "x509CertificateMultiFactor"] },
+    { "id": "authenticationStrengthPolicy", "displayName": "Sim Phishing-Resistant MFA Strength", "policyType": "custom" }
+  ],
+  "compliancePolicies": [
+    { "id": "deviceCompliancePolicy-1", "@odata.type": "#microsoft.graph.windows10CompliancePolicy", "displayName": "S1 Windows 11 staff and kiosk compliance", "passwordRequired": true, "passwordMinimumLength": 14, "passwordMinutesOfInactivityBeforeLock": 15, "assignments": [ { "id": "deviceCompliancePolicy-1_group-1", "target": { "@odata.type": "#microsoft.graph.groupAssignmentTarget", "groupId": "group-1" } } ] }
+  ],
+  "deviceLockCatalogPolicy": { "id": "configurationPolicy-lock", "name": "Device lock (settings catalog)", "platforms": "windows10", "technologies": "mdm",
+    "settings": [ { "id": "0", "settingInstance": { "@odata.type": "#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance", "settingDefinitionId": "device_vendor_msft_policy_config_devicelock_devicepasswordenabled", "choiceSettingValue": { "value": "device_vendor_msft_policy_config_devicelock_devicepasswordenabled_0", "children": [ { "@odata.type": "#microsoft.graph.deviceManagementConfigurationSimpleSettingInstance", "settingDefinitionId": "device_vendor_msft_policy_config_devicelock_maxinactivitytimedevicelock", "simpleSettingValue": { "@odata.type": "#microsoft.graph.deviceManagementConfigurationIntegerSettingValue", "value": 10 } } ] } } } ],
+    "assignments": [ { "id": "configurationPolicy-lock_group-1", "target": { "@odata.type": "#microsoft.graph.groupAssignmentTarget", "groupId": "group-1" } } ] },
+  "stamperScreenLock": { "id": "deviceConfiguration-cmmc-lock", "@odata.type": "#microsoft.graph.windows10GeneralConfiguration", "displayName": "CMMC-ScreenLock-Policy", "passwordRequired": true, "passwordMinutesOfInactivityBeforeScreenTimeout": 10, "assignments": [ { "id": "deviceConfiguration-cmmc-lock_group-1", "target": { "@odata.type": "#microsoft.graph.groupAssignmentTarget", "groupId": "group-1" } } ] }
+}

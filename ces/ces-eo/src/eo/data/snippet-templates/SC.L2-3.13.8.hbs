@@ -1,0 +1,30 @@
+## Control {{controlId}}: Implement Cryptographic Mechanisms to Prevent Unauthorized Disclosure of CUI During Transmission
+
+**Implementation Status:** {{status}}
+
+This organization implements cryptographic protections for CUI during transmission within the {{tenantName}} M365 GCC High tenant through TLS enforcement, Exchange Online transport rules, and encrypted communication channels managed by {{variables.systemAdministrator}}.
+
+{{#if transportConfigured}}
+**Transport Layer Security:**
+Exchange Online transport encryption enforces **{{tlsVersion}}** for all email communications containing CUI. {{#if enforceEncryption}}Encryption is mandatory for all outbound connections.{{/if}} {{#if requireTLS}}TLS is required for partner organization mail flow connectors.{{/if}}
+
+All M365 GCC High services enforce FIPS 140-2 validated cryptographic modules for data in transit:
+- **Exchange Online:** TLS {{tlsVersion}} for SMTP, IMAP, and ActiveSync connections
+- **SharePoint Online / OneDrive:** HTTPS (TLS {{tlsVersion}}) for all file transfers
+- **Teams:** SRTP for media and TLS {{tlsVersion}} for signaling
+{{else}}
+Transport encryption configuration has not been confirmed. CUI in transit may not be cryptographically protected to FIPS 140-2 standards.
+{{/if}}
+
+**Responsible Party:** {{variables.systemAdministrator}}
+
+**Verification Method:** Examine Exchange Online transport rules, TLS configuration settings, mail flow connector encryption requirements, and FIPS 140-2 validation certificates.
+
+{{#if evidenceArtifacts}}
+**Evidence:**
+{{#each evidenceArtifacts}}
+- {{label}}
+{{/each}}
+{{else}}
+**Evidence:** {{evidenceArtifactUrl}}
+{{/if}}

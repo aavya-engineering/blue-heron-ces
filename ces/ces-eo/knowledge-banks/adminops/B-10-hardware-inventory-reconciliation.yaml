@@ -1,0 +1,75 @@
+controlId: "CM.L2-3.4.1"
+relatedControlIds:
+  - "CM.L2-3.4.2"
+  - "AC.L1-3.1.1"  # [VERIFY] mapping not yet confirmed
+practiceStatement: Establish and maintain baseline configurations and inventories of organizational systems throughout the
+  respective system development life cycles.
+useCaseId: B-10
+useCaseTitle: "Hardware Inventory Reconciliation"
+domain: Device & Endpoint Management
+priority: P4 Standard
+trigger: 'SCHEDULE: Monthly reconciliation; ASSESSMENT: Pre-C3PAO assessment inventory validation'
+sodTier: Tier 1 -- Read-Only Audit
+entraRolesRequired:
+- Security Reader
+- Reports Reader (Intune read access via Entra role)
+approvalRequired: true
+services:
+- name: Microsoft Intune
+  purpose: managed device inventory -- serial number, model, manufacturer, assigned user
+- name: Microsoft Graph API
+  purpose: deviceManagement/managedDevices endpoint
+- name: Procurement/asset management system
+  purpose: CSV export of purchased hardware
+- name: Entra ID
+  purpose: device objects registered in the directory
+configurationSteps:
+  portalPath: https://intune.microsoft.us
+  powershellCmdlets:
+  - cmdlet: Connect-MgGraph
+    parameters:
+    - -Environment USGov
+    - -Scopes DeviceManagementManagedDevices.Read.All
+  - cmdlet: Get-MgDeviceManagementManagedDevice
+    parameters:
+    - -MgDeviceManagementManagedDevice
+    - -All
+    - -Property
+    - -Object
+    - -Csv
+  - cmdlet: Get-MgDevice
+    parameters:
+    - -MgDevice
+    - -All
+    - -Property
+    - -Object
+    - -Csv
+  graphApiEndpoint: GET https://graph.microsoft.us/v1.0/deviceManagement/managedDevices?$select=id,deviceName,serialNumber,manufacturer,model,userPrincipalName,enrolledDateTime,operatingSystem,complianceState
+  graphApiPayloadExample: {}
+  requiredPermissions:
+  - DeviceManagementManagedDevices.Read.All
+  - Device.Read.All
+evidenceArtifacts:
+- type: Use Case Execution Evidence
+  retentionPeriod: 7 years
+  storageLocation: evidence-store/domain-b-device/B-10/{year}/{month}/
+  format: 'CSV (reconciliation report with columns: SerialNumber, Source, Status [Matched/Unenrolled/Rogue/Mismatched], Details)'
+  filenamePattern: B-10_InventoryReconciliation_{YYYYMMDD}_{HHmmss}_Summary.csv
+  hashAlgorithm: SHA-256
+gccHighSpecifics:
+  endpoints:
+  - https://portal.azure.us
+  - https://graph.microsoft.us
+  complianceBoundary: FedRAMP High + CMMC L2
+  endpointValidation: All endpoints use .microsoft.us or .usgovcloudapi.net domains
+  notes: Intune managed device inventory and Entra device objects are fully available in GCC High. The Graph API endpoints
+    at `graph.microsoft.us` support the same OData query parameters for filtering and selecting device properties. Procurement
+    record integration is an offline process (CSV export/import) and is not affected by GCC High endpoint differences. For
+    organizations using an asset management system with API integration, ensure the system can target Azure Government endpoints
+    if it synchronizes with Entra ID or Intune.
+relatedPolicies: []
+odpValues: []
+dependencies:
+  hardDependencies: []
+  softDependencies: []
+notes: ''

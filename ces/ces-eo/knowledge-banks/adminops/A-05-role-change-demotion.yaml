@@ -1,0 +1,93 @@
+controlId: "AC.L1-3.1.2"
+relatedControlIds:
+  - "AC.L1-3.1.1"
+  - "PS.L2-3.9.2"
+
+practiceStatement: "Limit system access to the types of transactions and functions that authorized users are permitted to execute."
+
+useCaseId: "A-05"
+useCaseTitle: "Leave of Absence -- Suspend"
+domain: "Identity & Access Management"
+priority: "P4 Standard"
+trigger: "PERSONNEL: Leave of absence (LOA) notification from HR"
+
+sodTier: "Tier 2 -- Config Manager"
+entraRolesRequired:
+  - "User Administrator"
+
+approvalRequired: false
+
+services:
+  - name: "Entra ID"
+    purpose: "Account disable, group membership management"
+  - name: "Microsoft Graph PowerShell"
+    modules:
+      - "Microsoft.Graph.Users"
+      - "Microsoft.Graph.Groups"
+  - name: "Conditional Access"
+    purpose: "LOA group for policy exclusions or additional restrictions"
+
+configurationSteps:
+  portalPath: "https://entra.microsoft.us > Identity > Users > All users > search user > Properties > Edit > Account enabled: toggle to No"
+
+  powershellCmdlets:
+    - cmdlet: "Connect-MgGraph"
+      parameters:
+        - "-Environment USGov"
+        - "-Scopes User.ReadWrite.All,Group.ReadWrite.All"
+    - cmdlet: "Update-MgUser"
+      parameters:
+        - "-UserId"
+        - "-AccountEnabled $false"
+    - cmdlet: "Add-MgGroupMember"
+      parameters:
+        - "-GroupId"
+        - "-DirectoryObjectId"
+    - cmdlet: "Get-MgUserMemberOf"
+      parameters:
+        - "-UserId"
+
+  graphApiEndpoint: "PATCH https://graph.microsoft.us/v1.0/users/{userId}"
+  graphApiPayloadExample:
+    accountEnabled: false
+
+  requiredPermissions:
+    - "User.ReadWrite.All"
+    - "Group.ReadWrite.All"
+
+evidenceArtifacts:
+  - type: "Azure AD Audit Logs"
+    retentionPeriod: "7 years"
+    storageLocation: "evidence-store/domain-a-identity/A-05/{year}/{month}/"
+    query: "Activity: Disable account, Add to LOA group"
+  - type: "Stamper Execution Evidence"
+    hashAlgorithm: "SHA-256"
+    storageLocation: "evidence-store/domain-a-identity/A-05/{year}/{month}/"
+    format: "JSON (account disable confirmation, LOA group addition, preserved membership list)"
+    filenamePattern: "A-05_LOASuspended_{YYYYMMDD}_{HHmmss}_{UPN}.json"
+
+gccHighSpecifics:
+  endpoints:
+    - "https://graph.microsoft.us"
+    - "https://entra.microsoft.us"
+  complianceBoundary: "FedRAMP High + CMMC L2"
+  endpointValidation: "All endpoints use .microsoft.us domains"
+  notes: "Token caching means user may retain access for up to 1 hour after disable; this is acceptable for LOA (non-urgent) scenarios. License retention during LOA has no GCC High-specific implications."
+
+relatedPolicies:
+  - "AC-001 Access Control Policy"
+  - "PS-001 Personnel Security Policy"
+
+odpValues: []
+
+dependencies:
+  hardDependencies:
+    - useCaseId: "A-01"
+      reason: "User must exist in the directory"
+  softDependencies:
+    - useCaseId: "A-07"
+      reason: "MFA policy should be in place to enforce re-registration on return via A-06"
+    - useCaseId: "A-06"
+      reason: "LOA return restores the account"
+
+notes: "Unlike offboarding (A-02), LOA suspension is designed for temporary separation. Licenses remain assigned to avoid re-provisioning delays and preserve mailbox and OneDrive data. Do NOT remove existing groups or license assignments."

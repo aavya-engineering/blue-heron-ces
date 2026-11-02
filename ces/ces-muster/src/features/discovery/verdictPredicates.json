@@ -1,0 +1,668 @@
+{
+  "schema": "muster-verdict-predicates/1",
+  "note": "MG-02: discovery verdict predicates, keyed by Stamper registry entry_id. The executor (muster-api/src/services/discoveryService.ts evaluateVerdict) applies an entry's predicate to the get_command's non-empty output: true -> met, false -> not_met, undecidable -> unknown. An entry with no row here, or a row whose expect is null, yields unknown and never prunes a question (src/features/interview/discoveryFactJoin.ts). Predicates live in Muster beside the registry reading, never in Stamper's registry. Each predicate starts from the entry's own verification.evidence criterion and is upgraded to an expected value where the output carries one. live_validation=true marks predicates whose behaviour on a real tenant is unproven (placeholders, Format-Table text, presence-only criteria); MG-19 proves them on the BHD test tenant. Check kinds: json (dot path, case-insensitive keys; equals | in | not_empty | min_items; match all|any over array roots), table (PowerShell Format-Table column; same operators), regex (match = true; W5c3: with equals | in, the first capture group is the value tested and no match is undecidable), all (every check). W5 row fields: on_empty (\"not_met\": the verdict when the read succeeded and returned nothing; only for an unfiltered read, whose empty list is the tenant's state) and from_entry (judge expect over another entry's output from the same walk; this entry's own read must still succeed). An expect: null row with a W5 basis records why a read that returns output stays undecidable. W5c4: expect { lookup_effect: true } judges the registry entry's own lookup block (source, by_effect) over the block's source list instead of the get_command (muster-api discoveryLookup.ts): met when any object meets every condition, not_met when objects exist and none does, unknown when the list is empty or a condition needs an unresolved variable. W5c5: with from_entry, lookup_effect judges the REFERENCED entry's lookup block over that entry's source read; the block supports op empty and the odata_type field (as Stamper lookup.ts); a Format-Table header that wraps onto several lines is joined per column. W5c6: a lookup block whose condition values name a variable another lookup entry in the walk captures (an Exchange rule on {safeLinksPolicyName} ...) is judged after the walk with the value read off that entry's verdict object; when that entry found no equivalent the rule is recorded awaiting_create (posture unknown) until CES creates the pair. W7-MX1 part 2: on_not_found (\"not_met\", optional) is the verdict when the read FAILED with a not-found signature (404, ResourceNotFound, Request_ResourceNotFound) and the command had no unresolved {variable}: an optional service that is absent (e.g. Sentinel not onboarded) is an honest not met, recorded with status not_found; without the field, or with a placeholder left in the command, a not-found failure stays failed (unknown). A degradation signature (auth, cmdlet missing) is checked first and is never not_found.",
+  "predicates": {
+    "AC.L1-3.1.1.ca-policy-evidence": {
+      "expect": { "table": "State", "equals": "enabled", "match": "any" },
+      "basis": "Registry criterion: non-empty list of enabled Conditional Access policies. At least one enforced CA policy limits access to authorized users.",
+      "live_validation": true,
+      "live_reason": "Presence of any enabled CA policy is a coarse proxy; Format-Table text output."
+    },
+    "AC.L1-3.1.20.cross-tenant-evidence": {
+      "expect": { "table": "B2BCollaborationInbound", "not_empty": true, "match": "any" },
+      "basis": "Registry criterion: $.B2BCollaborationInbound not empty (a configured cross-tenant default restricts external connections).",
+      "live_validation": true,
+      "live_reason": "Nested settings object rendered by Format-Table; a real tenant may render it differently."
+    },
+    "AC.L2-3.1.18.byod-nonbrowser-signins": {
+      "expect": null,
+      "basis": "Registry criterion is empty: the read lists failed non-browser sign-ins, which evidences neither blocking nor allowing. No verdict.",
+      "live_validation": false
+    },
+    "AC.L2-3.1.19.ios-mam": {
+      "expect": { "regex": "displayName.*CMMC-iOS-MAM" },
+      "basis": "Registry criterion: an iOS app protection policy named CMMC-iOS-MAM exists.",
+      "live_validation": true,
+      "live_reason": "Presence of a Stamper-named policy; settings are not checked."
+    },
+    "AC.L2-3.1.2.role-assign": {
+      "expect": { "json": "principalId", "not_empty": true, "match": "any" },
+      "basis": "Registry criterion: the role assignment's principalId equals {operatorUserId}. Without the resolved variable Muster checks that a scoped assignment exists.",
+      "live_validation": true,
+      "live_reason": "Unresolved {operatorUserId}/{roleDefId} placeholders (MG-19); the sim ignores the filter and returns every assignment."
+    },
+    "AC.L2-3.1.20.guest-restrict": {
+      "expect": { "json": "allowInvitesFrom", "equals": "adminsAndGuestInviters" },
+      "basis": "Registry criterion: AllowInvitesFrom = adminsAndGuestInviters (guest invitations restricted).",
+      "live_validation": false
+    },
+    "AC.L2-3.1.3.byod-dlp-policies": {
+      "expect": { "json": "Enabled", "equals": true, "match": "any" },
+      "on_empty": "not_met",
+      "basis": "Registry criterion: at least one enabled DLP compliance policy. Upgraded from not_empty to Enabled = true. W5: the read lists every enabled DLP policy (no name filter), so an empty list is the tenant's state: no enabled DLP policy, a decisive not_met (on_empty).",
+      "live_validation": false
+    },
+    "AC.L2-3.1.3.dlp-policy": {
+      "expect": { "table": "Enabled", "equals": "True", "match": "any" },
+      "basis": "Registry criterion: a CUI/CMMC DLP policy exists. Upgraded to Enabled = True.",
+      "live_validation": true,
+      "live_reason": "Format-Table text output."
+    },
+    "AC.L2-3.1.4.pim-policy-get": {
+      "expect": { "table": "status", "equals": "Provisioned", "match": "any" },
+      "from_entry": "AZ-ID-005",
+      "on_empty": "not_met",
+      "basis": "W5: the role management policy this entry reads exists in every tenant by default, so its own output decides nothing. PIM is in use when a role eligibility schedule is provisioned: judged over AZ-ID-005's read (Get-MgRoleManagementDirectoryRoleEligibilitySchedule -All, no filter). A provisioned schedule -> met; an empty eligibility list -> not_met (no PIM); that read failed or absent -> unknown.",
+      "live_validation": true,
+      "live_reason": "Format-Table text of the eligibility list; this entry's own read must still succeed."
+    },
+    "AC.L2-3.1.8.smart-lockout": {
+      "expect": { "regex": "\"name\":\\s*\"LockoutThreshold\",\\s*\"value\":\\s*\"(\\d+)\"", "in": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"] },
+      "from_entry": "IA.L2-3.5.8.password-policy-evidence",
+      "basis": "W5c3: this entry's own read (the authentication methods policy) carries no lockout setting. The tenant's lockout threshold is in the Password Rule Settings directory setting that IA.L2-3.5.8.password-policy-evidence reads (GET /groupSettings, unfiltered), so the predicate judges that read: LockoutThreshold 1-10 -> met (unsuccessful logon attempts are limited, at or below the Entra smart-lockout default); a larger value -> not_met; the setting absent or that read empty / failed -> unknown (the platform default applies but is not read). Whether the value matches the organisation's own threshold (PI.ODP.001) is EO's reconciliation, not this verdict.",
+      "live_validation": true,
+      "live_reason": "Regex over ConvertTo-Json text of the settings name/value list; a real tenant's formatting and the setting's presence are unproven."
+    },
+    "AC.L2-3.1.9.terms-of-use": {
+      "expect": { "json": "displayName", "equals": "CUI System Access Notice" },
+      "basis": "Registry criterion: the CUI System Access Notice terms of use exists.",
+      "live_validation": false
+    },
+    "AU.L2-3.3.1.audit-enable": {
+      "expect": { "json": "UnifiedAuditLogIngestionEnabled", "equals": true },
+      "basis": "Registry criterion: UnifiedAuditLogIngestionEnabled = True.",
+      "live_validation": false
+    },
+    "AU.L2-3.3.1.org-customization": {
+      "expect": { "regex": "^\\s*false\\s*$", "flags": "i" },
+      "basis": "Registry criterion: IsDehydrated = False (organization customization enabled, a prerequisite for audit configuration).",
+      "live_validation": false
+    },
+    "AU.L2-3.3.2.signin-logs": {
+      "expect": { "table": "userPrincipalName", "not_empty": true, "match": "any" },
+      "basis": "Registry criterion: sign-in log records exist for the last 30 days (user actions traceable to users).",
+      "live_validation": true,
+      "live_reason": "Format-Table text output."
+    },
+    "AU.L2-3.3.5.audit-search": {
+      "expect": null,
+      "basis": "W5, honestly undecidable. Registry criterion is the search Status (Completed|Started|InProgress); the output's Status column is blank, so the criterion can be neither met nor failed, and records alone do not show correlation of review, analysis and reporting. No verdict.",
+      "live_validation": false
+    },
+    "AU.L2-3.3.6.audit-report-evidence": {
+      "expect": null,
+      "basis": "W5, honestly undecidable. Registry criterion is empty: returned audit records show the log is searchable, not that audit reduction and report generation are in place. No verdict.",
+      "live_validation": false
+    },
+    "AU.L2-3.3.7.time-source": {
+      "expect": null,
+      "basis": "W5, honestly undecidable. Registry criterion is the organisation's createdDateTime, which says nothing about an authoritative time source (Microsoft-inherited in the cloud); the output also leaves it blank. No verdict.",
+      "live_validation": false
+    },
+    "AZ-AUTO-003": {
+      "expect": {
+        "all": [
+          { "json": "hasSubScope", "equals": true },
+          { "json": "hasLawScope", "equals": true },
+          { "json": "hasStorageScope", "equals": true },
+          { "json": "hasKvScope", "equals": true }
+        ]
+      },
+      "basis": "The automation identity holds each least-privilege scoped role. The registry criterion ($.Id) does not match this read's output; the expected values are the read's own flags.",
+      "live_validation": true,
+      "live_reason": "Unresolved {automationMiPrincipalId}/{subscriptionId}/... placeholders (MG-19)."
+    },
+    "AZ-BOUNDARY-001": {
+      "expect": { "json": "name", "not_empty": true, "match": "any" },
+      "basis": "Registry criterion: network security groups exist in the boundary resource group.",
+      "live_validation": true,
+      "live_reason": "Unresolved {resourceGroup} placeholder (MG-19); presence only."
+    },
+    "AZ-ID-005": {
+      "expect": { "table": "status", "equals": "Provisioned", "match": "any" },
+      "basis": "W5. Registry criterion: a non-empty PIM role eligibility schedule list (Get-MgRoleManagementDirectoryRoleEligibilitySchedule -All, no filter). Upgraded to at least one schedule with status Provisioned: privileged roles are held as eligible (just-in-time), the least-privilege mechanism the registry entry evidences.",
+      "live_validation": true,
+      "live_reason": "Format-Table text output; eligibility proves PIM is used, not that no standing assignment exists (the harvest's standing Global Administrator verdict decides that)."
+    },
+    "AZ-KV-003": {
+      "expect": { "json": "id", "not_empty": true },
+      "basis": "Registry criterion: the customer-managed key exists ($.Id not empty).",
+      "live_validation": true,
+      "live_reason": "Unresolved {keyVaultName}/{cmkKeyName} placeholders (MG-19); Enabled is not checked."
+    },
+    "AZ-LOG-004": {
+      "expect": null,
+      "basis": "The read returns a REST response wrapper rendered as text; the lock list cannot be read from it. No verdict.",
+      "live_validation": false
+    },
+    "AZ-SUBNET-001": {
+      "expect": { "table": "name", "not_empty": true, "match": "any" },
+      "basis": "Registry criterion: virtual networks exist in the boundary resource group.",
+      "live_validation": true,
+      "live_reason": "Unresolved {resourceGroup} placeholder (MG-19); presence only; Format-Table text."
+    },
+    "CA.L2-3.12.1.compliance-assess": {
+      "expect": { "table": "currentScore", "not_empty": true, "match": "any" },
+      "basis": "Registry criterion: a Secure Score assessment exists (periodic security assessment).",
+      "live_validation": true,
+      "live_reason": "Format-Table text output; presence of a score, not its value."
+    },
+    "CA.L2-3.12.2.poam": {
+      "expect": null,
+      "basis": "W5, honestly undecidable. The read returns Secure Score control profiles, which exist in every tenant; they are not a plan of action. No verdict.",
+      "live_validation": false
+    },
+    "CM.L2-3.4.8.detected-apps": {
+      "expect": null,
+      "basis": "DEPTH-1a (2026-10-30): the read now lists Intune detected apps, an inventory; it shows neither a deny-by-exception nor an allow-by-exception policy. The former predicate judged a Conditional Access list, which never evidenced CM.L2-3.4.8 (a free pass, removed; founder option A). Honestly undecidable until an application-control read exists (depth plan DEPTH-10 CM).",
+      "live_validation": false
+    },
+    "IA.L1-3.5.1.identity-evidence": {
+      "expect": { "table": "id", "not_empty": true, "match": "any" },
+      "basis": "Registry criterion: users carry unique directory identifiers.",
+      "live_validation": true,
+      "live_reason": "Format-Table text output."
+    },
+    "IA.L1-3.5.2.auth-methods-evidence": {
+      "expect": null,
+      "basis": "Registry criterion is presence of the authentication methods policy, which exists in every tenant. No verdict.",
+      "live_validation": false
+    },
+    "IA.L2-3.5.1.user-identify": {
+      "expect": { "table": "userPrincipalName", "not_empty": true, "match": "any" },
+      "basis": "Registry criterion: enabled users are listed by unique UPN.",
+      "live_validation": true,
+      "live_reason": "Format-Table text output."
+    },
+    "IA.L2-3.5.10.cert-auth": {
+      "expect": { "json": "state", "equals": "enabled" },
+      "basis": "Registry criterion: certificate-based authentication state = enabled.",
+      "live_validation": false
+    },
+    "IA.L2-3.5.3.fido2-enable": {
+      "expect": { "json": "state", "equals": "enabled" },
+      "basis": "Registry criterion: FIDO2 authentication method state = enabled.",
+      "live_validation": false
+    },
+    "IA.L2-3.5.3.mfa-authenticator": {
+      "expect": { "json": "state", "equals": "enabled" },
+      "basis": "Registry criterion: Microsoft Authenticator method state = enabled.",
+      "live_validation": false
+    },
+    "IA.L2-3.5.5.disable-inactive": {
+      "expect": {
+        "all": [
+          { "json": "staleNonExcludedEnabledCount", "equals": 0 },
+          { "json": "exclusionsEnabled", "equals": true }
+        ]
+      },
+      "basis": "Registry criterion: no enabled account idle for 90 days, and the operator/break-glass exclusions exist.",
+      "live_validation": true,
+      "live_reason": "Unresolved {operatorUPN}/{breakGlassUPN} placeholders (MG-19)."
+    },
+    "IA.L2-3.5.7.password-protection": {
+      "expect": { "regex": "\"name\":\\s*\"EnableBannedPasswordCheck\",\\s*\"value\":\\s*\"(True)\"", "flags": "i", "in": ["True"] },
+      "from_entry": "IA.L2-3.5.8.password-policy-evidence",
+      "basis": "W5c3: this entry's own read (the authentication methods policy) carries no password-protection setting. Password protection (the banned-password check, a complexity rule beyond the platform's built-in one) is in the Password Rule Settings directory setting that IA.L2-3.5.8.password-policy-evidence reads (GET /groupSettings, unfiltered), so the predicate judges that read: EnableBannedPasswordCheck True -> met. False or absent -> unknown, not not_met: the platform's built-in complexity still applies and is not read.",
+      "live_validation": true,
+      "live_reason": "Regex over ConvertTo-Json text of the settings name/value list; a real tenant's formatting and the setting's presence are unproven."
+    },
+    "IA.L2-3.5.8.password-reuse": {
+      "expect": null,
+      "basis": "Registry criterion is presence of the authentication methods policy, which exists in every tenant. No verdict.",
+      "live_validation": false
+    },
+    "IA.L2-3.5.8.password-policy-evidence": {
+      "expect": null,
+      "basis": "W5c3, honestly undecidable for IA.L2-3.5.8. The read (Password Rule Settings, GET /groupSettings) carries lockout and banned-password values but no password-history depth, so reuse is neither shown prohibited nor shown allowed. No verdict. AC.L2-3.1.8.smart-lockout and IA.L2-3.5.7.password-protection judge this read through from_entry.",
+      "live_validation": false
+    },
+    "IA.L2-3.5.9.tap-config": {
+      "expect": { "all": [{ "json": "state", "equals": "enabled" }, { "json": "isUsableOnce", "equals": true }] },
+      "basis": "Registry criterion: Temporary Access Pass state = enabled and isUsableOnce = true. W5: the state is checked too, so a disabled method (the tenant's state, in the output) is a decisive not_met; enabled without isUsableOnce stays undecidable (unknown).",
+      "live_validation": true,
+      "live_reason": "A tenant can meet 3.5.9 with forced-change temporary passwords instead of TAP; not_met says the registry's mechanism is off and never prunes the question."
+    },
+    "IR.L2-3.6.1.malware-filter": {
+      "expect": { "json": "EnableFileFilter", "equals": true },
+      "basis": "Registry criterion: the default malware filter policy has EnableFileFilter = True.",
+      "live_validation": false
+    },
+    "IR.L2-3.6.3.attack-sim": {
+      "expect": { "table": "title", "not_empty": true, "match": "any" },
+      "basis": "Registry criterion: recent security alerts exist (the incident capability is exercised).",
+      "live_validation": true,
+      "live_reason": "Presence of alerts is a weak proxy for incident-response testing; Format-Table text."
+    },
+    "MP.L2-3.8.1.cui-label": {
+      "expect": { "all": [{ "json": "Name", "equals": "CUI" }, { "json": "EncryptionEnabled", "equals": true }] },
+      "basis": "W5. Registry criterion: the sensitivity label named CUI exists with EncryptionEnabled = True (CUI on digital media is marked and encrypted by the label).",
+      "live_validation": false
+    },
+    "MP.L2-3.8.9.dlp-policy": {
+      "expect": { "json": "DistributionStatus", "equals": "Success" },
+      "basis": "Registry criterion: the CMMC-CUI-Block DLP policy distributed successfully.",
+      "live_validation": false
+    },
+    "PS.L2-3.9.2.account-disable-evidence": {
+      "expect": null,
+      "basis": "W5, honestly undecidable. Registry criterion is empty: recent 'Disable account' audit rows show the disable path is used, not that every personnel action was followed by one. No verdict.",
+      "live_validation": false
+    },
+    "PS.L2-3.9.2.termination": {
+      "expect": null,
+      "basis": "W5, honestly undecidable. The read lists disabled accounts; it cannot tie them to leavers, so it shows neither that every leaver is disabled nor that one is not (S1 seeds a leaver not yet disabled). No verdict.",
+      "live_validation": false
+    },
+    "RA.L2-3.11.1.secure-score": {
+      "expect": { "table": "currentScore", "not_empty": true, "match": "any" },
+      "basis": "Registry criterion: Secure Score risk assessments exist.",
+      "live_validation": true,
+      "live_reason": "Format-Table text output; presence of a score, not its value."
+    },
+    "RA.L2-3.11.2.vuln-scan": {
+      "expect": { "table": "currentScore", "not_empty": true, "match": "any" },
+      "basis": "Registry criterion: a current Secure Score scan exists.",
+      "live_validation": true,
+      "live_reason": "Format-Table text output; presence of a score, not its value."
+    },
+    "SC.L1-3.13.1.conditional-access-boundary": {
+      "expect": { "table": "DisplayName", "not_empty": true, "match": "any" },
+      "basis": "Registry criterion: enabled Conditional Access policies monitor the boundary.",
+      "live_validation": true,
+      "live_reason": "Format-Table text output; presence only."
+    },
+    "SC.L1-3.13.1.nsg-boundary-rules": {
+      "expect": { "json": "SecurityRules", "min_items": 1, "match": "any" },
+      "basis": "Registry criterion: NSG boundary rules exist. Upgraded to at least one NSG carrying security rules.",
+      "live_validation": true,
+      "live_reason": "Resource group is hard-coded to rg-eo-prod; presence of rules, not their content."
+    },
+    "SC.L2-3.13.11.fips": {
+      "expect": null,
+      "basis": "W5, honestly undecidable. Registry criterion is a non-empty tenantType, which every tenant has; it does not evidence FIPS-validated cryptography. No verdict.",
+      "live_validation": false
+    },
+    "SC.L2-3.13.14.teams-external": {
+      "expect": { "json": "EnableFederationAccess", "equals": false },
+      "basis": "Registry criterion: EnableFederationAccess = False (collaborative devices and external access controlled).",
+      "live_validation": false
+    },
+    "SC.L2-3.13.16.byod-sensitivity-labels": {
+      "expect": { "json": "EncryptionEnabled", "equals": true, "match": "any" },
+      "basis": "W5. Registry criterion: at least one sensitivity label with encryption enabled (regex EncryptionEnabled.*True, upgraded to the JSON field, which the read returns as a boolean).",
+      "live_validation": true,
+      "live_reason": "Label encryption protects the content wherever it travels; the registry maps the entry to transmission and at-rest controls."
+    },
+    "SC.L2-3.13.16.data-at-rest": {
+      "expect": { "table": "isEncrypted", "equals": "True", "match": "all" },
+      "basis": "Registry criterion: managed devices are listed. Upgraded to every listed device encrypted.",
+      "live_validation": true,
+      "live_reason": "Format-Table text output."
+    },
+    "SC.L2-3.13.2.session-lock": {
+      "expect": { "json": "value", "min_items": 1 },
+      "basis": "Registry criterion: the CMMC-Screen-Lock-Policy configuration exists (the filtered value list is non-empty).",
+      "live_validation": false
+    },
+    "SI.L1-3.14.1.flaw-remediation-evidence": {
+      "expect": { "json": "secureScoreAvailable", "equals": true },
+      "basis": "Registry criterion: secureScoreAvailable = true.",
+      "live_validation": false
+    },
+    "SI.L1-3.14.4.av-signatures": {
+      "expect": { "regex": "CMMC-Defender-AntivirusPolicy" },
+      "basis": "Registry criterion: the CMMC-Defender-AntivirusPolicy configuration is returned.",
+      "live_validation": true,
+      "live_reason": "Hard-coded configuration id; the sim ignores it and returns other configurations."
+    },
+    "SI.L2-3.14.1.flaw-id": {
+      "expect": { "json": "currentScore", "not_empty": true },
+      "basis": "Registry criterion: $.currentScore not empty (flaws are identified through Secure Score).",
+      "live_validation": false
+    },
+    "SI.L2-3.14.6.email-protection-evidence": {
+      "expect": { "json": "Enabled", "equals": true, "match": "any" },
+      "basis": "Registry criterion: anti-phishing policies exist. Upgraded to at least one enabled policy.",
+      "live_validation": false
+    },
+    "SI.L2-3.14.6.security-alerts": {
+      "expect": { "json": "secureScoreAvailable", "equals": true },
+      "basis": "Registry criterion: $.secureScoreAvailable not empty. Upgraded to = true (security monitoring is producing data).",
+      "live_validation": false
+    },
+    "SI.L2-3.14.6.spam-protection": {
+      "expect": null,
+      "basis": "The Default content filter policy exists in every tenant; the registry criterion is presence only and the expected spam actions are a BHD content decision. No verdict.",
+      "live_validation": false
+    },
+    "SI.L2-3.14.7.security-alerts-evidence": {
+      "expect": { "json": "status", "in": ["resolved", "inProgress"], "match": "any" },
+      "basis": "W5c3 (replaces the W5 null): the read lists the latest security alerts with their status. An alert that has been worked (resolved or inProgress) shows unauthorized use is being identified and acted on -> met; alerts present but none worked (all new) -> not_met. Coverage of the monitoring is not shown; an empty list stays unknown (no alert is not evidence either way).",
+      "live_validation": true,
+      "live_reason": "Alert volume and triage statuses on a real tenant are unproven; the sim seeds the statuses."
+    },
+    "AC.L2-3.1.18.mobile-ca": {
+      "expect": { "json": "state", "equals": "enabled", "match": "all" },
+      "basis": "Registry criterion: the CMMC-MobileDeviceAccess CA policy state = enabled.",
+      "live_validation": true,
+      "live_reason": "Returns empty on the sim; tested against sim-shaped CA policy JSON only."
+    },
+    "AC.L2-3.1.18.byod-nonbrowser-block": {
+      "expect": { "regex": "compliantDevice|domainJoinedDevice|block" },
+      "basis": "Registry criterion: an enabled CA policy for non-browser clients requires a compliant or joined device, or blocks.",
+      "live_validation": true,
+      "live_reason": "Returns empty on the sim; tested against sim-shaped CA policy JSON only."
+    },
+    "SC.L2-3.13.4.remote-access": {
+      "expect": { "json": "State", "equals": "enabled", "match": "any" },
+      "basis": "Registry criterion: remote-access CA policies exist. Upgraded to at least one enforced (state = enabled).",
+      "live_validation": true,
+      "live_reason": "Returns empty on the sim; tested against sim-shaped CA policy JSON only."
+    },
+    "AC.L2-3.1.10.screen-lock": {
+      "expect": { "lookup_effect": true },
+      "basis": "W5c4: the registry entry's equivalence lookup block, judged over its source list (discoveryLookup.ts): met when an object meets every by_effect condition (a password-protected screen lock after 1 to 15 minutes of inactivity (the answered PI.ODP.003 minutes tighten the 15), assigned); not met when objects exist and none does; unknown when the list is empty or a condition needs an unresolved variable.",
+      "live_validation": true,
+      "live_reason": "Judged on simulator-shaped Graph lists only (CA policies, deviceConfigurations with $expand=assignments, authentication strengths); the source read's ConvertTo-Json shape on a real tenant is unproven."
+    },
+    "AC.L2-3.1.11.session-timeout": {
+      "expect": { "lookup_effect": true },
+      "basis": "W5c4: the registry entry's equivalence lookup block, judged over its source list (discoveryLookup.ts): met when an object meets every by_effect condition (an enabled CA policy on all users or the CUI group with sign-in frequency 1 to 8 hours and persistent browser never); not met when objects exist and none does; unknown when the list is empty or a condition needs an unresolved variable.",
+      "live_validation": true,
+      "live_reason": "Judged on simulator-shaped Graph lists only (CA policies, deviceConfigurations with $expand=assignments, authentication strengths); the source read's ConvertTo-Json shape on a real tenant is unproven."
+    },
+    "AC.L2-3.1.14.block-untrusted": {
+      "expect": { "lookup_effect": true },
+      "basis": "W5c4: the registry entry's equivalence lookup block, judged over its source list (discoveryLookup.ts): met when an object meets every by_effect condition (an enabled CA policy on all users or the CUI group, all apps, all locations with an exclusion, granting block); not met when objects exist and none does; unknown when the list is empty or a condition needs an unresolved variable.",
+      "live_validation": true,
+      "live_reason": "Judged on simulator-shaped Graph lists only (CA policies, deviceConfigurations with $expand=assignments, authentication strengths); the source read's ConvertTo-Json shape on a real tenant is unproven."
+    },
+    "AC.L2-3.1.15.admin-mfa": {
+      "expect": { "lookup_effect": true },
+      "basis": "W5c4: the registry entry's equivalence lookup block, judged over its source list (discoveryLookup.ts): met when an object meets every by_effect condition (an enabled CA policy on the Global Administrator role requiring the phishing-resistant authentication strength); not met when objects exist and none does; unknown when the list is empty or a condition needs an unresolved variable.",
+      "live_validation": true,
+      "live_reason": "Judged on simulator-shaped Graph lists only (CA policies, deviceConfigurations with $expand=assignments, authentication strengths); the source read's ConvertTo-Json shape on a real tenant is unproven."
+    },
+    "AC.L2-3.1.16.wifi-profile": {
+      "expect": { "lookup_effect": true },
+      "basis": "W5c4: the registry entry's equivalence lookup block, judged over its source list (discoveryLookup.ts): met when an object meets every by_effect condition (a WPA2/3-Enterprise Wi-Fi profile for the answered SSID (TCP.MU.006), assigned); not met when objects exist and none does; unknown when the list is empty or a condition needs an unresolved variable.",
+      "live_validation": true,
+      "live_reason": "Judged on simulator-shaped Graph lists only (CA policies, deviceConfigurations with $expand=assignments, authentication strengths); the source read's ConvertTo-Json shape on a real tenant is unproven."
+    },
+    "AC.L2-3.1.21.block-storage": {
+      "expect": { "lookup_effect": true },
+      "basis": "W5c4: the registry entry's equivalence lookup block, judged over its source list (discoveryLookup.ts): met when an object meets every by_effect condition (a device configuration blocking removable storage, assigned); not met when objects exist and none does; unknown when the list is empty or a condition needs an unresolved variable.",
+      "live_validation": true,
+      "live_reason": "Judged on simulator-shaped Graph lists only (CA policies, deviceConfigurations with $expand=assignments, authentication strengths); the source read's ConvertTo-Json shape on a real tenant is unproven."
+    },
+    "CM.L2-3.4.7.wdac": {
+      "expect": { "lookup_effect": true },
+      "basis": "W5c4: the registry entry's equivalence lookup block, judged over its source list (discoveryLookup.ts): met when an object meets every by_effect condition (a device configuration enforcing SmartScreen (no prompt override, sites and files) and blocking sideloading, assigned); not met when objects exist and none does; unknown when the list is empty or a condition needs an unresolved variable.",
+      "live_validation": true,
+      "live_reason": "Judged on simulator-shaped Graph lists only (CA policies, deviceConfigurations with $expand=assignments, authentication strengths); the source read's ConvertTo-Json shape on a real tenant is unproven."
+    },
+    "CM.L2-3.4.9.install-control": {
+      "expect": { "lookup_effect": true },
+      "basis": "W5c4: the registry entry's equivalence lookup block, judged over its source list (discoveryLookup.ts): met when an object meets every by_effect condition (a device configuration blocking sideloading and developer unlock, assigned); not met when objects exist and none does; unknown when the list is empty or a condition needs an unresolved variable.",
+      "live_validation": true,
+      "live_reason": "Judged on simulator-shaped Graph lists only (CA policies, deviceConfigurations with $expand=assignments, authentication strengths); the source read's ConvertTo-Json shape on a real tenant is unproven."
+    },
+    "IA.L2-3.5.4.auth-strength": {
+      "expect": { "lookup_effect": true },
+      "basis": "W5c4: the registry entry's equivalence lookup block, judged over its source list (discoveryLookup.ts): met when an object meets every by_effect condition (an authentication strength whose combinations are all phishing-resistant (FIDO2, Windows Hello for Business, certificate MFA)); not met when objects exist and none does; unknown when the list is empty or a condition needs an unresolved variable.",
+      "live_validation": true,
+      "live_reason": "Judged on simulator-shaped Graph lists only (CA policies, deviceConfigurations with $expand=assignments, authentication strengths); the source read's ConvertTo-Json shape on a real tenant is unproven."
+    },
+    "MA.L2-3.7.1.update-ring": {
+      "expect": { "lookup_effect": true },
+      "basis": "W5c4: the registry entry's equivalence lookup block, judged over its source list (discoveryLookup.ts): met when an object meets every by_effect condition (a Windows Update ring at quality deferral 0 and feature deferral 0 to 14 days with an auto-install mode, assigned); not met when objects exist and none does; unknown when the list is empty or a condition needs an unresolved variable.",
+      "live_validation": true,
+      "live_reason": "Judged on simulator-shaped Graph lists only (CA policies, deviceConfigurations with $expand=assignments, authentication strengths); the source read's ConvertTo-Json shape on a real tenant is unproven."
+    },
+    "MA.L2-3.7.5.remote-mfa": {
+      "expect": { "lookup_effect": true },
+      "basis": "W5c4: the registry entry's equivalence lookup block, judged over its source list (discoveryLookup.ts): met when an object meets every by_effect condition (an enabled or report-only CA policy on all users or the Global Administrator role, all apps, requiring MFA or an authentication strength); not met when objects exist and none does; unknown when the list is empty or a condition needs an unresolved variable.",
+      "live_validation": true,
+      "live_reason": "Judged on simulator-shaped Graph lists only (CA policies, deviceConfigurations with $expand=assignments, authentication strengths); the source read's ConvertTo-Json shape on a real tenant is unproven."
+    },
+    "MP.L2-3.8.6.bitlocker": {
+      "expect": { "lookup_effect": true },
+      "basis": "W5c4: the registry entry's equivalence lookup block, judged over its source list (discoveryLookup.ts): met when an object meets every by_effect condition (a BitLocker profile encrypting the device with XTS-AES 128 or 256 on the system drive, assigned); not met when objects exist and none does; unknown when the list is empty or a condition needs an unresolved variable.",
+      "live_validation": true,
+      "live_reason": "Judged on simulator-shaped Graph lists only (CA policies, deviceConfigurations with $expand=assignments, authentication strengths); the source read's ConvertTo-Json shape on a real tenant is unproven."
+    },
+    "RA.L2-3.11.3.vuln-remediation": {
+      "expect": { "lookup_effect": true },
+      "basis": "W5c4: the registry entry's equivalence lookup block, judged over its source list (discoveryLookup.ts): met when an object meets every by_effect condition (the same update ring as MA.L2-3.7.1 (verify-only entry; quality deferral 0, feature 0 to 14 days, auto-install, assigned)); not met when objects exist and none does; unknown when the list is empty or a condition needs an unresolved variable.",
+      "live_validation": true,
+      "live_reason": "Judged on simulator-shaped Graph lists only (CA policies, deviceConfigurations with $expand=assignments, authentication strengths); the source read's ConvertTo-Json shape on a real tenant is unproven."
+    },
+    "SC.L2-3.13.12.camera-block": {
+      "expect": { "lookup_effect": true },
+      "basis": "W5c4: the registry entry's equivalence lookup block, judged over its source list (discoveryLookup.ts): met when an object meets every by_effect condition (a device configuration blocking the camera, assigned); not met when objects exist and none does; unknown when the list is empty or a condition needs an unresolved variable.",
+      "live_validation": true,
+      "live_reason": "Judged on simulator-shaped Graph lists only (CA policies, deviceConfigurations with $expand=assignments, authentication strengths); the source read's ConvertTo-Json shape on a real tenant is unproven."
+    },
+    "SI.L1-3.14.5.scan-schedule-evidence": {
+      "expect": { "lookup_effect": true },
+      "basis": "W5c4: the registry entry's equivalence lookup block, judged over its source list (discoveryLookup.ts): met when an object meets every by_effect condition (a Defender Antivirus configuration with a quick or full scan on a day or every day at a set time, assigned); not met when objects exist and none does; unknown when the list is empty or a condition needs an unresolved variable.",
+      "live_validation": true,
+      "live_reason": "Judged on simulator-shaped Graph lists only (CA policies, deviceConfigurations with $expand=assignments, authentication strengths); the source read's ConvertTo-Json shape on a real tenant is unproven."
+    },
+    "CM.L2-3.4.1.compliance-policy-windows": {
+      "expect": { "lookup_effect": true },
+      "basis": "W5c5: the registry entry's equivalence lookup block, judged over its source list (discoveryLookup.ts): met when a Windows compliance policy (@odata.type windows10CompliancePolicy) requires a password of length >= 14 and history >= 24 (the answered PI.ODP.004 / PI.ODP.005 tighten them), locks within 1 to 15 minutes (held to the registry bound on an existing policy), requires BitLocker, Secure Boot, code integrity, Defender and real-time protection, sets a minimum OS version, and is assigned; not met when policies exist and none does; unknown when the list is empty or a condition needs an unresolved variable.",
+      "live_validation": true,
+      "live_reason": "Judged on simulator-shaped Graph lists only (deviceCompliancePolicies with $expand=assignments); the source read's ConvertTo-Json shape on a real tenant is unproven."
+    },
+    "AC.L2-3.1.17.wireless-profile-evidence": {
+      "expect": {"json":"wifiSecurityType","in":["wpaEnterprise","wpa2Enterprise"],"match":"any"},
+      "from_entry": "AC.L2-3.1.16.wifi-profile",
+      "basis": "W5c5: wireless access is protected by authentication and encryption when a Wi-Fi profile uses an enterprise (802.1X) security type. This entry's own read lists only names and ids, so the verdict is judged on the Wi-Fi lookup's device-configuration list (from_entry AC.L2-3.1.16.wifi-profile). A list whose Wi-Fi profiles are all open or personal (pre-shared key) is not met; no Wi-Fi profile in the list is unknown.",
+      "live_validation": true,
+      "live_reason": "Judged on the simulator's device-configuration list (run 51 S1: S1-MACH-CORP Wi-Fi, wpa2Enterprise); the personal-key judgement is a policy choice to confirm."
+    },
+    "MA.L2-3.7.4.media-check": {
+      "expect": {"json":"defenderScanRemovableDrivesDuringFullScan","equals":true,"match":"any"},
+      "from_entry": "SI.L1-3.14.5.scan-schedule-evidence",
+      "basis": "W5c5: media with diagnostic or test programs is checked for malicious code when the Defender Antivirus configuration scans removable drives. This entry's own read names a compliance policy only (presence), so the verdict is judged on the device-configuration list the scan-schedule lookup reads (from_entry SI.L1-3.14.5.scan-schedule-evidence). The setting false on every configuration that carries it is not met; no configuration carrying it is unknown.",
+      "live_validation": true,
+      "live_reason": "Judged on the simulator's device-configuration list (run 51 S1: S1-Defender-AV scans removable drives)."
+    },
+    "MP.L2-3.8.7.removable-media-intune": {
+      "expect": {"lookup_effect":true},
+      "from_entry": "AC.L2-3.1.21.block-storage",
+      "basis": "W5c5: removable media use is controlled when an assigned Windows device configuration blocks removable storage: the verdict of the AC.L2-3.1.21.block-storage lookup block over its source list (from_entry). This entry's own read filters on a type no Graph object has (*deviceRestriction*, a Stamper registry defect, LOG-W5c2-sim.md §14), so it is never judged on its own output. The same setting decides it in EvidenceOps.",
+      "live_validation": true,
+      "live_reason": "Judged on the simulator's device-configuration list; the registry read stays defective until Stamper fixes its filter."
+    },
+    "MP.L2-3.8.8.unowned-storage-intune": {
+      "expect": {"lookup_effect":true},
+      "from_entry": "AC.L2-3.1.21.block-storage",
+      "basis": "W5c5: portable storage without an identifiable owner is prohibited when an assigned Windows device configuration blocks all removable storage: the verdict of the AC.L2-3.1.21.block-storage lookup block (from_entry). This entry's own read has the same *deviceRestriction* filter defect as MP.L2-3.8.7.removable-media-intune. The same setting decides it in EvidenceOps.",
+      "live_validation": true,
+      "live_reason": "Judged on the simulator's device-configuration list; a tenant that allows owned devices only would need a different read."
+    },
+    "SC.L2-3.13.15.dkim": {
+      "expect": {"json":"Enabled","equals":true,"match":"all"},
+      "basis": "W5c5: registry criterion \"Enabled\": true, upgraded to every listed domain signing with DKIM (match all): mail from the tenant carries a verifiable signature. A domain with signing disabled is not met.",
+      "live_validation": true,
+      "live_reason": "Judged on the simulator's DKIM config (run 51 S1: one domain, Enabled true, Status Valid); a real tenant may also list its default onmicrosoft domain."
+    },
+    "IR.L2-3.6.2.incident-track": {
+      "expect": {"table":"Status","in":["Active","Closed"],"match":"any"},
+      "basis": "W5c5: registry criterion \"incidents exist\", upgraded to incidents being worked: at least one Sentinel incident is Active (in progress) or Closed. Incidents that are all New (untriaged) are not met; no incident is unknown. Same rule as SI.L2-3.14.7 alerts.",
+      "live_validation": true,
+      "live_reason": "Format-Table text; judged on the simulator's two S1 incidents (one Closed, one Active)."
+    },
+    "AC.L1-3.1.2.rbac-evidence": {
+      "expect": null,
+      "basis": "W5c5 honest null: the read lists the directory roles that exist (a platform catalogue), not which transactions users are limited to.",
+      "live_validation": false
+    },
+    "CM.L2-3.4.5.access-restrict": {
+      "expect": null,
+      "basis": "W5c5 honest null: the read lists who holds the change-capable admin roles; whether those restrictions are defined, documented and approved is not in it.",
+      "live_validation": false
+    },
+    "AT.L2-3.2.3.insider-threat": {
+      "expect": null,
+      "basis": "W5c5 honest null: the control is awareness training on insider threat; an enabled insider-risk policy is detection tooling, not training.",
+      "live_validation": false
+    },
+    "CM.L2-3.4.3.change-tracking": {
+      "expect": null,
+      "basis": "W5c5 honest null: Intune audit events show that changes are logged; that changes are reviewed and approved or disapproved is not in the read.",
+      "live_validation": false
+    },
+    "SI.L2-3.14.3.advisory-evidence": {
+      "expect": null,
+      "basis": "W5c5 honest null: message-center advisories reach every tenant; the read does not show they are monitored or acted on.",
+      "live_validation": false
+    },
+    "MP.L2-3.8.5.media-access": {
+      "expect": null,
+      "basis": "W5c5 honest null: a removable-storage block found by name does not evidence accountability for media in transport outside controlled areas.",
+      "live_validation": false
+    },
+    "AZ-LOG-001": {
+      "expect": null,
+      "basis": "W5c5 honest null: the workspace read carries retention (365 days on S1), which evidences AU.L2-3.3.1 only, but the infrastructure entry lists AU.L2-3.3.1, AU.L2-3.3.2 and AU.L2-3.3.3, and one verdict lands on all three (a Stamper attribution item). The registry criterion ProvisioningState is not in the simulator output.",
+      "live_validation": false
+    },
+    "SI.L2-3.14.2.anti-malware": {
+      "expect": {"lookup_effect":true},
+      "basis": "W5c6: the registry policy entry's lookup block over its list read: met when a policy that is not a built-in default (IsDefault never counts) has the file filter on with Reject or Quarantine; not met when policies exist and none does (only built-ins, as on a fresh tenant); unknown when the list is empty. A met policy's Name is captured for its rule entry in the same walk.",
+      "live_validation": true,
+      "live_reason": "Judged on simulator-shaped lists only (LOG-W5c2-sim.md §14 / §19); the source read's ConvertTo-Json shape on a real tenant is unproven."
+    },
+    "SI.L2-3.14.2.malware-rule": {
+      "expect": {"lookup_effect":true},
+      "basis": "W5c6: the registry rule entry's lookup block over its list read: met when an enabled rule targets the policy SI.L2-3.14.2.anti-malware found in this walk (MalwareFilterPolicy = the captured name) and scopes the primary domain; not met when rules exist and none does. When SI.L2-3.14.2.anti-malware found no equivalent, CES will create both, so the rule is recorded awaiting_create (posture unknown) and its control is decided by the policy's not met.",
+      "live_validation": true,
+      "live_reason": "Judged on simulator-shaped lists only (LOG-W5c2-sim.md §14 / §19); the source read's ConvertTo-Json shape on a real tenant is unproven."
+    },
+    "SI.L2-3.14.3.safe-links": {
+      "expect": {"lookup_effect":true},
+      "basis": "W5c6: the registry policy entry's lookup block over its list read: met when a policy that is not a built-in default (IsDefault never counts) has Safe Links for email, URL scanning and internal senders on; not met when policies exist and none does (only built-ins, as on a fresh tenant); unknown when the list is empty. A met policy's Name is captured for its rule entry in the same walk.",
+      "live_validation": true,
+      "live_reason": "Judged on simulator-shaped lists only (LOG-W5c2-sim.md §14 / §19); the source read's ConvertTo-Json shape on a real tenant is unproven."
+    },
+    "SI.L2-3.14.3.safe-links-rule": {
+      "expect": {"lookup_effect":true},
+      "basis": "W5c6: the registry rule entry's lookup block over its list read: met when an enabled rule targets the policy SI.L2-3.14.3.safe-links found in this walk (SafeLinksPolicy = the captured name) and scopes the primary domain; not met when rules exist and none does. When SI.L2-3.14.3.safe-links found no equivalent, CES will create both, so the rule is recorded awaiting_create (posture unknown) and its control is decided by the policy's not met.",
+      "live_validation": true,
+      "live_reason": "Judged on simulator-shaped lists only (LOG-W5c2-sim.md §14 / §19); the source read's ConvertTo-Json shape on a real tenant is unproven."
+    },
+    "SC.L2-3.13.13.safe-attach": {
+      "expect": {"lookup_effect":true},
+      "basis": "W5c6: the registry policy entry's lookup block over its list read: met when a policy that is not a built-in default (IsDefault never counts) has Safe Attachments enabled with Block or DynamicDelivery; not met when policies exist and none does (only built-ins, as on a fresh tenant); unknown when the list is empty. A met policy's Name is captured for its rule entry in the same walk.",
+      "live_validation": true,
+      "live_reason": "Judged on simulator-shaped lists only (LOG-W5c2-sim.md §14 / §19); the source read's ConvertTo-Json shape on a real tenant is unproven."
+    },
+    "SC.L2-3.13.13.safe-attach-rule": {
+      "expect": {"lookup_effect":true},
+      "basis": "W5c6: the registry rule entry's lookup block over its list read: met when an enabled rule targets the policy SC.L2-3.13.13.safe-attach found in this walk (SafeAttachmentPolicy = the captured name) and scopes the primary domain; not met when rules exist and none does. When SC.L2-3.13.13.safe-attach found no equivalent, CES will create both, so the rule is recorded awaiting_create (posture unknown) and its control is decided by the policy's not met.",
+      "live_validation": true,
+      "live_reason": "Judged on simulator-shaped lists only (LOG-W5c2-sim.md §14 / §19); the source read's ConvertTo-Json shape on a real tenant is unproven."
+    },
+    "SC.L2-3.13.15.anti-phish": {
+      "expect": {"lookup_effect":true},
+      "basis": "W5c6: the registry policy entry's lookup block over its list read: met when a policy that is not a built-in default (IsDefault never counts) has spoof and mailbox intelligence on and authentication failures quarantined; not met when policies exist and none does (only built-ins, as on a fresh tenant); unknown when the list is empty. A met policy's Name is captured for its rule entry in the same walk.",
+      "live_validation": true,
+      "live_reason": "Judged on simulator-shaped lists only (LOG-W5c2-sim.md §14 / §19); the source read's ConvertTo-Json shape on a real tenant is unproven."
+    },
+    "SC.L2-3.13.15.anti-phish-rule": {
+      "expect": {"lookup_effect":true},
+      "basis": "W5c6: the registry rule entry's lookup block over its list read: met when an enabled rule targets the policy SC.L2-3.13.15.anti-phish found in this walk (AntiPhishPolicy = the captured name) and scopes the primary domain; not met when rules exist and none does. When SC.L2-3.13.15.anti-phish found no equivalent, CES will create both, so the rule is recorded awaiting_create (posture unknown) and its control is decided by the policy's not met.",
+      "live_validation": true,
+      "live_reason": "Judged on simulator-shaped lists only (LOG-W5c2-sim.md §14 / §19); the source read's ConvertTo-Json shape on a real tenant is unproven."
+    },
+    "SC.L2-3.13.15.anti-spam": {
+      "expect": {"lookup_effect":true},
+      "basis": "W5c6: the registry policy entry's lookup block over its list read: met when a policy that is not a built-in default (IsDefault never counts) has spam to junk or quarantine, high-confidence spam and phish quarantined, bulk threshold 1 to 6; not met when policies exist and none does (only built-ins, as on a fresh tenant); unknown when the list is empty. A met policy's Name is captured for its rule entry in the same walk.",
+      "live_validation": true,
+      "live_reason": "Judged on simulator-shaped lists only (LOG-W5c2-sim.md §14 / §19); the source read's ConvertTo-Json shape on a real tenant is unproven."
+    },
+    "SC.L2-3.13.15.anti-spam-rule": {
+      "expect": {"lookup_effect":true},
+      "basis": "W5c6: the registry rule entry's lookup block over its list read: met when an enabled rule targets the policy SC.L2-3.13.15.anti-spam found in this walk (HostedContentFilterPolicy = the captured name) and scopes the primary domain; not met when rules exist and none does. When SC.L2-3.13.15.anti-spam found no equivalent, CES will create both, so the rule is recorded awaiting_create (posture unknown) and its control is decided by the policy's not met.",
+      "live_validation": true,
+      "live_reason": "Judged on simulator-shaped lists only (LOG-W5c2-sim.md §14 / §19); the source read's ConvertTo-Json shape on a real tenant is unproven."
+    },
+    "SC.L2-3.13.15.outbound-spam": {
+      "expect": {"lookup_effect":true},
+      "basis": "W5c6: the registry policy entry's lookup block over its list read: met when a policy that is not a built-in default (IsDefault never counts) has senders over the limit blocked and at most 500 external recipients an hour; not met when policies exist and none does (only built-ins, as on a fresh tenant); unknown when the list is empty. A met policy's Name is captured for its rule entry in the same walk.",
+      "live_validation": true,
+      "live_reason": "Judged on simulator-shaped lists only (LOG-W5c2-sim.md §14 / §19); the source read's ConvertTo-Json shape on a real tenant is unproven."
+    },
+    "SC.L2-3.13.15.outbound-spam-rule": {
+      "expect": {"lookup_effect":true},
+      "basis": "W5c6: the registry rule entry's lookup block over its list read: met when an enabled rule targets the policy SC.L2-3.13.15.outbound-spam found in this walk (HostedOutboundSpamFilterPolicy = the captured name) and scopes senders in the primary domain (SenderDomainIs); not met when rules exist and none does. When SC.L2-3.13.15.outbound-spam found no equivalent, CES will create both, so the rule is recorded awaiting_create (posture unknown) and its control is decided by the policy's not met.",
+      "live_validation": true,
+      "live_reason": "Judged on simulator-shaped lists only (LOG-W5c2-sim.md §14 / §19); the source read's ConvertTo-Json shape on a real tenant is unproven."
+    },
+    "AC.L2-3.1.6.admin-account": {
+      "expect": {"lookup_effect":true},
+      "basis": "W5c6: the registry entry's lookup block over its projected users read (EO's dedicated-admin rule): met when an enabled account holds a privileged role (standing or PIM-eligible), has no licence and is not a break-glass account (excluded by the enabled all-users CA policies); not met when users exist and none qualifies (every privileged account is licensed or break-glass); unknown when the read is empty. Replaces the W3 Admin-* name check, which could never see a customer's own convention (S1: adm.*).",
+      "live_validation": true,
+      "live_reason": "Judged on the simulator's role, eligibility, CA and users reads; the naming-convention alternative EO also accepts is not in the block yet (LOG-W5c5-stamper.md §2.1)."
+    },
+    "SC.L2-3.13.10.key-vault": {
+      "expect": {"lookup_effect":true},
+      "basis": "W5c6: the registry entry's lookup block over its projected vault list in the enclave resource group ({resourceGroup}, resolved by the walk): met when a vault has purge protection, soft delete, retention of at least 7 days, and every enclave managed identity holds Key Vault Crypto Service Encryption User on it; not met when vaults exist and none does; unknown when the group lists no vault.",
+      "live_validation": true,
+      "live_reason": "Judged on the simulator's Az facade (S1 kv-s1-mach-prod with its three VM identities assigned, LOG-W5c2-sim.md §19)."
+    },
+    "AZ-MON-001": {
+      "expect": {"lookup_effect":true},
+      "basis": "W5c6: the infrastructure entry's lookup block over every action group in the subscription: met when an enabled group mails the CISO address ({cisoEmail}); not met when groups exist and none is enabled. {cisoEmail} is the answered security mailbox (TCP.MU.007, from the answers file at E2; the plan emits it as the TM operator value cisoEmail, W5c6). Without the answers at E2 the address condition stays undecidable: an enabled group is unknown, never met.",
+      "live_validation": true,
+      "live_reason": "The simulator serves no Get-AzActionGroup yet (LOG-W5c6-muster.md follow-up); judged on test shapes only."
+    },
+    "AC.L1-3.1.1.ca-mfa-compliant-device": {
+      "expect": {"lookup_effect":true},
+      "basis": "W5c7: the registry entry's lookup block over the CA policy list: met when an enabled policy covers all users or the CUI group ({cuiGroupId}), all cloud apps, browser and modern clients (or all), no platform, location or risk narrowing, and grants MFA AND a compliant device; not met when policies exist and none does (on S1, S1-CA08 grants both but only for the admin portals, and S1-CA05 grants a compliant device alone); unknown when the list is empty.",
+      "live_validation": true,
+      "live_reason": "Judged on simulator-shaped CA lists; stricter than EO's caEnforcementEvaluator on scope (LOG-W5c7-stamper.md §1), so EO may count a policy discovery does not."
+    },
+    "AU.L2-3.3.7.time-sync": {
+      "expect": {"lookup_effect":true},
+      "basis": "W5c7: the registry entry's lookup block over the projected settings-catalog policies: met when an assigned Windows policy enables the W32Time NTP client, configures it as type NTP with a server and a poll of at most an hour, and, when the organisation answered PI.ODP.016, names those servers (hosts compared, ,0xN flags ignored); not met when policies exist and none does; unknown when the list is empty.",
+      "live_validation": true,
+      "live_reason": "Judged on the simulator's S1 NTP seed; the W32Time setting-definition ids are not live-verified (LOG-W5c7-stamper.md §2.1)."
+    },
+    "AC.L2-3.1.5.pim-eligible": {
+      "expect": { "json": "Status", "equals": "Provisioned", "match": "any" },
+      "basis": "W7-MX1: registry criterion $.PrincipalId = {operatorUserId} and $.Status = Provisioned. The read is filtered to the operator and Global Administrator ({operatorUserId}, {roleDefId}), so a Provisioned eligibility shows the management role is held just in time, apart from the operator's user functions (SC.L2-3.13.3; the entry also lists AC.L2-3.1.5 and AC.L2-3.1.7): met. Eligibilities none of which is Provisioned: not met. Empty (a filtered read): unknown.",
+      "live_validation": true,
+      "live_reason": "Judged on the simulator's S1/S2 operator eligibility (LOG-W7-SIM.md, roleEligibilitySchedule-7); an unresolved {operatorUserId} leaves the read empty (unknown)."
+    },
+    "AU.L2-3.3.3.sentinel-connector": {
+      "expect": { "all": [ { "json": "properties.dataTypes.exchange.state", "equals": "enabled" }, { "json": "properties.dataTypes.sharePoint.state", "equals": "enabled" }, { "json": "properties.dataTypes.teams.state", "equals": "enabled" } ] },
+      "basis": "W7-MX1: registry criterion (state verification): the Sentinel Office 365 connector has Exchange, SharePoint and Teams all enabled, so those audit events are collected for review: met. Any of the three disabled: not met. W7-MX1 part 2 (on_not_found): a 404 on the fully resolved connector URL means Sentinel is not onboarded on that workspace, so no Office 365 events are collected for review: not met. Any other failed read (workspace variables unresolved, a 400, auth) stays unknown.",
+      "on_not_found": "not_met",
+      "live_validation": true,
+      "live_reason": "az rest JSON on the simulator's S1 connector (LOG-W7-SIM.md); needs {subscriptionId}, {resourceGroup} and {lawWorkspaceName} from the one-workspace read; S2 (no Sentinel) answers the 404 (LOG-W7-SIM.md)."
+    },
+    "AU.L2-3.3.6.audit-reduction": {
+      "expect": { "all": [ { "json": "Status", "equals": "Completed", "match": "any" }, { "json": "Name", "regex": "[Aa][Uu][Dd][Ii][Tt]", "match": "any" } ] },
+      "basis": "W7-MX1: registry criterion: an audit-reduction compliance search exists (CMMC-AuditReduction-*). Upgraded to a completed search whose name says audit (CES's own, or the customer's equivalent): met. Searches that are not completed, or none about audit: not met. Empty: unknown.",
+      "live_validation": true,
+      "live_reason": "A real Get-ComplianceSearch -Identity miss errors (unknown); the simulator falls back to the whole collection, so the customer's own search is judged (LOG-W7-SIM.md open item 4)."
+    },
+    "IA.L2-3.5.11.branding": {
+      "expect": { "regex": "^\\s*\"?(id)\"?\\s*:\\s*\\S", "flags": "im", "equals": "id" },
+      "basis": "W7-MX1: registry criterion $.Id not empty; the entry is a platform control (the Entra sign-in page masks the password as it is typed). A returned branding object (Format-List 'Id : ...' or JSON \"id\") shows the tenant signs in through that page: met. No id in the output: unknown, never not met (a tenant without custom branding uses the same masked page).",
+      "live_validation": true,
+      "live_reason": "No ConvertTo-Json in the get, so the output is PowerShell's list format; judged on the simulator's S1/S2 branding. Reads only since the W7-MX1 degraded fix (the banner's 'Unauthorized' had marked it degraded)."
+    },
+    "PS.L2-3.9.2.leaver-workflow": {
+      "expect": {"lookup_effect":true},
+      "basis": "W7-MX1 part 2: the registry entry's lookup block (W7-ST) over its source read, which always emits one inventory object of every lifecycle workflow: met when qualifyingLeaverWorkflowCount >= 1 (an enabled leaver workflow with scheduling enabled and a disable- or delete-account task, so access ends with the personnel action); not met when the count is 0 (no workflows, or a leaver that is on demand, disabled or without that task); a failed read stays unknown.",
+      "live_validation": true,
+      "live_reason": "The inventory projection has never run on a tenant (LOG-W7-ST.md open item 2); judged on simulator-shaped S1/S2 inventories (leaver on demand before A-21: not met)."
+    }
+  }
+}

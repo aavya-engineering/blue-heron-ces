@@ -1,0 +1,1556 @@
+{
+  "family": "SC",
+  "family_name": "Systems and Communications Protection",
+  "practices": [
+    {
+      "id": "SC.L1-3.13.1",
+      "title": "Monitor, control and protect organizational communications (e.g., information transmitted or received by organizational information systems) at the external boundaries and key internal boundaries of the information systems.",
+      "approach": {
+        "what_assessor_does": "The assessor starts with the boundary description and network diagram in the SSP. They expect to see the external boundary (where the system meets the internet and outside cloud services) and the key internal boundaries (for example the CUI enclave subnet, the management subnet, guest or lab networks). For each boundary they ask three questions: what watches the traffic, what decides which traffic is allowed, and what protects the traffic that crosses it. They examine firewall and network security group rules, Conditional Access policies and log settings, interview the network or cloud administrator, and test by reading a recent sample of boundary logs and checking that a blocked connection really is blocked and recorded.",
+        "common_failure_modes": [
+          "Only the internet edge is described; no internal boundary is named, so the CUI systems sit on a flat network.",
+          "The diagram does not match the tenant: subnets, network security groups or public IPs exist that the diagram leaves out.",
+          "Traffic is logged at the boundary but nobody reviews the logs or acts on what they show.",
+          "Allow-any rules or broad inbound rules remain in place with no recorded reason.",
+          "Cloud services that hold CUI (mail, file sharing, Teams) are left out of the boundary picture.",
+          "Flow logging is on at the edge but not on the internal subnets the SSP calls key boundaries."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "SC.L1-3.13.1[a]",
+          "determination": "the external system boundary is defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "SSP authorization boundary section",
+              "ces_source": "eo_store",
+              "notes": "EO builds the SSP authorization boundary from the Tenant Manifest: the CUI-boundary questionnaire answers Muster writes to boundary_zones become boundary facts, and zones come from the manifest assets and the Infrastructure Manifest network (ces-eo src/eo/ssp/TmBoundary.ts). The assessor compares this boundary with the diagram and with what exists in the tenant."
+            },
+            {
+              "artifact_type": "Network and data-flow diagram showing the external boundary",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Should show every entry and exit point, including cloud services that store or carry CUI."
+            },
+            {
+              "artifact_type": "Network security group and resource firewall inventory",
+              "ces_source": "ao_row",
+              "notes": "AdminOps F-06 Resource Firewall/NSG Audit: lists NSG rules and Storage, Key Vault and SQL firewalls; registered against SC.L1-3.13.1 with [a] among its evidence objectives. Reconcile every internet-facing rule with the diagram."
+            },
+            {
+              "artifact_type": "System and communications protection policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-communications-policy.md (GateEvidence family SC). Should say what the organization treats as its external boundary and who owns it."
+            },
+            {
+              "artifact_type": "Network or cloud administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask where traffic enters and leaves the system and which outside services are inside the boundary."
+            }
+          ]
+        },
+        {
+          "id": "SC.L1-3.13.1[b]",
+          "determination": "key internal system boundaries are defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "SSP boundary zones for internal segments",
+              "ces_source": "eo_store",
+              "notes": "EO builds the SSP authorization boundary from the Tenant Manifest: the CUI-boundary questionnaire answers Muster writes to boundary_zones become boundary facts, and zones come from the manifest assets and the Infrastructure Manifest network (ces-eo src/eo/ssp/TmBoundary.ts). The zones should name the internal segments the organization treats as key boundaries."
+            },
+            {
+              "artifact_type": "Network diagram showing internal segments",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Should mark the CUI enclave, the management network and any guest or lab network, and the points where they meet."
+            },
+            {
+              "artifact_type": "Collected network security group rules",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry SC.L1-3.13.1.nsg-boundary-rules (evidence-only, az): collects NSG rules for human review. Each subnet with its own NSG should map to an internal boundary on the diagram."
+            },
+            {
+              "artifact_type": "Network or cloud administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask which internal segments are kept apart, why those were chosen, and how a new subnet gets added to the picture."
+            }
+          ]
+        },
+        {
+          "id": "SC.L1-3.13.1[c]",
+          "determination": "communications are monitored at the external system boundary",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Flow logging and analytics configuration",
+              "ces_source": "ao_row",
+              "notes": "AdminOps F-14 VNet Flow Logs + Sentinel Flow Analytics: enables VNet flow logs with Traffic Analytics into Log Analytics and a Sentinel scheduled rule for denied or unusual flows; registered against SC.L1-3.13.1 with [c] among its evidence objectives."
+            },
+            {
+              "artifact_type": "Boundary log review records",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: dated review notes, Sentinel incidents or tickets that show someone looked at boundary traffic and acted on it."
+            },
+            {
+              "artifact_type": "System and communications protection policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-communications-policy.md (GateEvidence family SC). Should say which boundary traffic is logged, how long logs are kept and how often they are reviewed."
+            },
+            {
+              "artifact_type": "Security operations interview",
+              "ces_source": "interview",
+              "notes": "Ask who reviews external boundary logs, how often, and what the last finding was. The assessor then asks to see that record."
+            }
+          ]
+        },
+        {
+          "id": "SC.L1-3.13.1[d]",
+          "determination": "communications are monitored at key internal boundaries",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Flow logging on internal subnets",
+              "ces_source": "ao_row",
+              "notes": "AdminOps F-14 VNet Flow Logs + Sentinel Flow Analytics; registered against SC.L1-3.13.1 with [d] among its evidence objectives. Check that the internal subnets named as key boundaries are covered, not only the edge."
+            },
+            {
+              "artifact_type": "Internal traffic review records",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: alerts, queries or review notes for traffic between internal segments."
+            },
+            {
+              "artifact_type": "Security operations interview",
+              "ces_source": "interview",
+              "notes": "Ask how traffic between the CUI enclave and other internal segments is watched and who is told when something unusual crosses it."
+            }
+          ]
+        },
+        {
+          "id": "SC.L1-3.13.1[e]",
+          "determination": "communications are controlled at the external system boundary",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Host firewall policy test",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry SC.L1-3.13.1 (boundaryProtectionL1Evaluator): settings-catalog read of /deviceManagement/configurationPolicies (legacy /deviceManagement/deviceConfigurations as fallback). Met only when a policy turns the host firewall on and sets the default inbound action to block on the domain, private and public profiles, the settings Stamper entry SC.L1-3.13.1.endpoint-firewall deploys. The Conditional Access read in the same registry entry does not decide the result."
+            },
+            {
+              "artifact_type": "Deployed firewall policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry SC.L1-3.13.1.endpoint-firewall (set): deploys CMMC-Firewall-Policy through the Intune settings catalog with the firewall on and inbound blocked by default on all three profiles."
+            },
+            {
+              "artifact_type": "Network security group and resource firewall audit",
+              "ces_source": "ao_row",
+              "notes": "AdminOps F-06 Resource Firewall/NSG Audit; registered against SC.L1-3.13.1 with [e] among its evidence objectives. Look for deny-by-default and for any rule open to the whole internet."
+            },
+            {
+              "artifact_type": "Subnet deny-by-default baseline",
+              "ces_source": "ao_row",
+              "notes": "AdminOps F-13 Enclave Subnet Deny-by-Default Baseline: gives every non-platform subnet an NSG with explicit Deny-All in and out, a route table that drops 0.0.0.0/0, and NSG evaluation on private endpoints; evidence objectives include [e]."
+            },
+            {
+              "artifact_type": "Azure Firewall maintenance records",
+              "ces_source": "ao_row",
+              "notes": "AdminOps F-11 Azure Firewall Deallocate and F-12 Azure Firewall Allocate, both with [e] among their evidence objectives. Egress filtering stops while the firewall is deallocated, so the assessor checks each pair falls inside an approved maintenance window."
+            },
+            {
+              "artifact_type": "Network or cloud administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask who can change boundary rules, how a change is approved, and walk through one recent change."
+            }
+          ]
+        },
+        {
+          "id": "SC.L1-3.13.1[f]",
+          "determination": "communications are controlled at key internal boundaries",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Internal subnet rule sets",
+              "ces_source": "ao_row",
+              "notes": "AdminOps F-13 Enclave Subnet Deny-by-Default Baseline (Allow-VNet in and out at priority 4000, Deny-All at 4096); evidence objectives include [f]. Compare the rules with the internal boundaries the SSP names."
+            },
+            {
+              "artifact_type": "Network security group and resource firewall audit",
+              "ces_source": "ao_row",
+              "notes": "AdminOps F-06 Resource Firewall/NSG Audit; evidence objectives include [f]."
+            },
+            {
+              "artifact_type": "Collected network security group rules",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry SC.L1-3.13.1.nsg-boundary-rules (evidence-only, az). Needs a person to confirm that rules between internal segments match the approved communications policy."
+            },
+            {
+              "artifact_type": "Network or cloud administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask what traffic is allowed between the CUI enclave and other segments and where that decision is written down. The assessor then tries one connection that should be refused."
+            }
+          ]
+        },
+        {
+          "id": "SC.L1-3.13.1[g]",
+          "determination": "communications are protected at the external system boundary",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Conditional Access policies at the identity boundary",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry SC.L1-3.13.1.conditional-access-boundary (evidence-only): collects Conditional Access policies that require MFA, a compliant device or an allowed location before cloud services can be reached."
+            },
+            {
+              "artifact_type": "Transport protection settings at entry points",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: VPN, gateway or web front-end settings showing the protocols and TLS versions allowed on traffic crossing the external boundary."
+            },
+            {
+              "artifact_type": "System and communications protection policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-communications-policy.md (GateEvidence family SC). Should say how traffic crossing the external boundary is protected (encryption, filtering, inspection)."
+            },
+            {
+              "artifact_type": "Network or cloud administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how traffic is protected as it crosses the external boundary. The assessor then tries to connect over an old protocol or without MFA and expects a refusal."
+            }
+          ]
+        },
+        {
+          "id": "SC.L1-3.13.1[h]",
+          "determination": "communications are protected at key internal boundaries",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Internal boundary protection baseline",
+              "ces_source": "ao_row",
+              "notes": "AdminOps F-13 Enclave Subnet Deny-by-Default Baseline; evidence objectives include [h]. Private endpoint network policies on, so NSG rules also apply to private endpoint traffic."
+            },
+            {
+              "artifact_type": "Internal encryption and segmentation settings",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: settings showing traffic between internal segments is encrypted or otherwise protected (for example TLS between services, private endpoints, IPsec)."
+            },
+            {
+              "artifact_type": "Network or cloud administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how traffic between internal segments is protected, and whether any service still talks in clear text inside the network."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SC.L2-3.13.2",
+      "title": "Employ architectural designs, software development techniques and systems engineering principles that promote effective information security within organizational systems.",
+      "approach": {
+        "what_assessor_does": "The assessor asks the organization to show which security design ideas it has chosen and where they are written down: for example layered defenses, least privilege, segmentation of CUI, secure defaults, and how changes are reviewed. If the organization writes or scripts any software (including automation scripts and configuration code), they look for the secure development practices it follows. They then look for proof those ideas were used: architecture documents, design review records, hardening baselines and cloud security recommendation reports with follow-up. They interview the person who designs the system and, where relevant, whoever writes code. Testing means picking one design idea from the documents and finding it in the live configuration.",
+        "common_failure_modes": [
+          "Principles are copied from a framework but never tied to this system, so nothing shows they were applied.",
+          "No design or architecture review happens before changes go live.",
+          "In-house scripts or code are written without any stated secure coding practice, and the SSP says none is needed.",
+          "Cloud security recommendations sit open for months with no decision recorded.",
+          "The person who designed the system cannot point to where a stated principle shows up in the configuration."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "SC.L2-3.13.2[a]",
+          "determination": "architectural designs that promote effective information security are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Security architecture document",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Should name the architectural designs used (for example segmentation, layered defenses, managed identities) and why they fit this system."
+            },
+            {
+              "artifact_type": "System and communications protection policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-communications-policy.md (GateEvidence family SC). Should list the security architecture approaches the organization has chosen."
+            },
+            {
+              "artifact_type": "Shared responsibility row for this practice",
+              "ces_source": "eo_store",
+              "notes": "EO inheritance data data/fedramp-gcc-high-inheritance.json marks this practice partial (Microsoft and customer both carry part). Microsoft applies its own secure engineering to the cloud service; the design of the organization's own configuration stays with the organization."
+            },
+            {
+              "artifact_type": "System architect interview",
+              "ces_source": "interview",
+              "notes": "Ask which security design ideas guided the build and where they are written down."
+            }
+          ]
+        },
+        {
+          "id": "SC.L2-3.13.2[b]",
+          "determination": "software development techniques that promote effective information security are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Secure development standard",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector. Covers code, scripts and infrastructure templates the organization writes: code review, secret handling, dependency checks. If no software is written, a signed statement saying so and covering scripts."
+            },
+            {
+              "artifact_type": "System and communications protection policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-communications-policy.md (GateEvidence family SC). Should say which secure development practices apply to code and scripts the organization writes."
+            },
+            {
+              "artifact_type": "Developer or automation owner interview",
+              "ces_source": "interview",
+              "notes": "Ask what code or scripts the organization writes and which secure coding practices they follow."
+            }
+          ]
+        },
+        {
+          "id": "SC.L2-3.13.2[c]",
+          "determination": "systems engineering principles that promote effective information security are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Systems engineering principles statement",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: the principles the organization follows (for example least functionality, secure defaults, fail secure) and the source it took them from."
+            },
+            {
+              "artifact_type": "System and communications protection policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-communications-policy.md (GateEvidence family SC). Should name the systems engineering principles and who is responsible for applying them."
+            },
+            {
+              "artifact_type": "System architect interview",
+              "ces_source": "interview",
+              "notes": "Ask which engineering principles are used and how a new system or change is checked against them."
+            }
+          ]
+        },
+        {
+          "id": "SC.L2-3.13.2[d]",
+          "determination": "identified architectural designs that promote effective information security are employed",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Secure Score read",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry SC.L2-3.13.2 (architecturalDesignEvaluator): reads /security/secureScores. Presence only: it confirms the read returned data and does not inspect any recommendation, so it supports but does not show the objective."
+            },
+            {
+              "artifact_type": "Cloud security recommendations and follow-up",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry SC.L2-3.13.2.advisor (evidence-only, az): collects Azure Advisor security recommendations for the subscription. The assessor looks for decisions on each open recommendation, not only the list."
+            },
+            {
+              "artifact_type": "Design review records",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: dated design or architecture reviews for recent changes, with the security points raised and how they were closed."
+            },
+            {
+              "artifact_type": "System architect interview",
+              "ces_source": "interview",
+              "notes": "Pick one design idea from the architecture document and ask the architect to show where it appears in the live tenant."
+            }
+          ]
+        },
+        {
+          "id": "SC.L2-3.13.2[e]",
+          "determination": "identified software development techniques that promote effective information security are employed",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Code review and pipeline records",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: pull request reviews, scan results or release checklists showing the secure development practices were followed on recent work."
+            },
+            {
+              "artifact_type": "Developer or automation owner interview",
+              "ces_source": "interview",
+              "notes": "Ask the developer to walk through how their last change was reviewed. The assessor checks that the record matches the description."
+            }
+          ]
+        },
+        {
+          "id": "SC.L2-3.13.2[f]",
+          "determination": "identified systems engineering principles that promote effective information security are employed",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Hardening baselines in use",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: the configuration baselines (for example security benchmarks) applied to servers, endpoints and cloud services, with the date last reviewed."
+            },
+            {
+              "artifact_type": "Cloud security recommendations and follow-up",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry SC.L2-3.13.2.advisor (evidence-only, az): collects Azure Advisor security recommendations for the subscription. Open items with no decision suggest the principles are not being applied."
+            },
+            {
+              "artifact_type": "Secure Score read",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry SC.L2-3.13.2 (architecturalDesignEvaluator): reads /security/secureScores. Presence only: it confirms the read returned data and does not inspect any recommendation, so it supports but does not show the objective."
+            },
+            {
+              "artifact_type": "System architect interview",
+              "ces_source": "interview",
+              "notes": "Ask how a new system is checked against the engineering principles before it goes live, and ask for the record from the last one."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SC.L2-3.13.3",
+      "title": "Separate user functionality from system management functionality.",
+      "approach": {
+        "what_assessor_does": "The assessor checks that the organization has listed the tools and functions used to run the system (admin portals, consoles, PowerShell, server management, network device management) and keeps them apart from what ordinary users do. In practice that means administrators use separate admin accounts, admin roles are given only when needed, and admin interfaces are not reachable from ordinary user sessions. They examine the role assignment list and account naming, interview administrators about how they do admin work, and test by trying to reach an admin portal or tool from a standard user account and by checking that a sampled admin does daily work, such as email, from a separate account.",
+        "common_failure_modes": [
+          "Administrators read email and browse the web with the same account that holds admin roles.",
+          "There is no list of management functions, so the assessor cannot tell what should be kept apart.",
+          "Admin roles are permanent rather than activated when needed, and many users hold them.",
+          "Standard users can open admin portals or run management tools without any block.",
+          "Shared admin accounts make it impossible to tell who did what."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "SC.L2-3.13.3[a]",
+          "determination": "user functionality is identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Description of user functions",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: what ordinary users do on the system (for example email, files, line-of-business apps) and which accounts they use."
+            },
+            {
+              "artifact_type": "System and communications protection policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-communications-policy.md (GateEvidence family SC). Should say which functions are user functions and which are management functions."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask what an ordinary user can do on the system and which tools they are given."
+            }
+          ]
+        },
+        {
+          "id": "SC.L2-3.13.3[b]",
+          "determination": "system management functionality is identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "List of management tools, portals and roles",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: admin portals, consoles, management scripts and directory roles used to run the system."
+            },
+            {
+              "artifact_type": "Directory role assignments read",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry SC.L2-3.13.3 (securityFunctionIsolationEvaluator): reads /roleManagement/directory/roleAssignments. Presence only: it confirms role assignments were read, not that they are separated. The assessor uses the list to check the management roles are complete."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask which tools and roles are used to manage the system and who holds them."
+            }
+          ]
+        },
+        {
+          "id": "SC.L2-3.13.3[c]",
+          "determination": "user functionality is separated from system management functionality",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Just-in-time admin role assignments",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry AC.L2-3.1.5.pim-eligible (set): creates a PIM eligible role assignment that must be activated with a reason and expires; the entry lists SC.L2-3.13.3. Shows admin rights are separate from day-to-day sign-in."
+            },
+            {
+              "artifact_type": "Directory role assignments read",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry SC.L2-3.13.3 (securityFunctionIsolationEvaluator), /roleManagement/directory/roleAssignments, presence only. Reconcile: each admin role holder should be a separate admin account, not a daily-use account."
+            },
+            {
+              "artifact_type": "Shared responsibility row for this practice",
+              "ces_source": "eo_store",
+              "notes": "EO inheritance data data/fedramp-gcc-high-inheritance.json marks this practice partial (Microsoft and customer both carry part). Microsoft separates its own service administration from tenant users; separating the organization's admin work from user work is the organization's part."
+            },
+            {
+              "artifact_type": "Sampled administrator interviews",
+              "ces_source": "interview",
+              "notes": "Ask each sampled administrator to show the account they use for email and the one they use for admin work. The assessor then tries an admin portal from a standard account and expects it to be refused."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SC.L2-3.13.4",
+      "title": "Prevent unauthorized and unintended information transfer via shared system resources.\nAssessment Objective:\n[a] unauthorized and unintended information transfer via shared system resources is \nprevented.",
+      "approach": {
+        "what_assessor_does": "The assessor looks for how the organization stops information left behind by one user or process from being seen by the next one on shared resources: shared devices, shared drives, terminal servers, virtual desktops, printers and memory or storage that gets reused. Much of the low-level part (memory and disk reuse inside the cloud service and operating system) is handled by Microsoft and the operating system, and the assessor expects the SSP to say so. For what the organization runs itself, they examine settings such as profile clean-up on shared machines, secure print release and permissions on shared folders, interview the administrator, and test by signing in as a second user on a shared device and looking for the first user's files.",
+        "common_failure_modes": [
+          "The SSP relies on the cloud provider for everything and says nothing about shared devices or shared folders the organization runs.",
+          "Shared workstations keep earlier users' profiles, downloads or cached files.",
+          "Shared folders that hold CUI are open to everyone in the organization.",
+          "Printed CUI waits in open output trays on shared printers.",
+          "Generic shared accounts are used on shared machines."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "SC.L2-3.13.4[a]",
+          "determination": "unauthorized and unintended information transfer via shared system resources is prevented",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Device configuration read",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry SC.L2-3.13.4 (sharedResourceControlEvaluator): reads /deviceManagement/deviceConfigurations. Presence only: it confirms device configurations exist and does not check any shared-resource setting."
+            },
+            {
+              "artifact_type": "Remote access Conditional Access policies",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry SC.L2-3.13.4.remote-access (evidence-only): collects Conditional Access policies whose names contain Remote or VPN. Names vary by tenant, so an empty result is not proof of a gap; the policies show only part of the picture."
+            },
+            {
+              "artifact_type": "Shared resource settings",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: settings for shared machines (profile deletion at sign-out, temp file clean-up), virtual desktop pooling, secure print release, and permissions on shared folders that hold CUI."
+            },
+            {
+              "artifact_type": "Shared responsibility row for this practice",
+              "ces_source": "eo_store",
+              "notes": "EO inheritance data data/fedramp-gcc-high-inheritance.json marks this practice partial (Microsoft and customer both carry part). Microsoft prevents data from one tenant reaching another and handles memory and storage reuse in the service; shared devices and folders the organization runs stay with the organization."
+            },
+            {
+              "artifact_type": "System and communications protection policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-communications-policy.md (GateEvidence family SC). Should name the shared resources in scope and how leftover information is prevented."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask which devices and storage are shared between users and what clears them. The assessor then signs in as a second user on a shared device and looks for the first user's files."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SC.L1-3.13.5",
+      "title": "Implement subnetworks for publicly accessible system components that are physically or logically separated from internal networks.",
+      "approach": {
+        "what_assessor_does": "The assessor asks for the list of everything the public can reach: websites, public IP addresses, email gateways, VPN endpoints, file-sharing links and any cloud resource with a public endpoint. They compare that list with what exists in the cloud subscription and tenant. For each public component they check it sits in its own subnet or zone, physically or logically apart from the internal network, with rules that stop it from reaching internal systems directly. They interview the network or cloud administrator and test by checking the rules between the public zone and internal subnets, and by confirming that a public resource cannot open a connection to an internal one.",
+        "common_failure_modes": [
+          "No list of public-facing components exists, or it misses cloud resources with public endpoints.",
+          "A public web server sits in the same subnet as internal systems.",
+          "Rules between the public zone and internal subnets allow broad traffic.",
+          "The SSP counts the host firewall on laptops as the only separation for public components."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "SC.L1-3.13.5[a]",
+          "determination": "publicly accessible system components are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "SSP boundary components",
+              "ces_source": "eo_store",
+              "notes": "EO builds the SSP authorization boundary from the Tenant Manifest: the CUI-boundary questionnaire answers Muster writes to boundary_zones become boundary facts, and zones come from the manifest assets and the Infrastructure Manifest network (ces-eo src/eo/ssp/TmBoundary.ts). Publicly reachable components should be named among the manifest assets or zones."
+            },
+            {
+              "artifact_type": "Inventory of publicly accessible components",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: public IP addresses, DNS names, websites, gateways and cloud resources with public endpoints, each with an owner."
+            },
+            {
+              "artifact_type": "Collected network security group rules",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry SC.L1-3.13.1.nsg-boundary-rules (evidence-only, az; lists SC.L1-3.13.5). Any rule open to the internet points to a public component; reconcile each with the inventory."
+            },
+            {
+              "artifact_type": "Network or cloud administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask what the public can reach and how a new public endpoint gets added to the list."
+            }
+          ]
+        },
+        {
+          "id": "SC.L1-3.13.5[b]",
+          "determination": "subnetworks for publicly accessible system components are physically or logically separated from internal networks",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Host firewall policy test",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry SC.L1-3.13.5 (publicNetworkL1Evaluator): settings-catalog read of /deviceManagement/configurationPolicies (legacy /deviceManagement/deviceConfigurations as fallback). Met only when a policy turns the host firewall on and sets the default inbound action to block on the domain, private and public profiles, the settings Stamper entry SC.L1-3.13.1.endpoint-firewall deploys. This tests the endpoint firewall, including the public profile; it does not show subnet separation for public servers."
+            },
+            {
+              "artifact_type": "Collected network security group rules",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry SC.L1-3.13.1.nsg-boundary-rules (evidence-only, az; lists SC.L1-3.13.5). Check that rules between the public subnet and internal subnets are narrow and recorded."
+            },
+            {
+              "artifact_type": "Network diagram showing the public zone",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: the subnet or zone holding public components and how it is separated from internal networks."
+            },
+            {
+              "artifact_type": "Shared responsibility row for this practice",
+              "ces_source": "eo_store",
+              "notes": "EO inheritance data data/fedramp-gcc-high-inheritance.json marks this practice partial (Microsoft and customer both carry part). Microsoft keeps its own public service components apart from its internal networks; separation of the organization's public components is the organization's part."
+            },
+            {
+              "artifact_type": "Network or cloud administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how a public component is stopped from reaching internal systems. The assessor then checks the rule that should block it."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SC.L2-3.13.6",
+      "title": "Deny network communications traffic by default and allow network communications traffic by exception (e.g., deny all, permit by exception).",
+      "approach": {
+        "what_assessor_does": "The assessor checks that every boundary device and host firewall starts from deny all, and that each allowed flow has a recorded business reason and an approver. They examine firewall and network security group rule sets end to end, looking for a final deny rule and for broad allow rules, and compare every allow rule with the approved exception list. They interview the network or cloud administrator about how an exception is requested and removed, and test by trying a port or protocol that is not on the list and expecting it to be refused.",
+        "common_failure_modes": [
+          "The rule set ends in allow-any, or the platform default allows outbound traffic and nobody changed it.",
+          "Allow rules exist with no business reason, owner or approval date.",
+          "Exceptions are added but never reviewed or removed.",
+          "Host firewalls are on but default inbound action is left at allow on one profile.",
+          "Outbound traffic is not filtered at all; only inbound is denied by default."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "SC.L2-3.13.6[a]",
+          "determination": "network communications traffic is denied by default",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Host firewall policy test",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry SC.L2-3.13.6 (networkDenyByDefaultEvaluator): settings-catalog read of /deviceManagement/configurationPolicies (legacy /deviceManagement/deviceConfigurations as fallback). Met only when a policy turns the host firewall on and sets the default inbound action to block on the domain, private and public profiles, the settings Stamper entry SC.L1-3.13.1.endpoint-firewall deploys. Covers inbound deny by default on endpoints; outbound and network-level rules need the rows below."
+            },
+            {
+              "artifact_type": "Deployed firewall policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry SC.L1-3.13.1.endpoint-firewall (set; lists SC.L2-3.13.6): CMMC-Firewall-Policy with inbound blocked by default on all profiles."
+            },
+            {
+              "artifact_type": "Subnet deny-by-default baseline",
+              "ces_source": "ao_row",
+              "notes": "AdminOps F-13 Enclave Subnet Deny-by-Default Baseline: explicit Deny-All in and out at priority 4096 on every non-platform subnet and a route that drops 0.0.0.0/0; registered against SC.L2-3.13.6 with [a] among its evidence objectives."
+            },
+            {
+              "artifact_type": "Azure Firewall maintenance records",
+              "ces_source": "ao_row",
+              "notes": "AdminOps F-11 Azure Firewall Deallocate and F-12 Azure Firewall Allocate, both registered against SC.L2-3.13.6 with [a]. While deallocated, egress filtering stops; check each window was approved."
+            },
+            {
+              "artifact_type": "Network or cloud administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask the administrator to show the last rule in each rule set. The assessor then tries a port that is not on the allowed list and expects it to be refused."
+            }
+          ]
+        },
+        {
+          "id": "SC.L2-3.13.6[b]",
+          "determination": "network communications traffic is allowed by exception",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Approved traffic exception list",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: each allowed port, protocol and destination with its business reason, owner, approver and review date."
+            },
+            {
+              "artifact_type": "Subnet allow rules",
+              "ces_source": "ao_row",
+              "notes": "AdminOps F-13 Enclave Subnet Deny-by-Default Baseline; evidence objectives include [b]. The Allow-VNet rules at priority 4000 are the baseline exception; anything above them needs an entry on the exception list."
+            },
+            {
+              "artifact_type": "Data loss prevention activity review",
+              "ces_source": "ao_row",
+              "notes": "AdminOps D-02 DLP Policy Effectiveness, registered against SC.L2-3.13.6 with [b]. It reviews data loss prevention activity, which supports permit-by-exception for content leaving the organization; it does not review network rules."
+            },
+            {
+              "artifact_type": "System and communications protection policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-communications-policy.md (GateEvidence family SC). Should say how a traffic exception is requested, approved, reviewed and removed."
+            },
+            {
+              "artifact_type": "Network or cloud administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how the last exception was approved and when exceptions were last reviewed. The assessor matches each allow rule to the list."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SC.L2-3.13.7",
+      "title": "Prevent remote devices from simultaneously establishing non-remote connections with organizational systems and communicating via some other connection to resources in external networks (i.e., split tunneling).\nAssessment Objective:\n[a] remote devices are prevented from simultaneously establishing non-remote \nconnections with the system and communicating via some other connection to \nresources in external networks (i.e., split tunneling).",
+      "approach": {
+        "what_assessor_does": "The assessor first asks how remote users reach the system. If they use a VPN, the assessor checks that VPN profiles send all traffic through the tunnel while connected, so a remote device cannot talk to the internet directly and to the organization at the same time. If there is no VPN and users reach cloud services directly, the assessor expects the SSP to explain this and how access is still controlled (for example Conditional Access with compliant devices and allowed locations). They examine VPN profile settings, interview the network administrator, and test by connecting a remote device and checking its routes or trying to reach an outside site without going through the tunnel.",
+        "common_failure_modes": [
+          "VPN profiles leave split tunneling on for speed, with no recorded exception.",
+          "Some VPN profiles are set correctly and others, often older ones, are not.",
+          "The SSP says split tunneling is blocked but no VPN profile or setting shows it.",
+          "No VPN is used and the SSP does not explain how remote access to CUI is controlled instead."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "SC.L2-3.13.7[a]",
+          "determination": "remote devices are prevented from simultaneously establishing non-remote connections with the system and communicating via some other connection to resources in external networks (i.e., split tunneling)",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "VPN profile split tunneling test",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry SC.L2-3.13.7 (splitTunnelingEvaluator): reads /deviceManagement/deviceConfigurations and checks every VPN profile sets enableSplitTunneling to false. Zero VPN profiles is not assessed, not a failure."
+            },
+            {
+              "artifact_type": "Conditional Access block on untrusted locations",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry AC.L2-3.1.14.block-untrusted (set; lists SC.L2-3.13.7): Conditional Access policy blocking access from locations outside the approved named locations. Relevant when remote access goes through a known gateway."
+            },
+            {
+              "artifact_type": "VPN configuration outside Intune",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector when VPN clients or gateways are not managed by Intune: the setting that forces all traffic through the tunnel, or a statement that no VPN is used and how remote access is controlled."
+            },
+            {
+              "artifact_type": "System and communications protection policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-communications-policy.md (GateEvidence family SC). Should say whether split tunneling is allowed and, if any exception exists, who approved it."
+            },
+            {
+              "artifact_type": "Network administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how remote devices connect and whether any profile allows split tunneling. The assessor then connects a remote device and checks its routes or tries an outside site with the tunnel up."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SC.L2-3.13.8",
+      "title": "Implement cryptographic mechanisms to prevent unauthorized disclosure of CUI during transmission unless otherwise protected by alternative physical safeguards.",
+      "approach": {
+        "what_assessor_does": "The assessor asks for the list of ways CUI leaves or moves between locations: email, file sharing, web apps, VPN, remote desktop, mobile devices, removable media sent by courier. For each path they want to know what encryption protects it or, where encryption is not used, what physical safeguard does (for example a protected cable run or hand carry by a cleared courier). They examine TLS settings, mail transport and encryption rules, certificate records and label encryption, interview the administrator, and test by checking the protocol and TLS version on a sample of endpoints and sending a test message with CUI markings to an outside address to see that it is encrypted.",
+        "common_failure_modes": [
+          "No list of transmission paths exists, so some paths (for example file transfer tools or older apps) are never checked.",
+          "Old TLS versions or clear-text protocols are still allowed on some services.",
+          "Outbound CUI email is not encrypted unless the user remembers to do it.",
+          "Certificates have expired or are close to it on services that carry CUI.",
+          "The SSP claims physical safeguards with no description of what they are."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "SC.L2-3.13.8[a]",
+          "determination": "cryptographic mechanisms intended to prevent unauthorized disclosure of CUI are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Transmission path list with protection method",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: each way CUI is sent (email, sharing, web, VPN, remote desktop, mobile) and the cryptographic mechanism protecting it."
+            },
+            {
+              "artifact_type": "Certificate expiry scan",
+              "ces_source": "ao_row",
+              "notes": "AdminOps C-05 TLS/SSL Certificate Expiry: scans App Service, Application Gateway and Key Vault for expiring certificates; registered against SC.L2-3.13.8 with [a]."
+            },
+            {
+              "artifact_type": "Mail encryption and transport rules",
+              "ces_source": "ao_row",
+              "notes": "AdminOps D-06 Email Encryption & Transport Rules: transport rules and Office Message Encryption for CUI email; registered against SC.L2-3.13.8 with [a] and [c]."
+            },
+            {
+              "artifact_type": "Exchange Online configuration",
+              "ces_source": "eo_store",
+              "notes": "EO evidence explorer item signal:exchangeConfig (Exchange Online Config), mapped to SC.L2-3.13.8; read live from the tenant when connected."
+            },
+            {
+              "artifact_type": "Compliance policy read",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry SC.L2-3.13.8 (fipsCryptoEvaluator): reads /deviceManagement/deviceCompliancePolicies. Presence only: it confirms compliance policies exist and does not check any encryption setting."
+            },
+            {
+              "artifact_type": "Messaging or network administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask which protocols and encryption each CUI path uses and how a new path gets reviewed."
+            }
+          ]
+        },
+        {
+          "id": "SC.L2-3.13.8[b]",
+          "determination": "alternative physical safeguards intended to prevent unauthorized disclosure of CUI are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Alternative physical safeguard description",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: where CUI moves without encryption, the physical safeguard used (protected distribution, courier or hand-carry procedure). If none is used, a statement that every path is encrypted."
+            },
+            {
+              "artifact_type": "System and communications protection policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-communications-policy.md (GateEvidence family SC). Should say whether alternative physical safeguards are allowed and where."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask whether any CUI ever moves without encryption and, if so, how it is physically protected. Answers should match the path list."
+            }
+          ]
+        },
+        {
+          "id": "SC.L2-3.13.8[c]",
+          "determination": "either cryptographic mechanisms or alternative physical safeguards are implemented to prevent unauthorized disclosure of CUI during transmission",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Legacy TLS disabled on mail transport",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry SC.L2-3.13.8.tls-enforce (set, exchange): Set-TransportConfig -AllowLegacyTLSClients $false, so mail clients must use TLS 1.2 or later."
+            },
+            {
+              "artifact_type": "Label encryption settings",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry SC.L2-3.13.16.byod-sensitivity-labels (evidence-only, ipps; lists SC.L2-3.13.8): sensitivity label configuration with encryption, which stays with the file when it is sent."
+            },
+            {
+              "artifact_type": "Mail encryption and transport rules",
+              "ces_source": "ao_row",
+              "notes": "AdminOps D-06 Email Encryption & Transport Rules; evidence objectives include [c]. Check the rule applies to CUI mail automatically."
+            },
+            {
+              "artifact_type": "Shared responsibility row for this practice",
+              "ces_source": "eo_store",
+              "notes": "EO inheritance data data/fedramp-gcc-high-inheritance.json marks this practice partial (Microsoft and customer both carry part). Microsoft service connections use TLS 1.2 or later; client settings, mail rules and any non-Microsoft path stay with the organization."
+            },
+            {
+              "artifact_type": "Messaging or network administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask the administrator to send a test message marked as CUI to an outside address. The assessor checks it arrives encrypted and checks the TLS version on a sample of endpoints."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SC.L2-3.13.9",
+      "title": "Terminate network connections associated with communications sessions at the end of the sessions or after a defined period of inactivity.",
+      "approach": {
+        "what_assessor_does": "The assessor looks for a written idle period after which network connections are ended, and checks it is applied to the connections that matter: VPN tunnels, remote desktop sessions, admin sessions to servers and network devices, and cloud sign-in sessions. They check that sessions are also ended when the user logs off or disconnects, not left open. They examine VPN, remote desktop and Conditional Access session settings, interview the administrator, and test by leaving a remote session idle past the limit and confirming the connection is closed rather than just the screen locked.",
+        "common_failure_modes": [
+          "No idle period is written down, or different documents give different values.",
+          "Only the screen lock is set; VPN and remote desktop connections stay open behind it.",
+          "Disconnected remote desktop sessions are kept alive on servers indefinitely.",
+          "Cloud sessions use long-lived tokens with no sign-in frequency set."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "SC.L2-3.13.9[a]",
+          "determination": "a period of inactivity to terminate network connections associated with communications sessions is defined",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "System and communications protection policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-communications-policy.md (GateEvidence family SC). Should state the idle period after which network connections are ended and which connection types it covers."
+            },
+            {
+              "artifact_type": "Session timeout values per connection type",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: the configured idle timeout for VPN, remote desktop, admin sessions and cloud sign-in. The CES Tenant Manifest answered value, when given, is the value EO tests against."
+            },
+            {
+              "artifact_type": "Security lead interview",
+              "ces_source": "interview",
+              "notes": "Ask what the idle period is, who set it and why. Answers should match the policy."
+            }
+          ]
+        },
+        {
+          "id": "SC.L2-3.13.9[b]",
+          "determination": "network connections associated with communications sessions are terminated at the end of the sessions",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Session end settings",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: VPN and remote desktop settings that close the connection on logoff or disconnect, and server settings that end disconnected sessions."
+            },
+            {
+              "artifact_type": "Shared responsibility row for this practice",
+              "ces_source": "eo_store",
+              "notes": "EO inheritance data data/fedramp-gcc-high-inheritance.json marks this practice partial (Microsoft and customer both carry part). The service ends idle sessions according to the tenant's Conditional Access sign-in settings; the organization sets those and runs its own VPN and remote desktop."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask what happens to a VPN or remote desktop connection when the user signs out. The assessor then signs out and checks the session is gone on the server or gateway."
+            }
+          ]
+        },
+        {
+          "id": "SC.L2-3.13.9[c]",
+          "determination": "network connections associated with communications sessions are terminated after the defined period of inactivity",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Inactivity lock test",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry SC.L2-3.13.9 (sessionTerminationNetworkEvaluator): reads /deviceManagement/deviceConfigurations, deviceCompliancePolicies and configurationPolicies and checks the screen locks within the bound (default 15 minutes, or the Tenant Manifest answered value). This tests device lock, not that network connections close."
+            },
+            {
+              "artifact_type": "Deployed screen lock policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry AC.L2-3.1.10.screen-lock (set; lists SC.L2-3.13.9): CMMC-ScreenLock-Policy with a 15-minute inactivity limit on managed Windows devices."
+            },
+            {
+              "artifact_type": "Idle timeout settings on network connections",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: VPN gateway idle timeout, remote desktop idle limit and network device session timeout."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how idle VPN and remote desktop connections are ended. The assessor leaves a session idle past the limit and checks the connection is closed, not only the screen locked."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SC.L2-3.13.10",
+      "title": "Establish and manage cryptographic keys for cryptography employed in organizational systems.",
+      "approach": {
+        "what_assessor_does": "The assessor asks where cryptography is used (disk encryption, TLS certificates, file and mail encryption, VPN, signing) and who creates and looks after the keys for each. They check keys are generated in a protected store, access to them is limited to named people and services, and there is a defined process for rotation, backup, recovery and revoking a key that may be exposed. They examine the key vault settings, key and certificate inventory and rotation records, interview the key custodian, and test by picking a key and checking its creation date, rotation history and who can use it.",
+        "common_failure_modes": [
+          "No inventory of keys and certificates exists, so nobody knows what needs rotating.",
+          "Keys are kept in scripts, files or shared mailboxes instead of a protected store.",
+          "Too many people or services have rights to use or export keys.",
+          "No recovery process exists for disk encryption keys, or recovery keys are not escrowed.",
+          "There is no plan for what to do when a key may have been exposed."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "SC.L2-3.13.10[a]",
+          "determination": "cryptographic keys are established whenever cryptography is employed",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Key vault deployment",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry SC.L2-3.13.10.key-vault (set, az): creates the CUI key vault on the Premium (HSM-backed) tier with purge protection, 90-day soft delete and role-based access, and grants the enclave managed identities crypto rights."
+            },
+            {
+              "artifact_type": "Key rotation policy configuration",
+              "ces_source": "ao_row",
+              "notes": "AdminOps C-03 Key Vault Key Rotation: sets an auto-rotation policy for HSM-backed keys; registered against SC.L2-3.13.10 with [a] and [b]."
+            },
+            {
+              "artifact_type": "Key and certificate inventory",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: every key and certificate in use, what it protects, where it was generated and who owns it."
+            },
+            {
+              "artifact_type": "Secure Score read",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry SC.L2-3.13.10 (cryptoKeyManagementEvaluator): reads /security/secureScores with the resourceGroup and keyVaultName variables. Presence only: it does not read key vault settings or keys."
+            },
+            {
+              "artifact_type": "Key custodian interview",
+              "ces_source": "interview",
+              "notes": "Ask how a new key is created, where, and who approves it."
+            }
+          ]
+        },
+        {
+          "id": "SC.L2-3.13.10[b]",
+          "determination": "cryptographic keys are managed whenever cryptography is employed",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Key rotation records",
+              "ces_source": "ao_row",
+              "notes": "AdminOps C-03 Key Vault Key Rotation; evidence objectives include [b]. The assessor checks the rotation period and the last rotation date."
+            },
+            {
+              "artifact_type": "Key management procedure",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: rotation, backup, recovery-key escrow, access review and revoking a key that may be exposed."
+            },
+            {
+              "artifact_type": "System and communications protection policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-communications-policy.md (GateEvidence family SC). Should say who manages cryptographic keys and how often they are rotated."
+            },
+            {
+              "artifact_type": "Shared responsibility row for this practice",
+              "ces_source": "eo_store",
+              "notes": "EO inheritance data data/fedramp-gcc-high-inheritance.json marks this practice partial (Microsoft and customer both carry part). Microsoft manages the keys for its own service encryption, and customer-managed keys are an option; keys the organization creates are its own to manage."
+            },
+            {
+              "artifact_type": "Key custodian interview",
+              "ces_source": "interview",
+              "notes": "Pick one key from the inventory and ask the custodian to show its creation date, rotation history and who can use it."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SC.L2-3.13.11",
+      "title": "Employ FIPS-validated cryptography when used to protect the confidentiality of CUI.\nAssessment Objective:\n[a] FIPS-validated cryptography is employed to protect the confidentiality of CUI.",
+      "approach": {
+        "what_assessor_does": "The assessor lists every place cryptography protects the confidentiality of CUI (laptop and server disks, removable media, mail and file encryption, VPN, TLS, mobile devices, backups) and asks for the FIPS 140 validation certificate number of the module that does the work in each place. For cloud services in GCC High they accept the provider's validation as inherited, but expect the organization's own endpoints, VPN and any other product to be shown separately. They examine certificate numbers against the NIST Cryptographic Module Validation Program list, interview the administrator, and test by checking a sample of devices for encryption status and the setting that puts the operating system in FIPS mode where that is needed.",
+        "common_failure_modes": [
+          "Encryption is on but nobody can name the validation certificate for the module.",
+          "The SSP says everything is inherited from the cloud provider, but laptops, VPN or mobile devices are the organization's own.",
+          "A product claims to be FIPS compliant but the module is not on the validated list or the certificate is historical.",
+          "Some devices in scope are not encrypted at all."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "SC.L2-3.13.11[a]",
+          "determination": "FIPS-validated cryptography is employed to protect the confidentiality of CUI",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Device encryption state test",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry SC.L2-3.13.11 (bitLockerEvaluator): reads /deviceManagement/managedDevices and deviceCompliancePolicies (and managed device encryption states where available). Checks BitLocker coverage against a threshold; it does not check FIPS validation of the module."
+            },
+            {
+              "artifact_type": "Platform FIPS inheritance record",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry SC.L2-3.13.11.fips (evidence-only): collects tenant organization data confirming the GCC High environment, where Microsoft's FIPS 140 validated cryptography is inherited."
+            },
+            {
+              "artifact_type": "Shared responsibility row for this practice",
+              "ces_source": "eo_store",
+              "notes": "EO inheritance data data/fedramp-gcc-high-inheritance.json marks this practice partial (Microsoft and customer both carry part). Microsoft uses FIPS 140 validated modules in the service; the organization's endpoints, VPN and other products are its own part."
+            },
+            {
+              "artifact_type": "Validation certificate list for each crypto module",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: for each place CUI is encrypted, the product, module and NIST validation certificate number, with the setting that enables the validated mode."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask which module encrypts CUI on laptops, VPN and mobile devices and how FIPS mode is turned on. The assessor checks a sample device for encryption status and the FIPS setting."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SC.L2-3.13.12",
+      "title": "Prohibit remote activation of collaborative computing devices and provide indication of devices in use to users present at the device.",
+      "approach": {
+        "what_assessor_does": "The assessor asks for the list of collaborative computing devices in scope: webcams, microphones, conference room systems, smart boards and similar. For each type they check that it cannot be switched on remotely without someone present, and that it shows people nearby when it is in use (a light, an on-screen sign or a sound). They examine device settings and the inventory, interview the person who looks after the devices, and test by turning on a camera or microphone to see the indicator, and by trying a remote activation where the device supports one.",
+        "common_failure_modes": [
+          "No inventory of collaborative devices, so conference room systems are missed.",
+          "Conference room systems allow remote join or auto-answer with camera on.",
+          "The indicator light can be turned off in software, or the device has none.",
+          "The camera is blocked on laptops but nothing covers microphones or room systems."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "SC.L2-3.13.12[a]",
+          "determination": "collaborative computing devices are identified",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Collaborative device inventory",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: webcams, microphones, conference room systems and smart boards, with their location and owner."
+            },
+            {
+              "artifact_type": "System and communications protection policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-communications-policy.md (GateEvidence family SC). Should name the collaborative device types in scope and the rules for their use."
+            },
+            {
+              "artifact_type": "Facilities or IT administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask what collaborative devices exist, including meeting rooms, and how new ones get added to the inventory."
+            }
+          ]
+        },
+        {
+          "id": "SC.L2-3.13.12[b]",
+          "determination": "collaborative computing devices provide indication to users of devices in use",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Device indicator documentation",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: vendor specifications or photos showing the in-use indicator for each device type, and any setting that keeps it on."
+            },
+            {
+              "artifact_type": "Shared responsibility row for this practice",
+              "ces_source": "eo_store",
+              "notes": "EO inheritance data data/fedramp-gcc-high-inheritance.json marks this practice partial (Microsoft and customer both carry part). Teams shows an indication before a camera or microphone is used; room systems and other products stay with the organization."
+            },
+            {
+              "artifact_type": "Facilities or IT administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how people in the room know a device is on. The assessor turns on a camera and microphone and watches for the indicator."
+            }
+          ]
+        },
+        {
+          "id": "SC.L2-3.13.12[c]",
+          "determination": "remote activation of collaborative computing devices is prohibited",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Camera block setting test",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry SC.L2-3.13.12 (collaborativeDeviceEvaluator): reads /deviceManagement/deviceConfigurations. Met when cameraBlocked is true, not met when false, not assessed when absent."
+            },
+            {
+              "artifact_type": "Deployed camera block policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry SC.L2-3.13.12.camera-block (set): CMMC-CollaborativeDeviceBlock Intune policy with cameraBlocked true on managed Windows devices. Blocking the camera covers laptops; room systems need their own settings."
+            },
+            {
+              "artifact_type": "Room system remote activation settings",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: auto-answer, remote join and remote management settings on conference room systems."
+            },
+            {
+              "artifact_type": "Facilities or IT administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask whether any device can be started from outside the room. The assessor tries a remote activation where the device supports it."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SC.L2-3.13.13",
+      "title": "Control and monitor the use of mobile code.",
+      "approach": {
+        "what_assessor_does": "The assessor checks that the organization has decided which kinds of mobile code are allowed (for example Office macros, browser scripts, Java, PDF scripts, ActiveX) and from where, and that settings enforce that decision. They then look for monitoring: something that detects and records when blocked or suspicious mobile code arrives or runs. They examine the mobile code policy, mail attachment scanning and Office and browser settings, interview the administrator, and test by opening a document with a macro from an outside source and checking it is blocked and that the attempt is recorded.",
+        "common_failure_modes": [
+          "No written decision on which mobile code is allowed, so settings cannot be judged.",
+          "Office macros from the internet are allowed to run.",
+          "Attachment scanning is on but nobody looks at what it catches.",
+          "Controls cover email only; browsers and downloads are left open."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "SC.L2-3.13.13[a]",
+          "determination": "use of mobile code is controlled",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Attachment sandbox policy and rule",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entries SC.L2-3.13.13.safe-attach and SC.L2-3.13.13.safe-attach-rule (set, exchange): CMMC-SafeAttach policy with Dynamic Delivery, applied to the primary domain by CMMC-SafeAttach-Rule. Attachments are opened in a sandbox before delivery."
+            },
+            {
+              "artifact_type": "System and communications protection policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-communications-policy.md (GateEvidence family SC). Should list the mobile code types allowed and blocked, and where trusted code can come from."
+            },
+            {
+              "artifact_type": "Office and browser mobile code settings",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: macro settings (for example blocking macros from the internet), script and plug-in settings in browsers, and application control rules."
+            },
+            {
+              "artifact_type": "Endpoint administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask which mobile code is allowed and how the settings enforce it. The assessor opens a document with a macro from an outside source and expects it to be blocked."
+            }
+          ]
+        },
+        {
+          "id": "SC.L2-3.13.13[b]",
+          "determination": "use of mobile code is monitored",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Attack simulation read",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry SC.L2-3.13.13 (safeAttachmentsEvaluator): reads /security/attackSimulation/simulations. Presence only: it does not read the attachment policy or its detections, so it does not show monitoring on its own."
+            },
+            {
+              "artifact_type": "Mobile code detection reports",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: Defender reports or alerts for blocked attachments, macros and scripts, with a record that someone reviewed them."
+            },
+            {
+              "artifact_type": "Shared responsibility row for this practice",
+              "ces_source": "eo_store",
+              "notes": "EO inheritance data data/fedramp-gcc-high-inheritance.json marks this practice partial (Microsoft and customer both carry part). Microsoft runs Safe Attachments, Safe Links and Defender for Endpoint in the service; deciding what is allowed and watching the results is the organization's part."
+            },
+            {
+              "artifact_type": "Security operations interview",
+              "ces_source": "interview",
+              "notes": "Ask who reviews mobile code detections and what happened with the last one. The assessor checks that the blocked test macro was recorded."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SC.L2-3.13.14",
+      "title": "Control and monitor the use of Voice over Internet Protocol (VoIP) technologies.",
+      "approach": {
+        "what_assessor_does": "The assessor asks which Voice over IP systems are in use (Teams calling, desk phones, softphones, conference bridges) and what the rules are for them: who may use them, who may be called, and whether outside federation or consumer accounts are allowed. They check settings enforce those rules, and that call activity and admin changes are logged and looked at. They examine the VoIP policy, Teams external access settings and usage or call records, interview the person who runs the phone system, and test by trying to reach a blocked external or consumer account.",
+        "common_failure_modes": [
+          "No written rules for VoIP use, so the settings have nothing to be checked against.",
+          "Teams federation with any outside organization is left open by default.",
+          "A separate phone system or softphone is in use but left out of the SSP.",
+          "Call records and admin changes are kept but never reviewed."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "SC.L2-3.13.14[a]",
+          "determination": "use of Voice over Internet Protocol (VoIP) technologies is controlled",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Teams external access restriction",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry SC.L2-3.13.14.teams-external (set, teams): Set-CsExternalAccessPolicy turns off federation and consumer access at the tenant level."
+            },
+            {
+              "artifact_type": "System and communications protection policy",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper gate document policies/system-communications-policy.md (GateEvidence family SC). Should list the approved VoIP systems and the rules for using them."
+            },
+            {
+              "artifact_type": "VoIP system inventory and settings",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: phone systems, softphones and conference bridges in use, with their access and encryption settings."
+            },
+            {
+              "artifact_type": "Shared responsibility row for this practice",
+              "ces_source": "eo_store",
+              "notes": "EO inheritance data data/fedramp-gcc-high-inheritance.json marks this practice partial (Microsoft and customer both carry part). Teams encrypts VoIP media with SRTP and TLS; deciding who may use it and how is the organization's part."
+            },
+            {
+              "artifact_type": "Phone system administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask which VoIP systems exist and who may call outside parties. The assessor tries to reach a blocked external or consumer account."
+            }
+          ]
+        },
+        {
+          "id": "SC.L2-3.13.14[b]",
+          "determination": "use of Voice over Internet Protocol (VoIP) technologies is monitored",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Presence read",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry SC.L2-3.13.14 (voipEvaluator): reads /communications/presences. Presence only: not assessed when nothing is returned, met otherwise; it does not read call records or external access settings."
+            },
+            {
+              "artifact_type": "Call usage and admin change records",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: Teams call usage or quality reports, phone system logs and admin audit entries for calling settings, with a record of review."
+            },
+            {
+              "artifact_type": "Phone system administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how VoIP use is watched and what would raise a concern. The assessor asks for the last review record."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SC.L2-3.13.15",
+      "title": "Protect the authenticity of communications sessions.\t\nAssessment Objective:\n[a] the authenticity of communications sessions is protected.",
+      "approach": {
+        "what_assessor_does": "The assessor checks that each side of a communications session can trust it is talking to the right party and that the session cannot be taken over or replayed. They look for TLS with valid certificates on services, session tokens protected by the identity provider, and for email, sender checks such as DKIM, SPF and DMARC with spoofing protection. They examine certificate settings, mail authentication records and identity session settings, interview the administrator, and test by checking DNS records for the mail domain, confirming certificates on public services are valid, and checking that clients refuse a connection with a bad certificate.",
+        "common_failure_modes": [
+          "DKIM is not turned on or DMARC is missing or set to take no action.",
+          "Services use self-signed or expired certificates and users are trained to click past warnings.",
+          "Old protocols that do not protect session authenticity are still allowed.",
+          "The SSP covers email only and says nothing about web, remote access or admin sessions."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "SC.L2-3.13.15[a]",
+          "determination": "the authenticity of communications sessions is protected",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Mail authentication and spoofing protection",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entries SC.L2-3.13.15.dkim (DKIM signing on the primary domain), SC.L2-3.13.15.anti-phish and .anti-phish-rule (spoof and mailbox intelligence, authentication failures quarantined), and .anti-spam, .anti-spam-rule, .outbound-spam, .outbound-spam-rule (set, exchange). These cover email; other session types need the rows below."
+            },
+            {
+              "artifact_type": "Security alerts read",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry SC.L2-3.13.15 (emailProtectionEvaluator): reads /security/alerts_v2. Presence only: it does not read any mail or session setting."
+            },
+            {
+              "artifact_type": "Shared responsibility row for this practice",
+              "ces_source": "eo_store",
+              "notes": "EO inheritance data data/fedramp-gcc-high-inheritance.json marks this practice partial (Microsoft and customer both carry part). Microsoft protects service sessions with TLS certificates and authenticated tokens; certificates on the organization's own services and its mail domain records are its part."
+            },
+            {
+              "artifact_type": "Session protection settings and DNS records",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: SPF, DKIM and DMARC records for each mail domain, certificate details for public services, and VPN and remote access authentication settings."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask how users and services know they are connected to the real system. The assessor checks the mail domain DNS records and the certificate on a public service."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SC.L2-3.13.16",
+      "title": "Protect the confidentiality of CUI at rest.\nAssessment Objective:\n[a] the confidentiality of CUI at rest is protected.",
+      "approach": {
+        "what_assessor_does": "The assessor asks where CUI is stored (laptops, servers, cloud file stores, mail, removable media, backups, mobile devices) and how each location keeps it confidential, usually by encryption, sometimes by tight access control and physical protection. They examine disk encryption status, label encryption settings and backup settings, interview the administrator, and test by picking a sample of devices and stores from the inventory and checking each is encrypted, including any personal or BYOD devices that may hold CUI.",
+        "common_failure_modes": [
+          "No list of where CUI is stored, so some stores (old file shares, backups, USB drives) are missed.",
+          "Most laptops are encrypted but some are not, or encryption is suspended.",
+          "Backups or exports of CUI are written unencrypted.",
+          "Personal devices can sync CUI files with no label encryption or device encryption.",
+          "Sensitivity labels exist but the ones used for CUI do not apply encryption."
+        ]
+      },
+      "objectives": [
+        {
+          "id": "SC.L2-3.13.16[a]",
+          "determination": "the confidentiality of CUI at rest is protected",
+          "methods": [
+            "examine",
+            "interview",
+            "test"
+          ],
+          "evidence": [
+            {
+              "artifact_type": "Data-at-rest evidence collection",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry SC.L2-3.13.16.data-at-rest (evidence-only): collects sensitivity label encryption settings and BitLocker device encryption status; cross-references MP.L2-3.8.6."
+            },
+            {
+              "artifact_type": "Label encryption and usage",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entries SC.L2-3.13.16.byod-sensitivity-labels (label policies with encryption) and SC.L2-3.13.16.byod-label-usage (sample of label application events in the last 30 days)."
+            },
+            {
+              "artifact_type": "Device compliance policy requiring encryption",
+              "ces_source": "stamper_evidence",
+              "notes": "Stamper entry CM.L2-3.4.1.compliance-policy-windows (set; lists SC.L2-3.13.16): CMMC-Compliance-Windows requires BitLocker and storage encryption on managed Windows devices."
+            },
+            {
+              "artifact_type": "Compliance policy and detected apps read",
+              "ces_source": "stack_signal",
+              "notes": "Control signal registry SC.L2-3.13.16 (mobileCodeEvaluator): reads /deviceManagement/deviceCompliancePolicies and /deviceManagement/detectedApps. Presence only: it does not test encryption. The BitLocker coverage test sits under SC.L2-3.13.11 (bitLockerEvaluator)."
+            },
+            {
+              "artifact_type": "Shared responsibility row for this practice",
+              "ces_source": "eo_store",
+              "notes": "EO inheritance data data/fedramp-gcc-high-inheritance.json marks this practice partial (Microsoft and customer both carry part). Microsoft encrypts service data at rest; devices, backups and stores the organization runs are its own part."
+            },
+            {
+              "artifact_type": "CUI storage inventory with protection method",
+              "ces_source": "ec_upload",
+              "notes": "Uploaded through the Evidence Collector: each place CUI is stored, including backups and removable media, and how it is encrypted or otherwise protected."
+            },
+            {
+              "artifact_type": "System administrator interview",
+              "ces_source": "interview",
+              "notes": "Ask where CUI is stored and how each place is protected. The assessor picks devices and stores from the inventory and checks each is encrypted."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
