@@ -1,0 +1,50 @@
+{
+  "rawResponse": "{\r\n    \"name\":  \"CMMC-SharedResource-PagefileClear\",\r\n    \"clearPagefileAtShutdown\":  \"device_vendor_msft_policy_config_localpoliciessecurityoptions_shutdown_clearvirtualmemorypagefile_1\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceManagementConfigurationPolicy-2_allDevicesAssignmentTarget\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.allDevicesAssignmentTarget\"\r\n                                       }\r\n                        }\r\n                    ]\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "SC.L2-3.13.4.pagefile-clear",
+    "label": "Clear the Virtual Memory Pagefile at Shutdown (Intune Settings Catalog, all devices)",
+    "engine": "mgraph",
+    "layer_hint": 6,
+    "sequence_hint": 53,
+    "idempotency": "get-then-set",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "SC.L2-3.13.4"
+    ],
+    "get_command": "$p = @((Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/beta/deviceManagement/configurationPolicies?$expand=settings,assignments').value | Where-Object { $_.name -eq 'CMMC-SharedResource-PagefileClear' }) | Select-Object -First 1; if ($p) { [pscustomobject]@{ name = $p.name; clearPagefileAtShutdown = (@($p.settings | ForEach-Object { $_.settingInstance } | Where-Object { $_.settingDefinitionId -eq 'device_vendor_msft_policy_config_localpoliciessecurityoptions_shutdown_clearvirtualmemorypagefile' }) | Select-Object -First 1).choiceSettingValue.value; assignments = @($p.assignments) } | ConvertTo-Json -Depth 10 }",
+    "set_command": "$existing = @((Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/beta/deviceManagement/configurationPolicies').value | Where-Object { $_.name -eq 'CMMC-SharedResource-PagefileClear' }); if ($existing.Count -gt 0) { Write-Output 'CMMC-SharedResource-PagefileClear already exists' } else { $created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/beta/deviceManagement/configurationPolicies' -Body (@{name='CMMC-SharedResource-PagefileClear';description='CMMC SC.L2-3.13.4 shared resource control - clear virtual memory pagefile at shutdown';platforms='windows10';technologies='mdm';settings=@(@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationSetting';settingInstance=@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance';settingDefinitionId='device_vendor_msft_policy_config_localpoliciessecurityoptions_shutdown_clearvirtualmemorypagefile';choiceSettingValue=@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationChoiceSettingValue';value='device_vendor_msft_policy_config_localpoliciessecurityoptions_shutdown_clearvirtualmemorypagefile_1'}}})} | ConvertTo-Json -Depth 20) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/beta/deviceManagement/configurationPolicies/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.allDevicesAssignmentTarget'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | Select-Object id,name | ConvertTo-Json -Depth 5 }",
+    "evidence_commands": [
+      "$p = @((Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/beta/deviceManagement/configurationPolicies?$expand=settings,assignments').value | Where-Object { $_.name -eq 'CMMC-SharedResource-PagefileClear' }) | Select-Object -First 1; if ($p) { [pscustomobject]@{ name = $p.name; clearPagefileAtShutdown = (@($p.settings | ForEach-Object { $_.settingInstance } | Where-Object { $_.settingDefinitionId -eq 'device_vendor_msft_policy_config_localpoliciessecurityoptions_shutdown_clearvirtualmemorypagefile' }) | Select-Object -First 1).choiceSettingValue.value; assignments = @($p.assignments) } | ConvertTo-Json -Depth 10 }"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SC.L2-3.13.4"
+    ],
+    "timestamp": "2026-11-02T11:35:09.747Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "$existing = @((Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/beta/deviceManagement/configurationPolicies').value | Where-Object { $_.name -eq 'CMMC-SharedResource-PagefileClear' }); if ($existing.Count -gt 0) { Write-Output 'CMMC-SharedResource-PagefileClear already exists' } else { $created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/beta/deviceManagement/configurationPolicies' -Body (@{name='CMMC-SharedResource-PagefileClear';description='CMMC SC.L2-3.13.4 shared resource control - clear virtual memory pagefile at shutdown';platforms='windows10';technologies='mdm';settings=@(@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationSetting';settingInstance=@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance';settingDefinitionId='device_vendor_msft_policy_config_localpoliciessecurityoptions_shutdown_clearvirtualmemorypagefile';choiceSettingValue=@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationChoiceSettingValue';value='device_vendor_msft_policy_config_localpoliciessecurityoptions_shutdown_clearvirtualmemorypagefile_1'}}})} | ConvertTo-Json -Depth 20) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/beta/deviceManagement/configurationPolicies/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.allDevicesAssignmentTarget'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | Select-Object id,name | ConvertTo-Json -Depth 5 }",
+    "sha256Hash": "ddfe26cbe61d83d20646500f53af44edca7ed2cdb02c90d3ae5fc011ff0557c4",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\r\n    \"name\":  \"CMMC-SharedResource-PagefileClear\",\r\n    \"clearPagefileAtShutdown\":  \"device_vendor_msft_policy_config_localpoliciessecurityoptions_shutdown_clearvirtualmemorypagefile_1\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceManagementConfigurationPolicy-2_allDevicesAssignmentTarget\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.allDevicesAssignmentTarget\"\r\n                                       }\r\n                        }\r\n                    ]\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

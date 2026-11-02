@@ -1,0 +1,50 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"deviceConfiguration-9\",\r\n    \"createdDateTime\":  \"2026-11-02T11:35:24.410Z\",\r\n    \"internetSharingBlocked\":  true,\r\n    \"description\":  \"CMMC CM.L2-3.4.7[o]: Connected Devices Service and Internet Connection Sharing off\",\r\n    \"displayName\":  \"CMMC-NonEssential-Services\",\r\n    \"connectedDevicesServiceBlocked\":  true,\r\n    \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceConfiguration-9_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ],\r\n    \"isAssigned\":  true\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "CM.L2-3.4.7.nonessential-services",
+    "label": "Restrict Nonessential Windows Services: Connected Devices, Internet Sharing (Intune)",
+    "engine": "mgraph",
+    "layer_hint": 4,
+    "sequence_hint": 7,
+    "idempotency": "get-then-set",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "CM.L2-3.4.7"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations?$expand=assignments').value | Where-Object displayName -eq 'CMMC-NonEssential-Services' | Select-Object -First 1 | ConvertTo-Json -Depth 10",
+    "set_command": "$created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations' -Body (@{'@odata.type'='#microsoft.graph.windows10GeneralConfiguration';displayName='CMMC-NonEssential-Services';description='CMMC CM.L2-3.4.7[o]: Connected Devices Service and Internet Connection Sharing off';connectedDevicesServiceBlocked=$true;internetSharingBlocked=$true} | ConvertTo-Json -Depth 10) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | ConvertTo-Json -Depth 10",
+    "evidence_commands": [
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations?$expand=assignments').value | Where-Object displayName -eq 'CMMC-NonEssential-Services' | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "CM.L2-3.4.7"
+    ],
+    "timestamp": "2026-11-02T11:35:25.263Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "$created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations' -Body (@{'@odata.type'='#microsoft.graph.windows10GeneralConfiguration';displayName='CMMC-NonEssential-Services';description='CMMC CM.L2-3.4.7[o]: Connected Devices Service and Internet Connection Sharing off';connectedDevicesServiceBlocked=$true;internetSharingBlocked=$true} | ConvertTo-Json -Depth 10) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | ConvertTo-Json -Depth 10",
+    "sha256Hash": "41219713b99a8fe5f7511fd677b4babf6cccf418f9e4ee9b62be6552e65e0a86",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\r\n    \"id\":  \"deviceConfiguration-9\",\r\n    \"createdDateTime\":  \"2026-11-02T11:35:24.410Z\",\r\n    \"internetSharingBlocked\":  true,\r\n    \"description\":  \"CMMC CM.L2-3.4.7[o]: Connected Devices Service and Internet Connection Sharing off\",\r\n    \"displayName\":  \"CMMC-NonEssential-Services\",\r\n    \"connectedDevicesServiceBlocked\":  true,\r\n    \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceConfiguration-9_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ],\r\n    \"isAssigned\":  true\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

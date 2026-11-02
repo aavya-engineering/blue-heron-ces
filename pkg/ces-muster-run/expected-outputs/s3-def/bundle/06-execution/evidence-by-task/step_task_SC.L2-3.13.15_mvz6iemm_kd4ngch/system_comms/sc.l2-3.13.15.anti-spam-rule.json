@@ -1,0 +1,50 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"CMMC-AntiSpam-Rule\",\r\n    \"Identity\":  \"CMMC-AntiSpam-Rule\",\r\n    \"Name\":  \"CMMC-AntiSpam-Rule\",\r\n    \"HostedContentFilterPolicy\":  \"CMMC-AntiSpam\",\r\n    \"RecipientDomainIs\":  \"s3-def.simtenant.onmicrosoft.us\",\r\n    \"State\":  \"Enabled\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "SC.L2-3.13.15.anti-spam-rule",
+    "label": "Create Anti-Spam Inbound Filter Rule for Primary Domain",
+    "engine": "exchange",
+    "layer_hint": 5,
+    "sequence_hint": 22,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "SC.L2-3.13.15"
+    ],
+    "get_command": "Get-HostedContentFilterRule | Where-Object { ($_.Name -eq 'CMMC-AntiSpam-Rule') -or (($_.State -eq 'Enabled') -and ($_.HostedContentFilterPolicy -eq '{antiSpamPolicyName}') -and (@($_.RecipientDomainIs) -contains '{primaryDomain}')) } | Sort-Object { $_.Name -ne 'CMMC-AntiSpam-Rule' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
+    "set_command": "try { New-HostedContentFilterRule -Name 'CMMC-AntiSpam-Rule' -HostedContentFilterPolicy '{antiSpamPolicyName}' -RecipientDomainIs '{primaryDomain}' } catch { Set-HostedContentFilterRule -Identity 'CMMC-AntiSpam-Rule' -HostedContentFilterPolicy '{antiSpamPolicyName}' -RecipientDomainIs '{primaryDomain}' }",
+    "evidence_commands": [
+      "Get-HostedContentFilterRule -Identity 'CMMC-AntiSpam-Rule' | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SC.L2-3.13.15"
+    ],
+    "timestamp": "2026-11-02T11:37:14.317Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "try { New-HostedContentFilterRule -Name 'CMMC-AntiSpam-Rule' -HostedContentFilterPolicy '{antiSpamPolicyName}' -RecipientDomainIs '{primaryDomain}' } catch { Set-HostedContentFilterRule -Identity 'CMMC-AntiSpam-Rule' -HostedContentFilterPolicy '{antiSpamPolicyName}' -RecipientDomainIs '{primaryDomain}' }",
+    "sha256Hash": "87c8915051eb6f3e73fbec8fe464faa432a7e83a1609cca5b21b0071f2a83b9b",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\r\n    \"id\":  \"CMMC-AntiSpam-Rule\",\r\n    \"Identity\":  \"CMMC-AntiSpam-Rule\",\r\n    \"Name\":  \"CMMC-AntiSpam-Rule\",\r\n    \"HostedContentFilterPolicy\":  \"CMMC-AntiSpam\",\r\n    \"RecipientDomainIs\":  \"s3-def.simtenant.onmicrosoft.us\",\r\n    \"State\":  \"Enabled\"\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

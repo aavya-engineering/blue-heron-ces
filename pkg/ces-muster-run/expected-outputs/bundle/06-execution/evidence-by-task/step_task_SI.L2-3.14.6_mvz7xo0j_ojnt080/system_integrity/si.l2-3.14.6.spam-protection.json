@@ -1,0 +1,35 @@
+{
+  "rawResponse": "[\r\n    {\r\n        \"id\":  \"Default\",\r\n        \"Identity\":  \"Default\",\r\n        \"Name\":  \"Default\",\r\n        \"IsDefault\":  true,\r\n        \"HighConfidenceSpamAction\":  \"MoveToJmf\",\r\n        \"SpamAction\":  \"MoveToJmf\",\r\n        \"BulkThreshold\":  7,\r\n        \"IsValid\":  true\r\n    },\r\n    {\r\n        \"id\":  \"CMMC-AntiSpam\",\r\n        \"Identity\":  \"CMMC-AntiSpam\",\r\n        \"IsValid\":  true,\r\n        \"Name\":  \"CMMC-AntiSpam\",\r\n        \"SpamAction\":  \"MoveToJmf\",\r\n        \"HighConfidenceSpamAction\":  \"Quarantine\",\r\n        \"BulkThreshold\":  6,\r\n        \"PhishSpamAction\":  \"Quarantine\"\r\n    }\r\n]\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "SI.L2-3.14.6.spam-protection",
+    "label": "Anti-Spam Hosted Content Filter Policy Evidence",
+    "engine": "exchange",
+    "layer_hint": 7,
+    "sequence_hint": 50,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "SI.L2-3.14.6"
+    ],
+    "get_command": "Get-HostedContentFilterPolicy -Identity 'Default' | Select-Object Name,IsDefault,HighConfidenceSpamAction,SpamAction,BulkThreshold | ConvertTo-Json",
+    "set_command": "",
+    "evidence_commands": [
+      "Get-HostedContentFilterPolicy | ConvertTo-Json -Depth 3"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SI.L2-3.14.6"
+    ],
+    "timestamp": "2026-11-02T12:16:48.065Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Anti-Spam Hosted Content Filter Policy Evidence",
+    "sha256Hash": "a9d7693afe0f6a39cbb55c4ff4bfe4b3c0d19c79e489a14c883510f2175b5866",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

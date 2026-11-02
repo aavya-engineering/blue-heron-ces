@@ -83,6 +83,9 @@ export interface LeaverFlowDeps {
   publicBaseUrl: string;
   /** BHD's role mailbox for opted-in done notices (CES_BHD_NOTICE_MAILBOX); never a person. */
   bhdMailbox?: string;
+  /** Simulator only (CES_AO_LEAVER_SINCE, as EO's CES_EO_ADMINOPS_SINCE): flows created before this ISO time belong to
+   *  another run and never count as tracked. ces.db is shared across runs; unset in production (R-F12, LOG-RF12-DIAG). */
+  trackedSince?: string;
   now?(): Date;
   logger?: Pick<Console, 'log' | 'warn'>;
 }
@@ -146,7 +149,9 @@ export class LeaverFlowService {
   /** The flow already tracking this leaver (same tenant, same UPN, same leave date), if any. */
   private tracked(tenantSlug: string, upn: string, leaveAt: string | null | undefined): LeaverFlow | undefined {
     const key = upn.trim().toLowerCase();
+    const since = this.deps.trackedSince ? Date.parse(this.deps.trackedSince) : NaN;
     return listFlows(tenantSlug).find((f) =>
+      !(Number.isFinite(since) && Date.parse(f.createdAt) < since) &&
       f.leaver.upn.toLowerCase() === key &&
       ((f.leaver.employeeLeaveDateTime ?? null) === (leaveAt ?? null) || OPEN_STATUSES.includes(f.status)));
   }

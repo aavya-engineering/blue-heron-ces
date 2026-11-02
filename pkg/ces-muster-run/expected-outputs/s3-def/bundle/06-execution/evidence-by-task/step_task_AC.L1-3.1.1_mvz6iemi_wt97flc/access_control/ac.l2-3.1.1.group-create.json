@@ -1,0 +1,48 @@
+{
+  "rawResponse": "{\r\n    \"securityEnabled\":  true,\r\n    \"mailEnabled\":  false,\r\n    \"createdDateTime\":  \"\\/Date(1733702400000)\\/\",\r\n    \"id\":  \"group-1\",\r\n    \"displayName\":  \"CUI-Authorized-Users\",\r\n    \"groupTypes\":  [\r\n\r\n                   ],\r\n    \"description\":  \"Program drawings site members (named CUI, but the site is shared to anyone)\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Resource already exists — creation skipped (idempotent)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Already compliant — state unchanged, evidence confirms resource exists",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "Already compliant — state unchanged, evidence confirms resource exists"
+  },
+  "registryEntry": {
+    "entry_id": "AC.L2-3.1.1.group-create",
+    "label": "Create CUI Security Group",
+    "engine": "mgraph",
+    "layer_hint": 7,
+    "sequence_hint": 0,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "AC.L1-3.1.1"
+    ],
+    "get_command": "Get-MgGroup -Filter 'displayName eq ''{cuiGroupName}''' | ConvertTo-Json",
+    "set_command": "New-MgGroup -DisplayName '{cuiGroupName}' -MailEnabled:$false -MailNickname '{cuiGroupName}' -SecurityEnabled:$true",
+    "evidence_commands": [
+      "Get-MgGroup -Filter 'displayName eq ''{cuiGroupName}''' | Select-Object Id,DisplayName,SecurityEnabled,CreatedDateTime | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AC.L1-3.1.1"
+    ],
+    "timestamp": "2026-11-02T11:33:48.855Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "New-MgGroup -DisplayName '{cuiGroupName}' -MailEnabled:$false -MailNickname '{cuiGroupName}' -SecurityEnabled:$true",
+    "sha256Hash": "f3f0b81b9a1d4401ed250fb3d73280ab48206dcff61cfab3576b46cdbf19e0e3",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "{\r\n    \"securityEnabled\":  true,\r\n    \"mailEnabled\":  false,\r\n    \"createdDateTime\":  \"\\/Date(1733702400000)\\/\",\r\n    \"id\":  \"group-1\",\r\n    \"displayName\":  \"CUI-Authorized-Users\",\r\n    \"groupTypes\":  [\r\n\r\n                   ],\r\n    \"description\":  \"Program drawings site members (named CUI, but the site is shared to anyone)\"\r\n}\r\n",
+    "postcheckMode": "state"
+  }
+}

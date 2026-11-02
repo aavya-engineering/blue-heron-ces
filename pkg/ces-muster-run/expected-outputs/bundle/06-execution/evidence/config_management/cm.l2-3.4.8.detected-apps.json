@@ -6,14 +6,16 @@
   "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
   "registryEntry": {
     "entry_id": "CM.L2-3.4.8.detected-apps",
-    "label": "Renderable: Detected Applications Inventory Evidence via Intune",
+    "label": "Detected Applications Inventory Evidence via Intune",
     "engine": "mgraph",
-    "layer_hint": 8,
+    "layer_hint": 4,
     "sequence_hint": 3,
-    "idempotency": "safe",
+    "idempotency": "evidence-only",
     "on_failure": "abort_step",
     "control_ids": [
-      "CM.L2-3.4.8"
+      "CM.L2-3.4.8",
+      "CM.L2-3.4.1",
+      "CM.L2-3.4.9"
     ],
     "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/detectedApps').value | Select-Object displayName,version,deviceCount",
     "set_command": "",
@@ -23,11 +25,13 @@
   },
   "metadata": {
     "controlIds": [
-      "CM.L2-3.4.8"
+      "CM.L2-3.4.8",
+      "CM.L2-3.4.1",
+      "CM.L2-3.4.9"
     ],
-    "timestamp": "2026-11-01T17:12:11.562Z",
+    "timestamp": "2026-11-02T12:14:48.592Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
-    "commandExecuted": "[manual/evidence-only] Renderable: Detected Applications Inventory Evidence via Intune",
+    "commandExecuted": "[manual/evidence-only] Detected Applications Inventory Evidence via Intune",
     "sha256Hash": "11967015efac7b63e3fd07e58c5ecd5713533cc7347e0c1fcc11197fd6f37a96",
     "moduleVersions": {},
     "environment": "GCC-High"

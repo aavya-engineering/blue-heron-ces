@@ -1,0 +1,39 @@
+{
+  "rawResponse": "{\r\n    \"NSGName\":  \"nsg-workload-cmmc\",\r\n    \"SecurityRules\":  [\r\n                          {\r\n                              \"Name\":  \"DenyAllInbound\",\r\n                              \"Protocol\":  \"*\",\r\n                              \"SourceAddressPrefix\":  \"*\",\r\n                              \"DestinationAddressPrefix\":  \"*\",\r\n                              \"DestinationPortRange\":  \"*\",\r\n                              \"Access\":  \"Deny\",\r\n                              \"Priority\":  4096,\r\n                              \"Direction\":  \"Inbound\"\r\n                          },\r\n                          {\r\n                              \"Name\":  \"DenyAllOutbound\",\r\n                              \"Protocol\":  \"*\",\r\n                              \"SourceAddressPrefix\":  \"*\",\r\n                              \"DestinationAddressPrefix\":  \"*\",\r\n                              \"DestinationPortRange\":  \"*\",\r\n                              \"Access\":  \"Deny\",\r\n                              \"Priority\":  4096,\r\n                              \"Direction\":  \"Outbound\"\r\n                          },\r\n                          {\r\n                              \"Name\":  \"CES-Out-443-AzureActiveDirectory\",\r\n                              \"Protocol\":  \"Tcp\",\r\n                              \"SourceAddressPrefix\":  \"VirtualNetwork\",\r\n                              \"DestinationAddressPrefix\":  \"AzureActiveDirectory\",\r\n                              \"DestinationPortRange\":  \"443\",\r\n                              \"Access\":  \"Allow\",\r\n                              \"Priority\":  200,\r\n                              \"Direction\":  \"Outbound\"\r\n                          },\r\n                          {\r\n                              \"Name\":  \"CES-Out-443-AzureResourceManager\",\r\n                              \"Protocol\":  \"Tcp\",\r\n                              \"SourceAddressPrefix\":  \"VirtualNetwork\",\r\n                              \"DestinationAddressPrefix\":  \"AzureResourceManager\",\r\n                              \"DestinationPortRange\":  \"443\",\r\n                              \"Access\":  \"Allow\",\r\n                              \"Priority\":  201,\r\n                              \"Direction\":  \"Outbound\"\r\n                          },\r\n                          {\r\n                              \"Name\":  \"CES-Out-443-AzureKeyVault\",\r\n                              \"Protocol\":  \"Tcp\",\r\n                              \"SourceAddressPrefix\":  \"VirtualNetwork\",\r\n                              \"DestinationAddressPrefix\":  \"AzureKeyVault\",\r\n                              \"DestinationPortRange\":  \"443\",\r\n                              \"Access\":  \"Allow\",\r\n                              \"Priority\":  202,\r\n                              \"Direction\":  \"Outbound\"\r\n                          },\r\n                          {\r\n                              \"Name\":  \"CES-Out-443-Storage\",\r\n                              \"Protocol\":  \"Tcp\",\r\n                              \"SourceAddressPrefix\":  \"VirtualNetwork\",\r\n                              \"DestinationAddressPrefix\":  \"Storage\",\r\n                              \"DestinationPortRange\":  \"443\",\r\n                              \"Access\":  \"Allow\",\r\n                              \"Priority\":  203,\r\n                              \"Direction\":  \"Outbound\"\r\n                          },\r\n                          {\r\n                              \"Name\":  \"CES-Out-443-GuestAndHybridManagement\",\r\n                              \"Protocol\":  \"Tcp\",\r\n                              \"SourceAddressPrefix\":  \"VirtualNetwork\",\r\n                              \"DestinationAddressPrefix\":  \"GuestAndHybridManagement\",\r\n                              \"DestinationPortRange\":  \"443\",\r\n                              \"Access\":  \"Allow\",\r\n                              \"Priority\":  204,\r\n                              \"Direction\":  \"Outbound\"\r\n                          },\r\n                          {\r\n                              \"Name\":  \"CES-Out-443-AzureUpdateDelivery\",\r\n                              \"Protocol\":  \"Tcp\",\r\n                              \"SourceAddressPrefix\":  \"VirtualNetwork\",\r\n                              \"DestinationAddressPrefix\":  \"AzureUpdateDelivery\",\r\n                              \"DestinationPortRange\":  \"443\",\r\n                              \"Access\":  \"Allow\",\r\n                              \"Priority\":  205,\r\n                              \"Direction\":  \"Outbound\"\r\n                          },\r\n                          {\r\n                              \"Name\":  \"CES-Out-443-AzureFrontDoor-FirstParty\",\r\n                              \"Protocol\":  \"Tcp\",\r\n                              \"SourceAddressPrefix\":  \"VirtualNetwork\",\r\n                              \"DestinationAddressPrefix\":  \"AzureFrontDoor.FirstParty\",\r\n                              \"DestinationPortRange\":  \"443\",\r\n                              \"Access\":  \"Allow\",\r\n                              \"Priority\":  206,\r\n                              \"Direction\":  \"Outbound\"\r\n                          }\r\n                      ],\r\n    \"DefaultSecurityRules\":  {\r\n\r\n                             }\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "SC.L1-3.13.1.nsg-boundary-rules",
+    "label": "NSG Boundary Protection Rules",
+    "engine": "az",
+    "layer_hint": 6,
+    "sequence_hint": 39,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "SC.L1-3.13.1",
+      "SC.L2-3.13.6",
+      "SC.L1-3.13.5"
+    ],
+    "get_command": "Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' | ForEach-Object { $nsg = $_; [PSCustomObject]@{ NSGName = $nsg.Name; SecurityRules = $nsg.SecurityRules | Select-Object Name,Protocol,SourceAddressPrefix,DestinationAddressPrefix,DestinationPortRange,Access,Priority,Direction; DefaultSecurityRules = $nsg.DefaultSecurityRules | Select-Object Name,Access,Priority,Direction } } | ConvertTo-Json -Depth 10",
+    "set_command": "",
+    "evidence_commands": [
+      "Get-AzNetworkSecurityGroup -ResourceGroupName '{resourceGroup}' | ForEach-Object { $nsg = $_; [PSCustomObject]@{ NSGName = $nsg.Name; SecurityRules = $nsg.SecurityRules | Select-Object Name,Protocol,SourceAddressPrefix,DestinationAddressPrefix,DestinationPortRange,Access,Priority,Direction; DefaultSecurityRules = $nsg.DefaultSecurityRules | Select-Object Name,Access,Priority,Direction } } | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SC.L1-3.13.1",
+      "SC.L2-3.13.6",
+      "SC.L1-3.13.5"
+    ],
+    "timestamp": "2026-11-02T11:36:10.376Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] NSG Boundary Protection Rules",
+    "sha256Hash": "eb84b02493015f14465a83c87b8ca605bb90bcbcc2e813cce83c824b64235e37",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

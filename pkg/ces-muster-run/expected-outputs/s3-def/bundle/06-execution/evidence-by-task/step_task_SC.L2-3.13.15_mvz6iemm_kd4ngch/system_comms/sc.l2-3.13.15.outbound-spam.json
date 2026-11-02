@@ -1,0 +1,52 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"CMMC-OutboundSpam\",\r\n    \"Identity\":  \"CMMC-OutboundSpam\",\r\n    \"Name\":  \"CMMC-OutboundSpam\",\r\n    \"ActionWhenThresholdReached\":  \"BlockUser\",\r\n    \"RecipientLimitExternalPerHour\":  500,\r\n    \"IsValid\":  true\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "SC.L2-3.13.15.outbound-spam",
+    "label": "Create Outbound Spam Filter Policy with User Block on Threshold",
+    "engine": "exchange",
+    "layer_hint": 5,
+    "sequence_hint": 23,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "SC.L2-3.13.15",
+      "SI.L2-3.14.6"
+    ],
+    "get_command": "Get-HostedOutboundSpamFilterPolicy | Where-Object { ($_.Name -eq 'CMMC-OutboundSpam') -or (($_.IsDefault -ne $true) -and ($_.ActionWhenThresholdReached -eq 'BlockUser') -and ($null -ne $_.RecipientLimitExternalPerHour -and [double]$_.RecipientLimitExternalPerHour -ge 1) -and ($null -ne $_.RecipientLimitExternalPerHour -and [double]$_.RecipientLimitExternalPerHour -le 500)) } | Sort-Object { $_.Name -ne 'CMMC-OutboundSpam' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
+    "set_command": "try { New-HostedOutboundSpamFilterPolicy -Name 'CMMC-OutboundSpam' -ActionWhenThresholdReached BlockUser -RecipientLimitExternalPerHour 500 | Out-Null } catch { Set-HostedOutboundSpamFilterPolicy -Identity 'CMMC-OutboundSpam' -ActionWhenThresholdReached BlockUser -RecipientLimitExternalPerHour 500 | Out-Null }; Get-HostedOutboundSpamFilterPolicy -Identity 'CMMC-OutboundSpam' | Select-Object Name | ConvertTo-Json",
+    "evidence_commands": [
+      "Get-HostedOutboundSpamFilterPolicy -Identity 'CMMC-OutboundSpam' | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SC.L2-3.13.15",
+      "SI.L2-3.14.6"
+    ],
+    "timestamp": "2026-11-02T11:37:16.022Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "try { New-HostedOutboundSpamFilterPolicy -Name 'CMMC-OutboundSpam' -ActionWhenThresholdReached BlockUser -RecipientLimitExternalPerHour 500 | Out-Null } catch { Set-HostedOutboundSpamFilterPolicy -Identity 'CMMC-OutboundSpam' -ActionWhenThresholdReached BlockUser -RecipientLimitExternalPerHour 500 | Out-Null }; Get-HostedOutboundSpamFilterPolicy -Identity 'CMMC-OutboundSpam' | Select-Object Name | ConvertTo-Json",
+    "sha256Hash": "15a8df37f1c66b7a16456b64483e1985f696680b1e698f02b221b9ef9fec19f1",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\r\n    \"id\":  \"CMMC-OutboundSpam\",\r\n    \"Identity\":  \"CMMC-OutboundSpam\",\r\n    \"Name\":  \"CMMC-OutboundSpam\",\r\n    \"ActionWhenThresholdReached\":  \"BlockUser\",\r\n    \"RecipientLimitExternalPerHour\":  500,\r\n    \"IsValid\":  true\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

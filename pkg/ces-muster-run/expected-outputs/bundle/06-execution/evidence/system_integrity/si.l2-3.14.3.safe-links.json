@@ -24,7 +24,8 @@
     "idempotency": "get-then-set",
     "on_failure": "abort_step",
     "control_ids": [
-      "SI.L2-3.14.3"
+      "SI.L2-3.14.3",
+      "SI.L2-3.14.6"
     ],
     "get_command": "Get-SafeLinksPolicy | Where-Object { ($_.Name -eq 'CMMC-SafeLinks') -or (($_.IsDefault -ne $true) -and ($_.EnableSafeLinksForEmail -eq $true) -and ($_.ScanUrls -eq $true) -and ($_.EnableForInternalSenders -eq $true)) } | Sort-Object { $_.Name -ne 'CMMC-SafeLinks' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
     "set_command": "New-SafeLinksPolicy -Name 'CMMC-SafeLinks' -EnableSafeLinksForEmail $true -ScanUrls $true -EnableForInternalSenders $true -DeliverMessageAfterScan $true | Out-Null; Get-SafeLinksPolicy -Identity 'CMMC-SafeLinks' | Select-Object Name | ConvertTo-Json",
@@ -32,9 +33,10 @@
   },
   "metadata": {
     "controlIds": [
-      "SI.L2-3.14.3"
+      "SI.L2-3.14.3",
+      "SI.L2-3.14.6"
     ],
-    "timestamp": "2026-11-01T17:12:02.421Z",
+    "timestamp": "2026-11-02T12:16:45.666Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "New-SafeLinksPolicy -Name 'CMMC-SafeLinks' -EnableSafeLinksForEmail $true -ScanUrls $true -EnableForInternalSenders $true -DeliverMessageAfterScan $true | Out-Null; Get-SafeLinksPolicy -Identity 'CMMC-SafeLinks' | Select-Object Name | ConvertTo-Json",
     "sha256Hash": "e3388912363a494a797aa18a903189336db16344ba5dc0e80995e3f17ef19c25",

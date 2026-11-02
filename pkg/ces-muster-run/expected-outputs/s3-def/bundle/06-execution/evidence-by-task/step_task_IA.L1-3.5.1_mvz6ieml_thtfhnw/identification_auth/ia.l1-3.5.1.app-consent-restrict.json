@@ -1,0 +1,50 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"authorizationPolicy\",\r\n    \"allowedToCreateApps\":  false,\r\n    \"userConsentPolicies\":  0\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Already compliant — state unchanged, evidence confirms resource exists",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "Already compliant — state unchanged, evidence confirms resource exists"
+  },
+  "registryEntry": {
+    "entry_id": "IA.L1-3.5.1.app-consent-restrict",
+    "label": "Users Cannot Register Applications or Consent to Apps (Admin-Identified Apps Only)",
+    "engine": "mgraph",
+    "layer_hint": 1,
+    "sequence_hint": 12,
+    "idempotency": "get-then-set",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "IA.L1-3.5.1"
+    ],
+    "get_command": "Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/policies/authorizationPolicy' | ForEach-Object { [pscustomobject]@{ id = $_.id; allowedToCreateApps = $_.defaultUserRolePermissions.allowedToCreateApps; userConsentPolicies = @($_.defaultUserRolePermissions.permissionGrantPoliciesAssigned | Where-Object { $_ -like 'ManagePermissionGrantsForSelf.*' }).Count } } | Select-Object -First 1 | ConvertTo-Json -Depth 5",
+    "set_command": "Invoke-MgGraphRequest -Method PATCH -Uri 'https://graph.microsoft.us/v1.0/policies/authorizationPolicy' -Body (@{defaultUserRolePermissions=@{allowedToCreateApps=$false;permissionGrantPoliciesAssigned=@()}} | ConvertTo-Json -Depth 5) -ContentType 'application/json'",
+    "evidence_commands": [
+      "Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/policies/authorizationPolicy' | ForEach-Object { [pscustomobject]@{ id = $_.id; allowedToCreateApps = $_.defaultUserRolePermissions.allowedToCreateApps; userConsentPolicies = @($_.defaultUserRolePermissions.permissionGrantPoliciesAssigned | Where-Object { $_ -like 'ManagePermissionGrantsForSelf.*' }).Count } } | Select-Object -First 1 | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "IA.L1-3.5.1"
+    ],
+    "timestamp": "2026-11-02T11:33:25.793Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "Invoke-MgGraphRequest -Method PATCH -Uri 'https://graph.microsoft.us/v1.0/policies/authorizationPolicy' -Body (@{defaultUserRolePermissions=@{allowedToCreateApps=$false;permissionGrantPoliciesAssigned=@()}} | ConvertTo-Json -Depth 5) -ContentType 'application/json'",
+    "sha256Hash": "704c0f805a31101eb1842145173bc39abf89f2a7766bf1271a284f2e0da0f019",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "{\r\n    \"id\":  \"authorizationPolicy\",\r\n    \"allowedToCreateApps\":  false,\r\n    \"userConsentPolicies\":  0\r\n}\r\n",
+    "postStateOutput": "{\r\n    \"id\":  \"authorizationPolicy\",\r\n    \"allowedToCreateApps\":  false,\r\n    \"userConsentPolicies\":  0\r\n}\r\n",
+    "stateChanged": false,
+    "postcheckMode": "state"
+  }
+}

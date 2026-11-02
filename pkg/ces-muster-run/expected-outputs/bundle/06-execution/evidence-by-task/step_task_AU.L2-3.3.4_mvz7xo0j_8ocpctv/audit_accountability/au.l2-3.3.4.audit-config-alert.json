@@ -1,0 +1,62 @@
+{
+  "rawResponse": "\r\n\r\nid                  : CMMC-Audit-Logging-Changed\r\nIdentity            : CMMC-Audit-Logging-Changed\r\nName                : CMMC-Audit-Logging-Changed\r\nCategory            : Others\r\nSeverity            : High\r\nThreatType          : Activity\r\nOperation           : {Set-AdminAuditLogConfig}\r\nNotifyUser          : {unset-security-email@example.invalid}\r\nAggregationType     : None\r\nComment             : CMMC AU.L2-3.3.4: alerts the named security contact when the audit log configuration is changed \r\n                      or turned off (audit logging process failure).\r\nDisabled            : False\r\nIsSystemRule        : False\r\nNotificationEnabled : True\r\n\r\n\r\n\r\n",
+  "outcome": "failed_no_remediation",
+  "outcomeRationale": "SET/verification failed: verification failed — built from an unanswered placeholder (the read shows 'unset-security-email@example.invalid')",
+  "failureDiagnostics": {
+    "rootCause": "exit_code_0",
+    "failureCategory": "FATAL",
+    "remediationSteps": [
+      "Review command output and stderr for specific error details",
+      "Check M365 GCC High service health dashboard",
+      "Consult PowerShell module documentation for the failing command"
+    ],
+    "exitCode": 0,
+    "stderrTail": "",
+    "stdoutTail": "\r\n\r\nid                  : CMMC-Audit-Logging-Changed\r\nIdentity            : CMMC-Audit-Logging-Changed\r\nName                : CMMC-Audit-Logging-Changed\r\nCategory            : Others\r\nSeverity            : High\r\nThreatType          : Activity\r\nOperation           : {Set-AdminAuditLogConfig}\r\nNotifyUser          : {unset-security-email@example.invalid}\r\nAggregationType     : None\r\nComment             : CMMC AU.L2-3.3.4: alerts the named security contact when the audit log configuration is changed \r\n                      or turned off (audit logging process failure).\r\nDisabled            : False\r\nIsSystemRule        : False\r\nNotificationEnabled : True\r\n\r\n\r\n\r\n"
+  },
+  "complianceVerdict": "NOT_SAT",
+  "verdictRationale": "built from an unanswered placeholder (the read shows 'unset-security-email@example.invalid')",
+  "verificationResult": {
+    "passed": false,
+    "confidence": "FAILED",
+    "score": 25,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": false
+    },
+    "reason": "built from an unanswered placeholder (the read shows 'unset-security-email@example.invalid')"
+  },
+  "registryEntry": {
+    "entry_id": "AU.L2-3.3.4.audit-config-alert",
+    "label": "Alert Policy - Audit Logging Changed or Turned Off",
+    "engine": "ipps",
+    "layer_hint": 7,
+    "sequence_hint": 15,
+    "idempotency": "get-then-set",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "AU.L2-3.3.4"
+    ],
+    "get_command": "Get-ProtectionAlert | ForEach-Object { [pscustomobject]@{ Name = $_.Name; Disabled = $_.Disabled; Severity = $_.Severity; Operation = @($_.Operation); NotifyUser = @($_.NotifyUser) } } | Where-Object { ($_.Name -eq 'CMMC-Audit-Logging-Changed') -or (($_.Disabled -eq $false) -and (@($_.Operation) -contains 'Set-AdminAuditLogConfig') -and (@($_.NotifyUser | Where-Object { $_ }).Count -gt 0)) } | Sort-Object { $_.Name -ne 'CMMC-Audit-Logging-Changed' } | Select-Object -First 1 | ConvertTo-Json -Depth 5",
+    "set_command": "New-ProtectionAlert -Name 'CMMC-Audit-Logging-Changed' -Category Others -ThreatType Activity -Operation 'Set-AdminAuditLogConfig' -NotifyUser '{cisoEmail}' -Severity High -AggregationType None -Comment 'CMMC AU.L2-3.3.4: alerts the named security contact when the audit log configuration is changed or turned off (audit logging process failure).'",
+    "evidence_commands": [
+      "Get-ProtectionAlert | ForEach-Object { [pscustomobject]@{ Name = $_.Name; Disabled = $_.Disabled; Severity = $_.Severity; Operation = @($_.Operation); NotifyUser = @($_.NotifyUser) } } | Where-Object { ($_.Name -eq 'CMMC-Audit-Logging-Changed') -or (($_.Disabled -eq $false) -and (@($_.Operation) -contains 'Set-AdminAuditLogConfig') -and (@($_.NotifyUser | Where-Object { $_ }).Count -gt 0)) } | Sort-Object { $_.Name -ne 'CMMC-Audit-Logging-Changed' } | Select-Object -First 1 | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AU.L2-3.3.4"
+    ],
+    "timestamp": "2026-11-02T12:16:01.987Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "New-ProtectionAlert -Name 'CMMC-Audit-Logging-Changed' -Category Others -ThreatType Activity -Operation 'Set-AdminAuditLogConfig' -NotifyUser '{cisoEmail}' -Severity High -AggregationType None -Comment 'CMMC AU.L2-3.3.4: alerts the named security contact when the audit log configuration is changed or turned off (audit logging process failure).'",
+    "sha256Hash": "7d03c350f87a18877c445fac39cb4ece9caf27ec07b62f775b0ef1e6b56b506e",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\r\n    \"Name\":  \"CMMC-Audit-Logging-Changed\",\r\n    \"Disabled\":  false,\r\n    \"Severity\":  \"High\",\r\n    \"Operation\":  [\r\n                      \"Set-AdminAuditLogConfig\"\r\n                  ],\r\n    \"NotifyUser\":  [\r\n                       \"unset-security-email@example.invalid\"\r\n                   ]\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

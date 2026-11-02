@@ -1,0 +1,52 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"deviceCompliancePolicy-3\",\r\n    \"createdDateTime\":  \"2026-11-02T12:13:51.723Z\",\r\n    \"@odata.type\":  \"#microsoft.graph.iosCompliancePolicy\",\r\n    \"description\":  \"CMMC L2 iOS/iPadOS device compliance baseline\",\r\n    \"passcodeMinutesOfInactivityBeforeScreenTimeout\":  15,\r\n    \"securityBlockJailbrokenDevices\":  true,\r\n    \"scheduledActionsForRule\":  [\r\n                                    {\r\n                                        \"scheduledActionConfigurations\":  [\r\n                                                                              {\r\n                                                                                  \"actionType\":  \"block\",\r\n                                                                                  \"notificationTemplateId\":  \"\",\r\n                                                                                  \"gracePeriodHours\":  0,\r\n                                                                                  \"notificationMessageCCList\":  [\r\n\r\n                                                                                                                ]\r\n                                                                              }\r\n                                                                          ],\r\n                                        \"ruleName\":  \"PasswordRequired\"\r\n                                    }\r\n                                ],\r\n    \"passcodeMinimumLength\":  6,\r\n    \"passcodeBlockSimple\":  true,\r\n    \"passcodeRequired\":  true,\r\n    \"displayName\":  \"CMMC-Compliance-iOS\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceCompliancePolicy-3_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ],\r\n    \"isAssigned\":  true\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "AC.L2-3.1.18.ios-compliance",
+    "label": "iOS/iPadOS Device Compliance Policy (CMMC baseline)",
+    "engine": "mgraph",
+    "layer_hint": 4,
+    "sequence_hint": 13,
+    "idempotency": "get-then-set",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "AC.L2-3.1.18",
+      "AC.L2-3.1.19"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceCompliancePolicies?$expand=assignments').value | Where-Object { $_.displayName -eq 'CMMC-Compliance-iOS' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
+    "set_command": "$created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceCompliancePolicies' -Body (@{'@odata.type'='#microsoft.graph.iosCompliancePolicy';displayName='CMMC-Compliance-iOS';description='CMMC L2 iOS/iPadOS device compliance baseline';passcodeRequired=$true;passcodeBlockSimple=$true;passcodeMinimumLength=6;passcodeMinutesOfInactivityBeforeScreenTimeout=15;securityBlockJailbrokenDevices=$true;scheduledActionsForRule=@(@{ruleName='PasswordRequired';scheduledActionConfigurations=@(@{actionType='block';gracePeriodHours=0;notificationTemplateId='';notificationMessageCCList=@()})})} | ConvertTo-Json -Depth 10) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/v1.0/deviceManagement/deviceCompliancePolicies/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | ConvertTo-Json -Depth 10",
+    "evidence_commands": [
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceCompliancePolicies?$expand=assignments').value | Where-Object { $_.'@odata.type' -eq '#microsoft.graph.iosCompliancePolicy' } | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AC.L2-3.1.18",
+      "AC.L2-3.1.19"
+    ],
+    "timestamp": "2026-11-02T12:13:52.570Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "$created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceCompliancePolicies' -Body (@{'@odata.type'='#microsoft.graph.iosCompliancePolicy';displayName='CMMC-Compliance-iOS';description='CMMC L2 iOS/iPadOS device compliance baseline';passcodeRequired=$true;passcodeBlockSimple=$true;passcodeMinimumLength=6;passcodeMinutesOfInactivityBeforeScreenTimeout=15;securityBlockJailbrokenDevices=$true;scheduledActionsForRule=@(@{ruleName='PasswordRequired';scheduledActionConfigurations=@(@{actionType='block';gracePeriodHours=0;notificationTemplateId='';notificationMessageCCList=@()})})} | ConvertTo-Json -Depth 10) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/v1.0/deviceManagement/deviceCompliancePolicies/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | ConvertTo-Json -Depth 10",
+    "sha256Hash": "1e824e6b07369d0fe07fadd4926b3a93376a2bd03c63d004a732374b798859dd",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\r\n    \"id\":  \"deviceCompliancePolicy-3\",\r\n    \"createdDateTime\":  \"2026-11-02T12:13:51.723Z\",\r\n    \"@odata.type\":  \"#microsoft.graph.iosCompliancePolicy\",\r\n    \"description\":  \"CMMC L2 iOS/iPadOS device compliance baseline\",\r\n    \"passcodeMinutesOfInactivityBeforeScreenTimeout\":  15,\r\n    \"securityBlockJailbrokenDevices\":  true,\r\n    \"scheduledActionsForRule\":  [\r\n                                    {\r\n                                        \"scheduledActionConfigurations\":  [\r\n                                                                              {\r\n                                                                                  \"actionType\":  \"block\",\r\n                                                                                  \"notificationTemplateId\":  \"\",\r\n                                                                                  \"gracePeriodHours\":  0,\r\n                                                                                  \"notificationMessageCCList\":  [\r\n\r\n                                                                                                                ]\r\n                                                                              }\r\n                                                                          ],\r\n                                        \"ruleName\":  \"PasswordRequired\"\r\n                                    }\r\n                                ],\r\n    \"passcodeMinimumLength\":  6,\r\n    \"passcodeBlockSimple\":  true,\r\n    \"passcodeRequired\":  true,\r\n    \"displayName\":  \"CMMC-Compliance-iOS\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceCompliancePolicy-3_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ],\r\n    \"isAssigned\":  true\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

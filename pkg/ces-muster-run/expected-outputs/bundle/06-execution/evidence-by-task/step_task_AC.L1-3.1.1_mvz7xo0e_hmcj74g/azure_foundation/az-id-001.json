@@ -1,0 +1,35 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"user-5\",\r\n    \"displayName\":  \"Sim User 5\",\r\n    \"userPrincipalName\":  \"sim.user5@simtenant.onmicrosoft.us\",\r\n    \"accountEnabled\":  true,\r\n    \"createdDateTime\":  \"\\/Date(1767700800000)\\/\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "AZ-ID-001",
+    "label": "Break-Glass Emergency Account",
+    "engine": "mgraph",
+    "layer_hint": 7,
+    "sequence_hint": 10,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "AC.L1-3.1.1"
+    ],
+    "get_command": "Get-MgUser -Filter 'userPrincipalName eq ''{breakGlassUPN}''' | Select-Object Id,DisplayName,UserPrincipalName,AccountEnabled | ConvertTo-Json -Depth 10",
+    "set_command": "",
+    "evidence_commands": [
+      "Get-MgUser -Filter 'userPrincipalName eq ''{breakGlassUPN}''' | Select-Object Id,DisplayName,UserPrincipalName,AccountEnabled,CreatedDateTime | ConvertTo-Json"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AC.L1-3.1.1"
+    ],
+    "timestamp": "2026-11-02T12:13:41.443Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Break-Glass Emergency Account",
+    "sha256Hash": "2c0913f0f59064f135f197e49c9f884bb444b4740b84e741d07d875635f7af54",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

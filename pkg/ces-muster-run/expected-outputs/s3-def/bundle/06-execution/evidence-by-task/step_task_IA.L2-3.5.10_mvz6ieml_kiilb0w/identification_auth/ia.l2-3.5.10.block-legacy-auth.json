@@ -1,0 +1,52 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"CMMC-Block-Legacy-Auth\",\r\n    \"displayName\":  \"CMMC-Block-Legacy-Auth\",\r\n    \"grantControls\":  {\r\n                          \"builtInControls\":  [\r\n                                                  \"block\"\r\n                                              ],\r\n                          \"operator\":  \"OR\"\r\n                      },\r\n    \"conditions\":  {\r\n                       \"clientAppTypes\":  [\r\n                                              \"exchangeActiveSync\",\r\n                                              \"other\"\r\n                                          ],\r\n                       \"users\":  {\r\n                                     \"excludeUsers\":  [\r\n                                                          \"user-60\"\r\n                                                      ],\r\n                                     \"includeUsers\":  [\r\n                                                          \"All\"\r\n                                                      ]\r\n                                 },\r\n                       \"applications\":  {\r\n                                            \"includeApplications\":  [\r\n                                                                        \"All\"\r\n                                                                    ]\r\n                                        }\r\n                   },\r\n    \"state\":  \"enabled\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "IA.L2-3.5.10.block-legacy-auth",
+    "label": "Conditional Access - Block Legacy Authentication for All Users",
+    "engine": "mgraph",
+    "layer_hint": 1,
+    "sequence_hint": 17,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "IA.L2-3.5.10",
+      "AC.L2-3.1.12"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/identity/conditionalAccess/policies').value | Where-Object { $_.displayName -eq 'CMMC-Block-Legacy-Auth' -or ($_.state -eq 'enabled' -and $_.conditions.users.includeUsers -contains 'All' -and $_.grantControls.builtInControls -contains 'block' -and $_.conditions.clientAppTypes -contains 'exchangeActiveSync' -and $_.conditions.clientAppTypes -contains 'other') } | Sort-Object { $_.state -ne 'enabled' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
+    "set_command": "New-MgIdentityConditionalAccessPolicy -BodyParameter @{displayName='CMMC-Block-Legacy-Auth';state='enabled';conditions=@{users=@{includeUsers=@('All');excludeUsers=@('{breakGlassUserId}')};applications=@{includeApplications=@('All')};clientAppTypes=@('exchangeActiveSync','other')};grantControls=@{operator='OR';builtInControls=@('block')}}",
+    "evidence_commands": [
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/identity/conditionalAccess/policies').value | Where-Object { $_.displayName -eq 'CMMC-Block-Legacy-Auth' -or ($_.state -eq 'enabled' -and $_.conditions.users.includeUsers -contains 'All' -and $_.grantControls.builtInControls -contains 'block' -and $_.conditions.clientAppTypes -contains 'exchangeActiveSync' -and $_.conditions.clientAppTypes -contains 'other') } | Sort-Object { $_.state -ne 'enabled' } | Select-Object -First 1 | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "IA.L2-3.5.10",
+      "AC.L2-3.1.12"
+    ],
+    "timestamp": "2026-11-02T11:33:31.918Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "New-MgIdentityConditionalAccessPolicy -BodyParameter @{displayName='CMMC-Block-Legacy-Auth';state='enabled';conditions=@{users=@{includeUsers=@('All');excludeUsers=@('{breakGlassUserId}')};applications=@{includeApplications=@('All')};clientAppTypes=@('exchangeActiveSync','other')};grantControls=@{operator='OR';builtInControls=@('block')}}",
+    "sha256Hash": "a83d2b3712c1787a896bbd0daf7b6a98e4677fe9da4c5dd0856c8441b6a624c5",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\r\n    \"id\":  \"CMMC-Block-Legacy-Auth\",\r\n    \"displayName\":  \"CMMC-Block-Legacy-Auth\",\r\n    \"grantControls\":  {\r\n                          \"builtInControls\":  [\r\n                                                  \"block\"\r\n                                              ],\r\n                          \"operator\":  \"OR\"\r\n                      },\r\n    \"conditions\":  {\r\n                       \"clientAppTypes\":  [\r\n                                              \"exchangeActiveSync\",\r\n                                              \"other\"\r\n                                          ],\r\n                       \"users\":  {\r\n                                     \"excludeUsers\":  [\r\n                                                          \"user-60\"\r\n                                                      ],\r\n                                     \"includeUsers\":  [\r\n                                                          \"All\"\r\n                                                      ]\r\n                                 },\r\n                       \"applications\":  {\r\n                                            \"includeApplications\":  [\r\n                                                                        \"All\"\r\n                                                                    ]\r\n                                        }\r\n                   },\r\n    \"state\":  \"enabled\"\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

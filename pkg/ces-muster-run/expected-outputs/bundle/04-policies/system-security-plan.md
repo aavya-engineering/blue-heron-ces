@@ -16,7 +16,7 @@
 | **Assessment Route** | unknown_contract_dependent |
 | **Boundary Strategy** | unknown |
 | **Deployment Posture** | cloud_only |
-| **SSP Date** | 2026-11-01 |
+| **SSP Date** | 2026-11-02 |
 
 ## 2. System Description
 
@@ -80,9 +80,9 @@ Sim tenant muster-partial implements security controls across all 14 NIST SP 800
 | Status | Count | Percentage |
 |--------|-------|-----------|
 | Met | 0 | 0% |
-| Partial | 60 | — |
-| Not Met | 52 | — |
-| Unknown | 22 | — |
+| Partial | 57 | — |
+| Not Met | 56 | — |
+| Unknown | 21 | — |
 | **Total** | **134** | — |
 
 ## 5. Organizational Defined Parameters (ODPs)
@@ -113,7 +113,7 @@ Physical security controls are documented separately or managed by the facility 
 
 | Field | Value |
 |-------|-------|
-| Policy Effective Date | 2026-11-01 |
+| Policy Effective Date | 2026-11-02 |
 | Review Cycle | Every 12 months |
 | Next Review Date | 2027-11-01 |
 | Affirming Official | Not specified |
@@ -128,4 +128,4 @@ Physical security controls are documented separately or managed by the facility 
 ---
 
 **Prepared by:** 
-**Date:** 2026-11-01
+**Date:** 2026-11-02

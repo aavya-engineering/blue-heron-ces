@@ -1,0 +1,36 @@
+{
+  "rawResponse": "{\r\n    \"displayName\":  \"CMMC-BlockRemovableStorage\",\r\n    \"id\":  \"deviceConfiguration-5\",\r\n    \"odataType\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n    \"storageBlockRemovableStorage\":  true,\r\n    \"usbBlocked\":  null\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "MP.L2-3.8.8.unowned-storage-intune",
+    "label": "Verify Intune Policy Prohibiting Unidentified Portable Storage",
+    "engine": "mgraph",
+    "layer_hint": 4,
+    "sequence_hint": 23,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "MP.L2-3.8.8"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object { $_.storageBlockRemovableStorage -eq $true -or $_.usbBlocked -eq $true } | ForEach-Object { [pscustomobject]@{ displayName = $_.displayName; id = $_.id } } | ConvertTo-Json -Depth 3",
+    "set_command": "",
+    "evidence_commands": [
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object { $_.storageBlockRemovableStorage -eq $true -or $_.usbBlocked -eq $true } | ForEach-Object { [pscustomobject]@{ displayName = $_.displayName; id = $_.id; odataType = $_.'@odata.type'; storageBlockRemovableStorage = $_.storageBlockRemovableStorage; usbBlocked = $_.usbBlocked } } | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "MP.L2-3.8.8"
+    ],
+    "timestamp": "2026-11-02T12:14:55.003Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Verify Intune Policy Prohibiting Unidentified Portable Storage",
+    "sha256Hash": "c77464a47334c99ee3e5e0eafc8010d90faff4ca7b46da0f6878bd0097afc03e",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "gateContext": "manual_gate"
+  }
+}

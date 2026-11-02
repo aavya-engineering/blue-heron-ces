@@ -38,7 +38,7 @@
       "SI.L1-3.14.1",
       "SI.L2-3.14.6"
     ],
-    "timestamp": "2026-11-01T17:09:33.791Z",
+    "timestamp": "2026-11-02T12:14:59.484Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "foreach ($p in @('VirtualMachines','StorageAccounts','CloudPosture','Arm')) { $cur = Get-AzSecurityPricing -Name $p -ErrorAction SilentlyContinue; if (-not $cur -or $cur.PricingTier -ne 'Standard') { Set-AzSecurityPricing -Name $p -PricingTier 'Free' | Out-Null } }; Get-AzSecurityPricing | Where-Object { $_.Name -in @('VirtualMachines','StorageAccounts','CloudPosture','Arm') } | Select-Object Name,PricingTier | ConvertTo-Json",
     "sha256Hash": "13df0801175dcd91a245c0ff60ae980e212d448246bfc460c28f9cb95c3b47d8",

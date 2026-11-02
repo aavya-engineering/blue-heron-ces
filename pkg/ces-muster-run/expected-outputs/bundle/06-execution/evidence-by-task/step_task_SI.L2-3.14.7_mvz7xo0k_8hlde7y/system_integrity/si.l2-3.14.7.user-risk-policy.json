@@ -1,0 +1,52 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"CMMC-UserRisk-Remediate\",\r\n    \"sessionControls\":  {\r\n                            \"signInFrequency\":  {\r\n                                                    \"isEnabled\":  true,\r\n                                                    \"frequencyInterval\":  \"everyTime\",\r\n                                                    \"authenticationType\":  \"primaryAndSecondaryAuthentication\"\r\n                                                }\r\n                        },\r\n    \"displayName\":  \"CMMC-UserRisk-Remediate\",\r\n    \"grantControls\":  {\r\n                          \"builtInControls\":  [\r\n                                                  \"mfa\",\r\n                                                  \"passwordChange\"\r\n                                              ],\r\n                          \"operator\":  \"AND\"\r\n                      },\r\n    \"conditions\":  {\r\n                       \"clientAppTypes\":  [\r\n                                              \"all\"\r\n                                          ],\r\n                       \"userRiskLevels\":  [\r\n                                              \"high\"\r\n                                          ],\r\n                       \"users\":  {\r\n                                     \"excludeUsers\":  [\r\n                                                          \"user-5\"\r\n                                                      ],\r\n                                     \"includeUsers\":  [\r\n                                                          \"All\"\r\n                                                      ]\r\n                                 },\r\n                       \"applications\":  {\r\n                                            \"includeApplications\":  [\r\n                                                                        \"All\"\r\n                                                                    ]\r\n                                        }\r\n                   },\r\n    \"state\":  \"enabled\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "SI.L2-3.14.7.user-risk-policy",
+    "label": "Conditional Access - Require Secure Password Change on High User Risk",
+    "engine": "mgraph",
+    "layer_hint": 7,
+    "sequence_hint": 31,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "SI.L2-3.14.7",
+      "IR.L2-3.6.1"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/identity/conditionalAccess/policies').value | Where-Object { $_.displayName -eq 'CMMC-UserRisk-Remediate' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
+    "set_command": "New-MgIdentityConditionalAccessPolicy -BodyParameter @{displayName='CMMC-UserRisk-Remediate';state='enabled';conditions=@{users=@{includeUsers=@('All');excludeUsers=@('{breakGlassUserId}')};applications=@{includeApplications=@('All')};clientAppTypes=@('all');userRiskLevels=@('high')};grantControls=@{operator='AND';builtInControls=@('mfa','passwordChange')};sessionControls=@{signInFrequency=@{isEnabled=$true;frequencyInterval='everyTime';authenticationType='primaryAndSecondaryAuthentication'}}}",
+    "evidence_commands": [
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/identity/conditionalAccess/policies').value | Where-Object { $_.displayName -eq 'CMMC-UserRisk-Remediate' } | Select-Object -First 1 | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SI.L2-3.14.7",
+      "IR.L2-3.6.1"
+    ],
+    "timestamp": "2026-11-02T12:16:54.862Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "New-MgIdentityConditionalAccessPolicy -BodyParameter @{displayName='CMMC-UserRisk-Remediate';state='enabled';conditions=@{users=@{includeUsers=@('All');excludeUsers=@('{breakGlassUserId}')};applications=@{includeApplications=@('All')};clientAppTypes=@('all');userRiskLevels=@('high')};grantControls=@{operator='AND';builtInControls=@('mfa','passwordChange')};sessionControls=@{signInFrequency=@{isEnabled=$true;frequencyInterval='everyTime';authenticationType='primaryAndSecondaryAuthentication'}}}",
+    "sha256Hash": "6318feb3e57ed5cb51f0d470831708abd8640782f11011696b6b91647c391943",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\r\n    \"id\":  \"CMMC-UserRisk-Remediate\",\r\n    \"sessionControls\":  {\r\n                            \"signInFrequency\":  {\r\n                                                    \"isEnabled\":  true,\r\n                                                    \"frequencyInterval\":  \"everyTime\",\r\n                                                    \"authenticationType\":  \"primaryAndSecondaryAuthentication\"\r\n                                                }\r\n                        },\r\n    \"displayName\":  \"CMMC-UserRisk-Remediate\",\r\n    \"grantControls\":  {\r\n                          \"builtInControls\":  [\r\n                                                  \"mfa\",\r\n                                                  \"passwordChange\"\r\n                                              ],\r\n                          \"operator\":  \"AND\"\r\n                      },\r\n    \"conditions\":  {\r\n                       \"clientAppTypes\":  [\r\n                                              \"all\"\r\n                                          ],\r\n                       \"userRiskLevels\":  [\r\n                                              \"high\"\r\n                                          ],\r\n                       \"users\":  {\r\n                                     \"excludeUsers\":  [\r\n                                                          \"user-5\"\r\n                                                      ],\r\n                                     \"includeUsers\":  [\r\n                                                          \"All\"\r\n                                                      ]\r\n                                 },\r\n                       \"applications\":  {\r\n                                            \"includeApplications\":  [\r\n                                                                        \"All\"\r\n                                                                    ]\r\n                                        }\r\n                   },\r\n    \"state\":  \"enabled\"\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

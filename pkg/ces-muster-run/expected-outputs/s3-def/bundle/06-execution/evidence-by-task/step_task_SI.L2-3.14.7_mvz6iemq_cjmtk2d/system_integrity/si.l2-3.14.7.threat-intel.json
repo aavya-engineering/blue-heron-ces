@@ -1,0 +1,35 @@
+{
+  "rawResponse": "{\r\n    \"Name\":  \"office365\",\r\n    \"Id\":  \"/resourceGroups/s3-def-rg-security/providers/Microsoft.OperationalInsights/workspaces/s3-def-law-prod/providers/Microsoft.SecurityInsights/dataConnectors/office365\",\r\n    \"Kind\":  \"Office365\",\r\n    \"Type\":  \"Microsoft.SecurityInsights/dataConnectors\",\r\n    \"Etag\":  null,\r\n    \"DataTypes\":  {\r\n                      \"teams\":  {\r\n                                    \"state\":  \"Enabled\"\r\n                                },\r\n                      \"exchange\":  {\r\n                                       \"state\":  \"Enabled\"\r\n                                   },\r\n                      \"sharePoint\":  {\r\n                                         \"state\":  \"Enabled\"\r\n                                     }\r\n                  },\r\n    \"TenantId\":  \"sim-tenant-s3-def\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "SI.L2-3.14.7.threat-intel",
+    "label": "Sentinel Threat Intelligence Data Connectors",
+    "engine": "az",
+    "layer_hint": 7,
+    "sequence_hint": 51,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "SI.L2-3.14.7"
+    ],
+    "get_command": "az sentinel data-connector list --resource-group '{resourceGroup}' --workspace-name '{lawWorkspaceName}' --query \"[?kind=='ThreatIntelligence']\" -o json",
+    "set_command": "",
+    "evidence_commands": [
+      "Get-AzSentinelDataConnector -ResourceGroupName '{resourceGroup}' -WorkspaceName '{lawWorkspaceName}' | ConvertTo-Json -Depth 3"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SI.L2-3.14.7"
+    ],
+    "timestamp": "2026-11-02T11:37:28.439Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Sentinel Threat Intelligence Data Connectors",
+    "sha256Hash": "844172cf9c4bdd92c70f1df96cd601506d6810995fb5b22bf8f639395347dec7",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

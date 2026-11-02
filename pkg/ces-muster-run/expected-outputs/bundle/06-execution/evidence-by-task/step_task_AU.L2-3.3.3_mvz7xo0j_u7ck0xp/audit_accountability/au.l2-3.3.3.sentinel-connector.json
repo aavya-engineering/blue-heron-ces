@@ -1,0 +1,50 @@
+{
+  "rawResponse": "{\"id\":\"office365\",\"kind\":\"Office365\",\"properties\":{\"dataTypes\":{\"teams\":{\"state\":\"Enabled\"},\"exchange\":{\"state\":\"Enabled\"},\"sharePoint\":{\"state\":\"Enabled\"}},\"tenantId\":\"sim-tenant-muster-partial\"}}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "AU.L2-3.3.3.sentinel-connector",
+    "label": "Connect Office 365 Data Connector to Sentinel",
+    "engine": "az",
+    "layer_hint": 7,
+    "sequence_hint": 12,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "AU.L2-3.3.3"
+    ],
+    "get_command": "az rest --method GET --url 'https://management.usgovcloudapi.net/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.OperationalInsights/workspaces/{lawWorkspaceName}/providers/Microsoft.SecurityInsights/dataConnectors/office365?api-version=2024-03-01'",
+    "set_command": "$f = Join-Path $env:TEMP 'stamper-sentinel-body.json'; @{kind='Office365';properties=@{tenantId='{tenantId}';dataTypes=@{exchange=@{state='Enabled'};sharePoint=@{state='Enabled'};teams=@{state='Enabled'}}}} | ConvertTo-Json -Depth 5 -Compress | Set-Content -Path $f -Encoding UTF8; az rest --method PUT --url 'https://management.usgovcloudapi.net/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.OperationalInsights/workspaces/{lawWorkspaceName}/providers/Microsoft.SecurityInsights/dataConnectors/office365?api-version=2024-03-01' --headers Content-Type=application/json --body \"@$f\"; Remove-Item $f -ErrorAction SilentlyContinue",
+    "evidence_commands": [
+      "az rest --method GET --url 'https://management.usgovcloudapi.net/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.OperationalInsights/workspaces/{lawWorkspaceName}/providers/Microsoft.SecurityInsights/dataConnectors/office365?api-version=2024-03-01'"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AU.L2-3.3.3"
+    ],
+    "timestamp": "2026-11-02T12:16:00.771Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "$f = Join-Path $env:TEMP 'stamper-sentinel-body.json'; @{kind='Office365';properties=@{tenantId='{tenantId}';dataTypes=@{exchange=@{state='Enabled'};sharePoint=@{state='Enabled'};teams=@{state='Enabled'}}}} | ConvertTo-Json -Depth 5 -Compress | Set-Content -Path $f -Encoding UTF8; az rest --method PUT --url 'https://management.usgovcloudapi.net/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.OperationalInsights/workspaces/{lawWorkspaceName}/providers/Microsoft.SecurityInsights/dataConnectors/office365?api-version=2024-03-01' --headers Content-Type=application/json --body \"@$f\"; Remove-Item $f -ErrorAction SilentlyContinue",
+    "sha256Hash": "460c133595a764e10ba9f4a331ea07d8d719acbda519ea6e1360696249d5d523",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\"id\":\"office365\",\"kind\":\"Office365\",\"properties\":{\"dataTypes\":{\"teams\":{\"state\":\"Enabled\"},\"exchange\":{\"state\":\"Enabled\"},\"sharePoint\":{\"state\":\"Enabled\"}},\"tenantId\":\"sim-tenant-muster-partial\"}}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

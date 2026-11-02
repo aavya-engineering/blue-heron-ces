@@ -1,0 +1,62 @@
+{
+  "rawResponse": "",
+  "outcome": "failed_no_remediation",
+  "outcomeRationale": "SET/verification failed: verification failed — built from an unanswered placeholder (the read shows 'unset-security-email@example.invalid')",
+  "failureDiagnostics": {
+    "rootCause": "exit_code_0",
+    "failureCategory": "FATAL",
+    "remediationSteps": [
+      "Review command output and stderr for specific error details",
+      "Check M365 GCC High service health dashboard",
+      "Consult PowerShell module documentation for the failing command"
+    ],
+    "exitCode": 0,
+    "stderrTail": "",
+    "stdoutTail": ""
+  },
+  "complianceVerdict": "NOT_SAT",
+  "verdictRationale": "built from an unanswered placeholder (the read shows 'unset-security-email@example.invalid')",
+  "verificationResult": {
+    "passed": false,
+    "confidence": "FAILED",
+    "score": 25,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": false
+    },
+    "reason": "built from an unanswered placeholder (the read shows 'unset-security-email@example.invalid')"
+  },
+  "registryEntry": {
+    "entry_id": "IR.L2-3.6.1.user-reporting",
+    "label": "Route User-Reported Messages to Microsoft and the Security Mailbox",
+    "engine": "exchange",
+    "layer_hint": 0,
+    "sequence_hint": 11,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "IR.L2-3.6.1"
+    ],
+    "get_command": "Get-ReportSubmissionPolicy -Identity DefaultReportSubmissionPolicy | Select-Object Identity,EnableReportToMicrosoft,ReportJunkToCustomizedAddress,ReportJunkAddresses,ReportNotJunkToCustomizedAddress,ReportNotJunkAddresses,ReportPhishToCustomizedAddress,ReportPhishAddresses | ConvertTo-Json -Depth 5",
+    "set_command": "Set-ReportSubmissionPolicy -Identity DefaultReportSubmissionPolicy -EnableReportToMicrosoft $true -ReportJunkToCustomizedAddress $true -ReportJunkAddresses '{securityEmail}' -ReportNotJunkToCustomizedAddress $true -ReportNotJunkAddresses '{securityEmail}' -ReportPhishToCustomizedAddress $true -ReportPhishAddresses '{securityEmail}'",
+    "evidence_commands": [
+      "Get-ReportSubmissionPolicy -Identity DefaultReportSubmissionPolicy | Select-Object Identity,EnableReportToMicrosoft,ReportJunkToCustomizedAddress,ReportJunkAddresses,ReportNotJunkToCustomizedAddress,ReportNotJunkAddresses,ReportPhishToCustomizedAddress,ReportPhishAddresses | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "IR.L2-3.6.1"
+    ],
+    "timestamp": "2026-11-02T12:11:59.719Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "Set-ReportSubmissionPolicy -Identity DefaultReportSubmissionPolicy -EnableReportToMicrosoft $true -ReportJunkToCustomizedAddress $true -ReportJunkAddresses '{securityEmail}' -ReportNotJunkToCustomizedAddress $true -ReportNotJunkAddresses '{securityEmail}' -ReportPhishToCustomizedAddress $true -ReportPhishAddresses '{securityEmail}'",
+    "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "{\r\n    \"Identity\":  \"DefaultReportSubmissionPolicy\",\r\n    \"EnableReportToMicrosoft\":  true,\r\n    \"ReportJunkToCustomizedAddress\":  false,\r\n    \"ReportJunkAddresses\":  [\r\n\r\n                            ],\r\n    \"ReportNotJunkToCustomizedAddress\":  false,\r\n    \"ReportNotJunkAddresses\":  [\r\n\r\n                               ],\r\n    \"ReportPhishToCustomizedAddress\":  false,\r\n    \"ReportPhishAddresses\":  [\r\n\r\n                             ]\r\n}\r\n",
+    "postStateOutput": "{\r\n    \"Identity\":  \"DefaultReportSubmissionPolicy\",\r\n    \"EnableReportToMicrosoft\":  true,\r\n    \"ReportJunkToCustomizedAddress\":  true,\r\n    \"ReportJunkAddresses\":  [\r\n                                \"unset-security-email@example.invalid\"\r\n                            ],\r\n    \"ReportNotJunkToCustomizedAddress\":  true,\r\n    \"ReportNotJunkAddresses\":  [\r\n                                   \"unset-security-email@example.invalid\"\r\n                               ],\r\n    \"ReportPhishToCustomizedAddress\":  true,\r\n    \"ReportPhishAddresses\":  [\r\n                                 \"unset-security-email@example.invalid\"\r\n                             ]\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

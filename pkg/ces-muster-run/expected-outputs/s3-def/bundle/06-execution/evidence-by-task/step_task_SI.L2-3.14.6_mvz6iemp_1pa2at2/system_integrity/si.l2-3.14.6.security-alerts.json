@@ -1,0 +1,35 @@
+{
+  "rawResponse": "{\r\n    \"alertCount\":  2,\r\n    \"alerts\":  [\r\n                   {\r\n                       \"id\":  \"alert-s3-1\",\r\n                       \"title\":  \"Suspicious PowerShell command line\",\r\n                       \"severity\":  \"high\",\r\n                       \"status\":  \"new\",\r\n                       \"createdDateTime\":  \"2026-10-12T21:50:00.000Z\"\r\n                   },\r\n                   {\r\n                       \"id\":  \"alert-s3-2\",\r\n                       \"title\":  \"Unfamiliar sign-in properties\",\r\n                       \"severity\":  \"medium\",\r\n                       \"status\":  \"new\",\r\n                       \"createdDateTime\":  \"2026-10-12T17:10:00.000Z\"\r\n                   }\r\n               ]\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "SI.L2-3.14.6.security-alerts",
+    "label": "Security Alert Monitoring Evidence via Defender",
+    "engine": "mgraph",
+    "layer_hint": 7,
+    "sequence_hint": 9,
+    "idempotency": "evidence-only",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "SI.L2-3.14.6"
+    ],
+    "get_command": "$secInfo = Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/security/secureScores?$top=1'; $alerts = (Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/security/alerts_v2?$top=10').value; [PSCustomObject]@{ secureScoreAvailable = ($secInfo.value.Count -gt 0); recentAlertCount = ($alerts | Measure-Object).Count; alerts = ($alerts | Select-Object id,title,severity,status,createdDateTime) } | ConvertTo-Json -Depth 5",
+    "set_command": "",
+    "evidence_commands": [
+      "$alerts = (Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/security/alerts_v2?$top=50').value; [PSCustomObject]@{ alertCount = ($alerts | Measure-Object).Count; alerts = ($alerts | Select-Object id,title,severity,status,createdDateTime) } | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SI.L2-3.14.6"
+    ],
+    "timestamp": "2026-11-02T11:37:24.723Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Security Alert Monitoring Evidence via Defender",
+    "sha256Hash": "4d96587470846a55c936c6cf22ecdd0166ed674d04e7a85fd8d8e176204c32a4",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

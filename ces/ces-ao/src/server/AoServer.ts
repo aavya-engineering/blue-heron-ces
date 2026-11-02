@@ -133,6 +133,7 @@ export class AoServer {
       execute: executeLeaverOp,
       publicBaseUrl: env['CES_AO_PUBLIC_URL'] || `http://localhost:${env['CES_AO_PORT'] || '3001'}`,
       ...(env['CES_BHD_NOTICE_MAILBOX'] ? { bhdMailbox: env['CES_BHD_NOTICE_MAILBOX'] } : {}),
+      ...(env['CES_AO_LEAVER_SINCE'] ? { trackedSince: env['CES_AO_LEAVER_SINCE'] } : {}),
     });
   }
 

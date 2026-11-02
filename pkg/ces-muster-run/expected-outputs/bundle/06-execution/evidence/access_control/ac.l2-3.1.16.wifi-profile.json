@@ -1,19 +1,31 @@
 {
-  "rawResponse": "{\r\n    \"id\":  \"deviceConfiguration-4\",\r\n    \"createdDateTime\":  \"2026-11-01T17:10:35.839Z\",\r\n    \"networkName\":  \"CUI-Network\",\r\n    \"wifiSecurityType\":  \"wpa2Enterprise\",\r\n    \"displayName\":  \"CMMC-WiFi-Secure\",\r\n    \"ssid\":  \"MUSTER-DEFAULT-SSID\",\r\n    \"@odata.type\":  \"#microsoft.graph.windowsWifiConfiguration\",\r\n    \"isAssigned\":  true\r\n}\r\n",
-  "outcome": "automated_success",
-  "outcomeRationale": "Command completed successfully (exit code 0)",
-  "complianceVerdict": "SAT",
-  "verdictRationale": "All verification checks passed",
+  "rawResponse": "{\r\n    \"id\":  \"deviceConfiguration-4\",\r\n    \"createdDateTime\":  \"2026-11-02T12:13:47.668Z\",\r\n    \"networkName\":  \"CUI-Network\",\r\n    \"wifiSecurityType\":  \"wpa2Enterprise\",\r\n    \"displayName\":  \"CMMC-WiFi-Secure\",\r\n    \"ssid\":  \"MUSTER-DEFAULT-SSID\",\r\n    \"@odata.type\":  \"#microsoft.graph.windowsWifiConfiguration\"\r\n}\r\n",
+  "outcome": "failed_no_remediation",
+  "outcomeRationale": "SET/verification failed: verification failed — built from an unanswered placeholder (the read shows 'MUSTER-DEFAULT-SSID')",
+  "failureDiagnostics": {
+    "rootCause": "exit_code_0",
+    "failureCategory": "FATAL",
+    "remediationSteps": [
+      "Review command output and stderr for specific error details",
+      "Check M365 GCC High service health dashboard",
+      "Consult PowerShell module documentation for the failing command"
+    ],
+    "exitCode": 0,
+    "stderrTail": "",
+    "stdoutTail": "{\r\n    \"id\":  \"deviceConfiguration-4\",\r\n    \"createdDateTime\":  \"2026-11-02T12:13:47.668Z\",\r\n    \"networkName\":  \"CUI-Network\",\r\n    \"wifiSecurityType\":  \"wpa2Enterprise\",\r\n    \"displayName\":  \"CMMC-WiFi-Secure\",\r\n    \"ssid\":  \"MUSTER-DEFAULT-SSID\",\r\n    \"@odata.type\":  \"#microsoft.graph.windowsWifiConfiguration\"\r\n}\r\n"
+  },
+  "complianceVerdict": "NOT_SAT",
+  "verdictRationale": "built from an unanswered placeholder (the read shows 'MUSTER-DEFAULT-SSID')",
   "verificationResult": {
-    "passed": true,
-    "confidence": "HIGH",
-    "score": 100,
+    "passed": false,
+    "confidence": "FAILED",
+    "score": 25,
     "details": {
       "exit_code_check": true,
       "set_output_check": null,
-      "evidence_check": true
+      "evidence_check": false
     },
-    "reason": "All verification checks passed"
+    "reason": "built from an unanswered placeholder (the read shows 'MUSTER-DEFAULT-SSID')"
   },
   "registryEntry": {
     "entry_id": "AC.L2-3.1.16.wifi-profile",
@@ -24,7 +36,8 @@
     "idempotency": "get-then-set",
     "on_failure": "abort_step",
     "control_ids": [
-      "AC.L2-3.1.16"
+      "AC.L2-3.1.16",
+      "AC.L2-3.1.17"
     ],
     "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations?$expand=assignments').value | Where-Object { ($_.displayName -eq 'CMMC-WiFi-Secure') -or ((@('#microsoft.graph.windowsWifiConfiguration') -contains $_.'@odata.type') -and ($_.wifiSecurityType -eq 'wpa2Enterprise') -and ($_.ssid -eq '{wifiSsid}') -and (@($_.assignments | Where-Object { $_ }).Count -gt 0)) } | Sort-Object { $_.displayName -ne 'CMMC-WiFi-Secure' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
     "set_command": "$created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations' -Body (@{'@odata.type'='#microsoft.graph.windowsWifiConfiguration';displayName='CMMC-WiFi-Secure';wifiSecurityType='wpa2Enterprise';networkName='CUI-Network';ssid='{wifiSsid}'} | ConvertTo-Json) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | ConvertTo-Json -Depth 10",
@@ -34,16 +47,17 @@
   },
   "metadata": {
     "controlIds": [
-      "AC.L2-3.1.16"
+      "AC.L2-3.1.16",
+      "AC.L2-3.1.17"
     ],
-    "timestamp": "2026-11-01T17:10:36.675Z",
+    "timestamp": "2026-11-02T12:13:48.099Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "$created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations' -Body (@{'@odata.type'='#microsoft.graph.windowsWifiConfiguration';displayName='CMMC-WiFi-Secure';wifiSecurityType='wpa2Enterprise';networkName='CUI-Network';ssid='{wifiSsid}'} | ConvertTo-Json) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | ConvertTo-Json -Depth 10",
-    "sha256Hash": "71c4cbf4d3100b9a50a88f23e0752e887972669c03d5905ea76e4cf995fbf1fb",
+    "sha256Hash": "9553e07c87be385e1487b1f2f409f36db38288ad4c7b5132dbfe1bd3ec381fc4",
     "moduleVersions": {},
     "environment": "GCC-High",
     "preStateOutput": "",
-    "postStateOutput": "{\r\n    \"id\":  \"deviceConfiguration-4\",\r\n    \"createdDateTime\":  \"2026-11-01T17:10:35.839Z\",\r\n    \"networkName\":  \"CUI-Network\",\r\n    \"wifiSecurityType\":  \"wpa2Enterprise\",\r\n    \"displayName\":  \"CMMC-WiFi-Secure\",\r\n    \"ssid\":  \"MUSTER-DEFAULT-SSID\",\r\n    \"@odata.type\":  \"#microsoft.graph.windowsWifiConfiguration\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceConfiguration-4_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ],\r\n    \"isAssigned\":  true\r\n}\r\n",
+    "postStateOutput": "{\r\n    \"id\":  \"deviceConfiguration-4\",\r\n    \"createdDateTime\":  \"2026-11-02T12:13:47.668Z\",\r\n    \"networkName\":  \"CUI-Network\",\r\n    \"wifiSecurityType\":  \"wpa2Enterprise\",\r\n    \"displayName\":  \"CMMC-WiFi-Secure\",\r\n    \"ssid\":  \"MUSTER-DEFAULT-SSID\",\r\n    \"@odata.type\":  \"#microsoft.graph.windowsWifiConfiguration\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceConfiguration-4_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ],\r\n    \"isAssigned\":  true\r\n}\r\n",
     "stateChanged": true,
     "postcheckMode": "state"
   }

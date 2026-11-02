@@ -1,0 +1,50 @@
+{
+  "rawResponse": "{\r\n    \"Name\":  \"simtenant.onmicrosoft.us\",\r\n    \"AuditDisabled\":  false\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "AU.L2-3.3.2.mailbox-audit-default",
+    "label": "Mailbox Auditing On by Default (Organization-Wide)",
+    "engine": "exchange",
+    "layer_hint": 7,
+    "sequence_hint": 43,
+    "idempotency": "get-then-set",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "AU.L2-3.3.2"
+    ],
+    "get_command": "Get-OrganizationConfig | Select-Object AuditDisabled | ConvertTo-Json -Depth 5",
+    "set_command": "Set-OrganizationConfig -AuditDisabled $false",
+    "evidence_commands": [
+      "Get-OrganizationConfig | Select-Object Name,AuditDisabled | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AU.L2-3.3.2"
+    ],
+    "timestamp": "2026-11-02T12:15:58.241Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "Set-OrganizationConfig -AuditDisabled $false",
+    "sha256Hash": "be1bce9f82b8be4abce6d1c47418e957dcad8275f802c302f851f23a290232ef",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "{\r\n    \"AuditDisabled\":  null\r\n}\r\n",
+    "postStateOutput": "{\r\n    \"AuditDisabled\":  false\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

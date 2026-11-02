@@ -3,7 +3,7 @@
 **SIMULATED CUSTOMER (FICTIONAL): Corvelline Defense Assemblies Inc. (FICTIONAL)** This organisation is a simulated customer of the CES simulator, deficient by design. Its name, people, identifiers, addresses and tenant are invented; this document describes no real company and is not a compliance record.
 
 **Version:** 1.0
-**Effective Date:** 2026-11-01
+**Effective Date:** 2026-11-02
 **Policy Owner:** Belmira Pennanmore
 **Organization:** Corvelline Defense Assemblies Inc. (FICTIONAL)
 
@@ -127,7 +127,7 @@ I, Derwyn Arrowbrook, as the Authorizing Official, have reviewed and approve thi
 
 ---
 
-**Effective Date:** 2026-11-01
+**Effective Date:** 2026-11-02
 **NIST SP 800-171 Controls:** 3.11.1--3.11.3
 **CMMC Controls:** 3.11.1, 3.11.2, 3.11.3
 **Policy Owner:** Belmira Pennanmore

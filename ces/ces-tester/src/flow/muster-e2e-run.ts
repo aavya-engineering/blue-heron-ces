@@ -1206,6 +1206,9 @@ export async function runMusterE2e(opts: MusterE2eRunOptions): Promise<MusterE2e
         const env: NodeJS.ProcessEnv = {
           ...buildAoEnv(simEnv, { pipelineRoot: P.pl, tenantRoot: P.tenants, simUrl: SIM_URL, secret: aoSecret }),
           CES_AO_AUTH_TOKEN: bearer, CES_AO_PUBLIC_URL: aoUrl, CES_BHD_NOTICE_MAILBOX: EL_BHD_MAILBOX, CES_NO_OPEN: '1',
+          // ces.db is shared across runs (as EO's CES_EO_ADMINOPS_SINCE): an earlier round's flow for the same seeded
+          // leaver must not make this run's scan "already tracked" (R-F12 EL: flow_id null, LOG-RF12-DIAG).
+          ...(windows.E1?.started ? { CES_AO_LEAVER_SINCE: windows.E1.started } : {}),
           // AO's DPAPI module-secret store wins over the env per name (ces-shared moduleSecrets.ts secretEnv); a store at the
           // machine default (%ProgramData%\CES\secrets) would replace this run's bearer. Point AO at an absent file instead.
           CES_MODULE_SECRETS_PATH: path.join(P.out, 'el', 'no-module-secrets.dpapi'),

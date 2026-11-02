@@ -1,7 +1,7 @@
 # Awareness and Training Policy (EDC-POL-012)
 
 **Version:** 1.0
-**Effective Date:** 2026-11-01
+**Effective Date:** 2026-11-02
 **Policy Owner:** Designated Official
 **Organization:** Sim tenant muster-partial
 
@@ -107,7 +107,7 @@ I, Designated Official, as the Authorizing Official, have reviewed and approve t
 
 ---
 
-**Effective Date:** 2026-11-01
+**Effective Date:** 2026-11-02
 **NIST SP 800-171 Controls:** 3.2.1--3.2.3
 **CMMC Controls:** 3.2.1, 3.2.2, 3.2.3
 **Policy Owner:** Designated Official

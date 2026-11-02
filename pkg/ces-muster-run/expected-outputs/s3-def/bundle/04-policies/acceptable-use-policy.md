@@ -60,7 +60,7 @@ This policy shall be reviewed every **12** months. Next scheduled review: **2027
 
 ---
 
-**Effective Date:** 2026-11-01
+**Effective Date:** 2026-11-02
 **NIST SP 800-171 Controls:** 3.1.1, 3.1.2, 3.1.3, 3.1.9, 3.1.18, 3.1.19, 3.1.22, 3.4.9, 3.6.1, 3.8.1, 3.8.7, 3.8.8, 3.13.1
 **Policy Owner:** Belmira Pennanmore
 

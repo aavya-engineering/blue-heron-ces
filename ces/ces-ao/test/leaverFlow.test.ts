@@ -39,7 +39,7 @@ let calls: LeaverExecArgs[];
 let execResult: LeaverExecResult;
 let signal: LeaverSignalUser[];
 
-function service(opts: { bhdMailbox?: string } = {}) {
+function service(opts: { bhdMailbox?: string; trackedSince?: string } = {}) {
   return new LeaverFlowService({
     resolveTenant: async () => ({ tenantId: TENANT_ID }),
     readSignal: async () => ({ query: 'GET /v1.0/users?$filter=employeeLeaveDateTime le <now>', users: signal }),
@@ -49,6 +49,7 @@ function service(opts: { bhdMailbox?: string } = {}) {
     },
     publicBaseUrl: 'http://ao.test:3001',
     ...(opts.bhdMailbox ? { bhdMailbox: opts.bhdMailbox } : {}),
+    ...(opts.trackedSince ? { trackedSince: opts.trackedSince } : {}),
     now: () => clock,
     logger: { log: () => undefined, warn: () => undefined },
   });
@@ -125,6 +126,17 @@ describe('detect -> ask (nothing is changed in the tenant)', () => {
     expect(again.started).toEqual([]);
     expect(again.alreadyTracked).toEqual([expect.objectContaining({ upn: LEAVER, status: 'awaiting_confirmation' })]);
     expect(requests()).toHaveLength(2);
+  });
+
+  it('R-F12: with trackedSince (simulator run window, CES_AO_LEAVER_SINCE) a flow from an earlier run does not count as tracked; unset, it still does', async () => {
+    await service().scan(SLUG);
+    advance(60);
+    expect((await service().scan(SLUG)).started).toEqual([]);
+    const rerun = await service({ trackedSince: clock.toISOString() }).scan(SLUG);
+    expect(rerun.started).toHaveLength(1);
+    expect(rerun.alreadyTracked).toEqual([]);
+    // inside the window the new flow is tracked as usual: never two flows for one leaver in one run
+    expect((await service({ trackedSince: clock.toISOString() }).scan(SLUG)).started).toEqual([]);
   });
 
   it('operator / HR input starts a flow without a leave date', async () => {

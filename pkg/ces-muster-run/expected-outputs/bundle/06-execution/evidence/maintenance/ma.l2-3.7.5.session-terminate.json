@@ -1,0 +1,50 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"CMMC-AdminSession-Terminate\",\r\n    \"sessionControls\":  {\r\n                            \"signInFrequency\":  {\r\n                                                    \"isEnabled\":  true,\r\n                                                    \"type\":  \"hours\",\r\n                                                    \"value\":  4\r\n                                                },\r\n                            \"persistentBrowser\":  {\r\n                                                      \"isEnabled\":  true,\r\n                                                      \"mode\":  \"never\"\r\n                                                  }\r\n                        },\r\n    \"displayName\":  \"CMMC-AdminSession-Terminate\",\r\n    \"conditions\":  {\r\n                       \"clientAppTypes\":  [\r\n                                              \"all\"\r\n                                          ],\r\n                       \"users\":  {\r\n                                     \"includeRoles\":  [\r\n                                                          \"62e90394-69f5-4237-9190-012177145e10\",\r\n                                                          \"194ae4cb-b126-40b2-bd5b-6091b380977d\",\r\n                                                          \"3a2c62db-5318-420d-8d74-23affee5d9d5\"\r\n                                                      ],\r\n                                     \"excludeUsers\":  [\r\n                                                          \"user-5\"\r\n                                                      ]\r\n                                 },\r\n                       \"applications\":  {\r\n                                            \"includeApplications\":  [\r\n                                                                        \"All\"\r\n                                                                    ]\r\n                                        }\r\n                   },\r\n    \"state\":  \"enabled\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "MA.L2-3.7.5.session-terminate",
+    "label": "Conditional Access - End Administrator (Nonlocal Maintenance) Sessions: 4-hour Sign-in Frequency, No Persistent Browser",
+    "engine": "mgraph",
+    "layer_hint": 2,
+    "sequence_hint": 8,
+    "idempotency": "get-then-set",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "MA.L2-3.7.5"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/identity/conditionalAccess/policies').value | Where-Object displayName -eq 'CMMC-AdminSession-Terminate' | Select-Object -First 1 | ConvertTo-Json -Depth 10",
+    "set_command": "New-MgIdentityConditionalAccessPolicy -BodyParameter @{displayName='CMMC-AdminSession-Terminate';state='enabled';conditions=@{users=@{includeRoles=@('62e90394-69f5-4237-9190-012177145e10','194ae4cb-b126-40b2-bd5b-6091b380977d','3a2c62db-5318-420d-8d74-23affee5d9d5');excludeUsers=@('{breakGlassUserId}')};applications=@{includeApplications=@('All')};clientAppTypes=@('all')};sessionControls=@{signInFrequency=@{value=4;type='hours';isEnabled=$true};persistentBrowser=@{mode='never';isEnabled=$true}}}",
+    "evidence_commands": [
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/identity/conditionalAccess/policies').value | Where-Object displayName -eq 'CMMC-AdminSession-Terminate' | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "MA.L2-3.7.5"
+    ],
+    "timestamp": "2026-11-02T12:13:35.111Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "New-MgIdentityConditionalAccessPolicy -BodyParameter @{displayName='CMMC-AdminSession-Terminate';state='enabled';conditions=@{users=@{includeRoles=@('62e90394-69f5-4237-9190-012177145e10','194ae4cb-b126-40b2-bd5b-6091b380977d','3a2c62db-5318-420d-8d74-23affee5d9d5');excludeUsers=@('{breakGlassUserId}')};applications=@{includeApplications=@('All')};clientAppTypes=@('all')};sessionControls=@{signInFrequency=@{value=4;type='hours';isEnabled=$true};persistentBrowser=@{mode='never';isEnabled=$true}}}",
+    "sha256Hash": "16d7f30b729e1377bde6b443aa7ac44c2b2a0f85760e409e87d0508ba9fdc918",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\r\n    \"id\":  \"CMMC-AdminSession-Terminate\",\r\n    \"sessionControls\":  {\r\n                            \"signInFrequency\":  {\r\n                                                    \"isEnabled\":  true,\r\n                                                    \"type\":  \"hours\",\r\n                                                    \"value\":  4\r\n                                                },\r\n                            \"persistentBrowser\":  {\r\n                                                      \"isEnabled\":  true,\r\n                                                      \"mode\":  \"never\"\r\n                                                  }\r\n                        },\r\n    \"displayName\":  \"CMMC-AdminSession-Terminate\",\r\n    \"conditions\":  {\r\n                       \"clientAppTypes\":  [\r\n                                              \"all\"\r\n                                          ],\r\n                       \"users\":  {\r\n                                     \"includeRoles\":  [\r\n                                                          \"62e90394-69f5-4237-9190-012177145e10\",\r\n                                                          \"194ae4cb-b126-40b2-bd5b-6091b380977d\",\r\n                                                          \"3a2c62db-5318-420d-8d74-23affee5d9d5\"\r\n                                                      ],\r\n                                     \"excludeUsers\":  [\r\n                                                          \"user-5\"\r\n                                                      ]\r\n                                 },\r\n                       \"applications\":  {\r\n                                            \"includeApplications\":  [\r\n                                                                        \"All\"\r\n                                                                    ]\r\n                                        }\r\n                   },\r\n    \"state\":  \"enabled\"\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

@@ -1,7 +1,7 @@
 # Risk Assessment Policy (EDC-POL-011)
 
 **Version:** 1.0
-**Effective Date:** 2026-11-01
+**Effective Date:** 2026-11-02
 **Policy Owner:** Designated Official
 **Organization:** Sim tenant muster-partial
 
@@ -124,7 +124,7 @@ I, Designated Official, as the Authorizing Official, have reviewed and approve t
 
 ---
 
-**Effective Date:** 2026-11-01
+**Effective Date:** 2026-11-02
 **NIST SP 800-171 Controls:** 3.11.1--3.11.3
 **CMMC Controls:** 3.11.1, 3.11.2, 3.11.3
 **Policy Owner:** Designated Official

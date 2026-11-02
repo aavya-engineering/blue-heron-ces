@@ -1,7 +1,7 @@
 # Personnel Termination and Transfer Procedure (EDC-POL-010)
 
 **Version:** 1.0
-**Effective Date:** 2026-11-01
+**Effective Date:** 2026-11-02
 **Policy Owner:** Designated Official
 **Organization:** Sim tenant muster-partial
 
@@ -128,6 +128,6 @@ I, Designated Official, as the Authorizing Official, have reviewed and approve t
 
 ---
 
-**Effective Date:** 2026-11-01
+**Effective Date:** 2026-11-02
 **CMMC Controls:** 3.9.2
 **Policy Owner:** Designated Official

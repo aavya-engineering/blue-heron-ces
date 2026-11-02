@@ -1,0 +1,48 @@
+{
+  "rawResponse": "{\r\n    \"createdDateTime\":  \"\\/Date(1759017600000)\\/\",\r\n    \"isPerDeviceAcceptanceRequired\":  false,\r\n    \"userReacceptRequiredFrequency\":  \"P365D\",\r\n    \"termsExpiration\":  null,\r\n    \"files\":  [\r\n                  {\r\n                      \"id\":  \"53530000-00bb-4000-8000-000000000001\",\r\n                      \"fileName\":  \"S3-CUI-System-Access-Notice.pdf\",\r\n                      \"language\":  \"en-US\",\r\n                      \"isDefault\":  true,\r\n                      \"displayName\":  \"CUI System Access Notice\"\r\n                  }\r\n              ],\r\n    \"id\":  \"touAgreement-1\",\r\n    \"displayName\":  \"CUI System Access Notice\",\r\n    \"isViewingBeforeAcceptanceRequired\":  true\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Resource already exists — creation skipped (idempotent)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Already compliant — state unchanged, evidence confirms resource exists",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "Already compliant — state unchanged, evidence confirms resource exists"
+  },
+  "registryEntry": {
+    "entry_id": "AC.L2-3.1.9.terms-of-use",
+    "label": "Create CUI Terms of Use Agreement",
+    "engine": "mgraph",
+    "layer_hint": 7,
+    "sequence_hint": 2,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "AC.L2-3.1.9"
+    ],
+    "get_command": "Get-MgAgreement -Filter \"displayName eq 'CUI System Access Notice'\" | ConvertTo-Json -Depth 10",
+    "set_command": "New-MgAgreement -BodyParameter @{displayName='CUI System Access Notice';isViewingBeforeAcceptanceRequired=$true;files=@(@{fileName='{touFileName}';language='en';isDefault=$true;fileData=@{data=[System.Convert]::FromBase64String('{touFileBase64}')}})}",
+    "evidence_commands": [
+      "Get-MgAgreement -Filter \"displayName eq 'CUI System Access Notice'\" | Select-Object Id,DisplayName,IsViewingBeforeAcceptanceRequired,Files | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AC.L2-3.1.9"
+    ],
+    "timestamp": "2026-11-02T11:36:29.125Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "New-MgAgreement -BodyParameter @{displayName='CUI System Access Notice';isViewingBeforeAcceptanceRequired=$true;files=@(@{fileName='{touFileName}';language='en';isDefault=$true;fileData=@{data=[System.Convert]::FromBase64String('{touFileBase64}')}})}",
+    "sha256Hash": "19c03991ffc59c222e0594cd4c18ae69459f44dd4bfcc1f4faddd7d1368276c4",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "{\r\n    \"createdDateTime\":  \"\\/Date(1759017600000)\\/\",\r\n    \"isPerDeviceAcceptanceRequired\":  false,\r\n    \"userReacceptRequiredFrequency\":  \"P365D\",\r\n    \"termsExpiration\":  null,\r\n    \"files\":  [\r\n                  {\r\n                      \"id\":  \"53530000-00bb-4000-8000-000000000001\",\r\n                      \"fileName\":  \"S3-CUI-System-Access-Notice.pdf\",\r\n                      \"language\":  \"en-US\",\r\n                      \"isDefault\":  true,\r\n                      \"displayName\":  \"CUI System Access Notice\"\r\n                  }\r\n              ],\r\n    \"id\":  \"touAgreement-1\",\r\n    \"displayName\":  \"CUI System Access Notice\",\r\n    \"isViewingBeforeAcceptanceRequired\":  true\r\n}\r\n",
+    "postcheckMode": "state"
+  }
+}

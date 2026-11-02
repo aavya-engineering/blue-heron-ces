@@ -1,0 +1,35 @@
+{
+  "rawResponse": "{\r\n    \"windowsDevicesRead\":  0,\r\n    \"protectionStatesReported\":  0,\r\n    \"signatureUpdateOverdueCount\":  0,\r\n    \"devices\":  [\r\n\r\n                ]\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "SI.L1-3.14.4.av-update-evidence",
+    "label": "Read Defender Signature Currency on Windows Devices",
+    "engine": "mgraph",
+    "layer_hint": 4,
+    "sequence_hint": 38,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "SI.L1-3.14.4"
+    ],
+    "get_command": "$d = @(@((Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/managedDevices').value) | Where-Object { $_ -and $_.operatingSystem -eq 'Windows' }); $s = @($d | ForEach-Object { $m = $_; try { $p = Invoke-MgGraphRequest -Uri \"https://graph.microsoft.us/beta/deviceManagement/managedDevices/$($m.id)/windowsProtectionState\" -ErrorAction Stop; [pscustomobject]@{ deviceName = $m.deviceName; reported = ($null -ne $p); malwareProtectionEnabled = $p.malwareProtectionEnabled; signatureVersion = $p.signatureVersion; signatureUpdateDateTime = $p.signatureUpdateDateTime; signatureUpdateOverdue = $p.signatureUpdateOverdue } } catch { [pscustomobject]@{ deviceName = $m.deviceName; reported = $false } } }); [pscustomobject]@{ windowsDevicesRead = $d.Count; protectionStatesReported = @($s | Where-Object { $_.reported }).Count; signatureUpdateOverdueCount = @($s | Where-Object { $_.signatureUpdateOverdue -eq $true }).Count; devices = $s } | ConvertTo-Json -Depth 5",
+    "set_command": "",
+    "evidence_commands": [
+      "$d = @(@((Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/managedDevices').value) | Where-Object { $_ -and $_.operatingSystem -eq 'Windows' }); $s = @($d | ForEach-Object { $m = $_; try { $p = Invoke-MgGraphRequest -Uri \"https://graph.microsoft.us/beta/deviceManagement/managedDevices/$($m.id)/windowsProtectionState\" -ErrorAction Stop; [pscustomobject]@{ deviceName = $m.deviceName; reported = ($null -ne $p); malwareProtectionEnabled = $p.malwareProtectionEnabled; signatureVersion = $p.signatureVersion; signatureUpdateDateTime = $p.signatureUpdateDateTime; signatureUpdateOverdue = $p.signatureUpdateOverdue } } catch { [pscustomobject]@{ deviceName = $m.deviceName; reported = $false } } }); [pscustomobject]@{ windowsDevicesRead = $d.Count; protectionStatesReported = @($s | Where-Object { $_.reported }).Count; signatureUpdateOverdueCount = @($s | Where-Object { $_.signatureUpdateOverdue -eq $true }).Count; devices = $s } | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SI.L1-3.14.4"
+    ],
+    "timestamp": "2026-11-02T12:15:07.143Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Read Defender Signature Currency on Windows Devices",
+    "sha256Hash": "530d671d4497308236c83b393c1188e38e6664f578e1143da2eeb4da5f2b20d0",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

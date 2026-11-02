@@ -1,5 +1,5 @@
 {
-  "rawResponse": "{\r\n    \"id\":  \"CMMC-RemoteMaintenance-MFA\",\r\n    \"displayName\":  \"CMMC-RemoteMaintenance-MFA\",\r\n    \"state\":  \"enabled\",\r\n    \"conditions\":  {\r\n                       \"users\":  {\r\n                                     \"includeRoles\":  [\r\n                                                          \"62e90394-69f5-4237-9190-012177145e10\",\r\n                                                          \"194ae4cb-b126-40b2-bd5b-6091b380977d\"\r\n                                                      ],\r\n                                     \"excludeUsers\":  [\r\n                                                          \"user-5\"\r\n                                                      ]\r\n                                 },\r\n                       \"applications\":  {\r\n                                            \"includeApplications\":  [\r\n                                                                        \"All\"\r\n                                                                    ]\r\n                                        },\r\n                       \"locations\":  {\r\n                                         \"includeLocations\":  [\r\n                                                                  \"All\"\r\n                                                              ],\r\n                                         \"excludeLocations\":  [\r\n                                                                  \"AllTrusted\"\r\n                                                              ]\r\n                                     }\r\n                   },\r\n    \"grantControls\":  {\r\n                          \"builtInControls\":  [\r\n                                                  \"mfa\"\r\n                                              ],\r\n                          \"operator\":  \"OR\"\r\n                      }\r\n}\r\n",
+  "rawResponse": "[\r\n    {\r\n        \"displayName\":  \"CMMC-Require-Compliant-Device-All-Users\",\r\n        \"state\":  \"enabled\",\r\n        \"includeUsers\":  [\r\n                             \"All\"\r\n                         ],\r\n        \"includeApplications\":  [\r\n                                    \"All\"\r\n                                ],\r\n        \"builtInControls\":  [\r\n                                \"compliantDevice\",\r\n                                \"domainJoinedDevice\"\r\n                            ]\r\n    },\r\n    {\r\n        \"displayName\":  \"CMMC-Block-Legacy-Auth\",\r\n        \"state\":  \"enabled\",\r\n        \"includeUsers\":  [\r\n                             \"All\"\r\n                         ],\r\n        \"includeApplications\":  [\r\n                                    \"All\"\r\n                                ],\r\n        \"builtInControls\":  [\r\n                                \"block\"\r\n                            ]\r\n    },\r\n    {\r\n        \"displayName\":  \"CMMC-RemoteMaintenance-MFA\",\r\n        \"state\":  \"enabled\",\r\n        \"includeUsers\":  [\r\n                             null\r\n                         ],\r\n        \"includeApplications\":  [\r\n                                    \"All\"\r\n                                ],\r\n        \"builtInControls\":  [\r\n                                \"mfa\"\r\n                            ]\r\n    }\r\n]\r\n",
   "outcome": "automated_success",
   "outcomeRationale": "Command completed successfully (exit code 0)",
   "complianceVerdict": "SAT",
@@ -15,20 +15,20 @@
     "control_ids": [
       "SC.L2-3.13.4"
     ],
-    "get_command": "Get-MgIdentityConditionalAccessPolicy -All | Where-Object { $_.DisplayName -like '*Remote*' -or $_.DisplayName -like '*VPN*' } | Select-Object DisplayName,State,Conditions,GrantControls | ConvertTo-Json -Depth 3",
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/identity/conditionalAccess/policies').value | Where-Object { $_.state -eq 'enabled' -and ($_.displayName -like '*Remote*' -or $_.displayName -like '*VPN*' -or ((@($_.conditions.users.includeUsers) -contains 'All') -and (@($_.conditions.applications.includeApplications) -contains 'All') -and (@($_.grantControls.builtInControls | Where-Object { $_ }).Count -gt 0))) } | ForEach-Object { [pscustomobject]@{ displayName = $_.displayName; state = $_.state } } | ConvertTo-Json -Depth 3",
     "set_command": "",
     "evidence_commands": [
-      "Get-MgIdentityConditionalAccessPolicy -All | Where-Object { $_.DisplayName -like '*Remote*' } | ConvertTo-Json -Depth 4"
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/identity/conditionalAccess/policies').value | Where-Object { $_.state -eq 'enabled' -and ($_.displayName -like '*Remote*' -or $_.displayName -like '*VPN*' -or ((@($_.conditions.users.includeUsers) -contains 'All') -and (@($_.conditions.applications.includeApplications) -contains 'All') -and (@($_.grantControls.builtInControls | Where-Object { $_ }).Count -gt 0))) } | ForEach-Object { [pscustomobject]@{ displayName = $_.displayName; state = $_.state; includeUsers = @($_.conditions.users.includeUsers); includeApplications = @($_.conditions.applications.includeApplications); builtInControls = @($_.grantControls.builtInControls) } } | ConvertTo-Json -Depth 4"
     ]
   },
   "metadata": {
     "controlIds": [
       "SC.L2-3.13.4"
     ],
-    "timestamp": "2026-11-01T17:10:23.186Z",
+    "timestamp": "2026-11-02T12:14:32.200Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "[manual/evidence-only] Conditional Access Policy for Remote Access Sessions",
-    "sha256Hash": "b9917ff18a3a9f2bfb300b2a963119c4c3e7113819e4c568ad9768d480316532",
+    "sha256Hash": "85f30e7b7c19f2af491aa99faff97bc1be5232358f4e3015440f11af9f60579d",
     "moduleVersions": {},
     "environment": "GCC-High"
   }

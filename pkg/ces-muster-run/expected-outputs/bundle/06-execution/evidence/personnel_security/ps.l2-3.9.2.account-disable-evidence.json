@@ -1,5 +1,5 @@
 {
-  "rawResponse": "",
+  "rawResponse": "{\r\n    \"count\":  0,\r\n    \"disableAccount\":  0,\r\n    \"revokeSessions\":  0,\r\n    \"events\":  [\r\n\r\n               ]\r\n}\r\n",
   "outcome": "automated_success",
   "outcomeRationale": "Command completed successfully (exit code 0)",
   "complianceVerdict": "SAT",
@@ -18,18 +18,17 @@
     "get_command": "(Invoke-MgGraphRequest -Uri \"https://graph.microsoft.us/v1.0/auditLogs/directoryAudits?`$filter=activityDisplayName eq 'Disable account'&`$top=5&`$orderby=activityDateTime desc\").value | Select-Object activityDisplayName,activityDateTime,initiatedBy,targetResources | ConvertTo-Json -Depth 10",
     "set_command": "",
     "evidence_commands": [
-      "(Invoke-MgGraphRequest -Uri \"https://graph.microsoft.us/v1.0/auditLogs/directoryAudits?`$filter=activityDisplayName eq 'Disable account'&`$top=10&`$orderby=activityDateTime desc\").value | ConvertTo-Json -Depth 10",
-      "(Invoke-MgGraphRequest -Uri \"https://graph.microsoft.us/v1.0/auditLogs/directoryAudits?`$filter=activityDisplayName eq 'Revoke sign in sessions'&`$top=10&`$orderby=activityDateTime desc\").value | ConvertTo-Json -Depth 10"
+      "$d = @((Invoke-MgGraphRequest -Uri \"https://graph.microsoft.us/v1.0/auditLogs/directoryAudits?`$filter=activityDisplayName eq 'Disable account'&`$top=10&`$orderby=activityDateTime desc\").value | Where-Object { $_ }); $s = @((Invoke-MgGraphRequest -Uri \"https://graph.microsoft.us/v1.0/auditLogs/directoryAudits?`$filter=activityDisplayName eq 'Revoke sign in sessions'&`$top=10&`$orderby=activityDateTime desc\").value | Where-Object { $_ }); [pscustomobject]@{ count = $d.Count + $s.Count; disableAccount = $d.Count; revokeSessions = $s.Count; events = @(@($d) + @($s) | ForEach-Object { [pscustomobject]@{ activityDisplayName = $_.activityDisplayName; activityDateTime = $_.activityDateTime; initiatedBy = $_.initiatedBy; targetResources = $_.targetResources } }) } | ConvertTo-Json -Depth 10"
     ]
   },
   "metadata": {
     "controlIds": [
       "PS.L2-3.9.2"
     ],
-    "timestamp": "2026-11-01T17:11:59.773Z",
+    "timestamp": "2026-11-02T12:16:41.814Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "[manual/evidence-only] Terminated User Account Disable Audit Evidence",
-    "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sha256Hash": "594177c04c70ca4d27a3f13f637df4b519371aab059b9fc5b252c0f4025db5d8",
     "moduleVersions": {},
     "environment": "GCC-High"
   }

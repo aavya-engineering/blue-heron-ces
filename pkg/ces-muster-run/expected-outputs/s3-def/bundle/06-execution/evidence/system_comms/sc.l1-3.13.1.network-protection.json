@@ -1,0 +1,50 @@
+{
+  "rawResponse": "{\r\n    \"name\":  \"CMMC-NetworkProtection\",\r\n    \"networkProtection\":  \"device_vendor_msft_policy_config_defender_enablenetworkprotection_1\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceManagementConfigurationPolicy-6_allDevicesAssignmentTarget\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.allDevicesAssignmentTarget\"\r\n                                       }\r\n                        }\r\n                    ]\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "SC.L1-3.13.1.network-protection",
+    "label": "Turn On Microsoft Defender Network Protection in Block Mode (Intune Settings Catalog, all devices)",
+    "engine": "mgraph",
+    "layer_hint": 6,
+    "sequence_hint": 18,
+    "idempotency": "get-then-set",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "SC.L1-3.13.1"
+    ],
+    "get_command": "$p = @((Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/beta/deviceManagement/configurationPolicies?$expand=settings,assignments').value | Where-Object { $_.name -eq 'CMMC-NetworkProtection' }) | Select-Object -First 1; if ($p) { [pscustomobject]@{ name = $p.name; networkProtection = (@($p.settings | ForEach-Object { $_.settingInstance } | Where-Object { $_.settingDefinitionId -eq 'device_vendor_msft_policy_config_defender_enablenetworkprotection' }) | Select-Object -First 1).choiceSettingValue.value; assignments = @($p.assignments) } | ConvertTo-Json -Depth 10 }",
+    "set_command": "$existing = @((Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/beta/deviceManagement/configurationPolicies').value | Where-Object { $_.name -eq 'CMMC-NetworkProtection' }); if ($existing.Count -gt 0) { Write-Output 'CMMC-NetworkProtection already exists' } else { $created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/beta/deviceManagement/configurationPolicies' -Body (@{name='CMMC-NetworkProtection';description='CMMC SC.L1-3.13.1 boundary protection - Defender network protection in block mode';platforms='windows10';technologies='mdm';settings=@(@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationSetting';settingInstance=@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance';settingDefinitionId='device_vendor_msft_policy_config_defender_enablenetworkprotection';choiceSettingValue=@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationChoiceSettingValue';value='device_vendor_msft_policy_config_defender_enablenetworkprotection_1'}}})} | ConvertTo-Json -Depth 20) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/beta/deviceManagement/configurationPolicies/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.allDevicesAssignmentTarget'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | Select-Object id,name | ConvertTo-Json -Depth 5 }",
+    "evidence_commands": [
+      "$p = @((Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/beta/deviceManagement/configurationPolicies?$expand=settings,assignments').value | Where-Object { $_.name -eq 'CMMC-NetworkProtection' }) | Select-Object -First 1; if ($p) { [pscustomobject]@{ name = $p.name; networkProtection = (@($p.settings | ForEach-Object { $_.settingInstance } | Where-Object { $_.settingDefinitionId -eq 'device_vendor_msft_policy_config_defender_enablenetworkprotection' }) | Select-Object -First 1).choiceSettingValue.value; assignments = @($p.assignments) } | ConvertTo-Json -Depth 10 }"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SC.L1-3.13.1"
+    ],
+    "timestamp": "2026-11-02T11:35:47.500Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "$existing = @((Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/beta/deviceManagement/configurationPolicies').value | Where-Object { $_.name -eq 'CMMC-NetworkProtection' }); if ($existing.Count -gt 0) { Write-Output 'CMMC-NetworkProtection already exists' } else { $created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/beta/deviceManagement/configurationPolicies' -Body (@{name='CMMC-NetworkProtection';description='CMMC SC.L1-3.13.1 boundary protection - Defender network protection in block mode';platforms='windows10';technologies='mdm';settings=@(@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationSetting';settingInstance=@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance';settingDefinitionId='device_vendor_msft_policy_config_defender_enablenetworkprotection';choiceSettingValue=@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationChoiceSettingValue';value='device_vendor_msft_policy_config_defender_enablenetworkprotection_1'}}})} | ConvertTo-Json -Depth 20) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/beta/deviceManagement/configurationPolicies/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.allDevicesAssignmentTarget'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | Select-Object id,name | ConvertTo-Json -Depth 5 }",
+    "sha256Hash": "231eeb9f6ccaf36fb6cedfabc6b74e847d02ea902bae6c9e67ffec36a185eae2",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\r\n    \"name\":  \"CMMC-NetworkProtection\",\r\n    \"networkProtection\":  \"device_vendor_msft_policy_config_defender_enablenetworkprotection_1\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceManagementConfigurationPolicy-6_allDevicesAssignmentTarget\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.allDevicesAssignmentTarget\"\r\n                                       }\r\n                        }\r\n                    ]\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

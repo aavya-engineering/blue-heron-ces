@@ -155,9 +155,11 @@ describe('W3.5 mechanism narratives (run 20 inputs)', () => {
   // AC.L2-3.1.17, MA.L2-3.7.4, MP.L2-3.8.6 and MP.L2-3.8.7 go met -> not_assessed (no other source): 76 / 7 / 0 / 27 -> 72 / 7 / 0 / 31.
   // W5 cycle 7: AU.L2-3.3.7 not_met -> not_assessed (run 20 never read the settings catalog): 72 / 6 / 0 / 32.
   // FIN-27 (FD-4): the replay passes no EO assessment / POA&M records, so CA.L2-3.12.1 / 3.12.3 are not_assessed (72 -> 70) and CA.L2-3.12.2 not_met -> not_assessed (6 -> 5).
-  test('status counts after W5 cycle 7 and FIN-27 (70 / 5 / 0 / 35)', () => {
+  // PL-121 (FIX-SCORE, founder placeholder rule): run 20's Wi-Fi SSID is MUSTER-DEFAULT-SSID, so AC.L2-3.1.16 met -> not_met
+  // and AC.L2-3.1.17 not_assessed -> not_met: 70 / 5 / 0 / 35 -> 69 / 7 / 0 / 34.
+  test('status counts after W5 cycle 7, FIN-27 and PL-121 (69 / 7 / 0 / 34)', () => {
     const counts = ['met', 'not_met', 'partial', 'not_assessed'].map(s => ssp.controlImplementations.filter(c => c.status === s).length);
-    expect(counts).toEqual([70, 5, 0, 35]);
+    expect(counts).toEqual([69, 7, 0, 34]);
     // The W5 cycle 2 mover.
     expect(ssp.controlImplementations.find(c => c.control_id === 'IA.L2-3.5.10')!.status).toBe('not_met');
   });

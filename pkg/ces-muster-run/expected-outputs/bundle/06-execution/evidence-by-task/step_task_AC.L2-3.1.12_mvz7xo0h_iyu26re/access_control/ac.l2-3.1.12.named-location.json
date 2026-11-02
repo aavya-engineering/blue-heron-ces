@@ -1,0 +1,50 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"namedLocation-1\",\r\n    \"displayName\":  \"Approved-CUI-Networks\",\r\n    \"isTrusted\":  true,\r\n    \"ipRanges\":  [\r\n                     {\r\n                         \"cidrAddress\":  \"203.0.113.0/24\",\r\n                         \"@odata.type\":  \"#microsoft.graph.iPv4CidrRange\"\r\n                     }\r\n                 ],\r\n    \"@odata.type\":  \"#microsoft.graph.ipNamedLocation\",\r\n    \"AdditionalProperties\":  {\r\n                                 \"@odata.type\":  \"#microsoft.graph.ipNamedLocation\",\r\n                                 \"ipRanges\":  [\r\n                                                  {\r\n                                                      \"cidrAddress\":  \"203.0.113.0/24\",\r\n                                                      \"@odata.type\":  \"#microsoft.graph.iPv4CidrRange\"\r\n                                                  }\r\n                                              ],\r\n                                 \"isTrusted\":  true\r\n                             }\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "AC.L2-3.1.12.named-location",
+    "label": "Create Approved CUI Named Location (IP Range)",
+    "engine": "mgraph",
+    "layer_hint": 7,
+    "sequence_hint": 0,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "AC.L2-3.1.12"
+    ],
+    "get_command": "Get-MgIdentityConditionalAccessNamedLocation -Filter \"displayName eq 'Approved-CUI-Networks'\" | ConvertTo-Json",
+    "set_command": "New-MgIdentityConditionalAccessNamedLocation -BodyParameter @{'@odata.type'='#microsoft.graph.ipNamedLocation';displayName='Approved-CUI-Networks';isTrusted=$true;ipRanges=@(@{'@odata.type'='#microsoft.graph.iPv4CidrRange';cidrAddress='{approvedIpRange}'})}",
+    "evidence_commands": [
+      "Get-MgIdentityConditionalAccessNamedLocation -Filter \"displayName eq 'Approved-CUI-Networks'\" | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AC.L2-3.1.12"
+    ],
+    "timestamp": "2026-11-02T12:15:43.823Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "New-MgIdentityConditionalAccessNamedLocation -BodyParameter @{'@odata.type'='#microsoft.graph.ipNamedLocation';displayName='Approved-CUI-Networks';isTrusted=$true;ipRanges=@(@{'@odata.type'='#microsoft.graph.iPv4CidrRange';cidrAddress='{approvedIpRange}'})}",
+    "sha256Hash": "1743fdae10c045d944100c36931993f1c59f23fc970728854d8f62b04f67c817",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\r\n    \"id\":  \"namedLocation-1\",\r\n    \"displayName\":  \"Approved-CUI-Networks\",\r\n    \"isTrusted\":  true,\r\n    \"ipRanges\":  [\r\n                     {\r\n                         \"cidrAddress\":  \"203.0.113.0/24\",\r\n                         \"@odata.type\":  \"#microsoft.graph.iPv4CidrRange\"\r\n                     }\r\n                 ],\r\n    \"@odata.type\":  \"#microsoft.graph.ipNamedLocation\",\r\n    \"AdditionalProperties\":  {\r\n                                 \"@odata.type\":  \"#microsoft.graph.ipNamedLocation\",\r\n                                 \"ipRanges\":  [\r\n                                                  \"@{cidrAddress=203.0.113.0/24; @odata.type=#microsoft.graph.iPv4CidrRange}\"\r\n                                              ],\r\n                                 \"isTrusted\":  true\r\n                             }\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

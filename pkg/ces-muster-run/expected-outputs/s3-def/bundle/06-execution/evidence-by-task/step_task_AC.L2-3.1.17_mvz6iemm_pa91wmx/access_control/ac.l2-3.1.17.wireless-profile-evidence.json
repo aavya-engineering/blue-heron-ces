@@ -1,0 +1,35 @@
+{
+  "rawResponse": "{\r\n    \"displayName\":  \"S3-DEF-CORP Wi-Fi\",\r\n    \"id\":  \"53530000-00b4-4000-8000-000000000001\",\r\n    \"odataType\":  \"#microsoft.graph.windowsWifiConfiguration\",\r\n    \"ssid\":  \"S3-DEF-CORP\",\r\n    \"wifiSecurityType\":  \"wpa2Enterprise\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "AC.L2-3.1.17.wireless-profile-evidence",
+    "label": "Verify Intune Wi-Fi Configuration Profiles Enforce WPA2/3",
+    "engine": "mgraph",
+    "layer_hint": 4,
+    "sequence_hint": 4,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "AC.L2-3.1.17"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object { $_.'@odata.type' -like '*wifi*' } | ForEach-Object { [pscustomobject]@{ displayName = $_.displayName; id = $_.id } } | ConvertTo-Json -Depth 3",
+    "set_command": "",
+    "evidence_commands": [
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object { $_.'@odata.type' -like '*wifi*' } | ForEach-Object { [pscustomobject]@{ displayName = $_.displayName; id = $_.id; odataType = $_.'@odata.type'; ssid = $_.ssid; wifiSecurityType = $_.wifiSecurityType } } | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AC.L2-3.1.17"
+    ],
+    "timestamp": "2026-11-02T11:34:00.200Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Verify Intune Wi-Fi Configuration Profiles Enforce WPA2/3",
+    "sha256Hash": "81f4e10238d95121b46f6e00eadea0e1035db0aecfe83fe65ef91b19589817ff",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

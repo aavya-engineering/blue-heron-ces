@@ -1,0 +1,50 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"CMMC-AntiSpam\",\r\n    \"Identity\":  \"CMMC-AntiSpam\",\r\n    \"IsValid\":  true,\r\n    \"Name\":  \"CMMC-AntiSpam\",\r\n    \"SpamAction\":  \"MoveToJmf\",\r\n    \"HighConfidenceSpamAction\":  \"Quarantine\",\r\n    \"BulkThreshold\":  6,\r\n    \"PhishSpamAction\":  \"Quarantine\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "SC.L2-3.13.15.anti-spam",
+    "label": "Create Anti-Spam Inbound Content Filter Policy",
+    "engine": "exchange",
+    "layer_hint": 5,
+    "sequence_hint": 21,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "SC.L2-3.13.15"
+    ],
+    "get_command": "Get-HostedContentFilterPolicy | Where-Object { ($_.Name -eq 'CMMC-AntiSpam') -or (($_.IsDefault -ne $true) -and (@('MoveToJmf','Quarantine') -contains $_.SpamAction) -and ($_.HighConfidenceSpamAction -eq 'Quarantine') -and ($_.PhishSpamAction -eq 'Quarantine') -and ($null -ne $_.BulkThreshold -and [double]$_.BulkThreshold -ge 1) -and ($null -ne $_.BulkThreshold -and [double]$_.BulkThreshold -le 6)) } | Sort-Object { $_.Name -ne 'CMMC-AntiSpam' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
+    "set_command": "try { New-HostedContentFilterPolicy -Name 'CMMC-AntiSpam' -SpamAction MoveToJmf -HighConfidenceSpamAction Quarantine -BulkThreshold 6 -PhishSpamAction Quarantine | Out-Null } catch { Set-HostedContentFilterPolicy -Identity 'CMMC-AntiSpam' -SpamAction MoveToJmf -HighConfidenceSpamAction Quarantine -BulkThreshold 6 -PhishSpamAction Quarantine | Out-Null }; Get-HostedContentFilterPolicy -Identity 'CMMC-AntiSpam' | Select-Object Name | ConvertTo-Json",
+    "evidence_commands": [
+      "Get-HostedContentFilterPolicy -Identity 'CMMC-AntiSpam' | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SC.L2-3.13.15"
+    ],
+    "timestamp": "2026-11-02T11:37:12.601Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "try { New-HostedContentFilterPolicy -Name 'CMMC-AntiSpam' -SpamAction MoveToJmf -HighConfidenceSpamAction Quarantine -BulkThreshold 6 -PhishSpamAction Quarantine | Out-Null } catch { Set-HostedContentFilterPolicy -Identity 'CMMC-AntiSpam' -SpamAction MoveToJmf -HighConfidenceSpamAction Quarantine -BulkThreshold 6 -PhishSpamAction Quarantine | Out-Null }; Get-HostedContentFilterPolicy -Identity 'CMMC-AntiSpam' | Select-Object Name | ConvertTo-Json",
+    "sha256Hash": "b2d0b9a7605fae0ee9b6b310ce3353df4edf785c2d881105ddfb259ef120a515",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\r\n    \"id\":  \"CMMC-AntiSpam\",\r\n    \"Identity\":  \"CMMC-AntiSpam\",\r\n    \"IsValid\":  true,\r\n    \"Name\":  \"CMMC-AntiSpam\",\r\n    \"SpamAction\":  \"MoveToJmf\",\r\n    \"HighConfidenceSpamAction\":  \"Quarantine\",\r\n    \"BulkThreshold\":  6,\r\n    \"PhishSpamAction\":  \"Quarantine\"\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

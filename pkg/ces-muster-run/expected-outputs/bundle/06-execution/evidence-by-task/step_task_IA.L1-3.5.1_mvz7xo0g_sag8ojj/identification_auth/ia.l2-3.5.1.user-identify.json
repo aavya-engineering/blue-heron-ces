@@ -1,0 +1,37 @@
+{
+  "rawResponse": "[\r\n    {\r\n        \"userType\":  \"Member\",\r\n        \"displayName\":  \"Sim User 1\",\r\n        \"userPrincipalName\":  \"sim.user1@simtenant.onmicrosoft.us\",\r\n        \"accountEnabled\":  true\r\n    },\r\n    {\r\n        \"userType\":  \"Member\",\r\n        \"displayName\":  \"Sim User 2\",\r\n        \"userPrincipalName\":  \"sim.user2@simtenant.onmicrosoft.us\",\r\n        \"accountEnabled\":  true\r\n    },\r\n    {\r\n        \"userType\":  \"Member\",\r\n        \"displayName\":  \"Sim User 3\",\r\n        \"userPrincipalName\":  \"sim.user3@simtenant.onmicrosoft.us\",\r\n        \"accountEnabled\":  true\r\n    },\r\n    {\r\n        \"userType\":  \"Member\",\r\n        \"displayName\":  \"Sim User 4\",\r\n        \"userPrincipalName\":  \"sim.user4@simtenant.onmicrosoft.us\",\r\n        \"accountEnabled\":  true\r\n    },\r\n    {\r\n        \"userType\":  \"Member\",\r\n        \"displayName\":  \"Sim User 5\",\r\n        \"userPrincipalName\":  \"sim.user5@simtenant.onmicrosoft.us\",\r\n        \"accountEnabled\":  true\r\n    },\r\n    {\r\n        \"userType\":  \"Member\",\r\n        \"displayName\":  \"Admin-sim.admin\",\r\n        \"userPrincipalName\":  \"admin-sim.admin@muster-partial\",\r\n        \"accountEnabled\":  true\r\n    }\r\n]\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "IA.L2-3.5.1.user-identify",
+    "label": "User and Device Identification Evidence",
+    "engine": "mgraph",
+    "layer_hint": 1,
+    "sequence_hint": 3,
+    "idempotency": "evidence-only",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "IA.L1-3.5.1",
+      "IA.L1-3.5.2"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/users?$filter=accountEnabled eq true&$select=displayName,userPrincipalName&$top=50').value | Select-Object displayName,userPrincipalName",
+    "set_command": "",
+    "evidence_commands": [
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/users?$filter=accountEnabled eq true&$select=displayName,userPrincipalName,accountEnabled,userType').value | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "IA.L1-3.5.1",
+      "IA.L1-3.5.2"
+    ],
+    "timestamp": "2026-11-02T12:13:13.032Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] User and Device Identification Evidence",
+    "sha256Hash": "10557412853030f513d66807636417659143908b0458ca28f5aced08742afe34",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

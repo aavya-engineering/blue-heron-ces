@@ -9,7 +9,7 @@
 | **Organization** | Corvelline Defense Assemblies Inc. (FICTIONAL) |
 | **Address** | 410 Ostervale Works Road, Dunmarrow, ZZ, 00000 |
 | **CMMC Level** | L2 |
-| **Effective Date** | 2026-11-01 |
+| **Effective Date** | 2026-11-02 |
 | **Prepared By** |  |
 | **Approved By** | Derwyn Arrowbrook |
 
@@ -142,6 +142,6 @@ Contact law enforcement when criminal activity is suspected, with guidance from 
 
 ---
 
-**Effective Date:** 2026-11-01
+**Effective Date:** 2026-11-02
 **NIST SP 800-171 Controls:** 3.6.1–3.6.3
 **Plan Owner:** 

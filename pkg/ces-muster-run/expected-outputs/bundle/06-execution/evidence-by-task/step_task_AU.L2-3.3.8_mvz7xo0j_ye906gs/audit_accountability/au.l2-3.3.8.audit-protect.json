@@ -1,0 +1,37 @@
+{
+  "rawResponse": "",
+  "outcome": "partial_success",
+  "outcomeRationale": "Command completed but expected data output was empty",
+  "complianceVerdict": "NOT_SAT",
+  "verdictRationale": "read returned nothing: absence not shown",
+  "registryEntry": {
+    "entry_id": "AU.L2-3.3.8.audit-protect",
+    "label": "Audit Log Access Restriction - Compliance Admin Role Evidence",
+    "engine": "mgraph",
+    "layer_hint": 7,
+    "sequence_hint": 2,
+    "idempotency": "evidence-only",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "AU.L2-3.3.8",
+      "AU.L2-3.3.9"
+    ],
+    "get_command": "Get-MgRoleManagementDirectoryRoleAssignment -Filter 'roleDefinitionId eq ''{complianceRoleId}''' -All",
+    "set_command": "",
+    "evidence_commands": [
+      "$e = @(Get-MgRoleManagementDirectoryRoleEligibilitySchedule -All | Where-Object { $_.RoleDefinitionId -eq '{complianceRoleId}' }); $a = @(Get-MgRoleManagementDirectoryRoleAssignment -All | Where-Object { $_.RoleDefinitionId -eq '{complianceRoleId}' }); if ($e.Count + $a.Count -gt 0) { [pscustomobject]@{ roleDefinitionId = '{complianceRoleId}'; eligible = @($e | ForEach-Object { $_.PrincipalId }); active = @($a | ForEach-Object { $_.PrincipalId }) } | ConvertTo-Json -Depth 4 }"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AU.L2-3.3.8",
+      "AU.L2-3.3.9"
+    ],
+    "timestamp": "2026-11-02T12:16:02.863Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Audit Log Access Restriction - Compliance Admin Role Evidence",
+    "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "rawResponse": "\r\n\r\nId                : /subscriptions/sim-sub/resourceGroups/s3-def-rg-security/providers/Microsoft.Network/virtualNetwork\r\n                    s/s3def-vnet-eo\r\nResourceGroupName : s3-def-rg-security\r\nName              : s3def-vnet-eo\r\nLocation          : usgovvirginia\r\nAddressPrefix     : 10.0.0.0/16\r\n\r\n\r\n\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "AZ-NET-001",
+    "label": "Create Virtual Network",
+    "engine": "az",
+    "layer_hint": 6,
+    "sequence_hint": 10,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "SC.L1-3.13.1",
+      "SC.L2-3.13.6",
+      "SC.L1-3.13.5"
+    ],
+    "get_command": "Get-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name '{vnetName}' | ConvertTo-Json -Depth 5",
+    "set_command": "New-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name '{vnetName}' -Location '{location}' -AddressPrefix '{vnetCidr}'",
+    "evidence_commands": []
+  },
+  "metadata": {
+    "controlIds": [
+      "SC.L1-3.13.1",
+      "SC.L2-3.13.6",
+      "SC.L1-3.13.5"
+    ],
+    "timestamp": "2026-11-02T11:35:54.338Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "New-AzVirtualNetwork -ResourceGroupName '{resourceGroup}' -Name '{vnetName}' -Location '{location}' -AddressPrefix '{vnetCidr}'",
+    "sha256Hash": "dbf1d007bdc15eb09f4ae6a9e715f9e0d0405a83bd6d70d4db393bef9100f797",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\r\n    \"Id\":  \"/subscriptions/sim-sub/resourceGroups/s3-def-rg-security/providers/Microsoft.Network/virtualNetworks/s3def-vnet-eo\",\r\n    \"ResourceGroupName\":  \"s3-def-rg-security\",\r\n    \"Name\":  \"s3def-vnet-eo\",\r\n    \"Location\":  \"usgovvirginia\",\r\n    \"AddressPrefix\":  \"10.0.0.0/16\",\r\n    \"ProvisioningState\":  \"Succeeded\",\r\n    \"AddressSpace\":  {\r\n                         \"AddressPrefixes\":  [\r\n                                                 \"10.0.0.0/16\"\r\n                                             ]\r\n                     }\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

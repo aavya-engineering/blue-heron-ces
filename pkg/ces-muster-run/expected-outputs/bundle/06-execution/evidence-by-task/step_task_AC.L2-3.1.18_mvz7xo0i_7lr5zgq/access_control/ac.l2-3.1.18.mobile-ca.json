@@ -1,0 +1,50 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"CMMC-MobileDeviceAccess\",\r\n    \"displayName\":  \"CMMC-MobileDeviceAccess\",\r\n    \"grantControls\":  {\r\n                          \"builtInControls\":  [\r\n                                                  \"approvedApplication\",\r\n                                                  \"compliantDevice\"\r\n                                              ],\r\n                          \"operator\":  \"OR\"\r\n                      },\r\n    \"conditions\":  {\r\n                       \"platforms\":  {\r\n                                         \"includePlatforms\":  [\r\n                                                                  \"android\",\r\n                                                                  \"iOS\"\r\n                                                              ]\r\n                                     },\r\n                       \"clientAppTypes\":  [\r\n                                              \"all\"\r\n                                          ],\r\n                       \"users\":  {\r\n                                     \"excludeUsers\":  [\r\n                                                          \"user-5\"\r\n                                                      ],\r\n                                     \"includeGroups\":  [\r\n                                                           \"group-1\"\r\n                                                       ]\r\n                                 },\r\n                       \"applications\":  {\r\n                                            \"includeApplications\":  [\r\n                                                                        \"All\"\r\n                                                                    ]\r\n                                        }\r\n                   },\r\n    \"state\":  \"enabled\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "AC.L2-3.1.18.mobile-ca",
+    "label": "Conditional Access - Mobile Device Compliance Requirement",
+    "engine": "mgraph",
+    "layer_hint": 4,
+    "sequence_hint": 13,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "AC.L2-3.1.18"
+    ],
+    "get_command": "Get-MgIdentityConditionalAccessPolicy -Filter \"displayName eq 'CMMC-MobileDeviceAccess'\" | ConvertTo-Json -Depth 10",
+    "set_command": "New-MgIdentityConditionalAccessPolicy -BodyParameter @{displayName='CMMC-MobileDeviceAccess';state='enabled';conditions=@{users=@{includeGroups=@('{cuiGroupId}');excludeUsers=@('{breakGlassUserId}')};applications=@{includeApplications=@('All')};platforms=@{includePlatforms=@('android','iOS')};clientAppTypes=@('all')};grantControls=@{operator='OR';builtInControls=@('approvedApplication','compliantDevice')}}",
+    "evidence_commands": [
+      "Get-MgIdentityConditionalAccessPolicy -Filter \"displayName eq 'CMMC-MobileDeviceAccess'\" | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AC.L2-3.1.18"
+    ],
+    "timestamp": "2026-11-02T12:13:50.122Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "New-MgIdentityConditionalAccessPolicy -BodyParameter @{displayName='CMMC-MobileDeviceAccess';state='enabled';conditions=@{users=@{includeGroups=@('{cuiGroupId}');excludeUsers=@('{breakGlassUserId}')};applications=@{includeApplications=@('All')};platforms=@{includePlatforms=@('android','iOS')};clientAppTypes=@('all')};grantControls=@{operator='OR';builtInControls=@('approvedApplication','compliantDevice')}}",
+    "sha256Hash": "2d9321430cd6998c7cde0e9baec8d7d604e074da4322c282d0635dbcc56e0b01",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\r\n    \"id\":  \"CMMC-MobileDeviceAccess\",\r\n    \"displayName\":  \"CMMC-MobileDeviceAccess\",\r\n    \"grantControls\":  {\r\n                          \"builtInControls\":  [\r\n                                                  \"approvedApplication\",\r\n                                                  \"compliantDevice\"\r\n                                              ],\r\n                          \"operator\":  \"OR\"\r\n                      },\r\n    \"conditions\":  {\r\n                       \"platforms\":  {\r\n                                         \"includePlatforms\":  [\r\n                                                                  \"android\",\r\n                                                                  \"iOS\"\r\n                                                              ]\r\n                                     },\r\n                       \"clientAppTypes\":  [\r\n                                              \"all\"\r\n                                          ],\r\n                       \"users\":  {\r\n                                     \"excludeUsers\":  [\r\n                                                          \"user-5\"\r\n                                                      ],\r\n                                     \"includeGroups\":  [\r\n                                                           \"group-1\"\r\n                                                       ]\r\n                                 },\r\n                       \"applications\":  {\r\n                                            \"includeApplications\":  [\r\n                                                                        \"All\"\r\n                                                                    ]\r\n                                        }\r\n                   },\r\n    \"state\":  \"enabled\"\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

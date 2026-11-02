@@ -1,0 +1,36 @@
+{
+  "rawResponse": "[\r\n    {\r\n        \"title\":  \"Sim Security Alert 1\",\r\n        \"severity\":  \"medium\",\r\n        \"status\":  \"newAlert\",\r\n        \"createdDateTime\":  \"2026-10-30T10:00:00.000Z\"\r\n    },\r\n    {\r\n        \"title\":  \"Sim Security Alert 2\",\r\n        \"severity\":  \"medium\",\r\n        \"status\":  \"newAlert\",\r\n        \"createdDateTime\":  \"2026-10-30T12:00:00.000Z\"\r\n    }\r\n]\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "SI.L2-3.14.1.flaw-id",
+    "label": "System Flaw Identification via Defender Vulnerability Management",
+    "engine": "mgraph",
+    "layer_hint": 4,
+    "sequence_hint": 40,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "SI.L1-3.14.1"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/security/secureScores?$top=1').value | Select-Object createdDateTime,currentScore,maxScore | ConvertTo-Json -Depth 10",
+    "set_command": "",
+    "evidence_commands": [
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/security/secureScores?$top=1').value | Select-Object createdDateTime,currentScore,maxScore | ConvertTo-Json -Depth 10",
+      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/security/alerts_v2?$top=10&$orderby=createdDateTime desc').value | Select-Object title,severity,status,createdDateTime | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SI.L1-3.14.1"
+    ],
+    "timestamp": "2026-11-02T12:14:55.809Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] System Flaw Identification via Defender Vulnerability Management",
+    "sha256Hash": "6f9c4929557a4aa7898193672ca4d2a43369bb260c854aea7568f0ab4ee92a5e",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

@@ -138,7 +138,8 @@ export async function runLeaverFlow(o: {
   const scan = await http('POST', `${o.aoUrl}/api/leaver/scan${q}`, {}, o.bearer);
   const startedFlows = (Array.isArray(get(scan.json, 'started')) ? (get(scan.json, 'started') as unknown[]) : []).map((f) => String(get(f, 'flowId') ?? '')).filter(Boolean);
   if (scan.status !== 200) problems.push(`scan POST ${scan.status}: ${scan.text.slice(0, 200)}`);
-  else if (!startedFlows.length) problems.push(`the scan started no flow (past leavers ${String(get(scan.json, 'pastLeavers'))}, enabled ${String(get(scan.json, 'enabledPastLeavers'))})`);
+  else if (!startedFlows.length) problems.push(`the scan started no flow (past leavers ${String(get(scan.json, 'pastLeavers'))}, enabled ${String(get(scan.json, 'enabledPastLeavers'))}` +
+    `; already tracked: ${JSON.stringify(get(scan.json, 'alreadyTracked') ?? []).slice(0, 300)})`);
   const flowId = startedFlows[0] ?? null;
 
   const ob = await http('GET', `${o.aoUrl}/api/leaver/outbox${q}`, undefined, o.bearer);

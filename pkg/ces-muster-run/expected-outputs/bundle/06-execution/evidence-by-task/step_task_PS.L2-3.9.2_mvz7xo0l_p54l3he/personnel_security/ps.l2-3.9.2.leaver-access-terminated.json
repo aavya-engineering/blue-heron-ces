@@ -1,0 +1,63 @@
+{
+  "rawResponse": "",
+  "outcome": "failed_no_remediation",
+  "outcomeRationale": "SET/verification failed: PS.L2-3.9.2.leaver-access-terminated: verification failed on existing resource — Evidence validation failed",
+  "failureDiagnostics": {
+    "rootCause": "exit_code_0",
+    "failureCategory": "FATAL",
+    "remediationSteps": [
+      "Review command output and stderr for specific error details",
+      "Check M365 GCC High service health dashboard",
+      "Consult PowerShell module documentation for the failing command"
+    ],
+    "exitCode": 0,
+    "stderrTail": "",
+    "stdoutTail": "{\r\n    \"displayName\":  \"CES leaver access inventory\",\r\n    \"pastLeaverCount\":  0,\r\n    \"enabledPastLeaverCount\":  0,\r\n    \"licensedPastLeaverCount\":  0,\r\n    \"enabledPastLeavers\":  [\r\n\r\n                           ],\r\n    \"licensedPastLeavers\":  [\r\n\r\n                            ]\r\n}\r\n"
+  },
+  "complianceVerdict": "NOT_SAT",
+  "verdictRationale": "Outcome 'failed_no_remediation' indicates compliance requirement is not yet satisfied",
+  "verificationResult": {
+    "passed": false,
+    "confidence": "FAILED",
+    "score": 25,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": false
+    },
+    "reason": "Evidence validation failed"
+  },
+  "registryEntry": {
+    "entry_id": "PS.L2-3.9.2.leaver-access-terminated",
+    "label": "Verify every past leaver (employeeLeaveDateTime passed) is disabled and holds no licence",
+    "engine": "mgraph",
+    "layer_hint": 7,
+    "sequence_hint": 55,
+    "idempotency": "safe",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "PS.L2-3.9.2"
+    ],
+    "get_command": "& { $now=(Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ'); $u=@(@((Invoke-MgGraphRequest -Uri \"https://graph.microsoft.us/v1.0/users?`$filter=employeeLeaveDateTime le $now&`$select=id,userPrincipalName,accountEnabled,employeeLeaveDateTime,assignedLicenses&`$top=999\").value) | Where-Object { $_ }); $open=@($u | Where-Object { $_.accountEnabled -eq $true }); $lic=@($u | Where-Object { @($_.assignedLicenses | Where-Object { $_ }).Count -gt 0 }); [pscustomobject]@{ displayName='CES leaver access inventory'; pastLeaverCount=$u.Count; enabledPastLeaverCount=$open.Count; licensedPastLeaverCount=$lic.Count; enabledPastLeavers=@($open | ForEach-Object { $_.userPrincipalName }); licensedPastLeavers=@($lic | ForEach-Object { $_.userPrincipalName }) } } | Where-Object { ($_.displayName -eq 'CES leaver access inventory') -or (($null -ne $_.pastLeaverCount -and [double]$_.pastLeaverCount -ge 1) -and ($null -ne $_.enabledPastLeaverCount -and [double]$_.enabledPastLeaverCount -le 0) -and ($null -ne $_.licensedPastLeaverCount -and [double]$_.licensedPastLeaverCount -le 0)) } | Sort-Object { $_.displayName -ne 'CES leaver access inventory' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
+    "set_command": "",
+    "evidence_commands": []
+  },
+  "metadata": {
+    "controlIds": [
+      "PS.L2-3.9.2"
+    ],
+    "timestamp": "2026-11-02T12:16:43.809Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[verify-only: SET not sent]",
+    "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "{\r\n    \"displayName\":  \"CES leaver access inventory\",\r\n    \"pastLeaverCount\":  0,\r\n    \"enabledPastLeaverCount\":  0,\r\n    \"licensedPastLeaverCount\":  0,\r\n    \"enabledPastLeavers\":  [\r\n\r\n                           ],\r\n    \"licensedPastLeavers\":  [\r\n\r\n                            ]\r\n}\r\n",
+    "stateChanged": false,
+    "postcheckMode": "state",
+    "lookupMatch": {
+      "basis": "name",
+      "object": "CES leaver access inventory"
+    }
+  }
+}

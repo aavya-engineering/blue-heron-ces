@@ -67,7 +67,7 @@ This policy shall be reviewed every **12** months. Next scheduled review: **2027
 
 ---
 
-**Effective Date:** 2026-11-01
+**Effective Date:** 2026-11-02
 **NIST SP 800-171 Controls:** 3.14.1–3.14.7
 **Policy Owner:**
 

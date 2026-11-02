@@ -117,7 +117,7 @@ You configure CES with environment variables (and, for long-running installs, a 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File C:\ces-nb\handoff\bootstrap.ps1 -Root C:\ces-nb
 ```
-It (1) checks every toolchain version, (2) checks that each module folder is there and matches `SOURCES.json` (in the monorepo it clones nothing) and warns if `core.autocrlf` is on, (3) runs `npm ci` once per npm install root and then the build for every component in dependency order, failing fast with the last log lines, (4) optionally (`-ModuleSecretsPath <file>`) makes the module-secret store. The install roots are the ces-mono root `<Root>\ces` (one `npm ci` for all its workspaces) and each separate package: `ces-tenant`, `tenant-stacksim`, `ces-tester`, `ces-muster` and `ces-muster\muster-api`. It never runs `npm ci` inside a ces-mono workspace member such as `ces-stamper`, even though four of them still hold an old `package-lock.json` (PUNCH-LIST PL-115): npm would treat that folder as the workspace root and wipe the shared `node_modules`. It is idempotent: fix the cause and rerun, or rerun at any time (a rerun reinstalls and rebuilds; about the same time as the first run). `-NoProfile` keeps your own PowerShell profile out of the run. It never kills a process and never writes outside `<Root>` (except the store path you name). Logs: `<Root>\out\bootstrap\bootstrap.json` and `<step>.out` / `.err`.
+It (1) checks every toolchain version, (2) checks that each module folder is there and matches `SOURCES.json` (in the monorepo it clones nothing) and warns if `core.autocrlf` is on, (3) runs `npm ci` once per npm install root and then the build for every component in dependency order, failing fast with the last log lines, (4) optionally (`-ModuleSecretsPath <file>`) makes the module-secret store. The install roots are the ces-mono root `<Root>\ces` (one `npm ci` for all its workspaces) and each separate package: `ces-tenant`, `tenant-stacksim`, `ces-tester`, `ces-muster` and `ces-muster\muster-api`. It never runs `npm ci` inside a ces-mono workspace member such as `ces-stamper`, even though four of them still hold an old `package-lock.json` (PUNCH-LIST PL-115): npm would treat that folder as the workspace root and wipe the shared `node_modules`. It is idempotent: fix the cause and rerun, or rerun at any time. A rerun skips `npm ci` in every install root whose `node_modules` is newer than its `package-lock.json` (it prints `install <root> : current`), runs `npm ci` where the lockfile changed, and rebuilds every component; `-Reinstall` forces `npm ci` everywhere (section 6.5). `-NoProfile` keeps your own PowerShell profile out of the run. It never kills a process and never writes outside `<Root>` (except the store path you name). Logs: `<Root>\out\bootstrap\bootstrap.json` and `<step>.out` / `.err`.
 
 ### 6.2 Build order
 `handoff\BUILD-ORDER.md` shows the order and the dependency graph (generated from the manifest): ces-tenant, then ces-shared (it runs the root `npm ci`), then the UI kit, then the servers (Stamper before AO, which links Stamper), the three UIs, the simulator, the tester, Muster and muster-api. The UI kit comes before the servers because `npm run build -w ces-stamper` (likewise `-w ces-eo` and `-w ces-ao`) also builds the UI workspace inside that folder, which imports the UI kit; the three UIs therefore build twice, which is harmless. To build one component by hand, run its `build` command from `handoff\handoff.manifest.yaml` in its folder, for example `npm run build -w ces-ao` from `<Root>\ces`. Use `cmd /c` or PowerShell 7 for commands chained with `&&` (Windows PowerShell 5.1 does not support `&&`).
@@ -136,6 +136,38 @@ powershell -NoProfile -ExecutionPolicy Bypass -File C:\ces-nb\handoff\verify\smo
 ```
 If another CES instance holds the manifest ports on this machine, add `-PortOffset <n>` (for example `-PortOffset 20000`) to move every smoke-test port by n; this option is new and has not been run yet (KI-17).
 `check.mjs` exits 0 when the manifest, contracts, settings, secrets inventory, generated files and code agree and no secret or identity string is in the kit (checks (a)-(f), listed in its header). `smoke.ps1` starts each server one at a time (simulator first), waits until its port answers and the listening address matches the manifest, then stops only what it started. It refuses to run if a port it needs is held.
+
+### 6.5 Full bootstrap, pulling updates, and your own incremental changes
+
+**Full bootstrap** (a new machine, a broken install, or when in doubt). Clone with the line in `START-HERE.md`, or keep your clone, then:
+```powershell
+Remove-Item -Recurse -Force C:\ces-nb\out          # old run output (only if you do not need it)
+powershell -NoProfile -ExecutionPolicy Bypass -File C:\ces-nb\handoff\bootstrap.ps1 -Root C:\ces-nb -Reinstall
+node C:\ces-nb\pkg\ces-muster-run\scripts\handoff\check.mjs
+powershell -NoProfile -ExecutionPolicy Bypass -File C:\ces-nb\handoff\verify\smoke.ps1 -Root C:\ces-nb
+```
+`-Reinstall` runs `npm ci` in every install root even when `node_modules` looks current, so the result matches a fresh clone. Install the browsers (section 6.3) only on a new machine or after a Playwright version change.
+
+**Pull BHD's updates** (incremental; each update is a commit on `main`, announced by email or Slack):
+```powershell
+cd C:\ces-nb
+git restore ces/tenant-stacksim/psmodules           # every run rewrites these tracked simulator files (KI-27); discard them first
+git status --short                                  # anything still listed is your own work: commit it on your branch, or git stash
+git pull --ff-only
+git ls-files --eol | Select-String 'i/lf\s+w/crlf'  # must print nothing (KI-21)
+powershell -NoProfile -ExecutionPolicy Bypass -File C:\ces-nb\handoff\bootstrap.ps1 -Root C:\ces-nb
+node C:\ces-nb\pkg\ces-muster-run\scripts\handoff\check.mjs
+```
+The plain rerun reinstalls only where a lockfile changed and rebuilds everything, so you never have to work out which modules an update touched. Then read the new rows in `WHAT-CHANGED.md`, `PUNCH-LIST.md` and `KNOWN-ISSUES.md`. If an update note says to delete old run output, delete `C:\ces-nb\out`. Finish with the unit gate (section 10) and one S1 run (section 8).
+
+**Your own incremental changes** (one module at a time):
+1. Branch from the latest `main`: `git switch main; git pull --ff-only; git switch -c <your-name>/<topic>`.
+2. Change one module.
+3. Rebuild that component with its `build` command from `handoff.manifest.yaml` (the order is in `BUILD-ORDER.md`). For example, after an EvidenceOps change: `cd C:\ces-nb\ces; npm run build -w ces-eo`. Rebuild what depends on it as well: a Stamper change also needs `npm run build -w ces-ao` (AdminOps links Stamper). A change in `ces-shared`, `ces-ui-kit` or `ces-tenant` reaches nearly everything, so rerun `bootstrap.ps1` instead.
+4. Run that package's tests with its manifest `test` command, for example `cd C:\ces-nb\ces; npm test -w ces-eo`.
+5. If the change can move a score, write the prediction first (which controls move, by how much, why). Then run an affected scenario (section 8), and compare with `<PKG>\expected-outputs\<slug>\` and the latest round results in `PUNCH-LIST.md`.
+6. Before you open a pull request, run the unit gate (section 10) and, for scoring changes, the proof round (section 11).
+7. To take in BHD's updates while your branch is open, use `git fetch origin; git merge origin/main`, not a rebase of a pushed branch; then rerun `bootstrap.ps1`. Push your branch and open a pull request on `ces-contractor`. Never force-push `main`.
 
 ## 7. Run the simulator and each module by hand
 

@@ -38,7 +38,7 @@ The two `-c` options must be on the `git clone` line itself: Git for Windows ins
 ```powershell
 cd C:\ces-nb; git config core.autocrlf false; git config core.longpaths true; git rm -r -q --cached .; git reset -q --hard HEAD
 ```
-then run the check line again. `bootstrap.ps1` is safe to rerun at any time; a rerun reinstalls and rebuilds.
+then run the check line again. `bootstrap.ps1` is safe to rerun at any time: it reinstalls only where a lockfile changed and rebuilds everything, and `-Reinstall` forces a full reinstall. **To take an update, or to make your own changes one module at a time, follow `handoff\GUIDE.md` section 6.5:** discard the simulator files a run rewrites, `git pull --ff-only`, rerun `bootstrap.ps1`, then run the check.
 
 Then run one scenario end to end (about 30 minutes; a browser window opens for the watched UI steps):
 ```powershell

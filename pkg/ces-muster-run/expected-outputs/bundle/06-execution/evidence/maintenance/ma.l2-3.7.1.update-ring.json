@@ -38,14 +38,14 @@
       "MA.L2-3.7.1",
       "MA.L2-3.7.2"
     ],
-    "timestamp": "2026-11-01T17:11:58.077Z",
+    "timestamp": "2026-11-02T12:16:19.708Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "$created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations' -Body (@{'@odata.type'='#microsoft.graph.windowsUpdateForBusinessConfiguration';displayName='CMMC-UpdateRing-Standard';qualityUpdatesDeferralPeriodInDays=0;featureUpdatesDeferralPeriodInDays=14;automaticUpdateMode='autoInstallAndRebootAtScheduledTime';businessReadyUpdatesOnly='all'} | ConvertTo-Json) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | ConvertTo-Json -Depth 10",
     "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "moduleVersions": {},
     "environment": "GCC-High",
     "preStateOutput": "",
-    "postStateOutput": "{\r\n    \"id\":  \"deviceConfiguration-12\",\r\n    \"createdDateTime\":  \"2026-11-01T17:11:57.205Z\",\r\n    \"@odata.type\":  \"#microsoft.graph.windowsUpdateForBusinessConfiguration\",\r\n    \"automaticUpdateMode\":  \"autoInstallAndRebootAtScheduledTime\",\r\n    \"qualityUpdatesDeferralPeriodInDays\":  0,\r\n    \"businessReadyUpdatesOnly\":  \"all\",\r\n    \"featureUpdatesDeferralPeriodInDays\":  14,\r\n    \"displayName\":  \"CMMC-UpdateRing-Standard\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceConfiguration-12_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ],\r\n    \"isAssigned\":  true\r\n}\r\n",
+    "postStateOutput": "{\r\n    \"id\":  \"deviceConfiguration-17\",\r\n    \"createdDateTime\":  \"2026-11-02T12:16:18.746Z\",\r\n    \"@odata.type\":  \"#microsoft.graph.windowsUpdateForBusinessConfiguration\",\r\n    \"automaticUpdateMode\":  \"autoInstallAndRebootAtScheduledTime\",\r\n    \"qualityUpdatesDeferralPeriodInDays\":  0,\r\n    \"businessReadyUpdatesOnly\":  \"all\",\r\n    \"featureUpdatesDeferralPeriodInDays\":  14,\r\n    \"displayName\":  \"CMMC-UpdateRing-Standard\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceConfiguration-17_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ],\r\n    \"isAssigned\":  true\r\n}\r\n",
     "stateChanged": true,
     "postcheckMode": "state"
   }

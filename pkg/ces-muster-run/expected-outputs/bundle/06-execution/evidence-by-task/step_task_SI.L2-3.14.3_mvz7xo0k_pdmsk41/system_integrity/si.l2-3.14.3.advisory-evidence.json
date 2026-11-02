@@ -1,0 +1,35 @@
+{
+  "rawResponse": "{\r\n    \"count\":  0,\r\n    \"advisories\":  [\r\n\r\n                   ]\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "SI.L2-3.14.3.advisory-evidence",
+    "label": "Microsoft Service Health and Security Advisory Evidence",
+    "engine": "mgraph",
+    "layer_hint": 7,
+    "sequence_hint": 54,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "SI.L2-3.14.3"
+    ],
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/admin/serviceAnnouncement/messages?$top=5&$orderby=lastModifiedDateTime desc').value | Select-Object id,title,severity,startDateTime | ConvertTo-Json -Depth 5",
+    "set_command": "",
+    "evidence_commands": [
+      "$r = @((Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/admin/serviceAnnouncement/messages?$top=25&$orderby=lastModifiedDateTime desc&$filter=severity eq ''high''').value | Where-Object { $_ }); [pscustomobject]@{ count = $r.Count; advisories = @($r | ForEach-Object { [pscustomobject]@{ id = $_.id; title = $_.title; severity = $_.severity; startDateTime = $_.startDateTime; lastModifiedDateTime = $_.lastModifiedDateTime; category = $_.category } }) } | ConvertTo-Json -Depth 5"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SI.L2-3.14.3"
+    ],
+    "timestamp": "2026-11-02T12:16:47.267Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Microsoft Service Health and Security Advisory Evidence",
+    "sha256Hash": "cbdd2783cfc5c067325d0ecde0df0f99f2defb728e6316e794cdf6da9fb5b79c",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

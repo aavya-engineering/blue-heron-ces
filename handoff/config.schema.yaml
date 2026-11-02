@@ -189,6 +189,16 @@ settings:
     scope: all
     description: "Tenants the leaver-flow timer scans for leavers and advances (reminders, escalations) every CES_AO_LEAVER_TICK_MIN minutes; the timer runs only when both settings are set. A scan reads the tenant."
     source: "ces-ao/src/server/routes/leaver.routes.ts:230"
+  - name: CES_AO_LEAVER_SINCE
+    component: [ces-ao]
+    required: false
+    default: "unset = every earlier flow for a leaver counts as tracking that leaver"
+    allowed: "an ISO 8601 time"
+    secret: false
+    owner: contractor
+    scope: sim
+    description: "Simulator run window (as EO's CES_EO_ADMINOPS_SINCE): the leaver flow's 'already tracked' check ignores flows created before this ISO time, so an earlier run's flow for the same seeded leaver does not block this run's flow. The tester sets it to E1's start; a real deployment leaves it unset."
+    source: "ces-ao/src/server/AoServer.ts:136"
   - name: CES_AO_LEAVER_TICK_MIN
     component: [ces-ao]
     required: false

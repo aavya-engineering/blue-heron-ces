@@ -1,5 +1,5 @@
 {
-  "rawResponse": "",
+  "rawResponse": "{\r\n    \"count\":  0,\r\n    \"permanentAssignments\":  [\r\n\r\n                             ]\r\n}\r\n",
   "outcome": "automated_success",
   "outcomeRationale": "Command completed successfully (exit code 0)",
   "complianceVerdict": "SAT",
@@ -18,17 +18,17 @@
     "get_command": "Get-MgRoleManagementDirectoryRoleAssignmentSchedule -All | Where-Object { $_.RoleDefinitionId -in @('{globalAdminRoleDefId}', '{privilegedRoleAdminDefId}', '{securityAdminRoleDefId}') -and $_.ScheduleInfo.Expiration.Type -eq 'noExpiration' } | Select-Object PrincipalId,RoleDefinitionId,Status,DirectoryScopeId",
     "set_command": "",
     "evidence_commands": [
-      "Get-MgRoleManagementDirectoryRoleAssignmentSchedule -All | Where-Object { $_.RoleDefinitionId -in @('{globalAdminRoleDefId}', '{privilegedRoleAdminDefId}', '{securityAdminRoleDefId}') } | Select-Object PrincipalId,RoleDefinitionId,Status,DirectoryScopeId,ScheduleInfo | ConvertTo-Json -Depth 5"
+      "$p = @(Get-MgRoleManagementDirectoryRoleAssignmentSchedule -All | Where-Object { $_.RoleDefinitionId -in @('{globalAdminRoleDefId}', '{privilegedRoleAdminDefId}', '{securityAdminRoleDefId}') -and $_.ScheduleInfo.Expiration.Type -eq 'noExpiration' }); [pscustomobject]@{ count = $p.Count; permanentAssignments = @($p | ForEach-Object { [pscustomobject]@{ PrincipalId = $_.PrincipalId; RoleDefinitionId = $_.RoleDefinitionId; Status = $_.Status; DirectoryScopeId = $_.DirectoryScopeId } }) } | ConvertTo-Json -Depth 5"
     ]
   },
   "metadata": {
     "controlIds": [
       "AC.L2-3.1.7"
     ],
-    "timestamp": "2026-11-01T17:09:10.590Z",
+    "timestamp": "2026-11-02T12:13:10.211Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "[manual/evidence-only] Verify No Permanent Privileged Role Assignments",
-    "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sha256Hash": "31d520870d936238d92b52713f1d346dc6d47ac7c69e2612033f1d91922b2089",
     "moduleVersions": {},
     "environment": "GCC-High"
   }

@@ -1,0 +1,50 @@
+{
+  "rawResponse": "{\r\n    \"name\":  \"CMMC-FIPS-Mode\",\r\n    \"fipsAlgorithmPolicy\":  \"device_vendor_msft_policy_config_cryptography_allowfipsalgorithmpolicy_1\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceManagementConfigurationPolicy-7_allDevicesAssignmentTarget\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.allDevicesAssignmentTarget\"\r\n                                       }\r\n                        }\r\n                    ]\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "SC.L2-3.13.11.fips-mode",
+    "label": "Turn On Windows FIPS Algorithm Policy (Intune Settings Catalog, all devices)",
+    "engine": "mgraph",
+    "layer_hint": 4,
+    "sequence_hint": 7,
+    "idempotency": "get-then-set",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "SC.L2-3.13.11"
+    ],
+    "get_command": "$p = @((Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/beta/deviceManagement/configurationPolicies?$expand=settings,assignments').value | Where-Object { $_.name -eq 'CMMC-FIPS-Mode' }) | Select-Object -First 1; if ($p) { [pscustomobject]@{ name = $p.name; fipsAlgorithmPolicy = (@($p.settings | ForEach-Object { $_.settingInstance } | Where-Object { $_.settingDefinitionId -eq 'device_vendor_msft_policy_config_cryptography_allowfipsalgorithmpolicy' }) | Select-Object -First 1).choiceSettingValue.value; assignments = @($p.assignments) } | ConvertTo-Json -Depth 10 }",
+    "set_command": "$existing = @((Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/beta/deviceManagement/configurationPolicies').value | Where-Object { $_.name -eq 'CMMC-FIPS-Mode' }); if ($existing.Count -gt 0) { Write-Output 'CMMC-FIPS-Mode already exists' } else { $created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/beta/deviceManagement/configurationPolicies' -Body (@{name='CMMC-FIPS-Mode';description='CMMC SC.L2-3.13.11 - System cryptography: use FIPS-compliant algorithms';platforms='windows10';technologies='mdm';settings=@(@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationSetting';settingInstance=@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance';settingDefinitionId='device_vendor_msft_policy_config_cryptography_allowfipsalgorithmpolicy';choiceSettingValue=@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationChoiceSettingValue';value='device_vendor_msft_policy_config_cryptography_allowfipsalgorithmpolicy_1'}}})} | ConvertTo-Json -Depth 20) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/beta/deviceManagement/configurationPolicies/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.allDevicesAssignmentTarget'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | Select-Object id,name | ConvertTo-Json -Depth 5 }",
+    "evidence_commands": [
+      "$p = @((Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/beta/deviceManagement/configurationPolicies?$expand=settings,assignments').value | Where-Object { $_.name -eq 'CMMC-FIPS-Mode' }) | Select-Object -First 1; if ($p) { [pscustomobject]@{ name = $p.name; fipsAlgorithmPolicy = (@($p.settings | ForEach-Object { $_.settingInstance } | Where-Object { $_.settingDefinitionId -eq 'device_vendor_msft_policy_config_cryptography_allowfipsalgorithmpolicy' }) | Select-Object -First 1).choiceSettingValue.value; assignments = @($p.assignments) } | ConvertTo-Json -Depth 10 }"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SC.L2-3.13.11"
+    ],
+    "timestamp": "2026-11-02T11:37:02.771Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "$existing = @((Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/beta/deviceManagement/configurationPolicies').value | Where-Object { $_.name -eq 'CMMC-FIPS-Mode' }); if ($existing.Count -gt 0) { Write-Output 'CMMC-FIPS-Mode already exists' } else { $created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/beta/deviceManagement/configurationPolicies' -Body (@{name='CMMC-FIPS-Mode';description='CMMC SC.L2-3.13.11 - System cryptography: use FIPS-compliant algorithms';platforms='windows10';technologies='mdm';settings=@(@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationSetting';settingInstance=@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance';settingDefinitionId='device_vendor_msft_policy_config_cryptography_allowfipsalgorithmpolicy';choiceSettingValue=@{'@odata.type'='#microsoft.graph.deviceManagementConfigurationChoiceSettingValue';value='device_vendor_msft_policy_config_cryptography_allowfipsalgorithmpolicy_1'}}})} | ConvertTo-Json -Depth 20) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/beta/deviceManagement/configurationPolicies/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.allDevicesAssignmentTarget'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | Select-Object id,name | ConvertTo-Json -Depth 5 }",
+    "sha256Hash": "3a9e03bedffee9f1e377c8a8710ecdf68bea2822b394a7bbc47b8efe7636fa3c",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\r\n    \"name\":  \"CMMC-FIPS-Mode\",\r\n    \"fipsAlgorithmPolicy\":  \"device_vendor_msft_policy_config_cryptography_allowfipsalgorithmpolicy_1\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceManagementConfigurationPolicy-7_allDevicesAssignmentTarget\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.allDevicesAssignmentTarget\"\r\n                                       }\r\n                        }\r\n                    ]\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

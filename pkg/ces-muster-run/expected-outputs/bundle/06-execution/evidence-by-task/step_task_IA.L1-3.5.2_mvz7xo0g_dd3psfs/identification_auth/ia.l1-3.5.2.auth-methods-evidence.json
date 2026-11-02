@@ -1,0 +1,35 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"authenticationMethodsPolicy\",\r\n    \"displayName\":  \"Authentication Methods Policy\",\r\n    \"policyVersion\":  \"1\",\r\n    \"authenticationMethodConfigurations\":  [\r\n                                               {\r\n                                                   \"@odata.type\":  \"#microsoft.graph.fido2AuthenticationMethodConfiguration\",\r\n                                                   \"id\":  \"Fido2\",\r\n                                                   \"state\":  \"disabled\"\r\n                                               },\r\n                                               {\r\n                                                   \"@odata.type\":  \"#microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration\",\r\n                                                   \"id\":  \"MicrosoftAuthenticator\",\r\n                                                   \"state\":  \"disabled\"\r\n                                               },\r\n                                               {\r\n                                                   \"@odata.type\":  \"#microsoft.graph.temporaryAccessPassAuthenticationMethodConfiguration\",\r\n                                                   \"id\":  \"TemporaryAccessPass\",\r\n                                                   \"state\":  \"disabled\"\r\n                                               },\r\n                                               {\r\n                                                   \"@odata.type\":  \"#microsoft.graph.x509CertificateAuthenticationMethodConfiguration\",\r\n                                                   \"id\":  \"x509Certificate\",\r\n                                                   \"state\":  \"disabled\"\r\n                                               }\r\n                                           ]\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "IA.L1-3.5.2.auth-methods-evidence",
+    "label": "Verify Authentication Methods Policy",
+    "engine": "mgraph",
+    "layer_hint": 1,
+    "sequence_hint": 12,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "IA.L1-3.5.2"
+    ],
+    "get_command": "Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/policies/authenticationMethodsPolicy' | Select-Object id,description",
+    "set_command": "",
+    "evidence_commands": [
+      "Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/policies/authenticationMethodsPolicy' | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "IA.L1-3.5.2"
+    ],
+    "timestamp": "2026-11-02T12:13:17.548Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Verify Authentication Methods Policy",
+    "sha256Hash": "66ab0968f338b4f2bd61cffda48c7387750f3b34a5daee25ba7343e537612e99",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}
