@@ -4,10 +4,15 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as fs from 'node:fs';
+import * as path from 'node:path';
 import {
-  DEFAULTS, VERDICTS, computeScenario, controlView, loadRegistries, loadResolverInfo, classifyCommand, run,
+  DEFAULT_WS, VERDICTS, computeScenario, controlView, defaultsFor, loadRegistries, loadResolverInfo, classifyCommand, run,
 } from './depth-coverage.mjs';
 
+// PL-124 / CR-22: the defaults follow the package location. A worktree (<WS>/wt/pkg/...) has no evidence folder of its
+// own, so the test then reads the workspace one level up (read only).
+const WS_USED = fs.existsSync(defaultsFor(DEFAULT_WS).plans[0]) ? DEFAULT_WS : path.resolve(DEFAULT_WS, '..');
+const DEFAULTS = defaultsFor(WS_USED);
 const S1_PLAN = DEFAULTS.plans[0];
 const readJson = (p) => JSON.parse(fs.readFileSync(p, 'utf8'));
 const objectives = readJson(DEFAULTS.objectives).objectives;
@@ -137,7 +142,7 @@ test('simulator classification: modelled, generic and unanswered calls', () => {
 });
 
 test('full run: five plans, S1 floor 3 (10 after PH-12, 140 before), simulator_unanswered is a list of registry entries', () => {
-  const r = run({});
+  const r = run({ root: WS_USED });
   assert.equal(r.scenarios.length, DEFAULTS.plans.length);
   assert.equal(r.scenarios[0].uncovered_floor, FLOOR);
   assert.ok(Array.isArray(r.simulator_unanswered));

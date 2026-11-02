@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   judgeV91, judgeV92, judgeV93, judgeV94, judgeV95, judgeV96, judgeV97, judgeV98, judgeV99, v99BlocksRebaseline,
   runDepthChecks, quotingProblem, isCommentOrPlaceholder, stepControls, depthFloor, DEPTH_PREDICTION_SCHEMA, DEPTH_CHECKS,
@@ -216,6 +217,24 @@ test('runDepthChecks: nine rows, floor from depth-coverage.json lowered by depth
   assert.equal(rows[8].pass, true);
   const broken = await runDepthChecks({ ...vctx, exePlan: { execution_graph: [null] } }, {});
   assert.ok(broken.some((r) => /^error: /.test(r.detail)));
+  fs.rmSync(pkg, { recursive: true, force: true });
+});
+
+test('PL-124 / CR-22: with no out/depth-coverage.json the floor comes from the shipped expected-outputs/depth-coverage.json; an out/ row still wins', () => {
+  const pkg = fs.mkdtempSync(path.join(os.tmpdir(), 'depth-ship-'));
+  fs.mkdirSync(path.join(pkg, 'expected-outputs'));
+  fs.writeFileSync(path.join(pkg, 'expected-outputs', 'depth-coverage.json'), JSON.stringify({ scenarios: [{ label: 's1-mach', uncovered_floor: 140 }], simulator_unanswered: [{ entry_id: 'X.sim-gap' }] }));
+  const readJson = (f) => JSON.parse(fs.readFileSync(f, 'utf8'));
+  const vctx = { pkg, slug: 's1-mach', readJson, exists: fs.existsSync };
+  assert.deepEqual(depthFloor(vctx), { floor: 140, source: 'expected-outputs/depth-coverage.json', simulatorUnanswered: [{ entry_id: 'X.sim-gap' }] });
+  assert.deepEqual(depthFloor({ ...vctx, slug: 'nobody' }), { floor: null, source: 'none', simulatorUnanswered: [] });
+  fs.mkdirSync(path.join(pkg, 'out'));
+  fs.writeFileSync(path.join(pkg, 'out', 'depth-coverage.json'), JSON.stringify({ scenarios: [{ label: 's1-mach', uncovered_floor: 99 }], simulator_unanswered: [] }));
+  assert.deepEqual(depthFloor(vctx), { floor: 99, source: 'out/depth-coverage.json', simulatorUnanswered: [] });
+  // the shipped file itself: one row per scenario, the DEPTH-0 floor
+  const shipped = readJson(path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'expected-outputs', 'depth-coverage.json'));
+  for (const s of ['s1-mach', 's2-eng', 's3-def', 'muster-partial']) assert.equal(typeof shipped.scenarios.find((r) => r.label === s)?.uncovered_floor, 'number', s);
+  assert.ok(!/[A-Za-z]:[\\/]ces-nb/i.test(JSON.stringify(shipped)), 'no hard-coded workspace path in the shipped file');
   fs.rmSync(pkg, { recursive: true, force: true });
 });
 

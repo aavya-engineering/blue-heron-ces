@@ -89,6 +89,8 @@ const report = exists(path.join(out, 'execution-report.json')) ? readJson(path.j
 const ssp = exists(path.join(out, 'ssp.json')) ? readJson(path.join(out, 'ssp.json')) : null;
 const assess = freshJson(path.join(out, 'eo-assess.json')) ?? [];
 const assessSummary = assess.find((e) => e.type === 'assess_summary') ?? null;
+const assess7b = freshJson(path.join(out, 'eo-assess-7b.json'));
+const assess7bSummary = (Array.isArray(assess7b) ? assess7b : []).find((e) => e.type === 'assess_summary') ?? null;
 const baseline = exists(baselinePath) ? readJson(baselinePath) : null;
 const directives = mp?.outputs?.human_readable_mission_plan?.control_directives ?? [];
 const posture = mp?.inputs?.readiness_posture ?? null;
@@ -109,6 +111,11 @@ const summary = {
   stamper: report ? { status: report.status, ...report.summary, failed_tasks: failedTaskNames } : null,
   eo_assess: assessSummary
     ? { controls_met: assessSummary.controls_met, controls_not_met: assessSummary.controls_not_met, controls_partial: assessSummary.controls_partial, controls_not_assessed: assessSummary.controls_not_assessed, sprs_score: assessSummary.sprs_score }
+    : null,
+  // PL-124 / CR-25: eo_assess above is E7 pass 1. The authoritative SPRS is the E7B re-assessment after AdminOps
+  // (out/eo-assess-7b.json; V36 and GAPS SC-7), shown here beside it. Additive: no V-check reads this key.
+  eo_assess_7b: assess7bSummary
+    ? { controls_met: assess7bSummary.controls_met, controls_not_met: assess7bSummary.controls_not_met, controls_partial: assess7bSummary.controls_partial, controls_not_assessed: assess7bSummary.controls_not_assessed, sprs_score: assess7bSummary.sprs_score }
     : null,
   ssp: ssp
     ? { sections: Object.keys(ssp).sort(), control_implementations: (ssp.controlImplementations ?? []).length, status_counts: sspStatus, source_artifacts: ssp.sourceArtifacts, system_name_source: ssp.systemName === `${ssp.tenantId} System` ? 'fallback' : 'manifest-or-variables' }
@@ -331,14 +338,16 @@ check('V10', 'Nothing written outside the workspace (C:\\CES_Pipeline, ~/.ces, ~
 
 // V109 (FIN-01 e): out/unit-gate.json is newer than the newest commit in every workspace repo (<WS>\ces and its child
 // repos, <WS>\pkg\*); V11, V21 and V22 read the gate and fail when it is stale. Judge in verify-gap.mjs (judgeV109).
+// PL-124 / CR-19: in the contractor monorepo the only .git is at <Root> itself, so <Root> counts as the workspace repo
+// when <WS>\ces has no .git of its own (BHD's module layout is unchanged: <WS> has no .git and <WS>\ces has one).
 const unitGateFile = path.join(out, 'unit-gate.json');
-const gitRepoDirs = [ces, ...(exists(ces) ? fs.readdirSync(ces).map((d) => path.join(ces, d)) : []), ...(exists(path.join(root, 'pkg')) ? fs.readdirSync(path.join(root, 'pkg')).map((d) => path.join(root, 'pkg', d)) : [])].filter((d) => exists(path.join(d, '.git')));
+const gitRepoDirs = [...(exists(path.join(ces, '.git')) ? [] : [root]), ces, ...(exists(ces) ? fs.readdirSync(ces).map((d) => path.join(ces, d)) : []), ...(exists(path.join(root, 'pkg')) ? fs.readdirSync(path.join(root, 'pkg')).map((d) => path.join(root, 'pkg', d)) : [])].filter((d) => exists(path.join(d, '.git')));
 const unitGateFresh = judgeV109({
   gateMs: exists(unitGateFile) ? fs.statSync(unitGateFile).mtimeMs : null,
   repos: gitRepoDirs.map((d) => {
     const r = spawnSync('git', ['-C', d, 'log', '-1', '--format=%ct'], { encoding: 'utf8' });
     const s = Number(String(r.stdout ?? '').trim());
-    return { repo: path.relative(root, d).split(path.sep).join('/'), commitMs: r.status === 0 && s > 0 ? s * 1000 : null };
+    return { repo: path.relative(root, d).split(path.sep).join('/') || '.', commitMs: r.status === 0 && s > 0 ? s * 1000 : null };
   }),
 });
 check('V109', 'Unit gate fresh: out/unit-gate.json is newer than the newest commit in every workspace repo', () => unitGateFresh);

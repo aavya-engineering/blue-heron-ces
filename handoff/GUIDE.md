@@ -185,7 +185,7 @@ All in `<Root>\out` (each run replaces the previous one; `verify\round.ps1` copi
 | File | What it tells you |
 |---|---|
 | `verify.json` | every V-check with pass / fail and a detail line; `pass` at the top is the verdict. ACCEPTANCE.md lists every V-check. |
-| `summary.json` | the headline numbers: `eo_assess.sprs_score`, `eo_assess.controls_met`, Stamper task counts, plan size |
+| `summary.json` | the headline numbers. **The authoritative SPRS is `eo_assess_7b.sprs_score`**: the E7B re-assessment after AdminOps (`eo-assess-7b.json`), the score V36 holds the documents to and GAPS row SC-7 reports. `eo_assess` is E7 pass 1 (`eo-assess.json`); on a first run in a fresh pipeline root it can read lower than E7B (KNOWN-ISSUES KI-25). Also Stamper task counts and plan size |
 | `steps.json`, `logs\<step>.out` / `.err` | each step's exit code, times and log |
 | `ssp.json`, `ssp.docx`, `poam.json` | the assessor deliverables (marked SIMULATED CUSTOMER (FICTIONAL)) |
 | `eo-package.zip`, `eo-package\` | the evidence package with its integrity manifest |
@@ -222,7 +222,7 @@ The unit gate once, then all four scenarios end to end with the tester harness, 
 
 ## 13. Moving to a real GCC High tenant (phase PH-L)
 
-Live work comes after the simulator finish line (gate G-FSIM: every use case works on the simulator on all four scenarios and BHD accepts). It is BHD's phase PH-L. Do not point CES at a live tenant before BHD says so.
+Live work comes after the simulator finish line (gate G-FSIM: every use case works on the simulator on all four scenarios and BHD accepts). It is BHD's phase PH-L. We will plan the move to a live tenant together; until then, work against the simulator.
 
 What you need:
 - **A tenant:** your own GCC High tenant, or a scoped guest account BHD grants in its tenant (the only access BHD shares; removed at the revocation date in ACCEPTANCE.md).

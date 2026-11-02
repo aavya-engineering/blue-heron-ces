@@ -1,5 +1,5 @@
 # KNOWN-ISSUES KI-02 workaround (Blue Heron Defense, CES team). Windows PowerShell 5.1.
-#   powershell -ExecutionPolicy Bypass -File handoff\lib\Set-MusterSecretsToken.ps1 -Path <store> -Ces <Root>\ces [-TenantId <id>] [-ExpiresIn 8h]
+#   powershell -NoProfile -ExecutionPolicy Bypass -File handoff\lib\Set-MusterSecretsToken.ps1 -Path <store> -Ces <Root>\ces [-TenantId <id>] [-ExpiresIn 8h]
 # Since PH-7 (2026-11-01) New-CesModuleSecrets.ps1 itself mints CES_MUSTER_SECRETS_TOKEN as this JWT, so this script is
 # now the RENEWAL step: the JWT expires (default 8 h) and this re-mints it in place. Background (the original KI-02):
 # ces-shared\scripts\New-CesModuleSecrets.ps1 used to fill CES_MUSTER_SECRETS_TOKEN with random bytes, but Stamper sends that

@@ -59,7 +59,7 @@ Use `handoff\bootstrap.ps1` only. The older `pkg\ces-muster-run\bootstrap.ps1`, 
 
 ## Rules that never bend
 
-- Simulator first; no live tenant until BHD says so.
+- Simulator first. Live-tenant work is the next phase, and we will plan it with you.
 - No AI on live tenants. Two-person approval is off by default. Any recurring Azure cost is off by default and needs two confirmations (DP-1 opt-in, DP-2 typed).
 - The HELD items stay held: Global Administrator (`AC.L2-3.1.2.role-assign`), the Teams Administrator grant, SharePoint `Sites.FullControl.All`.
 - An empty read is not evidence. Any score change is predicted before it is run.

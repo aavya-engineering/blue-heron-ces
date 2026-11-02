@@ -63,9 +63,9 @@ const MS5_VARS = ['approverUPN', 'initialPassword', 'touFileBase64'];
 const W4_ST2_PW_REF = { variable: 'initialPassword', form: 'one_time_operator_held', ref: 'secretref:one-time:w4-st2-fin20' };
 
 const readJson = (p: string) => JSON.parse(fs.readFileSync(p, 'utf-8'));
-/** The committed golden at ces-muster HEAD (its own git repo; no branch-name assumption) — not a possibly-dirty working tree. */
+/** The committed golden at ces-muster HEAD (no branch-name assumption) — not a possibly-dirty working tree. `HEAD:./` is relative to -C, so it works with ces-muster as its own repo or as a folder of the contractor monorepo (PL-123 / CR-13). */
 const committedGolden = (name: string): string => {
-  const r = spawnSync('git', ['-C', path.resolve(ROOT, '..', 'ces-muster'), 'show', `HEAD:src/features/plan/__fixtures__/${name}`], { encoding: 'utf-8', maxBuffer: 64 * 1024 * 1024 });
+  const r = spawnSync('git', ['-C', path.resolve(ROOT, '..', 'ces-muster'), 'show', `HEAD:./src/features/plan/__fixtures__/${name}`], { encoding: 'utf-8', maxBuffer: 64 * 1024 * 1024 });
   if (r.status !== 0) throw new Error(`git show ces-muster HEAD:${name} failed: ${r.stderr}`);
   return r.stdout;
 };

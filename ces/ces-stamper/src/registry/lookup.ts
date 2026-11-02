@@ -15,6 +15,7 @@
 import type { LookupBlock, LookupCondition, LookupEffect, LookupMatch, OrgValueDecision } from '../types/schema.types.js';
 import { OutputVerificationEngine } from '../core/OutputVerificationEngine.js';
 import type { VerificationResult } from '../core/OutputVerificationEngine.js';
+import { placeholderInRead, placeholderRationale } from '../shared/musterPlaceholders.js';
 
 const IDENT = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
@@ -168,6 +169,7 @@ export function verifyEquivalent(
   lookup: LookupBlock,
   decisions: OrgValueDecision[] | undefined,
   resolve: Resolve = identity,
+  placeholderIgnore: readonly string[] = [],
 ): { verification: VerificationResult; match: LookupMatch } | undefined {
   let parsed: unknown;
   try { parsed = JSON.parse(read); } catch { return undefined; }
@@ -178,8 +180,12 @@ export function verifyEquivalent(
   const conditions = evaluateEffect(obj, boundEffect(lookup, decisions), resolve);
   const failed = conditions.filter(c => !c.pass);
   const name = objectName(obj, lookup);
-  const passed = failed.length === 0;
-  const reason = passed
+  // PL-121 (founder ruling 2026-11-01): an equivalent built from an unanswered Muster placeholder never counts.
+  const placeholder = placeholderInRead(read, placeholderIgnore);
+  const passed = failed.length === 0 && placeholder === undefined;
+  const reason = placeholder !== undefined
+    ? `existing equivalent '${name}': ${placeholderRationale(placeholder)}`
+    : passed
     ? `existing equivalent '${name}' verified by effect (${conditions.length} conditions)`
     : `existing equivalent '${name}' does not meet ${failed.map(c => `${c.path} ${c.op} ${JSON.stringify(c.expected)} (observed ${JSON.stringify(c.observed)})`).join('; ')}`;
   return {
@@ -189,6 +195,7 @@ export function verifyEquivalent(
       score: passed ? 100 : 25, // the engine's score for exit 0 + a failed evidence check
       details: { exit_code_check: true, set_output_check: null, evidence_check: passed },
       reason,
+      ...(placeholder !== undefined ? { placeholder } : {}),
     },
     match: { basis: 'effect', object: name, conditions },
   };

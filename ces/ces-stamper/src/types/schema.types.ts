@@ -525,6 +525,9 @@ export const VerificationCriteriaSchema = z.object({
     min_items: z.number().int().min(1).optional(),
   }).optional(),
   consistency_hint: z.enum(['sync', 'eventual_fast', 'eventual_slow', 'eventual_hours']).optional(),
+  // PL-121 Round 2 (founder 2026-11-02: the setting that provides the protection must not depend on a placeholder):
+  // read paths ($.field) whose value is incidental to the protection; a Muster placeholder there does not void the read.
+  placeholder_ignore: z.array(z.string().min(1)).optional(),
   // synthetic-customer W3 (2026-10-28): a get-then-set creation entry whose GET finds the
   // resource is SAT only when the evidence rule passes on that read (PowerShellAdapter's
   // "already exists" path); otherwise the entry fails. W3 (Stamper slice): this is the default for

@@ -43,7 +43,12 @@ const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 const isolate = {
   CES_PIPELINE_ROOT: path.join(unitDir, 'pl'),
   CES_TENANT_ROOT: path.join(unitDir, 'tenants'),
+  // PL-123 / CR-17: tenant-tests TenantProbe.psm1 reads Stamper tenant configs from here (default ~/.stamper/tenants).
+  CES_STAMPER_TENANTS_DIR: path.join(unitDir, 'stamper-tenants'),
 };
+// PL-123 / CR-15: create the isolation folders before any suite loads (muster-api mkdtemp()s under the pipeline
+// root at import time and failed with ENOENT on a first run).
+for (const d of Object.values(isolate)) fs.mkdirSync(d, { recursive: true });
 
 async function simUp() {
   try {

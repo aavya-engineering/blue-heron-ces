@@ -18,6 +18,11 @@ import { structuredLog } from 'ces-shared/observability';
 
 const SLOW_MS = 1000;
 
+/** PL-122: a leaver confirm link's token (?t=...) never reaches a log line. */
+export function redactLoggedPath(p: string | undefined): string | undefined {
+  return p && /\/leaver\/confirm\//.test(p) ? p.replace(/([?&]t=)[^&#]*/g, '$1<redacted>') : p;
+}
+
 interface ReqLike {
   method?: string;
   originalUrl?: string;
@@ -53,7 +58,7 @@ export function quietRequestLogger(service: string) {
         service,
         requestId,
         method: req.method,
-        path: req.originalUrl ?? req.url,
+        path: redactLoggedPath(req.originalUrl ?? req.url),
         status,
         ms,
       });

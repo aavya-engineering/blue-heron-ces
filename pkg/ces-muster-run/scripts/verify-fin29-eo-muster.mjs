@@ -298,7 +298,9 @@ export const V129_MATRIX = {
   'AT.L2-3.2.1': { own: ['tier2+store', 'tier2', 'store'], expect: st('met', 'met', 'not_met', NA) },
   'AT.L2-3.2.2': { own: ['review', 'store'], expect: st([NA, 'met'], [NA, 'met'], 'not_met', NA), reason: 'met only once FIN-26 lets the training store decide the role population (FD-9); until then no scenario reaches met' },
   'AT.L2-3.2.3': { own: ['tier2+store', 'tier2', 'store'], expect: st('met', 'met', 'not_met', NA) },
-  'AU.L2-3.3.8': { own: ['review'], expect: st(NA, NA, NA, NA), reason: 'D-4: objective [b] has nothing reviewable in any synthetic customer file, so no scenario reaches met' },
+  // PL-120 (LOG-RF11-DIAG.md §1.3, STOP-RF11-3; PREDICT-RF11 §3.3): on S3 and mp nobody holds Compliance Administrator, so
+  // Stamper's AU.L2-3.3.8.audit-protect read is empty, the (a) rule makes it NOT_SAT and Tier 1 decides not_met (0 points).
+  'AU.L2-3.3.8': { own: ['review', 'tier1'], expect: st(NA, NA, 'not_met', 'not_met'), reason: 'D-4: objective [b] has nothing reviewable in any synthetic customer file, so no scenario reaches met' },
   'AU.L2-3.3.9': { own: ['review'], expect: st('met', 'met', NA, NA) },
   'IR.L2-3.6.2': { own: ['review'], expect: st(NA, NA, NA, NA), reason: 'D-4: objective [e] (authority report records) has nothing reviewable in any synthetic customer file, so no scenario reaches met' },
   'IR.L2-3.6.3': { own: ['review'], expect: st('met', 'met', NA, NA) },

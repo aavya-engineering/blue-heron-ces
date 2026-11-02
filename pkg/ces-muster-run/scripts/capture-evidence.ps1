@@ -1,5 +1,5 @@
 # MX evidence capture (Blue Heron Defense, CES team). Windows PowerShell 5.1.
-#   powershell -ExecutionPolicy Bypass -File capture-evidence.ps1 -Root <WS> [-Dest <folder>] [-Scenario muster-partial]
+#   powershell -NoProfile -ExecutionPolicy Bypass -File capture-evidence.ps1 -Root <WS> [-Dest <folder>] [-Scenario muster-partial]
 # Retired in Phase 3 (P3.3) in favour of bundle.mjs, which this script now calls. The old version hashed the
 # outputs BEFORE rewriting paths and copied ssp.docx unscrubbed; bundle.mjs copies all twelve evidence items,
 # rewrites local paths (also inside DOCX parts), hashes AFTER rewriting and runs identity-scan.ps1.

@@ -41,8 +41,9 @@ V-checks (V1, V2, ...) are the verify checks; `ACCEPTANCE.md` lists every id wit
 | verify:scenario | s1-mach | S1 |
 | summary:requirement_results.total | 130 | requirement results in the plan posture |
 | summary:stamper.total_tasks | 101 | Stamper tasks executed |
-| summary:eo_assess.controls_met | 103 | EO assessment, controls met |
-| summary:eo_assess.sprs_score | 91 | SPRS score from the EO assessment |
+| summary:eo_assess.controls_met | 103 | EO assessment at E7 pass 1, controls met |
+| summary:eo_assess.sprs_score | 91 | SPRS at E7 pass 1 (a first run in a fresh pipeline root reads lower: KNOWN-ISSUES KI-25) |
+| summary:eo_assess_7b.sprs_score | 91 | **the authoritative SPRS**: the E7B re-assessment after AdminOps (R-F9 `eo-assess-7b.json`) |
 <!-- acceptance:end -->
 
 <!-- acceptance:begin s2-eng -->
@@ -51,8 +52,9 @@ V-checks (V1, V2, ...) are the verify checks; `ACCEPTANCE.md` lists every id wit
 | verify:scenario | s2-eng | S2 |
 | summary:requirement_results.total | 134 | requirement results in the plan posture |
 | summary:stamper.total_tasks | 101 | Stamper tasks executed |
-| summary:eo_assess.controls_met | 103 | EO assessment, controls met |
-| summary:eo_assess.sprs_score | 96 | SPRS score from the EO assessment |
+| summary:eo_assess.controls_met | 103 | EO assessment at E7 pass 1, controls met |
+| summary:eo_assess.sprs_score | 96 | SPRS at E7 pass 1 (a first run in a fresh pipeline root reads lower: KNOWN-ISSUES KI-25) |
+| summary:eo_assess_7b.sprs_score | 96 | **the authoritative SPRS**: the E7B re-assessment after AdminOps (R-F9 `eo-assess-7b.json`) |
 <!-- acceptance:end -->
 
 <!-- acceptance:begin s3-def -->
@@ -62,7 +64,8 @@ V-checks (V1, V2, ...) are the verify checks; `ACCEPTANCE.md` lists every id wit
 | summary:requirement_results.total | 129 | requirement results in the plan posture |
 | summary:stamper.total_tasks | 101 | Stamper tasks executed |
 | summary:eo_assess.controls_met | 73 | EO assessment at E7, controls met |
-| summary:eo_assess.sprs_score | 18 | SPRS at E7; the E7B re-assessment reads 20 by design (AdminOps fixes land between them) |
+| summary:eo_assess.sprs_score | 18 | SPRS at E7 pass 1; the E7B re-assessment reads 20 by design (AdminOps fixes land between them) |
+| summary:eo_assess_7b.sprs_score | 20 | **the authoritative SPRS**: the E7B re-assessment after AdminOps (R-F9 `eo-assess-7b.json`: 20, 75 controls met) |
 <!-- acceptance:end -->
 
 <!-- acceptance:begin muster-partial -->
@@ -71,8 +74,9 @@ V-checks (V1, V2, ...) are the verify checks; `ACCEPTANCE.md` lists every id wit
 | verify:scenario | muster-partial | mp (a partly configured tenant: no Conditional Access policy enforces MFA) |
 | summary:requirement_results.total | 134 | requirement results in the plan posture |
 | summary:stamper.total_tasks | 101 | Stamper tasks executed |
-| summary:eo_assess.controls_met | 79 | EO assessment, controls met |
-| summary:eo_assess.sprs_score | 36 | SPRS score from the EO assessment |
+| summary:eo_assess.controls_met | 79 | EO assessment at E7 pass 1, controls met |
+| summary:eo_assess.sprs_score | 36 | SPRS at E7 pass 1 (a first run in a fresh pipeline root reads lower: KNOWN-ISSUES KI-25) |
+| summary:eo_assess_7b.sprs_score | 36 | **the authoritative SPRS**: the E7B re-assessment after AdminOps (R-F9 `eo-assess-7b.json`) |
 <!-- acceptance:end -->
 
 ## What was red at the last recorded round
@@ -83,7 +87,7 @@ Round R-F10 (2026-11-01, PH-12 code) was red on V8, V11, V17, V21, V22, V27, V29
 
 - **S1 / S2 / S3 / mp**: the four synthetic customer scenarios of the simulator (`tenant-stacksim\scenarios\<slug>.json`).
 - **R-Fn**: BHD proof round n (all four scenarios end to end). **PH-n**: a BHD fix wave.
-- **SPRS**: Supplier Performance Risk System score, the DoD (Department of Defense) self-assessment score that EO computes (`summary.eo_assess.sprs_score`).
+- **SPRS**: Supplier Performance Risk System score, the DoD (Department of Defense) self-assessment score that EO computes. The authoritative one is E7B's (`summary.eo_assess_7b.sprs_score`, written by `verify.mjs` from `out\eo-assess-7b.json`); `summary.eo_assess.sprs_score` is E7 pass 1 (PUNCH-LIST PL-124, clean-room CR-25).
 - **EO**: EvidenceOps, the CES evidence and assessment server (`ces-eo`). **Stamper**: applies the configuration plan (`ces-stamper`). **Muster**: data collection and plan writing (`ces-muster`).
 - **V-check (V1, V2, ...)**: a verify check, listed in `ACCEPTANCE.md`. **E-step (E1, E7, E7B, ...)**: a step of `<PKG>\scripts\mx-e2e.ps1`.
 - **harness tester / mx**: who drives the E-steps: `ces-tester` (`tester`, the default and what BHD's rounds use) or the package script (`mx`).

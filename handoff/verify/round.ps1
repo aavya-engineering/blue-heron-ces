@@ -1,5 +1,5 @@
 # CES handoff proof round (Blue Heron Defense, CES team). Windows PowerShell 5.1. Simulator only. Written by H1, 2026-11-01.
-#   powershell -ExecutionPolicy Bypass -File handoff\verify\round.ps1 -Root <Root> [-Scenarios s1-mach,s2-eng] [-UiHeadless]
+#   powershell -NoProfile -ExecutionPolicy Bypass -File handoff\verify\round.ps1 -Root <Root> [-Scenarios s1-mach,s2-eng] [-UiHeadless]
 # The acceptance test for the handoff: the four synthetic customer scenarios end to end against the simulator, in the
 # same order and with the same harness as BHD's proof rounds (FINISH-PLAN.md section 4, "Every round"):
 #   S1 s1-mach, S2 s2-eng, S3 s3-def (MX_STACKS=m365_e5_gcc,microsoft_intune), mp muster-partial.

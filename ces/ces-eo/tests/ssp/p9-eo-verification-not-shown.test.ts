@@ -71,12 +71,15 @@ describe('P9-EO withVerificationNotYetShown', () => {
 });
 
 // Replay over the R-F6 SSPs (read only): every not_met / not_assessed narrative, rewritten, has no V111 (a) sentence.
-const EVIDENCE = 'C:\\ces-nb\\evidence';
+// PL-123 / CR-18: the evidence root comes from CES_EVIDENCE_REPLAY_ROOT (for example BHD's <WS>\evidence). Unset = the
+// replay is skipped, so the unit gate never reads a workspace's live evidence through a hard-coded path.
+const EVIDENCE = process.env.CES_EVIDENCE_REPLAY_ROOT ?? '';
 const SLUGS = ['s1-mach', 's2-eng', 's3-def', 'muster-partial'];
 describe('P9-EO replay on the R-F6 SSPs', () => {
   for (const slug of SLUGS) {
-    const file = path.join(EVIDENCE, `gc-rf6-${slug}`, 'ws', 'out', 'ssp.json');
-    (fs.existsSync(file) ? test : test.skip)(`${slug}: no affirmative sentence on a not_met / not_assessed control after the rewrite`, () => {
+    const file = EVIDENCE ? path.join(EVIDENCE, `gc-rf6-${slug}`, 'ws', 'out', 'ssp.json') : '';
+    const why = EVIDENCE ? (fs.existsSync(file) ? '' : ` [skipped: ${file} is absent]`) : ' [skipped: CES_EVIDENCE_REPLAY_ROOT is not set]';
+    (why ? test.skip : test)(`${slug}: no affirmative sentence on a not_met / not_assessed control after the rewrite${why}`, () => {
       const ssp = JSON.parse(fs.readFileSync(file, 'utf-8')) as { controlImplementations: Array<{ control_id: string; status: string; implementationNarrative: string }> };
       const hits = ssp.controlImplementations
         .filter(c => c.status === 'not_met' || c.status === 'not_assessed')

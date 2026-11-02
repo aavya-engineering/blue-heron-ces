@@ -25,6 +25,7 @@ import { renderPs, psContext, psLiteral, psLiteralBody, psDoubleQuotedSafe } fro
 import { OutputVerificationEngine, VerificationResult } from '../core/OutputVerificationEngine.js';
 import { EVIDENCE_NOT_SHOWN_OUTCOME } from '../core/ExecutionResultsCollector.js';
 import { buildStructuredEvidence, writeAndUploadEvidence, deriveVerdict, buildFailureDiagnostics, failureCause, withCause, isEmptyReadResult, EMPTY_READ_REASON, stripExecutionMarker } from '../utils/structuredEvidence.js';
+import { placeholderInRead, placeholderRationale } from '../shared/musterPlaceholders.js';
 import { checkExistingOrgValues, describeOrgValueCheck, existingStateCriteria } from '../translators/orgValues.js';
 import { verifyEquivalent } from '../registry/lookup.js';
 import { RegistryEntrySnapshot } from '../types/schema.types.js';
@@ -75,6 +76,10 @@ export function judgeProhibitionRead(exitCode: number, rawOutput: string): { sho
   if (exitCode !== 0) return { shown: false, reason: `read failed (exit code ${exitCode})` };
   const text = stripExecutionMarker(rawOutput);
   if (isEmptyReadResult(text) || text.includes('ResourceNotFound')) return { shown: false, reason: PROHIBITION_EMPTY_READ_REASON };
+  // PL-121 (founder ruling 2026-11-01): a read that shows only a setting built from an unanswered Muster
+  // placeholder shows nothing that counts (shared/musterPlaceholders.ts; CLI and GUI judge alike).
+  const placeholder = placeholderInRead(text);
+  if (placeholder !== undefined) return { shown: false, reason: placeholderRationale(placeholder) };
   return { shown: true, reason: '' };
 }
 
@@ -121,6 +126,13 @@ export function isEvidenceNotShown(output: unknown): boolean {
 
 /** PH-13: mark one evidence record as an empty read (NOT_SAT, the plain reason), whatever its idempotency tag. */
 export function markEmptyEvidenceRecord(evidence: StructuredEvidence): void {
+  // PL-121: a read that was not shown because it shows a Muster placeholder keeps that reason (NOT_SAT).
+  const placeholder = placeholderInRead(evidence.rawResponse);
+  if (placeholder !== undefined) {
+    evidence.complianceVerdict = 'NOT_SAT';
+    evidence.verdictRationale = placeholderRationale(placeholder);
+    return;
+  }
   evidence.outcome = 'partial_success';
   evidence.outcomeRationale = 'Command completed but expected data output was empty';
   evidence.complianceVerdict = 'NOT_SAT';
@@ -734,6 +746,8 @@ export class PowerShellAdapter implements IEngineAdapter {
         const { verdict, rationale } = deriveVerdict('failed_no_remediation');
         evidence.complianceVerdict = verdict;
         evidence.verdictRationale = boundNote ? `${rationale} (${boundNote})` : rationale;
+        // PL-121: the read showed a Muster placeholder value; the verdict says so.
+        if (f.verificationResult?.placeholder !== undefined) evidence.verdictRationale = placeholderRationale(f.verificationResult.placeholder);
         if (f.preview) evidence.destructivePreview = f.preview;
         if (f.commandExecuted) evidence.metadata.commandExecuted = f.commandExecuted;
         await this.writeEvidence(_task.id, evidFile, evidence);
@@ -822,7 +836,7 @@ export class PowerShellAdapter implements IEngineAdapter {
         let orgChecks: OrgValueCheck[] | undefined;
         if (present && sub.verification?.evidence) {
           orgChecks = checkExistingOrgValues(read, sub.org_values);
-          const equivalent = verifyEquivalent(read, sub.lookup, sub.org_values, (v: string) => this.resolveComparisonValue(v, sub, variables));
+          const equivalent = verifyEquivalent(read, sub.lookup, sub.org_values, (v: string) => this.resolveComparisonValue(v, sub, variables), sub.verification?.placeholder_ignore);
           match = equivalent ? equivalent.match : { basis: 'name', object: this.resolveComparisonValue(sub.lookup.by_name.equals, sub, variables) };
           verification = equivalent ? equivalent.verification : new OutputVerificationEngine().verify(
             { stdout: '', stderr: '', exitCode: 0 }, { stdout: read, exitCode: 0 },
@@ -1255,7 +1269,7 @@ export class PowerShellAdapter implements IEngineAdapter {
                 // CES's object by name) is verified against the block's effect conditions (org-value
                 // bounds applied) and its assignment requirement; CES's own object keeps the entry's rule.
                 const equivalent = sub.lookup
-                  ? verifyEquivalent(strippedGetOutput, sub.lookup, sub.org_values, (v: string) => this.resolveComparisonValue(v, sub, variables))
+                  ? verifyEquivalent(strippedGetOutput, sub.lookup, sub.org_values, (v: string) => this.resolveComparisonValue(v, sub, variables), sub.verification?.placeholder_ignore)
                   : undefined;
                 if (sub.lookup) existsLookupMatch = equivalent ? equivalent.match : { basis: 'name', object: this.resolveComparisonValue(sub.lookup.by_name.equals, sub, variables) };
                 existsVerification = equivalent ? equivalent.verification : new OutputVerificationEngine().verify(

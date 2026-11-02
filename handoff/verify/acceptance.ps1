@@ -1,5 +1,5 @@
 # CES handoff acceptance run (Blue Heron Defense, CES team). Windows PowerShell 5.1. Simulator only.
-#   powershell -ExecutionPolicy Bypass -File handoff\verify\acceptance.ps1 -Root <Root> [-Scenario s1-mach] [-Harness tester|mx] [-UiHeadless] [-SkipUnitGate]
+#   powershell -NoProfile -ExecutionPolicy Bypass -File handoff\verify\acceptance.ps1 -Root <Root> [-Scenario s1-mach] [-Harness tester|mx] [-UiHeadless] [-SkipUnitGate]
 # The full acceptance test is the 4-scenario proof round: verify\round.ps1 calls this script once per scenario
 # (H1, 2026-11-01). The default harness is tester, as in BHD's proof rounds (FINISH-PLAN.md section 4).
 # Run after bootstrap.ps1 and smoke.ps1. Three parts, all against the workspace at <Root>\ces:
@@ -36,6 +36,13 @@ function Say([string]$m) { Write-Host "==> $m" }
 $gateRc = $null; $e2eRc = $null
 if (-not $CompareOnly) {
   if (-not (Test-Path (Join-Path $Root 'ces\node_modules'))) { Write-Host "REFUSE $Root\ces is not built; run bootstrap.ps1 first"; exit 2 }
+  # PL-125 / CR-08: "built" also means the last bootstrap finished. bootstrap.json with ok false = refuse; no
+  # bootstrap.json (the tree was built by hand, GUIDE 6.2) = a warning only.
+  $bootJson = Join-Path $Root 'out\bootstrap\bootstrap.json'
+  if (Test-Path $bootJson) {
+    $boot = $null; try { $boot = Get-Content $bootJson -Raw | ConvertFrom-Json } catch { $boot = $null }
+    if (-not $boot -or $boot.ok -ne $true) { Write-Host "REFUSE $bootJson does not say ""ok"": true (the last bootstrap failed$(if ($boot -and $boot.failed_step) { " at $($boot.failed_step)" })); fix the cause and rerun bootstrap.ps1"; exit 2 }
+  } else { Write-Host "WARN no $bootJson (bootstrap.ps1 has not run here): only the node_modules folder was checked" }
   # V10 baseline (same directories as mx-e2e's Snapshot-Outside), taken before the unit gate.
   $snap = [ordered]@{ taken = $started.ToString('yyyy-MM-ddTHH:mm:ss.fffZ') }
   $lad = Join-Path $env:LOCALAPPDATA 'CES'

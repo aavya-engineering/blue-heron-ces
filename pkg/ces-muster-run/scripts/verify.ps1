@@ -1,5 +1,5 @@
 # MX verify (Blue Heron Defense, CES team). Windows PowerShell 5.1 wrapper for verify.mjs.
-#   powershell -ExecutionPolicy Bypass -File verify.ps1 -Root <WS> [-Scenario muster-partial] [-Baseline <summary.json>]
+#   powershell -NoProfile -ExecutionPolicy Bypass -File verify.ps1 -Root <WS> [-Scenario muster-partial] [-Baseline <summary.json>]
 # Checks V1-V11 over the last e2e run in <WS>\out and writes <WS>\out\verify.json and summary.json.
 # The default baseline is ..\expected-outputs\<slug>\summary.json (muster-partial: ..\expected-outputs\summary.json);
 # without one, V6 records the first green run.

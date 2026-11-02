@@ -135,3 +135,14 @@ test('verify.mjs wires V109 once, before V11; V11 / V21 / V22 read its result; V
   assert.match(v, /storeDecided: \(storedSnapshot\?\.controls \?\? \[\]\)\.filter\(\(c\) => gapmod\.V80_STORE_DECIDED\.test/);
   assert.equal((v.match(/\r/g) ?? []).length, 0);
 });
+
+test('PL-124 / CR-19: V109 counts <Root> as the workspace repo only when <Root>/ces has no .git (the contractor monorepo); summary.json carries E7B beside E7 pass 1 (CR-25)', () => {
+  const v = fs.readFileSync(path.join(HERE, 'verify.mjs'), 'utf8');
+  assert.match(v, /const gitRepoDirs = \[\.\.\.\(exists\(path\.join\(ces, '\.git'\)\) \? \[\] : \[root\]\), ces,/);
+  assert.match(v, /repo: path\.relative\(root, d\)\.split\(path\.sep\)\.join\('\/'\) \|\| '\.'/);
+  assert.match(v, /eo_assess_7b: assess7bSummary/);
+  assert.match(v, /const assess7b = freshJson\(path\.join\(out, 'eo-assess-7b\.json'\)\);/);
+  // judgeV109 with the one monorepo repo, named '.'
+  const t = Date.now();
+  assert.equal(judgeV109({ gateMs: t, repos: [{ repo: '.', commitMs: t - 1000 }] }).pass, true);
+});

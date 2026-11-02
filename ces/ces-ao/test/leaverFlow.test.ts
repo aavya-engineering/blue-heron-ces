@@ -18,7 +18,8 @@ import * as path from 'node:path';
 import { closeAllCesRepositories, getCesRepository } from 'ces-shared/persistence/node';
 import { LeaverConfirmError, LeaverFlowService, correlationIdOf, publicFlow, type LeaverExecArgs, type LeaverExecResult, type LeaverSignalUser } from '../src/leaver/LeaverFlowService.js';
 import {
-  LEAVER_COLLECTIONS, getFlow, getSettings, listEscalations, listOutbox, outboxHash, putSettings, recordMessage, type OutboxMessage,
+  LEAVER_COLLECTIONS, REDACTED_TOKEN, getFlow, getSettings, listEscalations, listOutbox, listOutboxDelivered, outboxHash, putSettings, recordMessage,
+  redactConfirmTokens, type OutboxMessage,
 } from '../src/leaver/leaverStore.js';
 import { parseSignalOutput, signalCommand, SIGNAL_BEGIN, SIGNAL_END } from '../src/leaver/leaverSignal.js';
 import { readOnlyViolation } from '../src/execution/GetThenSetExecutor.js';
@@ -58,7 +59,8 @@ const tokenOf = (m: OutboxMessage): string => {
   if (!hit) throw new Error(`no confirm link in ${m.kind}`);
   return decodeURIComponent(hit[2]);
 };
-const requests = (kind = 'leaver_confirm_request') => listOutbox(SLUG).filter((m) => m.kind === kind);
+// PL-122: the stored outbox shows every link as ?t=<redacted>; the simulated recipients' mail (in memory) has the clear link.
+const requests = (kind = 'leaver_confirm_request') => listOutboxDelivered(SLUG).filter((m) => m.kind === kind);
 const advance = (minutes: number) => { clock = new Date(clock.getTime() + minutes * 60_000); };
 
 beforeEach(() => {
@@ -100,9 +102,14 @@ describe('detect -> ask (nothing is changed in the tenant)', () => {
     expect(msgs).toHaveLength(2);
     expect(msgs.map((m) => m.to)).toEqual([[ADMINS[0]], [ADMINS[1]]].sort());
     for (const m of msgs) {
-      expect(m).toMatchObject({ transport: 'simulated', delivered: false, audience: 'tenant_admins', from: 'adminops-noreply@ces.invalid', flow_id: flow.flowId });
-      expect(m.sha256).toBe(outboxHash(m));
+      expect(m).toMatchObject({ transport: 'simulated', delivered: false, audience: 'tenant_admins', from: 'adminops-noreply@ces.invalid', flow_id: flow.flowId, delivered_copy: true });
       expect(m.body).toContain(`http://ao.test:3001/leaver/confirm/${flow.flowId}?t=`);
+      // the stored record: the link redacted, and the hash over what is stored
+      const stored = listOutbox(SLUG).find((x) => x.id === m.id)!;
+      expect(stored.body).toBe(redactConfirmTokens(m.body));
+      expect(stored.body).toContain(`/leaver/confirm/${flow.flowId}?t=${REDACTED_TOKEN}`);
+      expect(stored.sha256).toBe(outboxHash(stored));
+      expect(m.sha256).toBe(stored.sha256);
     }
     expect(new Set(msgs.map(tokenOf)).size).toBe(2);
     // only hashes are stored on the flow; the API view drops them too
@@ -243,6 +250,55 @@ describe('no confirmation: remind, then escalate (never dropped)', () => {
 });
 
 describe('store rules', () => {
+  it('PL-122: no confirm token text lands in the store (ces.db and every file under the pipeline root), across request, reminder, escalation and confirm', async () => {
+    const { started: [flow] } = await service().scan(SLUG);
+    advance(24 * 60);
+    service().tick(SLUG);
+    advance(48 * 60);
+    service().tick(SLUG);
+    const tokens = [...new Set(['leaver_confirm_request', 'leaver_reminder', 'leaver_escalation'].flatMap((k) => requests(k)).map(tokenOf))];
+    expect(tokens).toHaveLength(6); // 2 admins x (request, reminder, escalation)
+    await service().decide(flow.flowId, tokens[0], 'confirm');
+    // the stored records: every body redacted, no token in any of the four collections
+    const rows = Object.values(LEAVER_COLLECTIONS).map((c) => JSON.stringify(getCesRepository().list(c, { tenantSlug: SLUG })));
+    for (const t of tokens) for (const r of rows) expect(r).not.toContain(t);
+    for (const m of listOutbox(SLUG)) expect(redactConfirmTokens(m.body)).toBe(m.body);
+    // the raw bytes on disk (ces.db and any -wal / -shm beside it), with the store closed and open
+    const scan = () => {
+      const files: string[] = [];
+      const walk = (d: string): void => {
+        for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+          if (e.isDirectory()) walk(path.join(d, e.name));
+          else files.push(path.join(d, e.name));
+        }
+      };
+      walk(tmp);
+      expect(files.some((f) => /ces\.db$/i.test(f))).toBe(true);
+      for (const f of files) {
+        const bytes = fs.readFileSync(f);
+        for (const t of tokens) {
+          expect(bytes.includes(Buffer.from(t, 'utf8'))).toBe(false);
+          expect(bytes.includes(Buffer.from(encodeURIComponent(t), 'utf8'))).toBe(false);
+        }
+      }
+    };
+    scan();
+    closeAllCesRepositories();
+    scan();
+    // a closed flow drops its delivered copies: the operator view now shows only the redacted links
+    expect(listOutboxDelivered(SLUG).filter((m) => m.flow_id === flow.flowId).some((m) => m.delivered_copy)).toBe(false);
+  });
+
+  it('PL-122: recordMessage refuses a body that still carries a confirm token', () => {
+    const msg: OutboxMessage = {
+      id: 'aom-token', tenant_id: TENANT_ID, tenant_slug: SLUG, flow_id: 'lvf-x', kind: 'leaver_confirm_request', source: { type: 'leaver_flow', id: 'lvf-x' },
+      from: 'adminops-noreply@ces.invalid', to: [], audience: 'tenant_admins', subject: 's', body: 'go to http://ao.test/leaver/confirm/lvf-x?t=abcdefghijklmnopqrstuvwxyz0123456789 now', transport: 'simulated', delivered: false, sha256: 'x', created_at: clock.toISOString(),
+    };
+    expect(() => recordMessage(msg)).toThrow(/carries a confirm token/);
+    expect(redactConfirmTokens(msg.body)).toBe(`go to http://ao.test/leaver/confirm/lvf-x?t=${REDACTED_TOKEN} now`);
+    expect(() => recordMessage({ ...msg, body: redactConfirmTokens(msg.body) })).not.toThrow();
+  });
+
   it('the outbox and the escalations are insert-only', () => {
     const msg: OutboxMessage = {
       id: 'aom-fixed', tenant_id: TENANT_ID, tenant_slug: SLUG, flow_id: 'lvf-x', kind: 'leaver_done', source: { type: 'leaver_flow', id: 'lvf-x' },

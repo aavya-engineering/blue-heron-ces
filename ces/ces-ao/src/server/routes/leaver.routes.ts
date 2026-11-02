@@ -18,7 +18,9 @@
 //   GET  /api/leaver/flows/:id                   one flow
 //   POST /api/leaver/flows/:id/resume            two-person approval on: run A-22 once the approval is decided
 //   POST /api/leaver/tick?tenant=                reminders and escalations now (the timer does the same)
-//   GET  /api/leaver/outbox?tenant=              the tenant's simulated messages
+//   GET  /api/leaver/outbox?tenant=              the tenant's simulated messages as delivered (PL-122: ces.db keeps each
+//                                                confirm link as ?t=<redacted>; an open flow's clear links come from
+//                                                process memory, marked delivered_copy: true)
 //   GET  /api/leaver/escalations?tenant=         the tenant's escalation records
 // Confirm routes, mounted BEFORE the bearer gate: the single-use token in the link is the gate (a tenant
 // administrator holds no AO bearer token). GET only shows the page (mail scanners fetch links); POST decides.
@@ -28,7 +30,7 @@
 import express, { Router, type Request, type Response } from 'express';
 import { getRequestPrincipal } from 'ces-shared/http/principal';
 import { LeaverConfirmError, LeaverFlowService, publicFlow } from '../../leaver/LeaverFlowService.js';
-import { getFlow, getSettings, listEscalations, listFlows, listOutbox, putSettings } from '../../leaver/leaverStore.js';
+import { getFlow, getSettings, listEscalations, listFlows, listOutboxDelivered, putSettings } from '../../leaver/leaverStore.js';
 
 const SLUG = /^[A-Za-z0-9._-]+$/;
 
@@ -141,7 +143,7 @@ export function createLeaverRouter(service: LeaverFlowService): Router {
 
   router.get('/leaver/outbox', (req, res) => {
     const slug = slugOf(req, res);
-    if (slug) res.json(listOutbox(slug));
+    if (slug) res.json(listOutboxDelivered(slug));
   });
 
   router.get('/leaver/escalations', (req, res) => {

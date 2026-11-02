@@ -34,9 +34,9 @@ All repositories are in the private organization https://github.com/blue-heron-d
 | Repo (manifest id) | GitHub repository | Folder in the workspace | Commit |
 | --- | --- | --- | --- |
 | ces-tenant | ces-tenant | `ces-tenant` | `5be6e2bec232db91443e0350d7a3a6e3ba95c7d0` |
-| ces-mono | ces-mono | `.` | `43655a300e533392b2f21d1794479741eb531f9e` |
-| tenant-stacksim | ces-stacksim | `tenant-stacksim` | `bbe3cb3f1dad239a067c0cab64e2fc01dc70a143` |
-| ces-tester | ces-tester | `ces-tester` | `3257ff68657859c573efb682ae10dc3aaf34f2f4` |
+| ces-mono | ces-mono | `.` | `3bb6f3ac1b85aca2599da44070c8eda888bc2487` |
+| tenant-stacksim | ces-stacksim | `tenant-stacksim` | `cea876a6b9da916d2ecc691ef0d1ba61c9b29ece` |
+| ces-tester | ces-tester | `ces-tester` | `e3a591e51607fccfaee986935bfc9f75d86afcf2` |
 | ces-muster | ces-muster | `ces-muster` | `8f5edb7b981564a406b322b7d8dfcdcb0fd28298` |
 
 ## Toolchain
@@ -103,7 +103,7 @@ Full rules are in contracts.yaml.
 | readiness-result | file | 1.1.0 | muster-api | ces-muster, ces-tester | `ces-muster/muster-api/src/services/discoveryEnvelope.ts:121` |
 | cost-acks | file | 1.0.0 | ces-stamper | ces-stamper | `ces-shared/src/types/cost-gate.types.ts:102` |
 | sprs-weights | file | 2.0.0 | ces-shared | ces-stamper, ces-eo, ces-muster, muster-api | `ces-shared/src/data/sprs-weights.json:3` |
-| leaver-escalation | db | 1 | ces-ao | ces-eo | `ces-ao/src/leaver/LeaverFlowService.ts:399` |
+| leaver-escalation | db | 1 | ces-ao | ces-eo | `ces-ao/src/leaver/LeaverFlowService.ts:409` |
 | ces-db | db | unversioned | ces-shared | ces-stamper, ces-eo, ces-ao, ces-ec, muster-api | `ces-shared/src/persistence/CesRepository.ts:154` |
 | tenant-service | api | unversioned | ces-tenant | ces-tenant | `ces-tenant/src/service/protocol.ts:42` |
 | stacksim-query | api | unversioned | tenant-stacksim | ces-tester, ces-tenant, ces-eo, ces-ao, ces-stamper, muster-api | `tenant-stacksim/src/http/QueryServer.ts:132` |

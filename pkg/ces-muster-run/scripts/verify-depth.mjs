@@ -100,7 +100,7 @@ export function judgeV91({ plan, objectivesRef, registries, floor = null, mode =
   if (noBasis.length) problems.push(`${noBasis.length} inherited / not_applicable record(s) without a basis: ${ex(noBasis)}`);
   if (mode === 'fail') {
     if (uncovered > 0) problems.push(`fail mode: ${uncovered} uncovered objective(s) (${missing.length} without a record)`);
-  } else if (floor === null || floor === undefined) problems.push('warn mode: no floor (out/depth-coverage.json has no row for this scenario)');
+  } else if (floor === null || floor === undefined) problems.push('warn mode: no floor (neither out/depth-coverage.json nor expected-outputs/depth-coverage.json has a row for this scenario)');
   else if (uncovered > floor) problems.push(`warn mode: ${uncovered} uncovered objective(s) > floor ${floor} (${floorSource})`);
   const counts = COVERAGE_TYPES.map((t) => `${t} ${[...recs.values()].filter((r) => r.type === t).length}`).join(', ');
   return verdict(problems, `${recs.size}/${idx.list.length} objectives with one record (${counts}); uncovered ${uncovered}${mode === 'fail' ? ' (fail mode)' : ` <= floor ${floor} (${floorSource}, warn mode)`}`);
@@ -357,10 +357,18 @@ export function v99BlocksRebaseline(row) {
 export function depthFloor(vctx) {
   const ratchetFile = path.join(vctx.pkg, 'depth-floor.json');
   const covFile = path.join(vctx.pkg, 'out', 'depth-coverage.json');
-  const cov = vctx.exists(covFile) ? vctx.readJson(covFile) : null;
-  const row = (cov?.scenarios ?? []).find((s) => s.label === vctx.slug);
+  // PL-124 / CR-22: out/depth-coverage.json is made only by scripts/depth-coverage.mjs, which the harness does not run,
+  // so a clean clone has none. The package ships the same DEPTH-0 floor rows (expected-outputs/depth-coverage.json, a
+  // snapshot of BHD's file): used only when out/ has no row for the scenario, so BHD's verdicts are unchanged.
+  const shippedFile = path.join(vctx.pkg, 'expected-outputs', 'depth-coverage.json');
+  const outCov = vctx.exists(covFile) ? vctx.readJson(covFile) : null;
+  const outRow = (outCov?.scenarios ?? []).find((s) => s.label === vctx.slug);
+  const shippedCov = !outRow && vctx.exists(shippedFile) ? vctx.readJson(shippedFile) : null;
+  const shippedRow = (shippedCov?.scenarios ?? []).find((s) => s.label === vctx.slug);
+  const cov = outRow ? outCov : shippedRow ? shippedCov : outCov;
+  const row = outRow ?? shippedRow;
   let floor = row?.uncovered_floor ?? null;
-  let source = row ? 'out/depth-coverage.json' : 'none';
+  let source = outRow ? 'out/depth-coverage.json' : shippedRow ? 'expected-outputs/depth-coverage.json' : 'none';
   const ratchet = vctx.exists(ratchetFile) ? vctx.readJson(ratchetFile)?.[vctx.slug] : undefined;
   if (typeof ratchet === 'number' && (floor === null || ratchet < floor)) { floor = ratchet; source = 'depth-floor.json'; }
   return { floor, source, simulatorUnanswered: cov?.simulator_unanswered ?? [] };

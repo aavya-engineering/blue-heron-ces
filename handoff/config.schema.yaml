@@ -929,6 +929,16 @@ settings:
     scope: dev
     description: "Points Stamper's dev plan-data folder (and the translate route's 'dev' tenant plans) at another root, used by test runs for a run-scoped folder."
     source: "ces-stamper/src/config/paths.ts:37"
+  - name: CES_STAMPER_TENANTS_DIR
+    component: []
+    required: false
+    default: "%USERPROFILE%\\.stamper\\tenants"
+    allowed: "a folder path holding <slug>.json tenant configs"
+    secret: false
+    owner: contractor
+    scope: dev
+    description: "Overrides the folder the end-user tenant test suite's TenantProbe.psm1 reads Stamper tenant configs from; the unit gate (run-tests.mjs) and the stacksim TenantProbe test point it at a temp folder so a test never writes the real ~\\.stamper\\tenants (PL-123, clean-room CR-17)."
+    source: "tenant-tests/lib/TenantProbe.psm1:23"
   - name: CES_STAMPER_UI
     component: [ces-stamper]
     required: false

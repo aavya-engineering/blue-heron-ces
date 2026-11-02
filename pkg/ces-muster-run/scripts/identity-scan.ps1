@@ -1,6 +1,6 @@
 # MX identity gate (Blue Heron Defense, CES team). Windows PowerShell 5.1.
-#   powershell -ExecutionPolicy Bypass -File identity-scan.ps1 -Path <folder or .zip> [-Path ...]
-#   powershell -ExecutionPolicy Bypass -File identity-scan.ps1 -Root <WS> -Scenario <slug> [-Report <file>]
+#   powershell -NoProfile -ExecutionPolicy Bypass -File identity-scan.ps1 -Path <folder or .zip> [-Path ...]
+#   powershell -NoProfile -ExecutionPolicy Bypass -File identity-scan.ps1 -Root <WS> -Scenario <slug> [-Report <file>]
 # Scans every file, and every entry inside .zip/.docx/.xlsx/.pptx files, for personal identifiers
 # and local machine paths. Prints each hit and exits 1 if there is any; exits 0 when clean.
 # The banned-name list is passed in by the packager with -Extra (one regex per entry), so this

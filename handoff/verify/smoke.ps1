@@ -133,6 +133,13 @@ if ($PortOffset -ne 0) {
   Write-Host "     ports shifted by $PortOffset (-PortOffset)"
 }
 if (-not (Test-Path (Join-Path $CES 'node_modules'))) { Write-Host "REFUSE $CES is not built; run bootstrap.ps1 first"; exit 2 }
+# PL-125 / CR-08: "built" also means the last bootstrap finished. bootstrap.json with ok false = refuse; no
+# bootstrap.json (the tree was built by hand, GUIDE 6.2) = a warning only.
+$bootJson = Join-Path $Root 'out\bootstrap\bootstrap.json'
+if (Test-Path $bootJson) {
+  $boot = $null; try { $boot = Get-Content $bootJson -Raw | ConvertFrom-Json } catch { $boot = $null }
+  if (-not $boot -or $boot.ok -ne $true) { Write-Host "REFUSE $bootJson does not say ""ok"": true (the last bootstrap failed$(if ($boot -and $boot.failed_step) { " at $($boot.failed_step)" })); fix the cause and rerun bootstrap.ps1"; exit 2 }
+} else { Write-Host "WARN no $bootJson (bootstrap.ps1 has not run here): only the node_modules folder was checked" }
 $allPorts = @($targets | ForEach-Object { $_.ports } | Where-Object { $null -ne $_ } | ForEach-Object { [int]$_.port } | Sort-Object -Unique)
 $held = @(Get-Holders $allPorts)
 if ($held.Count) {
@@ -207,6 +214,6 @@ try {
 $result.pass = (@($result.servers | Where-Object { -not $_.pass }).Count -eq 0)
 Save
 foreach ($h in @(Get-Holders $allPorts)) { Write-Host "WARN port $($h.port) still held by pid $($h.pid) after the smoke run (not killed)" }
-if ($result.pass) { Write-Host "SMOKE PASS ($(@($result.servers).Count) servers). Next: verify\acceptance.ps1 -Root $Root"; exit 0 }
+if ($result.pass) { Write-Host "SMOKE PASS ($(@($result.servers).Count) servers). Next: powershell -NoProfile -ExecutionPolicy Bypass -File $Root\handoff\verify\round.ps1 -Root $Root (all four scenarios; verify\acceptance.ps1 -Scenario <slug> runs one)"; exit 0 }
 Write-Host "SMOKE FAIL: see $SMK\smoke.json and $LOG"
 exit 1
