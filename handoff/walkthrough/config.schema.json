@@ -1,0 +1,297 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CES walkthrough configuration (config.local.json)",
+  "description": "Every URL, root and token the walkthrough reads. config.local.json is gitignored; the two examples are committed. The server refuses to start when a required field is missing. Shape A (mode \"ports\") also requires roots; shape B (mode \"remote\") requires testerRoot instead and never reads a module folder.",
+  "type": "object",
+  "required": [
+    "scenario",
+    "tenantSlug",
+    "urls",
+    "crossModule",
+    "tokens",
+    "musterOperator",
+    "eoPeople",
+    "aoNewUser",
+    "customerDir",
+    "pane",
+    "simulator",
+    "walkthroughPort"
+  ],
+  "properties": {
+    "mode": {
+      "type": "string",
+      "enum": [
+        "ports",
+        "remote"
+      ],
+      "description": "Which run shape (PLAN.md 11.2). \"ports\": the page runs on the machine that runs the modules, on their kit ports, and shares their folders. \"remote\": the page runs on any machine and reaches the modules only over HTTP(S) at the addresses in urls (path prefixes allowed). Absent: ports when every URL is loopback and roots are set, remote otherwise."
+    },
+    "target": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Shown in the page header, for example \"contractor host\" or \"kit ports\"."
+        }
+      }
+    },
+    "testerRoot": {
+      "type": "string",
+      "description": "Built ces-tester folder (dist present) on the machine running the page. The engine and Playwright load from here. Shape A may give it as roots.testerRoot instead."
+    },
+    "tls": {
+      "type": "object",
+      "properties": {
+        "caFile": {
+          "type": "string",
+          "description": "PEM file with the certificate the module host presents (a self-signed one is fine). Relative paths resolve against this config file's folder. Used for the walkthrough's own HTTPS calls and its module forwarders."
+        },
+        "ignoreErrors": {
+          "type": "boolean",
+          "description": "Fallback when no caFile: skip certificate checks for the module host (shown as a yellow health item)."
+        }
+      }
+    },
+    "scenario": {
+      "type": "string",
+      "description": "Simulator scenario the simulator must be serving, for example s1-mach."
+    },
+    "tenantSlug": {
+      "type": "string",
+      "description": "Tenant slug shared by the record, AO, EO and Stamper."
+    },
+    "roots": {
+      "type": "object",
+      "required": [
+        "testerRoot",
+        "musterRoot",
+        "stamperRoot",
+        "stacksimRoot",
+        "tenantRoot",
+        "pipelineRoot",
+        "storageRoot"
+      ],
+      "properties": {
+        "testerRoot": {
+          "type": "string",
+          "description": "Built ces-tester folder (dist present). The engine is loaded from here."
+        },
+        "musterRoot": {
+          "type": "string"
+        },
+        "stamperRoot": {
+          "type": "string"
+        },
+        "stacksimRoot": {
+          "type": "string"
+        },
+        "tenantRoot": {
+          "type": "string",
+          "description": "The CES_TENANT_ROOT your AO, EO, Stamper and muster-api use."
+        },
+        "pipelineRoot": {
+          "type": "string",
+          "description": "The CES_PIPELINE_ROOT your modules use (ces.db, Stamper plan-data)."
+        },
+        "storageRoot": {
+          "type": "string",
+          "description": "EO's STORAGE_ROOT."
+        }
+      },
+      "description": "Shape A only: the module folders the walkthrough links (junctions). Leave out in shape B."
+    },
+    "urls": {
+      "type": "object",
+      "required": [
+        "musterSpa",
+        "musterApi",
+        "stamper",
+        "stamperBasePath",
+        "ao",
+        "eo",
+        "ec",
+        "stacksim"
+      ],
+      "properties": {
+        "musterSpa": {
+          "type": "string"
+        },
+        "musterApi": {
+          "type": "string"
+        },
+        "stamper": {
+          "type": "string"
+        },
+        "stamperBasePath": {
+          "type": "string",
+          "description": "Empty on the kit layout."
+        },
+        "ao": {
+          "type": "string"
+        },
+        "eo": {
+          "type": "string"
+        },
+        "ec": {
+          "type": "string"
+        },
+        "stacksim": {
+          "type": "string"
+        }
+      }
+    },
+    "crossModule": {
+      "type": "object",
+      "required": [
+        "CES_EO_URL",
+        "EC_URL",
+        "STACKSIM_SERVER_URL"
+      ],
+      "properties": {
+        "CES_EO_URL": {
+          "type": "string",
+          "description": "What your muster-api was started with (the push reaches EO through it)."
+        },
+        "EC_URL": {
+          "type": "string",
+          "description": "What your EO was started with."
+        },
+        "STACKSIM_SERVER_URL": {
+          "type": "string",
+          "description": "What AO, EO and Stamper were started with. AO needs a loopback value."
+        }
+      }
+    },
+    "tokens": {
+      "type": "object",
+      "required": [
+        "ao",
+        "eo",
+        "eoOperator",
+        "stamper"
+      ],
+      "properties": {
+        "ao": {
+          "type": "string",
+          "description": "CES_AO_AUTH_TOKEN, used by the health probe only. Leave empty for a token-less AO."
+        },
+        "eo": {
+          "type": "string",
+          "description": "CES_EO_AUTH_TOKEN. Typed into EvidenceOps' access screen. Shape B: also sent as the bearer on every EvidenceOps call; the Setup panel asks for it."
+        },
+        "eoOperator": {
+          "type": "string",
+          "description": "A BHD operator token for EO's access screen (mints uploader and approver tokens)."
+        },
+        "stamper": {
+          "type": "string",
+          "description": "CES_STAMPER_AUTH_TOKEN. Shape A: health probe only (leave empty for a token-less Stamper). Shape B: sent as the bearer on every Stamper call; the Setup panel asks for it."
+        }
+      }
+    },
+    "musterOperator": {
+      "type": "object",
+      "required": [
+        "login",
+        "password"
+      ],
+      "properties": {
+        "login": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      },
+      "description": "An operator account on your muster-api (scripts/seed.ts creates one)."
+    },
+    "eoPeople": {
+      "type": "object",
+      "required": [
+        "uploaderUpn",
+        "reviewerUpn",
+        "controlId",
+        "objectiveId"
+      ],
+      "properties": {
+        "uploaderUpn": {
+          "type": "string",
+          "description": "Fictional uploader from the scenario's document-reviews.json."
+        },
+        "reviewerUpn": {
+          "type": "string",
+          "description": "Fictional reviewer, a different person."
+        },
+        "controlId": {
+          "type": "string",
+          "description": "A control with no stack source, for example PE.L2-3.10.2."
+        },
+        "objectiveId": {
+          "type": "string",
+          "description": "One of its objectives, for example PE.L2-3.10.2[b]."
+        }
+      }
+    },
+    "aoNewUser": {
+      "type": "object",
+      "required": [
+        "upn",
+        "displayName"
+      ],
+      "properties": {
+        "upn": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        }
+      },
+      "description": "The fictional joiner that step 13 (AdminOps A-01) creates in the simulated tenant."
+    },
+    "customerDir": {
+      "type": "string",
+      "description": "pkg\\ces-muster-run\\customers\\<slug> (interview-answers.json, org-content.json)."
+    },
+    "pane": {
+      "type": "object",
+      "required": [
+        "headed"
+      ],
+      "properties": {
+        "headed": {
+          "type": "boolean",
+          "description": "true opens visible browser windows as well as the in-page mirror."
+        },
+        "slowMoMs": {
+          "type": "number",
+          "description": "Playwright slow motion per action, so a person can follow. Default 250."
+        },
+        "windows": {
+          "type": "object",
+          "description": "Where each module window opens: { muster | stamper | ao | eo: { x, y, width, height } } in screen pixels. scripts\\mine.mjs measures the screen and writes it when absent (PLAN.md 13.2 item 3).",
+          "properties": {
+            "muster": { "type": "object" },
+            "stamper": { "type": "object" },
+            "ao": { "type": "object" },
+            "eo": { "type": "object" }
+          }
+        }
+      }
+    },
+    "simulator": {
+      "type": "object",
+      "required": [
+        "managedByWalkthrough"
+      ],
+      "properties": {
+        "managedByWalkthrough": {
+          "type": "boolean",
+          "description": "Kit localhost only: true lets Prepare seed and serve the simulator when port 4390 is free."
+        }
+      }
+    },
+    "walkthroughPort": {
+      "type": "number"
+    }
+  }
+}

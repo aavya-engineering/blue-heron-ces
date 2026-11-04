@@ -1,0 +1,37 @@
+{
+  "_note": "Shape B (remote): the page runs on any machine and reaches the modules only over HTTPS at these addresses, through a small forwarder per module on the machine running the page. Run it with: node server.mjs --config config.example.contractor.json. The four values below that are empty (Stamper token, EvidenceOps token, Muster operator login and password, EvidenceOps operator token) are asked for by the page's Setup panel, which saves them in config.local.json on this machine. tls.caFile is the certificate the host presents (self-signed); export it once from a browser (open the host, view its certificate, export it as Base-64 PEM to contractor-host-cert.pem next to this file)",
+  "mode": "remote",
+  "target": { "name": "contractor host (136.108.118.191.sslip.io)" },
+  "scenario": "s1-mach",
+  "tenantSlug": "s1-mach",
+  "testerRoot": "C:\\ces-nb\\ces\\ces-tester",
+  "tls": { "caFile": "contractor-host-cert.pem" },
+  "urls": {
+    "musterSpa": "https://136.108.118.191.sslip.io/muster",
+    "musterApi": "https://136.108.118.191.sslip.io/muster-api",
+    "stamper": "https://136.108.118.191.sslip.io",
+    "stamperBasePath": "/stamper",
+    "ao": "https://136.108.118.191.sslip.io/ao",
+    "eo": "https://136.108.118.191.sslip.io/eo",
+    "ec": "https://136.108.118.191.sslip.io/ec",
+    "stacksim": "https://136.108.118.191.sslip.io/stacksim"
+  },
+  "crossModule": {
+    "CES_EO_URL": "<what the contractor's muster-api was started with>",
+    "EC_URL": "<what the contractor's EvidenceOps was started with>",
+    "STACKSIM_SERVER_URL": "<what the contractor's AdminOps was started with (a loopback address)>"
+  },
+  "tokens": { "ao": "", "eo": "", "eoOperator": "", "stamper": "" },
+  "musterOperator": { "login": "", "password": "" },
+  "eoPeople": {
+    "uploaderUpn": "corvane.marrowholt@s1-mach.simtenant.onmicrosoft.us",
+    "reviewerUpn": "alvane.ashenmere@s1-mach.simtenant.onmicrosoft.us",
+    "controlId": "PE.L2-3.10.2",
+    "objectiveId": "PE.L2-3.10.2[b]"
+  },
+  "aoNewUser": { "upn": "walkthrough.joiner@s1-mach.simtenant.onmicrosoft.us", "displayName": "Walkthrough Joiner (fictional)" },
+  "customerDir": "C:\\ces-nb\\pkg\\ces-muster-run\\customers\\s1-mach",
+  "pane": { "headed": true, "slowMoMs": 250 },
+  "simulator": { "managedByWalkthrough": false },
+  "walkthroughPort": 4600
+}

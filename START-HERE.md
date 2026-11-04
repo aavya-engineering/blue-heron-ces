@@ -56,6 +56,7 @@ Use `handoff\bootstrap.ps1` only. The older `pkg\ces-muster-run\bootstrap.ps1`, 
 3. **`handoff\KNOWN-ISSUES.md`**: problems you will meet and their workarounds.
 4. **`handoff\ACCEPTANCE.md`**: when the work is done: the four-scenario proof round (`handoff\verify\round.ps1`), the V-check list, the sign-off.
 5. **`handoff\RUNBOOK.md`**: day-to-day operation: servers, logs, `ces.db` backup, the leaver flow, secrets rotation, common failures.
+6. **`handoff\walkthrough\README.md`**: the Demo Commander, one page that walks one complete CES flow, Muster to EvidenceOps, one button per step, on the simulator (Update 3).
 
 ## Rules that never bend
 

@@ -1,5 +1,9 @@
 # What's new in this handoff (2026-11-01)
 
+## Update 3 (2026-11-04): the Demo Commander
+- **New: `handoff\walkthrough\`**, the Demo Commander: one page that walks one complete CES flow, Muster to EvidenceOps, in 23 steps on the simulator, one button per step, in four module windows you can watch. Start with `handoff\walkthrough\README.md` ("Before you start", then "Quick start").
+- One new punch-list row, PL-146 (the screen step 13 needs). No module code changed.
+
 This handoff replaces the per-module repositories and the Muster run package sent in October. Everything now comes in this one repository, at one set of commits recorded in `SOURCES.json`.
 
 ## How you receive CES

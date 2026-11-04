@@ -223,6 +223,13 @@ R-F11 (2026-11-01 evening) ran the frozen handoff code on all four scenarios (BH
 | PL-131 | EvidenceOps tests | Two ces-eo golden tests (`tests\eo\assessment\presence-only-label.test.ts`, `tests\unit\ssp\mechanism-narratives-w3.test.ts`) still expected run 20's old counts. Run 20's Wi-Fi profile uses the placeholder SSID `MUSTER-DEFAULT-SSID`, so under the placeholder rule (PL-121) AC.L2-3.1.16 and 3.1.17 are not_met: 69 / 7 / 0 / 34, SPRS -4. **Fixed (expectations only).** | The unit gate failed 4 tests at `c85e0dc`. | BHD engineering | P1 | `<Root>\out\unit-gate.json` |
 | PL-132 | kit | `smoke.ps1` teardown: ignore `taskkill` failures for children that already exited (do not let a native stderr line set the exit code under Windows PowerShell 5.1), so the exit code reflects only the module checks (KNOWN-ISSUES KI-30). | A passing smoke test reported failure on the update-2 clean clone. | contractor | P2 | BHD clean-clone log 2026-11-02 (`runlogs\cr-u2\smoke.log`) |
 
+### New rows from the Demo Commander (Update 3)
+
+| ID | Area | What | Why | Owner | Priority | Source |
+|---|---|---|---|---|---|---|
+| PL-146 | AdminOps / Muster | **A screen that carries the pushed Tenant Manifest values into the AdminOps tenant record.** The add-user operation (A-01) needs the read-only fields `m365LicenseSkuId` and `baseGroupId`, which AdminOps fills from the tenant record's resources (`ces-ao\public\index.html`, tenantBindings). Today no screen writes those values from the pushed manifest; only the harness does it in code (`ces-tester\srclow\muster-e2e-run.ts`, `resourcesFromTm`). Until then, Demo Commander step 13 "Add a user (AdminOps)" shows "not yet drivable". | A customer cannot add a user from the screens after a push. | contractor | P2 | Demo Commander run, 2026-11-04 |
+
+
 
 ## R-F12 and R-F13 results
 
