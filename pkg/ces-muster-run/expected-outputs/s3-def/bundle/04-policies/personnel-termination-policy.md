@@ -3,7 +3,7 @@
 **SIMULATED CUSTOMER (FICTIONAL): Corvelline Defense Assemblies Inc. (FICTIONAL)** This organisation is a simulated customer of the CES simulator, deficient by design. Its name, people, identifiers, addresses and tenant are invented; this document describes no real company and is not a compliance record.
 
 **Version:** 1.0
-**Effective Date:** 2026-11-02
+**Effective Date:** 2026-11-01
 **Policy Owner:** Derwyn Arrowbrook
 **Organization:** Corvelline Defense Assemblies Inc. (FICTIONAL)
 
@@ -130,6 +130,6 @@ I, Derwyn Arrowbrook, as the Authorizing Official, have reviewed and approve thi
 
 ---
 
-**Effective Date:** 2026-11-02
+**Effective Date:** 2026-11-01
 **CMMC Controls:** 3.9.2
 **Policy Owner:** Derwyn Arrowbrook

@@ -26,7 +26,7 @@
     "control_ids": [
       "AC.L1-3.1.20"
     ],
-    "get_command": "[pscustomobject]@{ sharingCapability = (Invoke-MgGraphRequest -Method GET -Uri 'https://graph.microsoft.us/beta/admin/sharepoint/settings').sharingCapability } | ConvertTo-Json -Depth 10",
+    "get_command": "(Invoke-MgGraphRequest -Method GET -Uri 'https://graph.microsoft.us/beta/admin/sharepoint/settings').sharingCapability | ConvertTo-Json -Depth 10",
     "set_command": "Invoke-MgGraphRequest -Method PATCH -Uri 'https://graph.microsoft.us/beta/admin/sharepoint/settings' -Body '{\"sharingCapability\":\"disabled\"}' -ContentType 'application/json'",
     "evidence_commands": [
       "Invoke-MgGraphRequest -Method GET -Uri 'https://graph.microsoft.us/beta/admin/sharepoint/settings' | ConvertTo-Json -Depth 10"
@@ -36,14 +36,14 @@
     "controlIds": [
       "AC.L1-3.1.20"
     ],
-    "timestamp": "2026-11-02T11:36:17.407Z",
+    "timestamp": "2026-11-01T06:58:06.682Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "Invoke-MgGraphRequest -Method PATCH -Uri 'https://graph.microsoft.us/beta/admin/sharepoint/settings' -Body '{\"sharingCapability\":\"disabled\"}' -ContentType 'application/json'",
     "sha256Hash": "7e32e0d8e74bb383b7468dd7a78d9dd6d2015dc6941e40f40805d6a6014b808b",
     "moduleVersions": {},
     "environment": "GCC-High",
-    "preStateOutput": "{\r\n    \"sharingCapability\":  null\r\n}\r\n",
-    "postStateOutput": "{\r\n    \"sharingCapability\":  \"disabled\"\r\n}\r\n",
+    "preStateOutput": "",
+    "postStateOutput": "\"disabled\"\r\n",
     "stateChanged": true,
     "postcheckMode": "state"
   }

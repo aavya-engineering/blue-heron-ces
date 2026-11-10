@@ -24,8 +24,7 @@
     "idempotency": "get-then-set",
     "on_failure": "abort_step",
     "control_ids": [
-      "SC.L2-3.13.15",
-      "SI.L2-3.14.6"
+      "SC.L2-3.13.15"
     ],
     "get_command": "Get-HostedOutboundSpamFilterPolicy | Where-Object { ($_.Name -eq 'CMMC-OutboundSpam') -or (($_.IsDefault -ne $true) -and ($_.ActionWhenThresholdReached -eq 'BlockUser') -and ($null -ne $_.RecipientLimitExternalPerHour -and [double]$_.RecipientLimitExternalPerHour -ge 1) -and ($null -ne $_.RecipientLimitExternalPerHour -and [double]$_.RecipientLimitExternalPerHour -le 500)) } | Sort-Object { $_.Name -ne 'CMMC-OutboundSpam' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
     "set_command": "try { New-HostedOutboundSpamFilterPolicy -Name 'CMMC-OutboundSpam' -ActionWhenThresholdReached BlockUser -RecipientLimitExternalPerHour 500 | Out-Null } catch { Set-HostedOutboundSpamFilterPolicy -Identity 'CMMC-OutboundSpam' -ActionWhenThresholdReached BlockUser -RecipientLimitExternalPerHour 500 | Out-Null }; Get-HostedOutboundSpamFilterPolicy -Identity 'CMMC-OutboundSpam' | Select-Object Name | ConvertTo-Json",
@@ -35,10 +34,9 @@
   },
   "metadata": {
     "controlIds": [
-      "SC.L2-3.13.15",
-      "SI.L2-3.14.6"
+      "SC.L2-3.13.15"
     ],
-    "timestamp": "2026-11-02T02:31:41.974Z",
+    "timestamp": "2026-11-01T16:03:34.648Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "try { New-HostedOutboundSpamFilterPolicy -Name 'CMMC-OutboundSpam' -ActionWhenThresholdReached BlockUser -RecipientLimitExternalPerHour 500 | Out-Null } catch { Set-HostedOutboundSpamFilterPolicy -Identity 'CMMC-OutboundSpam' -ActionWhenThresholdReached BlockUser -RecipientLimitExternalPerHour 500 | Out-Null }; Get-HostedOutboundSpamFilterPolicy -Identity 'CMMC-OutboundSpam' | Select-Object Name | ConvertTo-Json",
     "sha256Hash": "15a8df37f1c66b7a16456b64483e1985f696680b1e698f02b221b9ef9fec19f1",

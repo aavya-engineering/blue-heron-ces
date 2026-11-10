@@ -1,5 +1,5 @@
 {
-  "rawResponse": "{\r\n    \"value\":  [\r\n                  {\r\n                      \"id\":  \"deviceConfiguration-11\",\r\n                      \"createdDateTime\":  \"2026-11-02T02:30:05.679Z\",\r\n                      \"appsAllowTrustedAppsSideloading\":  \"blocked\",\r\n                      \"displayName\":  \"CMMC-InstallControl-Policy\",\r\n                      \"developerUnlockSetting\":  \"blocked\",\r\n                      \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n                      \"isAssigned\":  true\r\n                  }\r\n              ]\r\n}\r\n",
+  "rawResponse": "{\r\n    \"value\":  [\r\n                  {\r\n                      \"id\":  \"deviceConfiguration-7\",\r\n                      \"createdDateTime\":  \"2026-11-01T16:05:06.849Z\",\r\n                      \"appsAllowTrustedAppsSideloading\":  \"blocked\",\r\n                      \"displayName\":  \"CMMC-InstallControl-Policy\",\r\n                      \"developerUnlockSetting\":  \"blocked\",\r\n                      \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n                      \"isAssigned\":  true\r\n                  }\r\n              ]\r\n}\r\n",
   "outcome": "automated_success",
   "outcomeRationale": "Command completed successfully (exit code 0)",
   "complianceVerdict": "SAT",
@@ -36,14 +36,14 @@
     "controlIds": [
       "CM.L2-3.4.9"
     ],
-    "timestamp": "2026-11-02T02:30:06.531Z",
+    "timestamp": "2026-11-01T16:05:07.709Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "$created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations' -Body (@{'@odata.type'='#microsoft.graph.windows10GeneralConfiguration';displayName='CMMC-InstallControl-Policy';appsAllowTrustedAppsSideloading='blocked';developerUnlockSetting='blocked'} | ConvertTo-Json -Depth 10) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | ConvertTo-Json -Depth 10",
-    "sha256Hash": "f6ae776ec6cd3e1192a1024fd8410794751d88ceb233f87a027db27d236841ef",
+    "sha256Hash": "66b0f4c7acdb56c169f3bc4bd158b0d4e91701393305e1698a5c0e57dc04d987",
     "moduleVersions": {},
     "environment": "GCC-High",
     "preStateOutput": "",
-    "postStateOutput": "{\r\n    \"id\":  \"deviceConfiguration-11\",\r\n    \"createdDateTime\":  \"2026-11-02T02:30:05.679Z\",\r\n    \"appsAllowTrustedAppsSideloading\":  \"blocked\",\r\n    \"displayName\":  \"CMMC-InstallControl-Policy\",\r\n    \"developerUnlockSetting\":  \"blocked\",\r\n    \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceConfiguration-11_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ],\r\n    \"isAssigned\":  true\r\n}\r\n",
+    "postStateOutput": "{\r\n    \"id\":  \"deviceConfiguration-7\",\r\n    \"createdDateTime\":  \"2026-11-01T16:05:06.849Z\",\r\n    \"appsAllowTrustedAppsSideloading\":  \"blocked\",\r\n    \"displayName\":  \"CMMC-InstallControl-Policy\",\r\n    \"developerUnlockSetting\":  \"blocked\",\r\n    \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceConfiguration-7_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ],\r\n    \"isAssigned\":  true\r\n}\r\n",
     "stateChanged": true,
     "postcheckMode": "state"
   }

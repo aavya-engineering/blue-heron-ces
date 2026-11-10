@@ -61,12 +61,11 @@ export const REPOS = [
   { id: 'ces-muster-run', dir: 'pkg/ces-muster-run', ref: 'v2', dest: 'pkg/ces-muster-run', exclude: ['handoff/'] },
 ];
 
-export const GITIGNORE = `# CES contractor monorepo. It is cloned to C:\\ces-nb, so the runtime folders (out, pl = the harness
-# pipeline root, tenants, evidence, runlogs) sit at the root and are anchored there; deeper folders with those names stay tracked.
+export const GITIGNORE = `# CES contractor monorepo. It is cloned to C:\\ces-nb, so the runtime folders (out, tenants, evidence,
+# runlogs) sit at the root and are anchored there; deeper folders with those names stay tracked.
 node_modules/
 dist/
 /out/
-/pl/
 /tenants/
 /evidence/
 /runlogs/

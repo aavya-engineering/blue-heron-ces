@@ -10,7 +10,7 @@
 | **System Name** | Sim tenant muster-partial CUI Information System |
 | **CMMC Level** | L2 |
 | **Prepared By** |  |
-| **Date Prepared** | 2026-11-02 |
+| **Date Prepared** | 2026-11-01 |
 | **POA&M Policy** | unknown |
 
 ## 2. Purpose
@@ -23,12 +23,12 @@ Based on the current Readiness Posture assessment:
 | Category | Count |
 |----------|-------|
 | Controls Met | 0 |
-| Controls Partially Met | 57 |
-| Controls Not Met | 56 |
-| Controls Unknown | 21 |
+| Controls Partially Met | 60 |
+| Controls Not Met | 52 |
+| Controls Unknown | 22 |
 | **Overall Compliance** | **0%** |
 
-Items requiring POA&M tracking: **56** not-met + **57** partial = potential POA&M entries.
+Items requiring POA&M tracking: **52** not-met + **60** partial = potential POA&M entries.
 
 ## 4. POA&M Items
 
@@ -65,5 +65,5 @@ For each POA&M item, milestones shall include:
 
 ---
 
-**Effective Date:** 2026-11-02
+**Effective Date:** 2026-11-01
 **Next Review:** 2027-11-01

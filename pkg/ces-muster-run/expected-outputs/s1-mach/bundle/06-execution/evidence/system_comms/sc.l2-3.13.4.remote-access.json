@@ -1,5 +1,5 @@
 {
-  "rawResponse": "[\r\n    {\r\n        \"displayName\":  \"S1-CA01 Require MFA - all users\",\r\n        \"state\":  \"enabled\",\r\n        \"includeUsers\":  [\r\n                             \"All\"\r\n                         ],\r\n        \"includeApplications\":  [\r\n                                    \"All\"\r\n                                ],\r\n        \"builtInControls\":  [\r\n                                \"mfa\"\r\n                            ]\r\n    },\r\n    {\r\n        \"displayName\":  \"S1-CA03 Block legacy authentication\",\r\n        \"state\":  \"enabled\",\r\n        \"includeUsers\":  [\r\n                             \"All\"\r\n                         ],\r\n        \"includeApplications\":  [\r\n                                    \"All\"\r\n                                ],\r\n        \"builtInControls\":  [\r\n                                \"block\"\r\n                            ]\r\n    },\r\n    {\r\n        \"displayName\":  \"S1-CA05 Require compliant device - all apps\",\r\n        \"state\":  \"enabled\",\r\n        \"includeUsers\":  [\r\n                             \"All\"\r\n                         ],\r\n        \"includeApplications\":  [\r\n                                    \"All\"\r\n                                ],\r\n        \"builtInControls\":  [\r\n                                \"compliantDevice\"\r\n                            ]\r\n    },\r\n    {\r\n        \"displayName\":  \"S1-CA06 Block sign-in from outside US\",\r\n        \"state\":  \"enabled\",\r\n        \"includeUsers\":  [\r\n                             \"All\"\r\n                         ],\r\n        \"includeApplications\":  [\r\n                                    \"All\"\r\n                                ],\r\n        \"builtInControls\":  [\r\n                                \"block\"\r\n                            ]\r\n    },\r\n    {\r\n        \"displayName\":  \"S1-CA07 Sign-in risk high - block\",\r\n        \"state\":  \"enabled\",\r\n        \"includeUsers\":  [\r\n                             \"All\"\r\n                         ],\r\n        \"includeApplications\":  [\r\n                                    \"All\"\r\n                                ],\r\n        \"builtInControls\":  [\r\n                                \"block\"\r\n                            ]\r\n    },\r\n    {\r\n        \"displayName\":  \"CMMC-Require-Compliant-Device-All-Users\",\r\n        \"state\":  \"enabled\",\r\n        \"includeUsers\":  [\r\n                             \"All\"\r\n                         ],\r\n        \"includeApplications\":  [\r\n                                    \"All\"\r\n                                ],\r\n        \"builtInControls\":  [\r\n                                \"compliantDevice\",\r\n                                \"domainJoinedDevice\"\r\n                            ]\r\n    }\r\n]\r\n",
+  "rawResponse": "",
   "outcome": "automated_success",
   "outcomeRationale": "Command completed successfully (exit code 0)",
   "complianceVerdict": "SAT",
@@ -15,20 +15,20 @@
     "control_ids": [
       "SC.L2-3.13.4"
     ],
-    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/identity/conditionalAccess/policies').value | Where-Object { $_.state -eq 'enabled' -and ($_.displayName -like '*Remote*' -or $_.displayName -like '*VPN*' -or ((@($_.conditions.users.includeUsers) -contains 'All') -and (@($_.conditions.applications.includeApplications) -contains 'All') -and (@($_.grantControls.builtInControls | Where-Object { $_ }).Count -gt 0))) } | ForEach-Object { [pscustomobject]@{ displayName = $_.displayName; state = $_.state } } | ConvertTo-Json -Depth 3",
+    "get_command": "Get-MgIdentityConditionalAccessPolicy -All | Where-Object { $_.DisplayName -like '*Remote*' -or $_.DisplayName -like '*VPN*' } | Select-Object DisplayName,State,Conditions,GrantControls | ConvertTo-Json -Depth 3",
     "set_command": "",
     "evidence_commands": [
-      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/identity/conditionalAccess/policies').value | Where-Object { $_.state -eq 'enabled' -and ($_.displayName -like '*Remote*' -or $_.displayName -like '*VPN*' -or ((@($_.conditions.users.includeUsers) -contains 'All') -and (@($_.conditions.applications.includeApplications) -contains 'All') -and (@($_.grantControls.builtInControls | Where-Object { $_ }).Count -gt 0))) } | ForEach-Object { [pscustomobject]@{ displayName = $_.displayName; state = $_.state; includeUsers = @($_.conditions.users.includeUsers); includeApplications = @($_.conditions.applications.includeApplications); builtInControls = @($_.grantControls.builtInControls) } } | ConvertTo-Json -Depth 4"
+      "Get-MgIdentityConditionalAccessPolicy -All | Where-Object { $_.DisplayName -like '*Remote*' } | ConvertTo-Json -Depth 4"
     ]
   },
   "metadata": {
     "controlIds": [
       "SC.L2-3.13.4"
     ],
-    "timestamp": "2026-11-02T01:42:11.874Z",
+    "timestamp": "2026-11-01T15:27:05.041Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "[manual/evidence-only] Conditional Access Policy for Remote Access Sessions",
-    "sha256Hash": "c6fa315772144ab1bbd7fa1f70cd34bd7ca7bdd912810e31e0c07617d11ae75f",
+    "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "moduleVersions": {},
     "environment": "GCC-High"
   }

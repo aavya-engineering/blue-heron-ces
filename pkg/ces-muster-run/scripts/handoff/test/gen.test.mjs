@@ -2,7 +2,6 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { generate } from '../gen.mjs';
 import { buildOrder, CycleError } from '../lib/graph.mjs';
-import { isProseDefault } from '../lib/render.mjs';
 import { makeFixture, MANIFEST } from './fixture.mjs';
 
 test('build order is topological with manifest-order ties', () => {
@@ -70,18 +69,4 @@ test('invalid manifest fields are reported', () => {
   const { kit } = makeFixture({ manifest: bad });
   const { errors } = generate(kit);
   assert.match(errors.join('\n'), /"kind" must be one of/);
-});
-
-test('PL-125 / CR-05: .env.example is a reference, not a file to copy; prose defaults are comments', () => {
-  const { kit } = makeFixture();
-  const env = generate(kit).outputs['.env.example'];
-  assert.match(env, /Reference only: do not copy this file to \.env/);
-  assert.doesNotMatch(env, /Copy to \.env and fill in/);
-  for (const [d, a, want] of [
-    ['unset', 'a mode', true], ['off', "'1' = on; anything else = off", true], ['on', "'0' = off; anything else = on", true],
-    ['legacy', "'react' = React SPA; anything else = legacy console", true], ['4002', 'a number', false],
-    ['http://127.0.0.1:4001', 'an http(s) base URL', false], ['8h', 'a jsonwebtoken expiresIn value', false],
-    ['15', 'a positive number of minutes; invalid or non-positive falls back to 15', false], ['unset = ~/.ces', 'a folder', true], ['', 'x', false],
-    ['login.microsoftonline.com', 'bare host name (e.g. login.microsoftonline.us); anything else falls back', false], ['1', "'0' = off; anything else = on", false],
-  ]) assert.equal(isProseDefault(d, a), want, `${d} / ${a}`);
 });

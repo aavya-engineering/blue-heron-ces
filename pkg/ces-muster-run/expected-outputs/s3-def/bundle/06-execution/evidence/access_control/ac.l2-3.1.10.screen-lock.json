@@ -1,5 +1,5 @@
 {
-  "rawResponse": "{\r\n    \"id\":  \"deviceConfiguration-3\",\r\n    \"createdDateTime\":  \"2026-11-02T11:33:56.658Z\",\r\n    \"passwordMinimumLength\":  14,\r\n    \"passwordRequired\":  true,\r\n    \"displayName\":  \"CMMC-ScreenLock-Policy\",\r\n    \"passwordMinutesOfInactivityBeforeScreenTimeout\":  15,\r\n    \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n    \"isAssigned\":  true\r\n}\r\n",
+  "rawResponse": "{\r\n    \"id\":  \"deviceConfiguration-3\",\r\n    \"createdDateTime\":  \"2026-11-01T06:57:14.469Z\",\r\n    \"passwordMinimumLength\":  14,\r\n    \"passwordRequired\":  true,\r\n    \"displayName\":  \"CMMC-ScreenLock-Policy\",\r\n    \"passwordMinutesOfInactivityBeforeScreenTimeout\":  15,\r\n    \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n    \"isAssigned\":  true\r\n}\r\n",
   "outcome": "automated_success",
   "outcomeRationale": "Command completed successfully (exit code 0)",
   "complianceVerdict": "SAT",
@@ -38,14 +38,14 @@
       "AC.L2-3.1.10",
       "SC.L2-3.13.9"
     ],
-    "timestamp": "2026-11-02T11:33:57.534Z",
+    "timestamp": "2026-11-01T06:57:15.319Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "$created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations' -Body (@{'@odata.type'='#microsoft.graph.windows10GeneralConfiguration';displayName='CMMC-ScreenLock-Policy';passwordMinutesOfInactivityBeforeScreenTimeout=15;passwordRequired=$true;passwordMinimumLength=14} | ConvertTo-Json -Depth 10) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | ConvertTo-Json -Depth 10",
-    "sha256Hash": "a68a5b61f9b374ca3b075655219d49bfe0011fe56341efe83cd932c8424f431c",
+    "sha256Hash": "41ef3e6a63f7bbe98dea0beaaf376fae0e79d978f4e23e2162532a5a1bd40bef",
     "moduleVersions": {},
     "environment": "GCC-High",
     "preStateOutput": "",
-    "postStateOutput": "{\r\n    \"id\":  \"deviceConfiguration-3\",\r\n    \"createdDateTime\":  \"2026-11-02T11:33:56.658Z\",\r\n    \"passwordMinimumLength\":  14,\r\n    \"passwordRequired\":  true,\r\n    \"displayName\":  \"CMMC-ScreenLock-Policy\",\r\n    \"passwordMinutesOfInactivityBeforeScreenTimeout\":  15,\r\n    \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceConfiguration-3_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ],\r\n    \"isAssigned\":  true\r\n}\r\n",
+    "postStateOutput": "{\r\n    \"id\":  \"deviceConfiguration-3\",\r\n    \"createdDateTime\":  \"2026-11-01T06:57:14.469Z\",\r\n    \"passwordMinimumLength\":  14,\r\n    \"passwordRequired\":  true,\r\n    \"displayName\":  \"CMMC-ScreenLock-Policy\",\r\n    \"passwordMinutesOfInactivityBeforeScreenTimeout\":  15,\r\n    \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceConfiguration-3_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ],\r\n    \"isAssigned\":  true\r\n}\r\n",
     "stateChanged": true,
     "postcheckMode": "state"
   }

@@ -1,5 +1,5 @@
 {
-  "rawResponse": "{\r\n    \"displayName\":  \"CMMC-BlockRemovableStorage\",\r\n    \"id\":  \"deviceConfiguration-5\",\r\n    \"odataType\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n    \"storageBlockRemovableStorage\":  true,\r\n    \"usbBlocked\":  null\r\n}\r\n",
+  "rawResponse": "",
   "outcome": "automated_success",
   "outcomeRationale": "Command completed successfully (exit code 0)",
   "complianceVerdict": "SAT",
@@ -15,20 +15,20 @@
     "control_ids": [
       "MP.L2-3.8.8"
     ],
-    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object { $_.storageBlockRemovableStorage -eq $true -or $_.usbBlocked -eq $true } | ForEach-Object { [pscustomobject]@{ displayName = $_.displayName; id = $_.id } } | ConvertTo-Json -Depth 3",
+    "get_command": "Get-MgDeviceManagementDeviceConfiguration | Where-Object {$_.AdditionalProperties.'@odata.type' -like '*deviceRestriction*'} | Select-Object DisplayName,Id",
     "set_command": "",
     "evidence_commands": [
-      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object { $_.storageBlockRemovableStorage -eq $true -or $_.usbBlocked -eq $true } | ForEach-Object { [pscustomobject]@{ displayName = $_.displayName; id = $_.id; odataType = $_.'@odata.type'; storageBlockRemovableStorage = $_.storageBlockRemovableStorage; usbBlocked = $_.usbBlocked } } | ConvertTo-Json -Depth 5"
+      "Get-MgDeviceManagementDeviceConfiguration | Where-Object {$_.AdditionalProperties.'@odata.type' -like '*deviceRestriction*'} | Select-Object DisplayName,Id | ConvertTo-Json -Depth 10"
     ]
   },
   "metadata": {
     "controlIds": [
       "MP.L2-3.8.8"
     ],
-    "timestamp": "2026-11-02T12:14:55.003Z",
+    "timestamp": "2026-11-01T17:10:54.882Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "[manual/evidence-only] Verify Intune Policy Prohibiting Unidentified Portable Storage",
-    "sha256Hash": "c77464a47334c99ee3e5e0eafc8010d90faff4ca7b46da0f6878bd0097afc03e",
+    "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "moduleVersions": {},
     "environment": "GCC-High",
     "gateContext": "manual_gate"

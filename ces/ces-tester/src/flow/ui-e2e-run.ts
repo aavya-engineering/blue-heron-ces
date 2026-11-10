@@ -45,7 +45,7 @@ import { driveStamperUi, type StamperUiDriveContext, type StamperUiDriveResult }
 import { HEADLESS_MODE, WATCHED_MODE, type WatchMode } from '../demo/watch-mode.js';
 import { simOnlyEnvViolations } from './sim-only-guard.js';
 import { mintInitialPassword, withInitialPassword } from './overrides-gate.js';
-import { heldPorts, musterE2ePaths, SIM_STORE_EL } from './muster-e2e-run.js';
+import { heldPorts, musterE2ePaths } from './muster-e2e-run.js';
 import { runEuEoProbe } from './fin19-steps.js';
 import {
   compareVariant,
@@ -145,12 +145,6 @@ export interface TwinInputs {
   readonly report: unknown;
   readonly ledger: LedgerEntryLike[] | null;
   readonly e6Window: TimeWindow | null;
-  /**
-   * FIX-EL (R-F11): the twin's sim store as step EL left it (`out/sim-store-el.json`, written by this run's EL), or null.
-   * Step EL runs A-22 on the confirmed leaver after E5 and before E6, so the twin's E6 starts from that state, not from
-   * the scenario's start. Each variant puts it in place after its reset, so its execute starts from the same state.
-   */
-  readonly elStore?: string | null;
   /** What is missing, by name; empty = the twin can be compared against. */
   readonly missing: string[];
 }
@@ -166,7 +160,6 @@ export function readTwin(P: UiE2ePaths): TwinInputs {
   const steps = readJsonOrNull<Record<string, { started?: string; ended?: string }>>(P.stepsFile);
   const e6 = steps?.E6;
   const e6Window = e6?.started && e6?.ended ? { started: String(e6.started), ended: String(e6.ended) } : null;
-  const elStore = elStoreOf(path.join(P.out, SIM_STORE_EL), steps?.EL);
   const missing = [
     ...(pMP ? [] : ['pushed mission plan']),
     ...(pTM ? [] : ['pushed tenant manifest']),
@@ -175,22 +168,7 @@ export function readTwin(P: UiE2ePaths): TwinInputs {
     ...(ledgerRaw?.data ? [] : ['out/ledger.json']),
     ...(e6Window ? [] : ['E6 window in out/steps.json']),
   ];
-  return { pMP, pTM, pIM, exePlan, report, ledger: ledgerRaw?.data ?? null, e6Window, elStore, missing };
-}
-
-/**
- * FIX-EL (R-F11): the post-EL store snapshot when it is this run's (written at or after this run's EL started), else
- * null (no EL this run, e.g. muster-partial, or a file left by an earlier run). Pure over `stat`.
- */
-export function elStoreOf(
-  file: string,
-  el: { started?: string } | undefined,
-  stat: (p: string) => { mtimeMs: number } | null = (p) => (fs.existsSync(p) ? fs.statSync(p) : null),
-): string | null {
-  const started = el?.started ? Date.parse(String(el.started)) : NaN;
-  if (!Number.isFinite(started)) return null;
-  const st = stat(file);
-  return st && st.mtimeMs >= started ? file : null;
+  return { pMP, pTM, pIM, exePlan, report, ledger: ledgerRaw?.data ?? null, e6Window, missing };
 }
 
 /** Why a variant cannot run here (its `requires_built` file is absent), or null. Pure over `exists`. */
@@ -292,13 +270,6 @@ export async function runStamperVariant(ctx: VariantRunContext): Promise<Variant
     log(`  [${variant.id}] reset the sim: stacksim scenario ${slug}`);
     const rc = await runLogged(V.logs, 'sim-scenario', process.execPath, ['bin/stacksim.mjs', 'scenario', slug], P.sim);
     if (rc !== 0) throw new Error(`stacksim scenario ${slug} failed (rc ${rc}; logs/sim-scenario.err)`);
-    // FIX-EL (R-F11): the twin's E6 started after step EL (A-22 on the confirmed leaver); start this execute from that
-    // same state, as ui-console-run.ts serveSim does for the AO and EO consoles.
-    if (twin.elStore) {
-      fs.mkdirSync(P.simTenantDir, { recursive: true });
-      fs.copyFileSync(twin.elStore, path.join(P.simTenantDir, 'store.json'));
-      log(`  [${variant.id}] put the twin's post-EL sim store in place (${outRel(P, twin.elStore)}): the execute starts where the twin's E6 started`);
-    }
     serve = await startServe({ stacksimRoot: P.sim, stance: scenario.stance, slug, port: SIM_PORT, logPath: path.join(V.logs, 'sim-serve.out') });
 
     const registry = createTenantRegistry({ registryRoot: V.tenants, stacksimRoot: P.sim });
@@ -397,7 +368,6 @@ export async function runStamperVariant(ctx: VariantRunContext): Promise<Variant
         execution_report: report ? outRel(P, V.report) : undefined,
         ledger: outRel(P, V.ledger),
         sim_store: store ? outRel(P, V.simStore) : undefined,
-        pre_execute_store: twin.elStore ? outRel(P, twin.elStore) : undefined,
         video: outRel(P, drive.recording?.videoPath),
         trace: outRel(P, drive.recording?.tracePath),
       },
@@ -548,7 +518,6 @@ export async function runUiE2e(opts: UiE2eRunOptions): Promise<UiE2eStamperRecor
       execution_report: 'execution-report.json',
       ledger: 'ledger.json',
       ...(twinStore ? { sim_store: outRel(P, P.twinSimStore) } : {}),
-      ...(twin.elStore ? { pre_execute_store: outRel(P, twin.elStore) } : {}),
       e6_window: twin.e6Window,
     },
     variants: results,

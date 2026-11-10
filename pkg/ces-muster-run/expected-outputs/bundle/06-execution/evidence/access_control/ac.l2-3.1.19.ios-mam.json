@@ -1,5 +1,5 @@
 {
-  "rawResponse": "{\r\n    \"id\":  \"iosManagedAppProtection-1\",\r\n    \"createdDateTime\":  \"2026-11-02T12:13:53.398Z\",\r\n    \"@odata.type\":  \"#microsoft.graph.iosManagedAppProtection\",\r\n    \"periodOfflineBeforeWipeIsEnforced\":  \"P30D\",\r\n    \"dataBackupBlocked\":  true,\r\n    \"deviceComplianceRequired\":  true,\r\n    \"allowedDataStorageLocations\":  [\r\n                                        \"oneDriveForBusiness\",\r\n                                        \"sharePoint\"\r\n                                    ],\r\n    \"displayName\":  \"CMMC-iOS-MAM\",\r\n    \"isAssigned\":  true\r\n}\r\n",
+  "rawResponse": "{\r\n    \"id\":  \"iosManagedAppProtection-1\",\r\n    \"createdDateTime\":  \"2026-11-01T17:10:40.387Z\",\r\n    \"@odata.type\":  \"#microsoft.graph.iosManagedAppProtection\",\r\n    \"periodOfflineBeforeWipeIsEnforced\":  \"P30D\",\r\n    \"dataBackupBlocked\":  true,\r\n    \"deviceComplianceRequired\":  true,\r\n    \"allowedDataStorageLocations\":  [\r\n                                        \"oneDriveForBusiness\",\r\n                                        \"sharePoint\"\r\n                                    ],\r\n    \"displayName\":  \"CMMC-iOS-MAM\",\r\n    \"isAssigned\":  true\r\n}\r\n",
   "outcome": "automated_success",
   "outcomeRationale": "Command completed successfully (exit code 0)",
   "complianceVerdict": "SAT",
@@ -36,14 +36,14 @@
     "controlIds": [
       "AC.L2-3.1.19"
     ],
-    "timestamp": "2026-11-02T12:13:54.220Z",
+    "timestamp": "2026-11-01T17:10:41.201Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "$created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceAppManagement/iosManagedAppProtections' -Body (@{'@odata.type'='#microsoft.graph.iosManagedAppProtection';displayName='CMMC-iOS-MAM';periodOfflineBeforeWipeIsEnforced='P30D';allowedDataStorageLocations=@('oneDriveForBusiness','sharePoint');dataBackupBlocked=$true;deviceComplianceRequired=$true} | ConvertTo-Json) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/v1.0/deviceAppManagement/iosManagedAppProtections/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | ConvertTo-Json -Depth 10",
-    "sha256Hash": "f21df20ae1314f9225426c4c50658652f515d00f04e794ad00a6d2096c409045",
+    "sha256Hash": "77719c75d6d378b22625a959cf5df4671f9c1153025680235b32175e3b07706c",
     "moduleVersions": {},
     "environment": "GCC-High",
     "preStateOutput": "",
-    "postStateOutput": "{\r\n    \"id\":  \"iosManagedAppProtection-1\",\r\n    \"createdDateTime\":  \"2026-11-02T12:13:53.398Z\",\r\n    \"@odata.type\":  \"#microsoft.graph.iosManagedAppProtection\",\r\n    \"periodOfflineBeforeWipeIsEnforced\":  \"P30D\",\r\n    \"dataBackupBlocked\":  true,\r\n    \"deviceComplianceRequired\":  true,\r\n    \"allowedDataStorageLocations\":  [\r\n                                        \"oneDriveForBusiness\",\r\n                                        \"sharePoint\"\r\n                                    ],\r\n    \"displayName\":  \"CMMC-iOS-MAM\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"iosManagedAppProtection-1_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ],\r\n    \"isAssigned\":  true\r\n}\r\n",
+    "postStateOutput": "{\r\n    \"id\":  \"iosManagedAppProtection-1\",\r\n    \"createdDateTime\":  \"2026-11-01T17:10:40.387Z\",\r\n    \"@odata.type\":  \"#microsoft.graph.iosManagedAppProtection\",\r\n    \"periodOfflineBeforeWipeIsEnforced\":  \"P30D\",\r\n    \"dataBackupBlocked\":  true,\r\n    \"deviceComplianceRequired\":  true,\r\n    \"allowedDataStorageLocations\":  [\r\n                                        \"oneDriveForBusiness\",\r\n                                        \"sharePoint\"\r\n                                    ],\r\n    \"displayName\":  \"CMMC-iOS-MAM\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"iosManagedAppProtection-1_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ],\r\n    \"isAssigned\":  true\r\n}\r\n",
     "stateChanged": true,
     "postcheckMode": "state"
   }

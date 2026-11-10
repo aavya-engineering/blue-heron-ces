@@ -36,7 +36,7 @@
     "controlIds": [
       "AU.L2-3.3.3"
     ],
-    "timestamp": "2026-11-02T11:36:38.803Z",
+    "timestamp": "2026-11-01T06:58:24.560Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "$f = Join-Path $env:TEMP 'stamper-sentinel-body.json'; @{kind='Office365';properties=@{tenantId='{tenantId}';dataTypes=@{exchange=@{state='Enabled'};sharePoint=@{state='Enabled'};teams=@{state='Enabled'}}}} | ConvertTo-Json -Depth 5 -Compress | Set-Content -Path $f -Encoding UTF8; az rest --method PUT --url 'https://management.usgovcloudapi.net/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.OperationalInsights/workspaces/{lawWorkspaceName}/providers/Microsoft.SecurityInsights/dataConnectors/office365?api-version=2024-03-01' --headers Content-Type=application/json --body \"@$f\"; Remove-Item $f -ErrorAction SilentlyContinue",
     "sha256Hash": "143feb701f505ef52d090e61ff61ba1a525cbd26d14323e30117af8e1ece616e",

@@ -12,7 +12,7 @@
 | **System Name** | Tamberlow Systems Engineering LLC (FICTIONAL) CUI Information System |
 | **CMMC Level** | L2 |
 | **Prepared By** | Galwyn Rowanfield |
-| **Date Prepared** | 2026-11-02 |
+| **Date Prepared** | 2026-11-01 |
 | **POA&M Policy** | poam_if_allowed |
 
 ## 2. Purpose
@@ -26,12 +26,12 @@ Based on the current Readiness Posture assessment:
 | Category | Count |
 |----------|-------|
 | Controls Met | 0 |
-| Controls Partially Met | 39 |
-| Controls Not Met | 84 |
-| Controls Unknown | 11 |
+| Controls Partially Met | 40 |
+| Controls Not Met | 82 |
+| Controls Unknown | 12 |
 | **Overall Compliance** | **0%** |
 
-Items requiring POA&M tracking: **84** not-met + **39** partial = potential POA&M entries.
+Items requiring POA&M tracking: **82** not-met + **40** partial = potential POA&M entries.
 
 ## 4. POA&M Items
 
@@ -68,7 +68,7 @@ For each POA&M item, milestones shall include:
 
 ---
 
-**Effective Date:** 2026-11-02
+**Effective Date:** 2026-11-01
 **Next Review:** 2027-11-01
 
 ## Approval

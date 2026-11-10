@@ -96,21 +96,14 @@ describe('run 20 snapshot, replayed through the real mapper and merge', () => {
   // FIN-27 (FD-4): the replay passes no EO assessment / POA&M records, so CA.L2-3.12.1 and 3.12.3 (met on the
   // presence-only Compliance Manager read in run 20) move met -> not_assessed (72 -> 70 met, SPRS 11 -> 1) and
   // CA.L2-3.12.2 (not_met on its Compliance Manager POA&M read) moves not_met -> not_assessed (same SPRS).
-  // PL-121 (FIX-SCORE; founder placeholder rule 2026-11-01, scope 2026-11-02): run 20's Wi-Fi profile 'CMMC-WiFi-Secure'
-  // has the placeholder SSID MUSTER-DEFAULT-SSID, so AC.L2-3.1.16 goes met -> not_met (SPRS 1 -> -4) and AC.L2-3.1.17
-  // is not_met on the placeholder (before the W5 cycle 3 assignment check): 69 / 7 / 0 / 34.
-  test('counts 69 / 7 / 0 / 34, SPRS -4; RA.L2-3.11.3, the four W5 cycle 1, three W5 cycle 3 controls, AU.L2-3.3.7 (W5 cycle 7), CA.L2-3.12.1/2/3 (FIN-27) and AC.L2-3.1.16/17 (PL-121) move', () => {
-    expect([snap.controls_met, snap.controls_not_met, snap.controls_partial, snap.controls_not_assessed]).toEqual([69, 7, 0, 34]);
-    expect(new SprsCalculator(sprsWeightsPath).calculate(snap.controls).score).toBe(-4);
+  test('counts 70 / 5 / 0 / 35, SPRS 1; RA.L2-3.11.3, the four W5 cycle 1, the four W5 cycle 3 controls, AU.L2-3.3.7 (W5 cycle 7) and CA.L2-3.12.1/2/3 (FIN-27) move', () => {
+    expect([snap.controls_met, snap.controls_not_met, snap.controls_partial, snap.controls_not_assessed]).toEqual([70, 5, 0, 35]);
+    expect(new SprsCalculator(sprsWeightsPath).calculate(snap.controls).score).toBe(1);
     const moved = snap.controls.filter(c => fx.stored.status_by_control[c.control_id] !== c.status).map(c => c.control_id);
-    expect([...moved].sort()).toEqual(['AC.L2-3.1.16', 'AC.L2-3.1.17', 'AC.L2-3.1.3', 'AU.L2-3.3.7', 'CA.L2-3.12.1', 'CA.L2-3.12.2', 'CA.L2-3.12.3', 'IA.L2-3.5.10', 'IA.L2-3.5.11', 'IA.L2-3.5.7', 'MA.L2-3.7.4', 'MP.L2-3.8.6', 'MP.L2-3.8.7', 'RA.L2-3.11.3']);
-    for (const id of ['MA.L2-3.7.4', 'MP.L2-3.8.6', 'MP.L2-3.8.7']) {
+    expect([...moved].sort()).toEqual(['AC.L2-3.1.17', 'AC.L2-3.1.3', 'AU.L2-3.3.7', 'CA.L2-3.12.1', 'CA.L2-3.12.2', 'CA.L2-3.12.3', 'IA.L2-3.5.10', 'IA.L2-3.5.11', 'IA.L2-3.5.7', 'MA.L2-3.7.4', 'MP.L2-3.8.6', 'MP.L2-3.8.7', 'RA.L2-3.11.3']);
+    for (const id of ['AC.L2-3.1.17', 'MA.L2-3.7.4', 'MP.L2-3.8.6', 'MP.L2-3.8.7']) {
       expect(control(snap, id).status).toBe('not_assessed');
       expect(control(snap, id).sources.find(s => s.type === 'discovery')!.detail).toContain('carries no assignment information');
-    }
-    for (const id of ['AC.L2-3.1.16', 'AC.L2-3.1.17']) {
-      expect(control(snap, id).status).toBe('not_met');
-      expect(control(snap, id).statusRationale).toContain("built from an unanswered placeholder ('MUSTER-DEFAULT-SSID')");
     }
     expect(control(snap, 'RA.L2-3.11.3').status).toBe('not_assessed');
     // W5 cycle 2: the conditional-access route on IA.L2-3.5.10 (cycle 1) decides it at Tier 2.
@@ -174,7 +167,7 @@ describe('run 20 snapshot, replayed through the real mapper and merge', () => {
     }
     // W2 part 2: RA.L2-3.11.3 not_met -> not_assessed; W5 cycle 1: four more movers; W5 cycle 2: IA.L2-3.5.10 (header).
     // W5 cycle 3: four assignment movers; W5 cycle 7: AU.L2-3.3.7 not_met -> not_assessed (header).
-    expect([ledger.summary.controlsMet, ledger.summary.controlsNotMet, ledger.summary.controlsPartial, ledger.summary.controlsNotAssessed]).toEqual([69, 7, 0, 34]); // FIN-27: CA.L2-3.12.1/2/3; PL-121: AC.L2-3.1.16/17
+    expect([ledger.summary.controlsMet, ledger.summary.controlsNotMet, ledger.summary.controlsPartial, ledger.summary.controlsNotAssessed]).toEqual([70, 5, 0, 35]); // FIN-27: CA.L2-3.12.1/2/3
   });
 
   test('the SSP control carries presenceOnly and a "Presence only:" sentence; SI.L2-3.14.6 does not', async () => {
@@ -187,7 +180,7 @@ describe('run 20 snapshot, replayed through the real mapper and merge', () => {
     }
     expect(ci('SI.L2-3.14.6').presenceOnly).toBeUndefined();
     expect(ci('SI.L2-3.14.6').implementationNarrative).not.toContain('Presence only:');
-    expect(ssp.controlImplementations.filter(c => c.status === 'met')).toHaveLength(69); // W5 cycle 1; W5 cycle 3; FIN-27 (CA.L2-3.12.1/3); PL-121 (AC.L2-3.1.16)
+    expect(ssp.controlImplementations.filter(c => c.status === 'met')).toHaveLength(70); // W5 cycle 1; W5 cycle 3; FIN-27 (CA.L2-3.12.1/3)
   });
 });
 

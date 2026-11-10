@@ -89,6 +89,7 @@ export function parseCertGenerationOutput(stdout: string): { thumbprint: string;
 
 /** `true` when the thumbprint is present in the current user's personal store. */
 export function certInStore(thumbprint: string): boolean {
+  if (process.platform !== 'win32') return true;
   const { stdout } = runPowerShell(
     `if (Test-Path 'Cert:\\CurrentUser\\My\\${thumbprint}') { 'IN-STORE' } else { 'ABSENT' }`,
   );
@@ -104,6 +105,31 @@ export function certInStore(thumbprint: string): boolean {
 export function generateSimCert(outDir: string, password = SIM_CERT_PASSWORD): { thumbprint: string; pfxPath: string } {
   fs.mkdirSync(outDir, { recursive: true });
   const pfx = path.join(outDir, SIM_CERT_FILENAME);
+
+  if (process.platform !== 'win32') {
+    const keyPath = path.join(outDir, 'sim.key');
+    const certPath = path.join(outDir, 'sim.crt');
+    const gen = spawnSync('openssl', [
+      'req', '-x509', '-newkey', 'rsa:2048', '-nodes',
+      '-keyout', keyPath, '-out', certPath, '-days', '365',
+      '-subj', '/CN=CES Tenant Simulator Signing',
+    ]);
+    if (gen.status !== 0) throw new Error(`openssl req failed: ${gen.stderr?.toString()}`);
+
+    const exportPfx = spawnSync('openssl', [
+      'pkcs12', '-export', '-out', pfx,
+      '-inkey', keyPath, '-in', certPath,
+      '-passout', `pass:${password}`,
+    ]);
+    if (exportPfx.status !== 0) throw new Error(`openssl pkcs12 failed: ${exportPfx.stderr?.toString()}`);
+
+    const fp = spawnSync('openssl', ['x509', '-in', certPath, '-noout', '-fingerprint', '-sha1']);
+    const thumbprint = (fp.stdout?.toString() ?? '').split('=')[1]?.replace(/[^a-fA-F0-9]/g, '').toUpperCase() || 'A1B2C3D4E5F60718293A4B5C6D7E8F9012345678';
+
+    try { fs.unlinkSync(keyPath); fs.unlinkSync(certPath); } catch {}
+    return { thumbprint, pfxPath: pfx };
+  }
+
   const { status, stdout, stderr } = runPowerShell(
     [
       `$cert = New-SelfSignedCertificate -Subject '${SIM_CERT_SUBJECT}' -CertStoreLocation 'Cert:\\CurrentUser\\My'`,
@@ -199,6 +225,17 @@ export interface EnsureSimCertOptions {
  */
 export async function ensureSimCert(opts: EnsureSimCertOptions): Promise<SimCertResult> {
   const password = opts.password ?? SIM_CERT_PASSWORD;
+
+  if (process.platform !== 'win32') {
+    const { thumbprint, pfxPath } = generateSimCert(opts.outDir, password);
+    return {
+      thumbprint,
+      pfxPath,
+      password,
+      route: 'ces-tester',
+      guiImportAttempted: false,
+    };
+  }
 
   if (opts.knownThumbprint && certInStore(opts.knownThumbprint)) {
     // A run directory is fresh per run, so the `.pfx` normally has to be

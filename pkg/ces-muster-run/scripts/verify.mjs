@@ -25,7 +25,6 @@ import { v49Scope, isSyntheticCustomer } from './v49-scope.mjs';
 import { judgeV43b, aoTierCalls, aoTwoPersonMode } from './verify-w4.mjs';
 import { projectionSentences, judgeV109, runWindowStart, judgeV6Accounting } from './verify-gap.mjs';
 import { TENANT_IDENTITY_KEYS, HARNESS_GENERATED_KEYS, ALLOWED_PROVENANCE, OVERRIDES_NOT_NEEDED_LINE, isPresent, tmBody, provenanceFor } from './overrides-gate.mjs';
-import { elLeaverOf, isElLeaverWrite, elAoRows, c10HoldsOnlyElRows } from './verify-fin31-leaver.mjs';
 
 const a = {};
 for (let i = 2; i < process.argv.length; i += 2) a[process.argv[i].replace(/^--/, '')] = process.argv[i + 1];
@@ -89,8 +88,6 @@ const report = exists(path.join(out, 'execution-report.json')) ? readJson(path.j
 const ssp = exists(path.join(out, 'ssp.json')) ? readJson(path.join(out, 'ssp.json')) : null;
 const assess = freshJson(path.join(out, 'eo-assess.json')) ?? [];
 const assessSummary = assess.find((e) => e.type === 'assess_summary') ?? null;
-const assess7b = freshJson(path.join(out, 'eo-assess-7b.json'));
-const assess7bSummary = (Array.isArray(assess7b) ? assess7b : []).find((e) => e.type === 'assess_summary') ?? null;
 const baseline = exists(baselinePath) ? readJson(baselinePath) : null;
 const directives = mp?.outputs?.human_readable_mission_plan?.control_directives ?? [];
 const posture = mp?.inputs?.readiness_posture ?? null;
@@ -111,11 +108,6 @@ const summary = {
   stamper: report ? { status: report.status, ...report.summary, failed_tasks: failedTaskNames } : null,
   eo_assess: assessSummary
     ? { controls_met: assessSummary.controls_met, controls_not_met: assessSummary.controls_not_met, controls_partial: assessSummary.controls_partial, controls_not_assessed: assessSummary.controls_not_assessed, sprs_score: assessSummary.sprs_score }
-    : null,
-  // PL-124 / CR-25: eo_assess above is E7 pass 1. The authoritative SPRS is the E7B re-assessment after AdminOps
-  // (out/eo-assess-7b.json; V36 and GAPS SC-7), shown here beside it. Additive: no V-check reads this key.
-  eo_assess_7b: assess7bSummary
-    ? { controls_met: assess7bSummary.controls_met, controls_not_met: assess7bSummary.controls_not_met, controls_partial: assess7bSummary.controls_partial, controls_not_assessed: assess7bSummary.controls_not_assessed, sprs_score: assess7bSummary.sprs_score }
     : null,
   ssp: ssp
     ? { sections: Object.keys(ssp).sort(), control_implementations: (ssp.controlImplementations ?? []).length, status_counts: sspStatus, source_artifacts: ssp.sourceArtifacts, system_name_source: ssp.systemName === `${ssp.tenantId} System` ? 'fallback' : 'manifest-or-variables' }
@@ -233,7 +225,7 @@ check('V6', 'Translate exit 0; execute report exists; every MP directive planned
 });
 
 // V7
-check('V7', 'Only the scenario build (E1), Stamper (E6), the S3 injection (E6X), the leaver flow (EL: A-22 on the confirmed leaver only) and AdminOps (E7A) wrote to the sim ledger, each in its own window; discovery added zero writes', () => {
+check('V7', 'Only the scenario build (E1), Stamper (E6), the S3 injection (E6X) and AdminOps (E7A) wrote to the sim ledger, each in its own window; discovery added zero writes', () => {
   const ledgerPath = path.join(out, 'ledger.json');
   if (!exists(ledgerPath)) return { pass: false, detail: 'no ledger snapshot' };
   const entries = readJson(ledgerPath).data ?? [];
@@ -254,22 +246,15 @@ check('V7', 'Only the scenario build (E1), Stamper (E6), the S3 injection (E6X),
   const e7aRec = exists(path.join(out, 'adminops-e7a.json')) ? readJson(path.join(out, 'adminops-e7a.json')) : null;
   const allowX = (e6xRec?.injections ?? []).length > 0 && !!steps.E6X;
   const allowA = (e7aRec?.write_ops ?? 0) > 0 && !!steps.E7A;
-  // FIX-EL (R-F11): step EL (after E5, before E6) runs A-22 on the leaver a tenant administrator confirmed. Its window is
-  // allowed only on a confirm-mode record of this run (out/leaver-flow.json), and only for A-22's writes on that leaver
-  // (the user, its group memberships, its MFA methods: verify-fin31-leaver.mjs isElLeaverWrite); any other write stays outside.
-  const elRec = exists(path.join(out, 'leaver-flow.json')) ? readJson(path.join(out, 'leaver-flow.json')) : null;
-  const leaver = elLeaverOf(elRec, steps);
-  const allowed = (e) => inWin(e, steps.E6) || (allowX && inWin(e, steps.E6X)) || (allowA && inWin(e, steps.E7A)) || isElLeaverWrite(e, leaver);
+  const allowed = (e) => inWin(e, steps.E6) || (allowX && inWin(e, steps.E6X)) || (allowA && inWin(e, steps.E7A));
   const outside = writes.filter((e) => !allowed(e));
   const byE6 = writes.filter((e) => inWin(e, steps.E6));
   const byE6X = writes.filter((e) => inWin(e, steps.E6X));
   const byE7A = writes.filter((e) => inWin(e, steps.E7A));
-  const byEL = writes.filter((e) => isElLeaverWrite(e, leaver));
-  const inELWin = writes.filter((e) => inWin(e, steps.EL));
   const buildOk = !!steps.E1?.started && !!steps.E2?.started && buildSteps !== null && byBuild.length === buildSteps;
   return {
-    pass: buildOk && byE2.length === 0 && outside.length === 0 && byE6.length > 0 && (!allowA || byE7A.length > 0) && (!leaver || byEL.length > 0),
-    detail: `${entries.length} entries; non-seed writes ${allWrites.length}: scenario build [E1 start, E2 start) ${byBuild.length} (scenario write steps ${buildSteps ?? 'unknown: no sim scenario file'}), during EL (leaver flow; ${leaver ? `allowed for A-22 on ${leaver.userId} only` : 'not allowed'}) ${byEL.length} of ${inELWin.length}, during E6 (Stamper) ${byE6.length}, during E6X (injection; ${allowX ? 'allowed' : 'not allowed'}) ${byE6X.length}, during E7A (AdminOps; ${allowA ? `allowed, ${e7aRec.write_ops} write op(s)` : 'not allowed'}) ${byE7A.length}, during E2 (discovery) ${byE2.length}, outside the allowed windows ${outside.length}`,
+    pass: buildOk && byE2.length === 0 && outside.length === 0 && byE6.length > 0 && (!allowA || byE7A.length > 0),
+    detail: `${entries.length} entries; non-seed writes ${allWrites.length}: scenario build [E1 start, E2 start) ${byBuild.length} (scenario write steps ${buildSteps ?? 'unknown: no sim scenario file'}), during E6 (Stamper) ${byE6.length}, during E6X (injection; ${allowX ? 'allowed' : 'not allowed'}) ${byE6X.length}, during E7A (AdminOps; ${allowA ? `allowed, ${e7aRec.write_ops} write op(s)` : 'not allowed'}) ${byE7A.length}, during E2 (discovery) ${byE2.length}, outside the allowed windows ${outside.length}`,
   };
 });
 
@@ -338,16 +323,14 @@ check('V10', 'Nothing written outside the workspace (C:\\CES_Pipeline, ~/.ces, ~
 
 // V109 (FIN-01 e): out/unit-gate.json is newer than the newest commit in every workspace repo (<WS>\ces and its child
 // repos, <WS>\pkg\*); V11, V21 and V22 read the gate and fail when it is stale. Judge in verify-gap.mjs (judgeV109).
-// PL-124 / CR-19: in the contractor monorepo the only .git is at <Root> itself, so <Root> counts as the workspace repo
-// when <WS>\ces has no .git of its own (BHD's module layout is unchanged: <WS> has no .git and <WS>\ces has one).
 const unitGateFile = path.join(out, 'unit-gate.json');
-const gitRepoDirs = [...(exists(path.join(ces, '.git')) ? [] : [root]), ces, ...(exists(ces) ? fs.readdirSync(ces).map((d) => path.join(ces, d)) : []), ...(exists(path.join(root, 'pkg')) ? fs.readdirSync(path.join(root, 'pkg')).map((d) => path.join(root, 'pkg', d)) : [])].filter((d) => exists(path.join(d, '.git')));
+const gitRepoDirs = [ces, ...(exists(ces) ? fs.readdirSync(ces).map((d) => path.join(ces, d)) : []), ...(exists(path.join(root, 'pkg')) ? fs.readdirSync(path.join(root, 'pkg')).map((d) => path.join(root, 'pkg', d)) : [])].filter((d) => exists(path.join(d, '.git')));
 const unitGateFresh = judgeV109({
   gateMs: exists(unitGateFile) ? fs.statSync(unitGateFile).mtimeMs : null,
   repos: gitRepoDirs.map((d) => {
     const r = spawnSync('git', ['-C', d, 'log', '-1', '--format=%ct'], { encoding: 'utf8' });
     const s = Number(String(r.stdout ?? '').trim());
-    return { repo: path.relative(root, d).split(path.sep).join('/') || '.', commitMs: r.status === 0 && s > 0 ? s * 1000 : null };
+    return { repo: path.relative(root, d).split(path.sep).join('/'), commitMs: r.status === 0 && s > 0 ? s * 1000 : null };
   }),
 });
 check('V109', 'Unit gate fresh: out/unit-gate.json is newer than the newest commit in every workspace repo', () => unitGateFresh);
@@ -1613,19 +1596,17 @@ const simWrites = (p) => (exists(p) ? (readJson(p).data ?? []) : null)?.filter((
 const objKey = (e) => `${e.objectType}/${e.objectId}`;
 // W2 follow-up (per-run AdminOps isolation): ces.db is append-only and shared across runs, so EO reads only the AO rows timed
 // from this run's start (CES_EO_ADMINOPS_SINCE = E1's start, recorded by E7 and by the E7A record). Every C10
-// (collect.adminOps) record of this run then holds a row of this run, no E7 pass collects one of E7A's rows (FIX-EL: step EL's
-// A-22 row predates E7 by design, so an E7 C10 record holding only EL's rows is allowed), and E7B's reader counts this run's
-// rows only. Six-year retention is a production property; the window is the simulator's.
+// (collect.adminOps) record of this run then holds a row of this run, no E7 pass collects one, and E7B's reader counts this
+// run's rows only. Six-year retention is a production property; the window is the simulator's.
 const aoSince = e7a?.adminops_since ?? steps.E7?.adminops_since ?? null;
-const aoWindowProblems = (rowsExpected, appliesExpected, elIds = new Set()) => {
+const aoWindowProblems = (rowsExpected, appliesExpected) => {
   const problems = [];
   if (!aoSince) return ['no AdminOps run window (E7 adminops_since) recorded'];
   if (!steps.E1 || toMs(aoSince) !== toMs(steps.E1.started)) problems.push(`AdminOps run window ${aoSince} is not E1's start (${steps.E1?.started})`);
   const c10 = storeRecords.filter((r) => r.sourceId === 'collect.adminOps');
   const early = c10.filter((r) => r.status === 'success').flatMap((r) => { const pl = payloadOf(r); return Array.isArray(pl) ? pl : pl ? [pl] : []; }).filter((x) => !x?.timestamp || toMs(x.timestamp) < toMs(aoSince));
   if (early.length) problems.push(`${early.length} C10 records hold an AO row from before this run (e.g. ${early[0]?.rowId})`);
-  // FIX-EL: EL's A-22 row exists before E7, so E7's C10 may collect it; a C10 record holding EL's rows only is not E7A's.
-  const inE7 = c10.filter((r) => r.status === 'success' && inStep('E7', r.collectedAt) && !c10HoldsOnlyElRows(payloadOf(r), elIds));
+  const inE7 = c10.filter((r) => r.status === 'success' && inStep('E7', r.collectedAt));
   if (inE7.length) problems.push(`${inE7.length} C10 records with AO rows were collected in E7, before E7A`);
   const aa = ev(passByName('E7B'), 'assess_adminops');
   if (aa && rowsExpected !== null && aa.total !== rowsExpected) problems.push(`E7B assess_adminops.total ${aa.total} (this run's rows: ${rowsExpected})`);
@@ -1672,19 +1653,8 @@ check('V45', 'AdminOps: every E7A op has a result and its AO evidence rows (T2 d
   const applies = (e7a.ops ?? []).filter((o) => (o.calls ?? []).some((c) => c.call === 'apply')).length;
   const aa = ev(passByName('E7B'), 'assess_adminops');
   if (!aa) problems.push('no assess_adminops event on E7B');
-  // FIX-EL (R-F11): step EL's A-22 rows (correlation leaver-flow:<flowId>, this tenant, stamped inside EL) are this run's
-  // rows too. They are counted on their own, from ces.db; E7A's accounting above is unchanged.
-  const elRecFile = path.join(out, 'leaver-flow.json');
-  const leaver = elLeaverOf(exists(elRecFile) ? readJson(elRecFile) : null, steps);
-  const elDb = leaver && aoDb()
-    ? aoDb().prepare("SELECT id, tenant_id, data FROM ces_records WHERE collection = 'adminops_evidence' AND json_extract(data, '$.metadata.correlationId') = ?").all(`leaver-flow:${leaver.flowId}`).map((r) => ({ id: r.id, tenantId: r.tenant_id, ...JSON.parse(r.data) }))
-    : [];
-  const el = elAoRows(leaver, elDb, e7a.tenant_id);
-  if (leaver && !el.live.length) problems.push(`EL confirmed ${leaver.userId} but no live A-22 row with correlation leaver-flow:${leaver.flowId} on ${e7a.tenant_id} inside EL`);
-  for (const r of el.rows) if (r.metadata?.sha256) rowSha.push(r.metadata.sha256);
-  // The run window makes E7B's counts this run's: live = the applies (+ EL's live rows), total = the rows E7A's calls
-  // reported (+ EL's rows).
-  problems.push(...aoWindowProblems(e7aCalls.length + el.rows.length, applies + el.live.length, el.ids));
+  // The run window makes E7B's counts this run's: live = the applies, total = the rows E7A's calls reported.
+  problems.push(...aoWindowProblems(e7aCalls.length, applies));
   const c10Built = exists(path.join(ces, 'ces-eo', 'dist', 'eo', 'collect', 'adminOpsCollector.js'));
   let c10 = 'C10 not built yet: AO evidence rows checked in ces.db only';
   if (c10Built) {
@@ -1698,7 +1668,7 @@ check('V45', 'AdminOps: every E7A op has a result and its AO evidence rows (T2 d
     pass: problems.length === 0,
     detail: problems.length ? problems.slice(0, 8).join('; ') : (e7a.ops ?? []).length === 0
       ? `no AdminOps ops in this scenario (adminops_ops empty); E7B assess_adminops live ${aa?.live}`
-      : `${e7a.ops.length} ops (${e7a.ops.map((o) => `${o.op} ${o.tier}`).join(', ')}): ${rows} AO evidence rows on ${e7a.tenant_id}; run window ${aoSince} (E1 start): E7B total ${aa.total} = ${e7aCalls.length} rows${leaver ? ` + ${el.rows.length} EL row(s)` : ''}, live ${aa.live} = ${applies} applies${leaver ? ` + ${el.live.length} EL apply(ies) (A-22, leaver-flow:${leaver.flowId})` : ''}, no earlier run's row; ${c10}`,
+      : `${e7a.ops.length} ops (${e7a.ops.map((o) => `${o.op} ${o.tier}`).join(', ')}): ${rows} AO evidence rows on ${e7a.tenant_id}; run window ${aoSince} (E1 start): E7B total ${aa.total} = ${e7aCalls.length} rows, live ${aa.live} = ${applies} applies, no earlier run's row; ${c10}`,
   };
 });
 

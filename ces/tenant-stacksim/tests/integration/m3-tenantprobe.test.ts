@@ -32,12 +32,14 @@ import { writeSimTenantConfig } from '../../src/config/SimTenantConfig.js';
  *       if($p.Count){ New-EutVerdict PASS "MFA CA policy enabled for All users: '$($p[0].displayName)' (MFA implemented for network access to non-priv [c] and priv [d] accounts)" } else { New-EutVerdict FAIL 'no enabled all-user MFA CA policy' } } catch { Resolve-EutProbeError $_ -What 'CA read' }
  *
  * TenantProbe.psm1:Get-EutTenantConfig reads tenant config from
- * `$env:CES_STAMPER_TENANTS_DIR\$TenantSlug.json` when that is set, else
- * `$HOME\.stamper\tenants\$TenantSlug.json` (a spawned powershell.exe's
- * automatic $HOME does not follow a modified USERPROFILE, so an env-var
- * override is the only safe redirect). PL-123 / CR-17: this test writes the
- * sim tenant config under its own temp root and points
- * CES_STAMPER_TENANTS_DIR there; it never touches the real ~/.stamper.
+ * `$HOME\.stamper\tenants\$TenantSlug.json` with no env-var override
+ * (confirmed by a targeted read of that function, and empirically: a
+ * spawned powershell.exe's automatic $HOME variable does not follow a
+ * modified USERPROFILE env var on this Windows PowerShell 5.1 box). Since
+ * TenantProbe offers no path override, this test writes the sim tenant
+ * config to the REAL `~/.stamper/tenants/stacksim-test-m3.json` (a
+ * uniquely-named sim slug, left in place after the test run - config, not
+ * code, outside tenant-stacksim/; logged in IMPLEMENTATION_LOG.md).
  */
 
 const SIM_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -154,16 +156,16 @@ describe('M3: unmodified TenantProbe.psm1 against a seeded m365_azure sim tenant
       conditions: { users: { includeUsers: ['All'] } },
     });
 
-    // PL-123 / CR-17: TenantProbe.psm1:Get-EutTenantConfig now honours
-    // CES_STAMPER_TENANTS_DIR, so the flat config goes under this test's temp
-    // root (homeDir = tenantRoot), never the real ~/.stamper/tenants. It is
-    // still removed in afterEach.
+    // TenantProbe.psm1:Get-EutTenantConfig has no path override (confirmed
+    // by targeted read + empirical $HOME/USERPROFILE test) - write to the
+    // real ~/.stamper/tenants/{slug}.json via the backlog-S3 opt-in flag,
+    // and DELETE it in afterEach (backlog-S3: TenantProbe-compat flows own
+    // cleaning their real-dir file per run; nothing is left behind).
     const written = await writeSimTenantConfig(
       { slug: TENANT_SLUG, tenantStance: 'm365_azure', port: handle.port },
-      { emitFlat: true, homeDir: tenantRoot },
+      { emitFlat: true },
     );
     flatConfigPath = written.flatPath;
-    expect(path.resolve(flatConfigPath!).startsWith(path.resolve(tenantRoot) + path.sep)).toBe(true);
   });
 
   afterEach(async () => {
@@ -184,7 +186,6 @@ describe('M3: unmodified TenantProbe.psm1 against a seeded m365_azure sim tenant
       const env: NodeJS.ProcessEnv = {
         ...process.env,
         STACKSIM_SERVER_URL: `http://127.0.0.1:${handle.port}`,
-        CES_STAMPER_TENANTS_DIR: path.join(tenantRoot, '.stamper', 'tenants'),
       };
 
       const result = await runPowershellScript(scriptPath, env);

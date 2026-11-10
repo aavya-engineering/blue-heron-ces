@@ -18,7 +18,6 @@ import { VerificationResult } from '../core/OutputVerificationEngine.js';
 import { getExecutorIdentity } from './executorIdentity.js';
 import { describeOrgValueCheck } from '../translators/orgValues.js';
 import { recordWrittenEvidence, type EvidenceFileLedger } from '../evidence/EvidenceStore.js';
-import { placeholderInRead, placeholderRationale } from '../shared/musterPlaceholders.js';
 
 type ModuleVersionMap = Record<string, string>;
 
@@ -598,17 +597,8 @@ export function buildStructuredEvidence(
 
   // Derive compliance verdict from outcome + verification result
   const derived = deriveVerdict(outcome, options?.verificationResult, options?.consistency_hint, options?.assessOnly);
-  let verdict: 'SAT' | 'NOT_SAT' = emptyEvidenceRead ? 'NOT_SAT' : derived.verdict;
+  const verdict = emptyEvidenceRead ? 'NOT_SAT' : derived.verdict;
   let rationale = emptyEvidenceRead ? EMPTY_READ_REASON : derived.rationale;
-  // PL-121 (founder ruling 2026-11-01): a setting built from an unanswered placeholder never counts. A record
-  // whose read (the tenant's answer, or the read after the SET) shows a Muster placeholder value is NOT_SAT,
-  // on every route that writes a record (CLI and GUI alike). Assess discovery keeps its own rule (Execute
-  // overwrites it, PH-13 O-4).
-  const placeholder = options?.assessOnly === true ? undefined : (placeholderInRead(rawOutput, subCommand.verification?.placeholder_ignore) ?? placeholderInRead(options?.postStateOutput, subCommand.verification?.placeholder_ignore));
-  if (placeholder !== undefined && verdict === 'SAT') {
-    verdict = 'NOT_SAT';
-    rationale = placeholderRationale(placeholder);
-  }
 
   // synthetic-customer W3: an entry verified on $.DistributionStatus records the status of the
   // verified read; a SAT on 'Pending' is "created, distribution pending".

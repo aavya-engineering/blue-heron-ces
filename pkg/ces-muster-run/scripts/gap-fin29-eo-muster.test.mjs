@@ -121,24 +121,6 @@ test('V129: deciders, matrix completeness, per-scenario agreement', () => {
   assert.match(judgeV129({ snapshot: { controls: unwired }, slug: 's1-mach' }).detail, /router wiring not landed/);
 });
 
-test('PL-120: AU.L2-3.3.8 not_met by Tier 1 is the pin on S3 and mp; on S1 / S2 it stays not_assessed', () => {
-  const why = { review: 'GD-b (document review) decides: x', store: 'Store precedence (personnel store): x', tier1: 'Tier 1 (state-verified) decides: x', tier3: 'Tier 3 (state-verified execution verdict) decides: x', 'tier2+store': 'Tier 2 (live read) decides: x; store precedence (training store) agrees', eo_records: `${CA_SELF_RECORD_TIER}x`, eo_records_unmet: `${CA_SELF_RECORD_UNMET} x` };
-  const column = (slug) => Object.entries(V129_MATRIX).map(([id, m]) => {
-    const status = [].concat(m.expect[slug])[0];
-    const dec = id === 'AU.L2-3.3.8' && status === 'not_met' ? 'tier1' : m.own[0];
-    return { control_id: id, status, statusRationale: status === 'not_assessed' ? 'No source has an opinion' : why[dec] };
-  });
-  for (const slug of ['s3-def', 'muster-partial']) {
-    const cs = column(slug);
-    assert.equal(cs.find((c) => c.control_id === 'AU.L2-3.3.8').status, 'not_met');
-    const r = judgeV129({ snapshot: { controls: cs }, slug });
-    assert.doesNotMatch(r.detail, /AU\.L2-3\.3\.8 not_met \(tier1\), predicted/, slug);
-    assert.doesNotMatch(r.detail, /AU\.L2-3\.3\.8 not_met decided by tier1/, slug);
-  }
-  const s1 = column('s1-mach').map((c) => (c.control_id === 'AU.L2-3.3.8' ? { ...c, status: 'not_met', statusRationale: why.tier1 } : c));
-  assert.match(judgeV129({ snapshot: { controls: s1 }, slug: 's1-mach' }).detail, /AU\.L2-3\.3\.8 not_met \(tier1\), predicted not_assessed/);
-});
-
 test('V129 on a saved real snapshot: every decider is classified (no "other")', (t) => {
   const pkg = 'C:/ces-nb/out/eo-package';
   const dir = fs.existsSync(pkg) ? fs.readdirSync(pkg).sort().pop() : null;

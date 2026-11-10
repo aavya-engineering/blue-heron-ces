@@ -367,12 +367,7 @@ describe('synthetic customer S3 (s3-def, deficient by design)', () => {
       return offenders;
     };
 
-    // PL-123 / CR-14: the token list is BHD's private file (<WS>/nb-tools/scan-tokens.txt, identity tokens, not shipped).
-    // Without it this one assertion is skipped with the reason in its name; the denylist, address, domain, host and
-    // GUID scans below still run.
-    const tokensNote = existsSync(SCAN_TOKENS) ? '' : ` [skipped: ${SCAN_TOKENS} is absent; it is BHD's private list and is not shipped]`;
-    if (tokensNote) console.warn(`customer-scenario identity scan:${tokensNote}`);
-    it.skipIf(!existsSync(SCAN_TOKENS))(`the scan tokens file is present (V49 input)${tokensNote}`, () => {
+    it('the scan tokens file is present (V49 input)', () => {
       expect(tokens.length).toBeGreaterThan(4);
     });
 

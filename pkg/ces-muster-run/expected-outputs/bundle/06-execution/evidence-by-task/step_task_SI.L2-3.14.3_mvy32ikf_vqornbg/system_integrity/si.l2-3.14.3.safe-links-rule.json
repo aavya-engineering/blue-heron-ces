@@ -1,0 +1,48 @@
+{
+  "rawResponse": "\r\n\r\nid                : CMMC-SafeLinks-Rule\r\nIdentity          : CMMC-SafeLinks-Rule\r\nName              : CMMC-SafeLinks-Rule\r\nSafeLinksPolicy   : CMMC-SafeLinks\r\nRecipientDomainIs : muster-partial.simtenant.onmicrosoft.us\r\nEnabled           : True\r\n\r\n\r\n\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "SI.L2-3.14.3.safe-links-rule",
+    "label": "Create Safe Links Rule for Primary Domain",
+    "engine": "exchange",
+    "layer_hint": 7,
+    "sequence_hint": 20,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "SI.L2-3.14.3"
+    ],
+    "get_command": "Get-SafeLinksRule | Where-Object { ($_.Name -eq 'CMMC-SafeLinks-Rule') -or (($_.State -eq 'Enabled') -and ($_.SafeLinksPolicy -eq '{safeLinksPolicyName}') -and (@($_.RecipientDomainIs) -contains '{primaryDomain}')) } | Sort-Object { $_.Name -ne 'CMMC-SafeLinks-Rule' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
+    "set_command": "New-SafeLinksRule -Name 'CMMC-SafeLinks-Rule' -SafeLinksPolicy '{safeLinksPolicyName}' -RecipientDomainIs '{primaryDomain}' -Enabled $true",
+    "evidence_commands": []
+  },
+  "metadata": {
+    "controlIds": [
+      "SI.L2-3.14.3"
+    ],
+    "timestamp": "2026-11-01T17:12:03.621Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "New-SafeLinksRule -Name 'CMMC-SafeLinks-Rule' -SafeLinksPolicy '{safeLinksPolicyName}' -RecipientDomainIs '{primaryDomain}' -Enabled $true",
+    "sha256Hash": "8cae96fed7436611f9c8c5293a7cfe9a32d27d96b257f482b5417107b32b7860",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\r\n    \"id\":  \"CMMC-SafeLinks-Rule\",\r\n    \"Identity\":  \"CMMC-SafeLinks-Rule\",\r\n    \"Name\":  \"CMMC-SafeLinks-Rule\",\r\n    \"SafeLinksPolicy\":  \"CMMC-SafeLinks\",\r\n    \"RecipientDomainIs\":  \"muster-partial.simtenant.onmicrosoft.us\",\r\n    \"Enabled\":  true,\r\n    \"State\":  \"Enabled\"\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

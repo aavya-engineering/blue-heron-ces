@@ -1,5 +1,5 @@
 {
-  "rawResponse": "{\r\n    \"securityEnabled\":  true,\r\n    \"mailEnabled\":  false,\r\n    \"createdDateTime\":  \"\\/Date(1733702400000)\\/\",\r\n    \"id\":  \"group-1\",\r\n    \"displayName\":  \"CUI-Authorized-Users\",\r\n    \"groupTypes\":  [\r\n\r\n                   ],\r\n    \"description\":  \"Program drawings site members (named CUI, but the site is shared to anyone)\"\r\n}\r\n",
+  "rawResponse": "{\r\n    \"securityEnabled\":  true,\r\n    \"mailEnabled\":  false,\r\n    \"createdDateTime\":  \"\\/Date(1733616000000)\\/\",\r\n    \"id\":  \"group-1\",\r\n    \"displayName\":  \"CUI-Authorized-Users\",\r\n    \"groupTypes\":  [\r\n\r\n                   ],\r\n    \"description\":  \"Program drawings site members (named CUI, but the site is shared to anyone)\"\r\n}\r\n",
   "outcome": "automated_success",
   "outcomeRationale": "Resource already exists — creation skipped (idempotent)",
   "complianceVerdict": "SAT",
@@ -36,13 +36,14 @@
     "controlIds": [
       "AC.L1-3.1.1"
     ],
-    "timestamp": "2026-11-02T11:33:48.855Z",
+    "timestamp": "2026-11-01T06:57:06.946Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "New-MgGroup -DisplayName '{cuiGroupName}' -MailEnabled:$false -MailNickname '{cuiGroupName}' -SecurityEnabled:$true",
-    "sha256Hash": "f3f0b81b9a1d4401ed250fb3d73280ab48206dcff61cfab3576b46cdbf19e0e3",
+    "sha256Hash": "956db11c202a9051bdfd39d1530d1e209c1efe1e349fce2aecbbd6e560ef5c1a",
     "moduleVersions": {},
     "environment": "GCC-High",
-    "preStateOutput": "{\r\n    \"securityEnabled\":  true,\r\n    \"mailEnabled\":  false,\r\n    \"createdDateTime\":  \"\\/Date(1733702400000)\\/\",\r\n    \"id\":  \"group-1\",\r\n    \"displayName\":  \"CUI-Authorized-Users\",\r\n    \"groupTypes\":  [\r\n\r\n                   ],\r\n    \"description\":  \"Program drawings site members (named CUI, but the site is shared to anyone)\"\r\n}\r\n",
-    "postcheckMode": "state"
+    "preStateOutput": "{\r\n    \"securityEnabled\":  true,\r\n    \"mailEnabled\":  false,\r\n    \"createdDateTime\":  \"\\/Date(1733616000000)\\/\",\r\n    \"id\":  \"group-1\",\r\n    \"displayName\":  \"CUI-Authorized-Users\",\r\n    \"groupTypes\":  [\r\n\r\n                   ],\r\n    \"description\":  \"Program drawings site members (named CUI, but the site is shared to anyone)\"\r\n}\r\n",
+    "postcheckMode": "presence",
+    "presenceReason": "the state to assert is SecurityEnabled true, but the muster-partial seed group carries no securityEnabled property (S1 does), and this entry aborts the 13-control AC.L1-3.1.1 task on failure; presence until the simulator seed carries the property"
   }
 }

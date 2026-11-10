@@ -1,5 +1,7 @@
 // The Demo Commander page. It only ever starts a step when the person presses a button (or Next): no auto-advance.
 (() => {
+  const BASE = window.location.pathname.endsWith('/') ? window.location.pathname : window.location.pathname + '/';
+  const api = (path) => BASE + String(path || '').replace(/^\//, '');
   const $ = (id) => document.getElementById(id);
   let content = null;
   let st = null;
@@ -146,7 +148,7 @@
       for (const a of r.artifacts) {
         const li = document.createElement('li');
         const link = document.createElement('a');
-        link.href = a.url;
+        link.href = a.url.startsWith('/') ? api(a.url) : a.url;
         link.target = '_blank';
         link.rel = 'noopener';
         link.textContent = decodeURIComponent(a.url.split('/').pop());
@@ -241,7 +243,7 @@
       input.value = '';
     }
     if (!Object.keys(body).length) return;
-    const r = await fetch('/setup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const r = await fetch(api('setup'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     const res = await r.json().catch(() => ({}));
     $('setupMsg').textContent = r.ok ? `Saved ${res.saved.length} value(s) in config.local.json on this machine. Health is checked again.` : `Not saved: ${res.error || r.status}`;
     $('setupForm').dataset.built = '';
@@ -271,21 +273,21 @@
   }
 
   async function refresh() {
-    st = await (await fetch('/state')).json();
+    st = await (await fetch(api('state'))).json();
     render();
   }
 
   async function checkHealth() {
     if (phase !== 'live') return;
     $('summary').textContent = 'Checking health...';
-    health = await (await fetch('/health')).json();
+    health = await (await fetch(api('health'))).json();
     render();
   }
 
   async function run(id) {
     if (!canRun(id)) return;
     selected = id;
-    const r = await fetch(id === 'prepare' ? '/prepare' : `/step/${encodeURIComponent(id)}`, { method: 'POST' });
+    const r = await fetch(api(id === 'prepare' ? 'prepare' : `step/${encodeURIComponent(id)}`), { method: 'POST' });
     const body = await r.json().catch(() => ({}));
     if (r.status !== 202) feed(`could not start ${id}: ${body.error ?? r.status}${body.red ? `\n  ${body.red.join('\n  ')}` : ''}`, 'res bad');
     await refresh();
@@ -298,7 +300,7 @@
       ? 'Close the four module windows and stop the modules this launcher started? The page goes offline until Start-Mine runs again. Modules the launcher did not start (attached ones) stay up.'
       : 'Close the four module windows and start a new run? The modules keep running: this page did not start them.';
     if (!window.confirm(text)) return;
-    const r = await fetch('/stop', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+    const r = await fetch(api('stop'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
     const body = await r.json().catch(() => ({}));
     if (r.status !== 202 && r.status !== 200) feed(`could not stop: ${body.error ?? r.status}`, 'res bad');
   }
@@ -370,11 +372,11 @@
     const img = $('mirror');
     img.hidden = false;
     $('ph').hidden = true;
-    img.src = `/mirror/${view}?t=${Date.now()}`;
+    img.src = api(`mirror/${view}?t=${Date.now()}`);
   }
 
   function listen() {
-    es = new EventSource('/events');
+    es = new EventSource(api('events'));
     // An event stream that breaks while stopping means the server has gone: the stop finished (PLAN.md 14.2 item 4).
     es.onerror = () => { if (phase === 'stopping') enterStopped(); };
     es.onmessage = async (m) => {
@@ -416,7 +418,7 @@
   }
 
   async function init() {
-    content = await (await fetch('/content/steps.json')).json();
+    content = await (await fetch(api('content/steps.json'))).json();
     $('foot').innerHTML = '';
     const ul = document.createElement('ul');
     for (const t of content.outOfScope) {

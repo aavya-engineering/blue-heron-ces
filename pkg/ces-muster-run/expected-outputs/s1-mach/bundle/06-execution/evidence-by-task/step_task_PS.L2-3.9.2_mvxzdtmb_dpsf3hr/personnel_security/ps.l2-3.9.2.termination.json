@@ -1,0 +1,35 @@
+{
+  "rawResponse": "[\r\n    {\r\n        \"activityDateTime\":  \"\\/Date(1792713600000)\\/\",\r\n        \"initiatedBy\":  {\r\n                            \"user\":  {\r\n                                         \"id\":  \"user-46\",\r\n                                         \"displayName\":  \"Tamsel Kettlevane (Admin)\",\r\n                                         \"userPrincipalName\":  \"adm.tamsel.kettlevane@s1-mach.simtenant.onmicrosoft.us\",\r\n                                         \"ipAddress\":  \"198.51.100.20\"\r\n                                     }\r\n                        },\r\n        \"targetResources\":  [\r\n                                {\r\n                                    \"id\":  \"51510000-00de-4000-8000-000000000001\",\r\n                                    \"displayName\":  \"Brannoc Ferrowick\",\r\n                                    \"type\":  \"User\",\r\n                                    \"userPrincipalName\":  \"brannoc.ferrowick@s1-mach.simtenant.onmicrosoft.us\",\r\n                                    \"modifiedProperties\":  [\r\n\r\n                                                           ]\r\n                                }\r\n                            ]\r\n    },\r\n    {\r\n        \"activityDateTime\":  \"\\/Date(1791504000000)\\/\",\r\n        \"initiatedBy\":  {\r\n                            \"user\":  {\r\n                                         \"id\":  \"user-47\",\r\n                                         \"displayName\":  \"Corvane Marrowholt (Admin)\",\r\n                                         \"userPrincipalName\":  \"adm.corvane.marrowholt@s1-mach.simtenant.onmicrosoft.us\",\r\n                                         \"ipAddress\":  \"198.51.100.20\"\r\n                                     }\r\n                        },\r\n        \"targetResources\":  [\r\n                                {\r\n                                    \"id\":  \"51510000-00de-4000-8000-000000000002\",\r\n                                    \"displayName\":  \"Ilsa Quellmarsh\",\r\n                                    \"type\":  \"User\",\r\n                                    \"userPrincipalName\":  \"ilsa.quellmarsh@s1-mach.simtenant.onmicrosoft.us\",\r\n                                    \"modifiedProperties\":  [\r\n\r\n                                                           ]\r\n                                }\r\n                            ]\r\n    }\r\n]\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "PS.L2-3.9.2.termination",
+    "label": "Personnel Termination and Transfer Account Disable Evidence",
+    "engine": "mgraph",
+    "layer_hint": 7,
+    "sequence_hint": 35,
+    "idempotency": "evidence-only",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "PS.L2-3.9.2"
+    ],
+    "get_command": "Get-MgUser -Filter 'accountEnabled eq false' -All | Select-Object DisplayName,UserPrincipalName,DeletedDateTime",
+    "set_command": "",
+    "evidence_commands": [
+      "Get-MgAuditLogDirectoryAudit -Filter \"category eq 'UserManagement' and activityDisplayName eq 'Delete user'\" -All -Top 500 | Select-Object ActivityDateTime,InitiatedBy,TargetResources | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "PS.L2-3.9.2"
+    ],
+    "timestamp": "2026-11-01T15:28:28.907Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Personnel Termination and Transfer Account Disable Evidence",
+    "sha256Hash": "6e08e3e52ac47a20c00940803da5a86ed12299264535ba8a7132af0f945787d2",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

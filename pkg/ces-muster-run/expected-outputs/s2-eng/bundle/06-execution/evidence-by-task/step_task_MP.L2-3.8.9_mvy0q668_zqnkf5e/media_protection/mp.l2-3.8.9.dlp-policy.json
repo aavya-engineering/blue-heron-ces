@@ -1,0 +1,51 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"CMMC-CUI-Block\",\r\n    \"Identity\":  \"CMMC-CUI-Block\",\r\n    \"DistributionStatus\":  \"Success\",\r\n    \"Name\":  \"CMMC-CUI-Block\",\r\n    \"ExchangeLocation\":  \"All\",\r\n    \"SharePointLocation\":  \"All\",\r\n    \"OneDriveLocation\":  \"All\",\r\n    \"Mode\":  \"Enable\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "MP.L2-3.8.9.dlp-policy",
+    "label": "Create DLP Compliance Policy to Enforce CUI Blocking",
+    "engine": "ipps",
+    "layer_hint": 6,
+    "sequence_hint": 7,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "MP.L2-3.8.9"
+    ],
+    "get_command": "Get-DlpCompliancePolicy -Identity 'CMMC-CUI-Block' | ConvertTo-Json -Depth 10",
+    "set_command": "New-DlpCompliancePolicy -Name 'CMMC-CUI-Block' -ExchangeLocation All -SharePointLocation All -OneDriveLocation All -Mode Enable",
+    "evidence_commands": [
+      "Get-DlpCompliancePolicy -Identity 'CMMC-CUI-Block' | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "MP.L2-3.8.9"
+    ],
+    "timestamp": "2026-11-01T16:04:07.858Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "New-DlpCompliancePolicy -Name 'CMMC-CUI-Block' -ExchangeLocation All -SharePointLocation All -OneDriveLocation All -Mode Enable",
+    "sha256Hash": "d7200d702d146bffc044aa50062b3091350f4c3810356e21d5e7cf1a0e753c22",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\r\n    \"id\":  \"CMMC-CUI-Block\",\r\n    \"Identity\":  \"CMMC-CUI-Block\",\r\n    \"DistributionStatus\":  \"Success\",\r\n    \"Name\":  \"CMMC-CUI-Block\",\r\n    \"ExchangeLocation\":  \"All\",\r\n    \"SharePointLocation\":  \"All\",\r\n    \"OneDriveLocation\":  \"All\",\r\n    \"Mode\":  \"Enable\"\r\n}\r\n",
+    "stateChanged": true,
+    "distributionStatus": "Success",
+    "postcheckMode": "state"
+  }
+}

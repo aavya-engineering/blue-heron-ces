@@ -3,7 +3,7 @@
 **SIMULATED CUSTOMER (FICTIONAL): Tamberlow Systems Engineering LLC (FICTIONAL)** This organisation is a simulated customer of the CES simulator. Its name, people, identifiers, addresses and tenant are invented; this document describes no real company and is not a compliance record.
 
 **Version:** 1.0
-**Effective Date:** 2026-11-02
+**Effective Date:** 2026-11-01
 **Policy Owner:** Aubrel Ashbyfield
 **Organization:** Tamberlow Systems Engineering LLC (FICTIONAL)
 
@@ -130,6 +130,6 @@ I, Aubrel Ashbyfield, as the Authorizing Official, have reviewed and approve thi
 
 ---
 
-**Effective Date:** 2026-11-02
+**Effective Date:** 2026-11-01
 **CMMC Controls:** 3.9.2
 **Policy Owner:** Aubrel Ashbyfield

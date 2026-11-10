@@ -1,7 +1,7 @@
 # Personnel Screening Procedure (EDC-POL-009)
 
 **Version:** 1.0
-**Effective Date:** 2026-11-02
+**Effective Date:** 2026-11-01
 **Policy Owner:** Designated Official
 **Organization:** Sim tenant muster-partial
 
@@ -121,6 +121,6 @@ I, Designated Official, as the Authorizing Official, have reviewed and approve t
 
 ---
 
-**Effective Date:** 2026-11-02
+**Effective Date:** 2026-11-01
 **CMMC Controls:** 3.9.1
 **Policy Owner:** Designated Official

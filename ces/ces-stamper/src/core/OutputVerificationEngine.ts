@@ -10,7 +10,6 @@
 import { VerificationCriteria } from '../registry/command-registry.types.js';
 import { StateVerificationDetails } from '../types/schema.types.js';
 import { verifyPostSetState } from '../utils/stateVerification.js';
-import { placeholderInRead, placeholderRationale } from '../shared/musterPlaceholders.js';
 
 export type ConfidenceLevel = 'HIGH' | 'MEDIUM' | 'LOW' | 'FAILED';
 
@@ -53,8 +52,6 @@ export interface VerificationResult {
   };
   reason: string;
   stateVerificationDetails?: StateVerificationDetails;
-  /** PL-121: the Muster placeholder value the verified read shows (the result is then not passed). */
-  placeholder?: string;
 }
 
 export class OutputVerificationEngine {
@@ -85,12 +82,6 @@ export class OutputVerificationEngine {
     if (criteria?.evidence && evidenceResult) {
       evidenceCheck = this.checkEvidence(evidenceResult.stdout, criteria.evidence);
     }
-
-    // PL-121 (founder ruling 2026-11-01): a setting built from an unanswered placeholder never counts.
-    // A successful read that shows a Muster placeholder value fails the evidence check, whatever the
-    // entry's own rule says (shared judgement: shared/musterPlaceholders.ts).
-    const placeholder = evidenceResult && evidenceResult.exitCode === 0 ? placeholderInRead(evidenceResult.stdout, criteria?.placeholder_ignore) : undefined;
-    if (placeholder !== undefined) evidenceCheck = false;
 
     // 4. stateChanged:false — resource was already in desired state.
     // SET output criteria may not match an idempotent "already exists" output, so a failed
@@ -133,9 +124,7 @@ export class OutputVerificationEngine {
     const passed = score >= 60 && exitCodeCheck && (setOutputCheck !== false) && (evidenceCheck !== false);
 
     // 8. Generate reason
-    const reason = placeholder !== undefined && exitCodeCheck
-      ? placeholderRationale(placeholder)
-      : options?.stateChanged === false && exitCodeCheck && passed
+    const reason = options?.stateChanged === false && exitCodeCheck && passed
       ? 'Already compliant — state unchanged, evidence confirms resource exists'
       : this.generateReason(exitCodeCheck, setOutputCheck, evidenceCheck, confidence);
 
@@ -149,7 +138,6 @@ export class OutputVerificationEngine {
         evidence_check: evidenceCheck,
       },
       reason,
-      ...(placeholder !== undefined ? { placeholder } : {}),
     };
   }
 

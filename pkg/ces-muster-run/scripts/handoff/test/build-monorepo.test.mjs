@@ -100,7 +100,6 @@ test('no-commit build: layout, provenance, only tracked files, kit at the root, 
   ].sort());
   assert.equal(fs.existsSync(path.join(fx.out, '.git')), false);
   assert.equal(fs.readFileSync(path.join(fx.out, '.gitignore'), 'utf8'), GITIGNORE);
-  assert.ok(GITIGNORE.split('\n').includes('/pl/'), 'PL-125 / CR-21: the harness pipeline root <Root>/pl is ignored');
   const src = JSON.parse(fs.readFileSync(path.join(fx.out, 'SOURCES.json'), 'utf8'));
   assert.equal(src.repos.length, 6);
   assert.equal(src.repos.find((r) => r.repo === 'ces-tenant').commit, fx.t2);

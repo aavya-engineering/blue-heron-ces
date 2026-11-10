@@ -18,7 +18,7 @@
 | **Assessment Route** | certification |
 | **Boundary Strategy** | single_enclave |
 | **Deployment Posture** | hybrid |
-| **SSP Date** | 2026-11-02 |
+| **SSP Date** | 2026-11-01 |
 
 ## 2. System Description
 
@@ -94,9 +94,9 @@ Tamberlow Systems Engineering LLC (FICTIONAL) implements security controls acros
 | Status | Count | Percentage |
 |--------|-------|-----------|
 | Met | 0 | 0% |
-| Partial | 39 | — |
-| Not Met | 84 | — |
-| Unknown | 11 | — |
+| Partial | 40 | — |
+| Not Met | 82 | — |
+| Unknown | 12 | — |
 | **Total** | **134** | — |
 
 ## 5. Organizational Defined Parameters (ODPs)
@@ -132,7 +132,7 @@ Tamberlow Systems Engineering LLC (FICTIONAL) implements security controls acros
 
 | Field | Value |
 |-------|-------|
-| Policy Effective Date | 2026-11-02 |
+| Policy Effective Date | 2026-11-01 |
 | Review Cycle | Every 12 months |
 | Next Review Date | 2027-11-01 |
 | Affirming Official | Aubrel Ashbyfield |
@@ -147,7 +147,7 @@ Tamberlow Systems Engineering LLC (FICTIONAL) implements security controls acros
 ---
 
 **Prepared by:** Galwyn Rowanfield
-**Date:** 2026-11-02
+**Date:** 2026-11-01
 
 ## Approval
 

@@ -36,14 +36,14 @@
     "controlIds": [
       "CM.L2-3.4.6"
     ],
-    "timestamp": "2026-11-02T12:14:40.304Z",
+    "timestamp": "2026-11-01T17:10:49.554Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "$created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations' -Body (@{'@odata.type'='#microsoft.graph.windows10GeneralConfiguration';displayName='CMMC-LeastFunctionality';cortanaBlocked=$true;microsoftAccountSignInAssistantSettings='disabled'} | ConvertTo-Json) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | ConvertTo-Json -Depth 10",
     "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "moduleVersions": {},
     "environment": "GCC-High",
     "preStateOutput": "",
-    "postStateOutput": "{\r\n    \"id\":  \"deviceConfiguration-6\",\r\n    \"createdDateTime\":  \"2026-11-02T12:14:39.500Z\",\r\n    \"microsoftAccountSignInAssistantSettings\":  \"disabled\",\r\n    \"cortanaBlocked\":  true,\r\n    \"displayName\":  \"CMMC-LeastFunctionality\",\r\n    \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceConfiguration-6_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ],\r\n    \"isAssigned\":  true\r\n}\r\n",
+    "postStateOutput": "{\r\n    \"id\":  \"deviceConfiguration-6\",\r\n    \"createdDateTime\":  \"2026-11-01T17:10:48.741Z\",\r\n    \"microsoftAccountSignInAssistantSettings\":  \"disabled\",\r\n    \"cortanaBlocked\":  true,\r\n    \"displayName\":  \"CMMC-LeastFunctionality\",\r\n    \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceConfiguration-6_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ],\r\n    \"isAssigned\":  true\r\n}\r\n",
     "stateChanged": true,
     "postcheckMode": "state"
   }

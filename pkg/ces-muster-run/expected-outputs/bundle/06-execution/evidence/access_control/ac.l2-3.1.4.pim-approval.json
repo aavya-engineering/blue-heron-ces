@@ -36,7 +36,7 @@
     "controlIds": [
       "AC.L2-3.1.4"
     ],
-    "timestamp": "2026-11-02T12:13:07.652Z",
+    "timestamp": "2026-11-01T17:09:07.999Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "$roleId=(Get-MgRoleManagementDirectoryRoleDefinition -Filter \"displayName eq 'Compliance Administrator'\").Id; $pimPolicyId=(Get-MgPolicyRoleManagementPolicyAssignment -Filter \"scopeId eq '/' and scopeType eq 'DirectoryRole' and roleDefinitionId eq '$roleId'\" | Select-Object -First 1).PolicyId; $approverId=(Get-MgUser -Filter 'userPrincipalName eq ''{approverUPN}''').Id; $approvalStage=@{approvalStageTimeOutInDays=1;isApproverJustificationRequired=$true;isEscalationEnabled=$false;primaryApprovers=@(@{'@odata.type'='#microsoft.graph.singleUser';userId=$approverId})}; $body=@{'@odata.type'='#microsoft.graph.unifiedRoleManagementPolicyApprovalRule';id='Approval_EndUser_Assignment';setting=@{isApprovalRequired=$true;isApprovalRequiredForExtension=$false;isRequestorJustificationRequired=$true;approvalMode='SingleStage';approvalStages=@($approvalStage)}}; Update-MgPolicyRoleManagementPolicyRule -UnifiedRoleManagementPolicyId $pimPolicyId -UnifiedRoleManagementPolicyRuleId 'Approval_EndUser_Assignment' -BodyParameter $body",
     "sha256Hash": "c694b08f05548b182ff115742809955775af856d7930a1bb3f9c8789dcf412a4",

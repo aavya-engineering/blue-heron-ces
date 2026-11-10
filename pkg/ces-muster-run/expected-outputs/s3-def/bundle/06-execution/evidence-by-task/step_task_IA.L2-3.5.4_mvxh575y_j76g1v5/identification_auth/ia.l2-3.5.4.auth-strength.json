@@ -1,0 +1,69 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"00000000-0000-0000-0000-000000000004\",\r\n    \"displayName\":  \"Phishing-resistant MFA\",\r\n    \"description\":  \"Phishing-resistant, Passwordless methods for the strongest authentication, such as a FIDO2 security key\",\r\n    \"policyType\":  \"builtIn\",\r\n    \"requirementsSatisfied\":  \"mfa\",\r\n    \"allowedCombinations\":  [\r\n                                \"windowsHelloForBusiness\",\r\n                                \"fido2\",\r\n                                \"x509CertificateMultiFactor\"\r\n                            ],\r\n    \"createdDateTime\":  \"\\/Date(1638345600000)\\/\",\r\n    \"modifiedDateTime\":  \"\\/Date(1638345600000)\\/\"\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Resource already exists — creation skipped (idempotent)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "existing equivalent 'Phishing-resistant MFA' verified by effect (1 conditions) (existing equivalent 'Phishing-resistant MFA' matched by effect)",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "existing equivalent 'Phishing-resistant MFA' verified by effect (1 conditions)"
+  },
+  "registryEntry": {
+    "entry_id": "IA.L2-3.5.4.auth-strength",
+    "label": "Create Phishing-Resistant Authentication Strength Policy",
+    "engine": "mgraph",
+    "layer_hint": 1,
+    "sequence_hint": 10,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "IA.L2-3.5.4"
+    ],
+    "get_command": "Get-MgPolicyAuthenticationStrengthPolicy -All | Where-Object { ($_.DisplayName -eq 'CMMC-PhishingResistant') -or ((@($_.AllowedCombinations | Where-Object { $_ }).Count -gt 0 -and @($_.AllowedCombinations | Where-Object { @('fido2','windowsHelloForBusiness','x509CertificateMultiFactor') -notcontains $_ }).Count -eq 0)) } | Sort-Object { $_.DisplayName -ne 'CMMC-PhishingResistant' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
+    "set_command": "Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/policies/authenticationStrengthPolicies' -Body (@{displayName='CMMC-PhishingResistant';description='Requires FIDO2 or WHfB';allowedCombinations=@('fido2','windowsHelloForBusiness','x509CertificateMultiFactor')} | ConvertTo-Json) -ContentType 'application/json'",
+    "evidence_commands": [
+      "Get-MgPolicyAuthenticationStrengthPolicy -All | Where-Object DisplayName -like 'CMMC-Phishing*' | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "IA.L2-3.5.4"
+    ],
+    "timestamp": "2026-11-01T06:55:28.369Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/policies/authenticationStrengthPolicies' -Body (@{displayName='CMMC-PhishingResistant';description='Requires FIDO2 or WHfB';allowedCombinations=@('fido2','windowsHelloForBusiness','x509CertificateMultiFactor')} | ConvertTo-Json) -ContentType 'application/json'",
+    "sha256Hash": "a41c2ab1d3f2308e1386265fe6cb32430058d0b40d45fb7fe103fb78c9050988",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "{\r\n    \"id\":  \"00000000-0000-0000-0000-000000000004\",\r\n    \"displayName\":  \"Phishing-resistant MFA\",\r\n    \"description\":  \"Phishing-resistant, Passwordless methods for the strongest authentication, such as a FIDO2 security key\",\r\n    \"policyType\":  \"builtIn\",\r\n    \"requirementsSatisfied\":  \"mfa\",\r\n    \"allowedCombinations\":  [\r\n                                \"windowsHelloForBusiness\",\r\n                                \"fido2\",\r\n                                \"x509CertificateMultiFactor\"\r\n                            ],\r\n    \"createdDateTime\":  \"\\/Date(1638345600000)\\/\",\r\n    \"modifiedDateTime\":  \"\\/Date(1638345600000)\\/\"\r\n}\r\n",
+    "postcheckMode": "state",
+    "lookupMatch": {
+      "basis": "effect",
+      "object": "Phishing-resistant MFA",
+      "conditions": [
+        {
+          "path": "$.AllowedCombinations",
+          "op": "all_in",
+          "expected": [
+            "fido2",
+            "windowsHelloForBusiness",
+            "x509CertificateMultiFactor"
+          ],
+          "observed": [
+            "windowsHelloForBusiness",
+            "fido2",
+            "x509CertificateMultiFactor"
+          ],
+          "pass": true
+        }
+      ]
+    }
+  }
+}

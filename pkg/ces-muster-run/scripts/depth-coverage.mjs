@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // DEPTH-0 (ces-strategy docs/context/depth/DEPTH-REPORT-AND-PLAN.md §4): objective-level depth baseline.
-//   node scripts/depth-coverage.mjs [--root <WS>] [--plan <executable-plan.json>]... [--out <path>]
+//   node scripts/depth-coverage.mjs [--plan <executable-plan.json>]... [--out <path>]
 // Per scenario plan, per assessment objective: verdict (S1 family-report verdicts, scripts/depth-verdicts.s1.json),
 // the registry entry ids that ran for the objective's control (sub_commands) and the tasks carrying it (controls[]).
 // Also lists the registry commands tenant-stacksim has no resolver for (simulator_unanswered).
@@ -12,13 +12,9 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const PKG = path.resolve(HERE, '..');
-// PL-124 / CR-22 (KI-13): no hard-coded workspace. The workspace root is --root, else the folder two levels above this
-// package (<WS>\pkg\ces-muster-run in both BHD's layout and the contractor monorepo).
-export const DEFAULT_WS = path.resolve(PKG, '..', '..');
+const WS = 'C:\\ces-nb';
 
-/** The default inputs for a workspace root (the evidence plans are BHD's DEPTH-0 baseline runs). */
-export function defaultsFor(WS) {
-  return {
+export const DEFAULTS = {
   plans: [
     path.join(WS, 'evidence', 'w8-s1-eu-5', 'ui', 'spa', 'executable-plan.json'),
     path.join(WS, 'evidence', 'gc-w9r1b-s1-mach', 'executable-plan.json'),
@@ -34,10 +30,7 @@ export function defaultsFor(WS) {
   verdicts: path.join(HERE, 'depth-verdicts.s1.json'),
   stacksim: path.join(WS, 'ces', 'tenant-stacksim'),
   out: path.join(PKG, 'out', 'depth-coverage.json'),
-  };
-}
-
-export const DEFAULTS = defaultsFor(DEFAULT_WS);
+};
 
 export const VERDICTS = ['configured', 'partial', 'read_only', 'manual_or_document', 'unrelated', 'none', 'definitional'];
 export const UNCOVERED = ['none', 'unrelated', 'read_only'];
@@ -373,8 +366,7 @@ export function scenarioLabel(planPath) {
 }
 
 export function run(opts) {
-  const { root, ...rest } = opts ?? {};
-  const o = { ...(root ? defaultsFor(root) : DEFAULTS), ...rest };
+  const o = { ...DEFAULTS, ...opts };
   const objectives = readJson(o.objectives).objectives;
   const registry = loadRegistries(o.registries);
   const vdoc = readJson(o.verdicts);
@@ -429,7 +421,6 @@ function parseArgs(argv) {
     const v = argv[i + 1];
     if (a === '--plan') { (o.plans ??= []).push(path.resolve(v)); i++; }
     else if (a === '--out') { o.out = path.resolve(v); i++; }
-    else if (a === '--root') { o.root = path.resolve(v); i++; }
     else if (a === '--objectives') { o.objectives = path.resolve(v); i++; }
     else if (a === '--registry') { (o.registries ??= []).push(path.resolve(v)); i++; }
     else if (a === '--verdicts') { o.verdicts = path.resolve(v); i++; }

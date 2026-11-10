@@ -12,7 +12,7 @@
 | **System Name** | Corvelline Defense Assemblies Inc. (FICTIONAL) CUI Information System |
 | **CMMC Level** | L2 |
 | **Prepared By** | Belmira Pennanmore |
-| **Date Prepared** | 2026-11-02 |
+| **Date Prepared** | 2026-11-01 |
 | **POA&M Policy** | poam_if_allowed |
 
 ## 2. Purpose
@@ -26,12 +26,12 @@ Based on the current Readiness Posture assessment:
 | Category | Count |
 |----------|-------|
 | Controls Met | 0 |
-| Controls Partially Met | 24 |
-| Controls Not Met | 89 |
-| Controls Unknown | 16 |
+| Controls Partially Met | 25 |
+| Controls Not Met | 87 |
+| Controls Unknown | 17 |
 | **Overall Compliance** | **0%** |
 
-Items requiring POA&M tracking: **89** not-met + **24** partial = potential POA&M entries.
+Items requiring POA&M tracking: **87** not-met + **25** partial = potential POA&M entries.
 
 ## 4. POA&M Items
 
@@ -68,7 +68,7 @@ For each POA&M item, milestones shall include:
 
 ---
 
-**Effective Date:** 2026-11-02
+**Effective Date:** 2026-11-01
 **Next Review:** 2027-11-01
 
 ## Approval

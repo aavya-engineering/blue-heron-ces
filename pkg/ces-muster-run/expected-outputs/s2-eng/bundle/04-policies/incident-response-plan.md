@@ -9,7 +9,7 @@
 | **Organization** | Tamberlow Systems Engineering LLC (FICTIONAL) |
 | **Address** | 2750 Halberd Point Road, Suite 300, Wrenmoor, ZZ, 00000 |
 | **CMMC Level** | L2 |
-| **Effective Date** | 2026-11-02 |
+| **Effective Date** | 2026-11-01 |
 | **Prepared By** | Roswen Dunnridge |
 | **Approved By** | Aubrel Ashbyfield |
 
@@ -142,6 +142,6 @@ Contact law enforcement when criminal activity is suspected, with guidance from 
 
 ---
 
-**Effective Date:** 2026-11-02
+**Effective Date:** 2026-11-01
 **NIST SP 800-171 Controls:** 3.6.1–3.6.3
 **Plan Owner:** Roswen Dunnridge

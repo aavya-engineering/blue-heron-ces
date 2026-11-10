@@ -1,5 +1,5 @@
 {
-  "rawResponse": "{\r\n    \"roleDefinitionId\":  \"17315797-102d-40b4-93e0-432062caca18\",\r\n    \"eligible\":  [\r\n                     \"user-30\"\r\n                 ],\r\n    \"active\":  [\r\n\r\n               ]\r\n}\r\n",
+  "rawResponse": "",
   "outcome": "automated_success",
   "outcomeRationale": "Command completed successfully (exit code 0)",
   "complianceVerdict": "SAT",
@@ -19,7 +19,7 @@
     "get_command": "Get-MgRoleManagementDirectoryRoleAssignment -Filter 'roleDefinitionId eq ''{complianceRoleId}''' -All",
     "set_command": "",
     "evidence_commands": [
-      "$e = @(Get-MgRoleManagementDirectoryRoleEligibilitySchedule -All | Where-Object { $_.RoleDefinitionId -eq '{complianceRoleId}' }); $a = @(Get-MgRoleManagementDirectoryRoleAssignment -All | Where-Object { $_.RoleDefinitionId -eq '{complianceRoleId}' }); if ($e.Count + $a.Count -gt 0) { [pscustomobject]@{ roleDefinitionId = '{complianceRoleId}'; eligible = @($e | ForEach-Object { $_.PrincipalId }); active = @($a | ForEach-Object { $_.PrincipalId }) } | ConvertTo-Json -Depth 4 }"
+      "Get-MgDirectoryRole -Filter \"displayName eq 'Compliance Administrator'\" -All | ForEach-Object { Get-MgDirectoryRoleMember -DirectoryRoleId $_.Id -All | Select-Object Id,AdditionalProperties } | ConvertTo-Json -Depth 3"
     ]
   },
   "metadata": {
@@ -27,10 +27,10 @@
       "AU.L2-3.3.8",
       "AU.L2-3.3.9"
     ],
-    "timestamp": "2026-11-02T02:31:10.532Z",
+    "timestamp": "2026-11-01T16:05:57.794Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "[manual/evidence-only] Audit Log Access Restriction - Compliance Admin Role Evidence",
-    "sha256Hash": "cca7409b0a9d1e8c7fe0c427e2509ae23e8302b402b374114e84aa4bb821f2f1",
+    "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "moduleVersions": {},
     "environment": "GCC-High"
   }

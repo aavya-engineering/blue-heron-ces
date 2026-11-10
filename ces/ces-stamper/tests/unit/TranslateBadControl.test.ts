@@ -24,9 +24,8 @@ import { ManifestReader } from '../../src/translators/ManifestReader';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..', '..');
 
-// `HEAD:./` is relative to -C: works with ces-muster as its own repo or as a monorepo folder (PL-123 / CR-13).
 const committedGolden = (name: string): string => {
-  const r = spawnSync('git', ['-C', path.resolve(ROOT, '..', 'ces-muster'), 'show', `HEAD:./src/features/plan/__fixtures__/${name}`], { encoding: 'utf-8', maxBuffer: 64 * 1024 * 1024 });
+  const r = spawnSync('git', ['-C', path.resolve(ROOT, '..', 'ces-muster'), 'show', `HEAD:src/features/plan/__fixtures__/${name}`], { encoding: 'utf-8', maxBuffer: 64 * 1024 * 1024 });
   if (r.status !== 0) throw new Error(`git show ces-muster HEAD:${name} failed: ${r.stderr}`);
   return r.stdout;
 };

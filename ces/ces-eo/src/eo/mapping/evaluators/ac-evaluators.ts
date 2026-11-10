@@ -19,7 +19,6 @@ import {
   breakGlassOf, targetsAllUsers, targetsGroupsOrRoles, builtIns, requiresMfa, blocks, includesPrivilegedRole,
   cfgName, screenLockVerdict, storageBlockVerdict, caVerdict, SCREEN_LOCK_READS, sharedAccountsOf, accountLabel,
 } from './conditions.js';
-import { isMusterPlaceholder, placeholderNote } from './placeholders.js';
 
 // W5 cycle 1: every evaluator below except caEnforcementEvaluator and privilegedFunctionEvaluator
 // (which already tested a setting) was presence only and now tests a condition; the rules are in
@@ -35,14 +34,6 @@ const D = REQUIREMENT_DEFAULTS;
 const isPrivileged = (r: Record<string, unknown>): boolean => PRIVILEGED_ROLE_TEMPLATES.has(String(r.roleDefinitionId));
 const roleName = (r: Record<string, unknown>): string => PRIVILEGED_ROLE_TEMPLATES.get(String(r.roleDefinitionId)) ?? String(r.roleDefinitionId);
 const wifiOf = (rows: Record<string, unknown>[]) => rows.filter(c => c.wifiSecurityType !== undefined || /wifi/i.test(String(c['@odata.type'] ?? '')));
-/**
- * PL-121 (founder ruling 2026-11-01, scope 2026-11-02: the setting that provides the protection must not depend on a
- * placeholder): a Wi-Fi profile whose SSID (or network name) is Muster's unanswered placeholder never counts.
- */
-const placeholderSsidOf = (c: Record<string, unknown>): string | undefined =>
-  [c.ssid, c.networkName].find(isMusterPlaceholder) as string | undefined;
-const placeholderBuilt = (built: Record<string, unknown>[]): string =>
-  built.map(c => `'${cfgName(c)}' ${placeholderNote(placeholderSsidOf(c)!)}`).join(', ');
 
 /**
  * W5 cycle 3 (AC.L2-3.1.6): a stated admin naming convention (`adm.{firstname}.{lastname}@{domain}`) as a
@@ -550,11 +541,8 @@ export const acEvaluators: Record<string, EvaluatorFn> = {
   wifiProfileEvaluator: (signals, ctx) => {
     const empty = unreadOrEmpty(signals, CFG, 'Intune device configurations');
     if (empty) return empty;
-    const all = wifiOf(rowsOf(signals, CFG)!.rows);
-    if (all.length === 0) return notAssessed('Wireless access authorization', 'no Wi-Fi profile in the device configurations', signals, CFG);
-    const built = all.filter(c => placeholderSsidOf(c) !== undefined);
-    const wifi = all.filter(c => placeholderSsidOf(c) === undefined);
-    if (wifi.length === 0) return { status: 'not_met', evidence: `Wireless access authorization: ${placeholderBuilt(built)}; a profile for an SSID nobody answered authorizes no wireless access` };
+    const wifi = wifiOf(rowsOf(signals, CFG)!.rows);
+    if (wifi.length === 0) return notAssessed('Wireless access authorization', 'no Wi-Fi profile in the device configurations', signals, CFG);
     const ok = wifi.filter(c => /enterprise/i.test(String(c.wifiSecurityType ?? '')));
     const failing = failingChecks(ok, ctx);
     if (ok.length > 0 && failing.length === 0) {
@@ -567,11 +555,8 @@ export const acEvaluators: Record<string, EvaluatorFn> = {
   wirelessProtectionEvaluator: (signals) => {
     const empty = unreadOrEmpty(signals, CFG, 'Intune device configurations');
     if (empty) return empty;
-    const all = wifiOf(rowsOf(signals, CFG)!.rows);
-    if (all.length === 0) return notAssessed('Wireless protection', 'no Wi-Fi profile in the device configurations', signals, CFG);
-    const built = all.filter(c => placeholderSsidOf(c) !== undefined);
-    const wifi = all.filter(c => placeholderSsidOf(c) === undefined);
-    if (wifi.length === 0) return { status: 'not_met', evidence: `Wireless protection: ${placeholderBuilt(built)}; a profile for an SSID nobody answered protects no wireless access` };
+    const wifi = wifiOf(rowsOf(signals, CFG)!.rows);
+    if (wifi.length === 0) return notAssessed('Wireless protection', 'no Wi-Fi profile in the device configurations', signals, CFG);
     const weak = wifi.filter(c => !/^wpa/i.test(String(c.wifiSecurityType ?? '')));
     if (weak.length > 0) return { status: 'not_met', evidence: `Wireless protection: ${weak.map(c => `'${cfgName(c)}' ${String(c.wifiSecurityType)}`).join(', ')} without WPA authentication and encryption` };
     return { status: 'met', evidence: `Wireless protection: ${wifi.map(c => `'${cfgName(c)}' ${String(c.wifiSecurityType)}`).join(', ')} (authentication and encryption)` };

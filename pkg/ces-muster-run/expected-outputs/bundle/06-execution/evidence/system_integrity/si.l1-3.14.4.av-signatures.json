@@ -1,5 +1,5 @@
 {
-  "rawResponse": "{\r\n    \"displayName\":  \"CMMC-Defender-AntivirusPolicy\",\r\n    \"id\":  \"deviceConfiguration-15\",\r\n    \"odataType\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n    \"defenderSignatureUpdateIntervalInHours\":  4,\r\n    \"lastModifiedDateTime\":  null\r\n}\r\n",
+  "rawResponse": "",
   "outcome": "automated_success",
   "outcomeRationale": "Command completed successfully (exit code 0)",
   "complianceVerdict": "SAT",
@@ -15,20 +15,20 @@
     "control_ids": [
       "SI.L1-3.14.4"
     ],
-    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object { $null -ne $_.defenderSignatureUpdateIntervalInHours } | ForEach-Object { [pscustomobject]@{ displayName = $_.displayName; id = $_.id; defenderSignatureUpdateIntervalInHours = $_.defenderSignatureUpdateIntervalInHours } } | ConvertTo-Json -Depth 5",
+    "get_command": "Get-MgDeviceManagementDeviceConfiguration -All | Where-Object { $_.DisplayName -eq 'CMMC-Defender-AntivirusPolicy' } | Select-Object DisplayName, Id, LastModifiedDateTime | ConvertTo-Json",
     "set_command": "",
     "evidence_commands": [
-      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object { $null -ne $_.defenderSignatureUpdateIntervalInHours } | ForEach-Object { [pscustomobject]@{ displayName = $_.displayName; id = $_.id; odataType = $_.'@odata.type'; defenderSignatureUpdateIntervalInHours = $_.defenderSignatureUpdateIntervalInHours; lastModifiedDateTime = $_.lastModifiedDateTime } } | ConvertTo-Json -Depth 5"
+      "Get-MgDeviceManagementDeviceConfiguration -All | Where-Object { $_.DisplayName -eq 'CMMC-Defender-AntivirusPolicy' } | Select-Object DisplayName, Id, LastModifiedDateTime | ConvertTo-Json"
     ]
   },
   "metadata": {
     "controlIds": [
       "SI.L1-3.14.4"
     ],
-    "timestamp": "2026-11-02T12:15:06.714Z",
+    "timestamp": "2026-11-01T17:09:37.058Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "[manual/evidence-only] Antivirus Signature Currency via Intune",
-    "sha256Hash": "bf8996dce29e8b5cb03b976830c48698c0d855b0ed537b74dcae3c64ff9290f7",
+    "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "moduleVersions": {},
     "environment": "GCC-High"
   }

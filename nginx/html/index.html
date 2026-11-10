@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CES — Compliance Engine System</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #151d2e;
+      --border: #23304a;
+      --text: #f1f5f9;
+      --subtext: #94a3b8;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.15);
+      --badge: #0284c7;
+      --green: #34d399;
+      --purple: #a855f7;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      background: radial-gradient(circle at 50% 0%, #172554 0%, var(--bg) 70%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+      max-width: 800px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 6px 14px;
+      background: var(--accent-glow);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    h1 {
+      font-size: 38px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+      background: linear-gradient(to right, #ffffff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    p.lead {
+      color: var(--subtext);
+      font-size: 17px;
+      line-height: 1.6;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+      width: 100%;
+      max-width: 1100px;
+      margin-bottom: 40px;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      border-color: var(--accent);
+      box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.5), 0 0 20px var(--accent-glow);
+    }
+    .card-top {
+      margin-bottom: 16px;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .card-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #fff;
+    }
+    .tag {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: #1e293b;
+      color: var(--subtext);
+      border: 1px solid #334155;
+    }
+    .tag.db {
+      background: rgba(168, 85, 247, 0.2);
+      border-color: var(--purple);
+      color: #d8b4fe;
+    }
+    .tag.active {
+      background: rgba(52, 211, 153, 0.2);
+      border-color: var(--green);
+      color: #6ee7b7;
+    }
+    .card-desc {
+      color: var(--subtext);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .card-footer {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent);
+      margin-top: 16px;
+    }
+    footer {
+      color: #64748b;
+      font-size: 13px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="badge">CES Architecture &amp; Control</div>
+    <h1>CMMC Level 2 Compliance Engine</h1>
+    <p class="lead">Centralized unified console for all CES services, tenant simulator, walkthrough runner, and SQLite database management.</p>
+  </header>
+
+  <div class="grid">
+    <!-- Muster Web UI -->
+    <a href="/muster/" class="card">
+      <div class="card-top">
+        <div class="card-header">
+          <div class="card-title">Muster Web UI</div>
+          <span class="tag active">:5173</span>
+        </div>
+        <p class="card-desc">Customer interview questionnaire, CUI boundary scoping, policy plan generation, and SSP docx builder.</p>
+      </div>
+      <div class="card-footer">Launch Muster UI &rarr;</div>
+    </a>
+
+    <!-- Database Management Web UI -->
+    <a href="http://localhost:8080" target="_blank" class="card" style="border-color: var(--purple);">
+      <div class="card-top">
+        <div class="card-header">
+          <div class="card-title">Database Management (DB UI)</div>
+          <span class="tag db">:8080</span>
+        </div>
+        <p class="card-desc">Dedicated web-based SQLite database manager (<code>ces.db</code>). Query tables, browse records, inspect JSON payloads, and run SQL migrations.</p>
+      </div>
+      <div class="card-footer" style="color: var(--purple);">Open SQLite Web UI &rarr;</div>
+    </a>
+
+    <!-- Stamper Engine -->
+    <a href="/stamper/" class="card">
+      <div class="card-top">
+        <div class="card-header">
+          <div class="card-title">Stamper Engine</div>
+          <span class="tag active">:5002</span>
+        </div>
+        <p class="card-desc">Applies compliance baselines command-by-command to the tenant with immutable verification records.</p>
+      </div>
+      <div class="card-footer">Open Stamper GUI &rarr;</div>
+    </a>
+
+    <!-- AdminOps Console -->
+    <a href="/ao/" class="card">
+      <div class="card-top">
+        <div class="card-header">
+          <div class="card-title">AdminOps Console</div>
+          <span class="tag active">:5003</span>
+        </div>
+        <p class="card-desc">Governed admin lifecycle operations: joiners, movers, leavers with two-person authorization flows.</p>
+      </div>
+      <div class="card-footer">Open AdminOps &rarr;</div>
+    </a>
+
+    <!-- EvidenceOps Console -->
+    <a href="/eo/" class="card">
+      <div class="card-top">
+        <div class="card-header">
+          <div class="card-title">EvidenceOps</div>
+          <span class="tag active">:5004</span>
+        </div>
+        <p class="card-desc">Continuous evidence evaluation, score prediction, SPRS tracking, and audit review dashboard.</p>
+      </div>
+      <div class="card-footer">Open EvidenceOps &rarr;</div>
+    </a>
+
+    <!-- Tenant Simulator -->
+    <a href="/stacksim/" class="card">
+      <div class="card-top">
+        <div class="card-header">
+          <div class="card-title">Tenant Simulator</div>
+          <span class="tag active">:4390</span>
+        </div>
+        <p class="card-desc">Simulated Microsoft 365 GCC High tenant backend with live state inspector and pre-loaded scenarios.</p>
+      </div>
+      <div class="card-footer">Open Simulator &rarr;</div>
+    </a>
+
+    <!-- Demo Commander -->
+    <a href="/demo/" class="card">
+      <div class="card-top">
+        <div class="card-header">
+          <div class="card-title">Demo Commander</div>
+          <span class="tag active">:4600</span>
+        </div>
+        <p class="card-desc">Guided one-click walkthrough running the complete end-to-end CES compliance lifecycle.</p>
+      </div>
+      <div class="card-footer">Open Demo Commander &rarr;</div>
+    </a>
+
+    <!-- Evidence Collector API -->
+    <a href="/ec/" class="card">
+      <div class="card-top">
+        <div class="card-header">
+          <div class="card-title">Evidence Collector (EC)</div>
+          <span class="tag">:4001</span>
+        </div>
+        <p class="card-desc">Background collector service gathering tenant and host artifacts on a scheduled interval.</p>
+      </div>
+      <div class="card-footer">View EC Service &rarr;</div>
+    </a>
+  </div>
+
+  <footer>
+    CES Unified Deployment &bull; SQLite WAL Mode Persistence &bull; Port 80/443 Gateway
+  </footer>
+
+</body>
+</html>
+

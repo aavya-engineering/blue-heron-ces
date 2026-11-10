@@ -383,7 +383,8 @@ export function loadTokens(file, { username = os.userInfo().username } = {}) {
       if (t && !t.startsWith('#')) pats.push(t);
     }
   }
-  if (username && username.length >= 3) pats.push(`(?i)${username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`);
+  const ignoredUsernames = new Set(['ces', 'root', 'node', 'runner', 'admin', 'administrator', 'user']);
+  if (username && username.length >= 3 && !ignoredUsernames.has(username.toLowerCase())) pats.push(`(?i)${username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`);
   return pats;
 }
 
@@ -507,6 +508,6 @@ function main(argv) {
   return ok ? 0 : 1;
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (process.argv[1] && (path.resolve(process.argv[1]) === fileURLToPath(import.meta.url) || fs.realpathSync(process.argv[1]) === fs.realpathSync(fileURLToPath(import.meta.url)))) {
   process.exitCode = main(process.argv.slice(2));
 }

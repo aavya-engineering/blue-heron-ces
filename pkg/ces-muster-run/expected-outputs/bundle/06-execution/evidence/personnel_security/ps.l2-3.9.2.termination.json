@@ -1,5 +1,5 @@
 {
-  "rawResponse": "{\r\n    \"count\":  0,\r\n    \"deletions\":  [\r\n\r\n                  ]\r\n}\r\n",
+  "rawResponse": "",
   "outcome": "automated_success",
   "outcomeRationale": "Command completed successfully (exit code 0)",
   "complianceVerdict": "SAT",
@@ -18,17 +18,17 @@
     "get_command": "Get-MgUser -Filter 'accountEnabled eq false' -All | Select-Object DisplayName,UserPrincipalName,DeletedDateTime",
     "set_command": "",
     "evidence_commands": [
-      "$r = @(Get-MgAuditLogDirectoryAudit -Filter \"category eq 'UserManagement' and activityDisplayName eq 'Delete user'\" -All -Top 500 | Where-Object { $_ }); [pscustomobject]@{ count = $r.Count; deletions = @($r | ForEach-Object { [pscustomobject]@{ ActivityDateTime = $_.ActivityDateTime; InitiatedBy = $_.InitiatedBy; TargetResources = $_.TargetResources } }) } | ConvertTo-Json -Depth 10"
+      "Get-MgAuditLogDirectoryAudit -Filter \"category eq 'UserManagement' and activityDisplayName eq 'Delete user'\" -All -Top 500 | Select-Object ActivityDateTime,InitiatedBy,TargetResources | ConvertTo-Json -Depth 10"
     ]
   },
   "metadata": {
     "controlIds": [
       "PS.L2-3.9.2"
     ],
-    "timestamp": "2026-11-02T12:16:41.409Z",
+    "timestamp": "2026-11-01T17:11:58.891Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "[manual/evidence-only] Personnel Termination and Transfer Account Disable Evidence",
-    "sha256Hash": "0e5ab4d4aafe583452e55369c801848adc6835b696bd9c155f4f17f959377f32",
+    "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "moduleVersions": {},
     "environment": "GCC-High"
   }

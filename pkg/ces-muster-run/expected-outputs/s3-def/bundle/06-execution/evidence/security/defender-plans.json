@@ -1,5 +1,5 @@
 {
-  "rawResponse": "[\r\n    {\r\n        \"Name\":  \"VirtualMachines\",\r\n        \"PricingTier\":  \"Free\"\r\n    },\r\n    {\r\n        \"Name\":  \"StorageAccounts\",\r\n        \"PricingTier\":  \"Free\"\r\n    },\r\n    {\r\n        \"Name\":  \"CloudPosture\",\r\n        \"PricingTier\":  \"Free\"\r\n    },\r\n    {\r\n        \"Name\":  \"Arm\",\r\n        \"PricingTier\":  \"Free\"\r\n    }\r\n]\r\n",
+  "rawResponse": "{\r\n    \"Name\":  \"Arm\",\r\n    \"PricingTier\":  \"Free\"\r\n}\r\n",
   "outcome": "automated_success",
   "outcomeRationale": "Command completed successfully (exit code 0)",
   "complianceVerdict": "SAT",
@@ -38,15 +38,16 @@
       "SI.L1-3.14.1",
       "SI.L2-3.14.6"
     ],
-    "timestamp": "2026-11-02T11:35:37.186Z",
+    "timestamp": "2026-11-01T06:55:45.874Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "foreach ($p in @('VirtualMachines','StorageAccounts','CloudPosture','Arm')) { $cur = Get-AzSecurityPricing -Name $p -ErrorAction SilentlyContinue; if (-not $cur -or $cur.PricingTier -ne 'Standard') { Set-AzSecurityPricing -Name $p -PricingTier 'Free' | Out-Null } }; Get-AzSecurityPricing | Where-Object { $_.Name -in @('VirtualMachines','StorageAccounts','CloudPosture','Arm') } | Select-Object Name,PricingTier | ConvertTo-Json",
-    "sha256Hash": "13df0801175dcd91a245c0ff60ae980e212d448246bfc460c28f9cb95c3b47d8",
+    "sha256Hash": "d126c88863a761e6803f19b553e63d5850ac6f95d6150c0397572995e0c72263",
     "moduleVersions": {},
     "environment": "GCC-High",
     "preStateOutput": "",
-    "postStateOutput": "\r\nName            PricingTier\r\n----            -----------\r\nVirtualMachines Free       \r\nStorageAccounts Free       \r\nCloudPosture    Free       \r\nArm             Free       \r\n\r\n\r\n",
+    "postStateOutput": "\r\nName PricingTier\r\n---- -----------\r\nArm  Free       \r\n\r\n\r\n",
     "stateChanged": true,
-    "postcheckMode": "state"
+    "postcheckMode": "presence",
+    "presenceReason": "the state to assert is that all four plans (VirtualMachines, StorageAccounts, CloudPosture, Arm) carry a tier, but the simulator returns only the Arm plan; presence until it returns all four (DEPTH-9b)"
   }
 }

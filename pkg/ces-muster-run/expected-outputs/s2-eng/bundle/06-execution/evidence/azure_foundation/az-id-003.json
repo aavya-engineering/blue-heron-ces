@@ -1,5 +1,5 @@
 {
-  "rawResponse": "{\r\n    \"AppId\":  \"sim-app-s2-eng\",\r\n    \"ApplicationObjectId\":  \"52520000-00a9-4000-8000-000000000001\",\r\n    \"DisplayName\":  \"CES Automation (FICTIONAL)\",\r\n    \"Id\":  null,\r\n    \"ServicePrincipalType\":  null,\r\n    \"AccountEnabled\":  null\r\n}\r\n",
+  "rawResponse": "",
   "outcome": "automated_success",
   "outcomeRationale": "Command completed successfully (exit code 0)",
   "complianceVerdict": "SAT",
@@ -18,17 +18,17 @@
     "get_command": "Get-MgServicePrincipal -Filter 'appId eq ''{appId}''' | Select-Object Id,DisplayName,AppId | ConvertTo-Json -Depth 10",
     "set_command": "",
     "evidence_commands": [
-      "$app = Get-MgApplication -Filter 'appId eq ''{appId}''' | Select-Object -First 1; $sp = Get-MgServicePrincipal -Filter 'appId eq ''{appId}''' | Select-Object -First 1; if ($app -or $sp) { [pscustomobject]@{ AppId = '{appId}'; ApplicationObjectId = $app.Id; DisplayName = $(if ($sp) { $sp.DisplayName } else { $app.DisplayName }); Id = $sp.Id; ServicePrincipalType = $sp.ServicePrincipalType; AccountEnabled = $sp.AccountEnabled } | ConvertTo-Json }"
+      "Get-MgServicePrincipal -Filter 'appId eq ''{appId}''' | Select-Object Id,DisplayName,AppId,ServicePrincipalType,AccountEnabled | ConvertTo-Json"
     ]
   },
   "metadata": {
     "controlIds": [
       "AC.L1-3.1.1"
     ],
-    "timestamp": "2026-11-02T02:29:36.465Z",
+    "timestamp": "2026-11-01T16:04:49.982Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "[manual/evidence-only] EO Automation Service Principal",
-    "sha256Hash": "d2d63e3c50bd2f8e8daa1cf9918f4b825b7279ef48e56537288d0ce858d77d9b",
+    "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "moduleVersions": {},
     "environment": "GCC-High"
   }

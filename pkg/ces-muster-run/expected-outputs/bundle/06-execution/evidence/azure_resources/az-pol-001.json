@@ -36,7 +36,7 @@
     "controlIds": [
       "SC.L1-3.13.5"
     ],
-    "timestamp": "2026-11-02T12:15:34.758Z",
+    "timestamp": "2026-11-01T17:11:25.061Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "$a = Get-AzPolicyAssignment -Name 'CES-No-NIC-Public-IP' -Scope '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}' -ErrorAction SilentlyContinue; if (-not $a) { $def = Get-AzPolicyDefinition -Id '/providers/Microsoft.Authorization/policyDefinitions/83a86a26-fd1f-447c-b59d-e51f44264114'; New-AzPolicyAssignment -Name 'CES-No-NIC-Public-IP' -DisplayName 'Network interfaces should not have public IPs (SB-1)' -PolicyDefinition $def -Scope '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}' | Select-Object Name,EnforcementMode | ConvertTo-Json } else { Write-Output 'Assignment already exists - skipping creation' }",
     "sha256Hash": "4f768a943c0c98ecd901bf5e3b2f2ae36d50e642c883a9a7d92d35d4c5a29327",

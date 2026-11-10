@@ -14,9 +14,7 @@
 //     is still enabled (the Graph read in leaverSignal.ts; no Entra ID Governance licence is named for the
 //     property, only the User-LifeCycleInfo permissions), or an operator / HR input naming the leaver.
 //  2. Ask. CES records one confirmation request per tenant administrator in the simulated mail outbox, each
-//     with its own single-use confirm link (a capability token; only its SHA-256 is stored on the flow, and the
-//     stored outbox record shows the link as `?t=<redacted>`, PL-122: the clear link exists only in the simulated
-//     delivery, in process memory).
+//     with its own single-use confirm link (a capability token; only its SHA-256 is stored on the flow).
 //  3. Act. On confirm, AdminOps A-22 (leaver access termination) runs through the governed AO pipeline
 //     (executeInvocation: sim-only rail, CMMC gate, two-person gate when it is on, get-then-set, evidence).
 //     The evidence row carries objective PS.L2-3.9.2[b]; EvidenceOps collects it (collector C10).
@@ -30,8 +28,7 @@
 import { randomBytes, randomUUID, timingSafeEqual } from 'node:crypto';
 import {
   AO_OUTBOX_FROM, LEAVER_CONTROL, LEAVER_OBJECTIVE, LEAVER_OP, LEAVE_SIGNAL_SOURCE_URLS, OPEN_STATUSES, TOKEN_GRACE_MINUTES,
-  forgetDelivered, getFlow, getSettings, isMailbox, listFlows, outboxHash, recordEscalation, recordMessage, redactConfirmTokens,
-  rememberDelivered, saveFlow, sha256Hex,
+  getFlow, getSettings, isMailbox, listFlows, outboxHash, recordEscalation, recordMessage, saveFlow, sha256Hex,
   type FlowToken, type LeaverEscalation, type LeaverFlow, type OutboxKind, type OutboxMessage,
 } from './leaverStore.js';
 
@@ -83,9 +80,6 @@ export interface LeaverFlowDeps {
   publicBaseUrl: string;
   /** BHD's role mailbox for opted-in done notices (CES_BHD_NOTICE_MAILBOX); never a person. */
   bhdMailbox?: string;
-  /** Simulator only (CES_AO_LEAVER_SINCE, as EO's CES_EO_ADMINOPS_SINCE): flows created before this ISO time belong to
-   *  another run and never count as tracked. ces.db is shared across runs; unset in production (R-F12, LOG-RF12-DIAG). */
-  trackedSince?: string;
   now?(): Date;
   logger?: Pick<Console, 'log' | 'warn'>;
 }
@@ -149,9 +143,7 @@ export class LeaverFlowService {
   /** The flow already tracking this leaver (same tenant, same UPN, same leave date), if any. */
   private tracked(tenantSlug: string, upn: string, leaveAt: string | null | undefined): LeaverFlow | undefined {
     const key = upn.trim().toLowerCase();
-    const since = this.deps.trackedSince ? Date.parse(this.deps.trackedSince) : NaN;
     return listFlows(tenantSlug).find((f) =>
-      !(Number.isFinite(since) && Date.parse(f.createdAt) < since) &&
       f.leaver.upn.toLowerCase() === key &&
       ((f.leaver.employeeLeaveDateTime ?? null) === (leaveAt ?? null) || OPEN_STATUSES.includes(f.status)));
   }
@@ -168,10 +160,7 @@ export class LeaverFlowService {
 
   private message(flow: LeaverFlow, kind: OutboxKind, audience: OutboxMessage['audience'], to: string[], subject: string, body: string, undeliverable?: OutboxMessage['undeliverable']): OutboxMessage {
     const source = { type: 'leaver_flow' as const, id: flow.flowId };
-    // PL-122: ces.db keeps the body with the confirm token redacted (the hash covers what is stored); the clear
-    // body is the simulated delivery, kept in process memory only.
-    const stored = redactConfirmTokens(body);
-    const base = { from: AO_OUTBOX_FROM, to, subject, body: stored, kind, source };
+    const base = { from: AO_OUTBOX_FROM, to, subject, body, kind, source };
     const m: OutboxMessage = {
       id: `aom-${randomUUID()}`,
       tenant_id: flow.tenantId,
@@ -186,7 +175,6 @@ export class LeaverFlowService {
       created_at: iso(this.now()),
     };
     recordMessage(m);
-    if (stored !== body) rememberDelivered(m.id, body);
     flow.messageIds.push(m.id);
     return m;
   }
@@ -327,7 +315,6 @@ export class LeaverFlowService {
         `${t.recipient} declined the leaver flow for ${this.describeLeaver(flow)}: ${flow.declinedReason}. CES changed nothing. ` +
         'If the leave date is wrong, correct or clear employeeLeaveDateTime on the account, or the next scan will not start a new flow for this date.');
       saveFlow(flow);
-      forgetDelivered(flow.messageIds);
       return flow;
     }
     flow.confirmedBy = t.recipient;
@@ -404,8 +391,6 @@ export class LeaverFlowService {
       this.escalate(flow, 'execution_failed', r.summary);
     }
     saveFlow(flow);
-    // The flow is closed (done or failed): its links can no longer confirm anything, so the delivered copies go.
-    forgetDelivered(flow.messageIds);
     return flow;
   }
 

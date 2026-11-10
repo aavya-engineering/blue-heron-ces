@@ -1,33 +1,34 @@
 {
-  "rawResponse": "{\r\n    \"id\":  \"user-48\",\r\n    \"displayName\":  \"Dorrel Nettlecombe (Admin)\",\r\n    \"userPrincipalName\":  \"adm.dorrel.nettlecombe@s1-mach.simtenant.onmicrosoft.us\",\r\n    \"accountEnabled\":  true,\r\n    \"assignedLicenses\":  [\r\n\r\n                         ],\r\n    \"followsConvention\":  true,\r\n    \"privileged\":  true,\r\n    \"breakGlass\":  false\r\n}\r\n",
-  "outcome": "automated_success",
-  "outcomeRationale": "Resource already exists — creation skipped (idempotent)",
-  "complianceVerdict": "SAT",
-  "verdictRationale": "existing equivalent 'Dorrel Nettlecombe (Admin)' verified by effect (4 conditions) (existing equivalent 'Dorrel Nettlecombe (Admin)' matched by effect)",
-  "verificationResult": {
-    "passed": true,
-    "confidence": "HIGH",
-    "score": 100,
-    "details": {
-      "exit_code_check": true,
-      "set_output_check": null,
-      "evidence_check": true
-    },
-    "reason": "existing equivalent 'Dorrel Nettlecombe (Admin)' verified by effect (4 conditions)"
+  "rawResponse": "",
+  "outcome": "failed_remediation_available",
+  "outcomeRationale": "Command failed: exit_code_0",
+  "failureDiagnostics": {
+    "rootCause": "exit_code_0",
+    "failureCategory": "FATAL",
+    "remediationSteps": [
+      "Review command output and stderr for specific error details",
+      "Check M365 GCC High service health dashboard",
+      "Consult PowerShell module documentation for the failing command"
+    ],
+    "exitCode": 0,
+    "stderrTail": "",
+    "stdoutTail": ""
   },
+  "complianceVerdict": "NOT_SAT",
+  "verdictRationale": "read returned nothing: absence not shown",
   "registryEntry": {
     "entry_id": "AC.L2-3.1.6.admin-account",
-    "label": "Create Dedicated Admin Account",
+    "label": "Prohibition: Create Dedicated Admin Account",
     "engine": "mgraph",
-    "layer_hint": 1,
+    "layer_hint": 8,
     "sequence_hint": 2,
-    "idempotency": "get-then-set",
+    "idempotency": "safe",
     "on_failure": "abort_step",
     "control_ids": [
       "AC.L2-3.1.6"
     ],
     "get_command": "$roles = @('62e90394-69f5-4237-9190-012177145e10','e8611ab8-c189-46e8-94e1-60213ab1f814','194ae4cb-b126-40b2-bd5b-6091b380977d','3a2c62db-5318-420d-8d74-23affee5d9d5','29232cdf-9323-42fd-ade2-1d097af3e4de','17315797-102d-40b4-93e0-432062caca18','f28a1f50-f6e7-4571-818b-6a12f2af6b6c','fe930be7-5e62-47db-91af-98c3a49a38b1'); $priv = @(@((Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/roleManagement/directory/roleAssignments').value) + @((Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/roleManagement/directory/roleEligibilitySchedules').value) | Where-Object { $roles -contains $_.roleDefinitionId } | ForEach-Object { $_.principalId }); $bg = @((Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/identity/conditionalAccess/policies').value | Where-Object { $_.state -eq 'enabled' -and @($_.conditions.users.includeUsers) -contains 'All' } | ForEach-Object { $_.conditions.users.excludeUsers }); (Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/users?$select=id,displayName,userPrincipalName,accountEnabled,assignedLicenses').value | ForEach-Object { [pscustomobject]@{ id = $_.id; displayName = $_.displayName; userPrincipalName = $_.userPrincipalName; accountEnabled = $_.accountEnabled; assignedLicenses = @($_.assignedLicenses); followsConvention = ([string]$_.userPrincipalName -match '{adminNamingPattern}'); privileged = ($priv -contains $_.id); breakGlass = ($bg -contains $_.id) } } | Where-Object { ($_.displayName -eq 'Admin-{adminUserName}') -or (($_.privileged -eq $true) -and ($_.breakGlass -eq $false) -and ($_.accountEnabled -eq $true) -and ((@($_.assignedLicenses | Where-Object { $_ }).Count -eq 0) -or ($_.followsConvention -eq $true))) } | Sort-Object { $_.displayName -ne 'Admin-{adminUserName}' } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
-    "set_command": "New-MgUser -DisplayName 'Admin-{adminUserName}' -UserPrincipalName 'admin-{adminUserName}@{tenantName}' -PasswordProfile @{Password='{initialPassword}';ForceChangePasswordNextSignIn=$true} -AccountEnabled:$true",
+    "set_command": "",
     "evidence_commands": [
       "Get-MgUser -Filter 'displayName eq ''Admin-{adminUserName}''' | Where-Object { $_.DisplayName -eq 'Admin-{adminUserName}' } | Select-Object -First 1 | Select-Object Id,DisplayName,UserPrincipalName,AccountEnabled,CreatedDateTime | ConvertTo-Json -Depth 10"
     ]
@@ -36,60 +37,11 @@
     "controlIds": [
       "AC.L2-3.1.6"
     ],
-    "timestamp": "2026-11-02T01:40:42.933Z",
+    "timestamp": "2026-11-01T15:28:38.894Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
-    "commandExecuted": "New-MgUser -DisplayName 'Admin-{adminUserName}' -UserPrincipalName 'admin-{adminUserName}@{tenantName}' -PasswordProfile @{Password='{initialPassword}';ForceChangePasswordNextSignIn=$true} -AccountEnabled:$true",
-    "sha256Hash": "ab77995a61b5b02c791e87b3ed267f78e5edee772316127f4f38e937d3c36109",
+    "commandExecuted": "[manual/evidence-only] Prohibition: Create Dedicated Admin Account",
+    "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "moduleVersions": {},
-    "environment": "GCC-High",
-    "preStateOutput": "{\r\n    \"id\":  \"user-48\",\r\n    \"displayName\":  \"Dorrel Nettlecombe (Admin)\",\r\n    \"userPrincipalName\":  \"adm.dorrel.nettlecombe@s1-mach.simtenant.onmicrosoft.us\",\r\n    \"accountEnabled\":  true,\r\n    \"assignedLicenses\":  [\r\n\r\n                         ],\r\n    \"followsConvention\":  true,\r\n    \"privileged\":  true,\r\n    \"breakGlass\":  false\r\n}\r\n",
-    "postcheckMode": "state",
-    "lookupMatch": {
-      "basis": "effect",
-      "object": "Dorrel Nettlecombe (Admin)",
-      "conditions": [
-        {
-          "path": "$.privileged",
-          "op": "equals",
-          "expected": true,
-          "observed": true,
-          "pass": true
-        },
-        {
-          "path": "$.breakGlass",
-          "op": "equals",
-          "expected": false,
-          "observed": false,
-          "pass": true
-        },
-        {
-          "path": "$.accountEnabled",
-          "op": "equals",
-          "expected": true,
-          "observed": true,
-          "pass": true
-        },
-        {
-          "path": "$.assignedLicenses | $.followsConvention",
-          "op": "any_of",
-          "expected": [
-            {
-              "path": "$.assignedLicenses",
-              "op": "empty"
-            },
-            {
-              "path": "$.followsConvention",
-              "op": "equals",
-              "value": true
-            }
-          ],
-          "observed": [
-            [],
-            true
-          ],
-          "pass": true
-        }
-      ]
-    }
+    "environment": "GCC-High"
   }
 }

@@ -1,0 +1,35 @@
+{
+  "rawResponse": "",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "SI.L1-3.14.4.av-signatures",
+    "label": "Antivirus Signature Currency via Intune",
+    "engine": "mgraph",
+    "layer_hint": 4,
+    "sequence_hint": 7,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "SI.L1-3.14.4"
+    ],
+    "get_command": "Get-MgDeviceManagementDeviceConfiguration -All | Where-Object { $_.DisplayName -eq 'CMMC-Defender-AntivirusPolicy' } | Select-Object DisplayName, Id, LastModifiedDateTime | ConvertTo-Json",
+    "set_command": "",
+    "evidence_commands": [
+      "Get-MgDeviceManagementDeviceConfiguration -All | Where-Object { $_.DisplayName -eq 'CMMC-Defender-AntivirusPolicy' } | Select-Object DisplayName, Id, LastModifiedDateTime | ConvertTo-Json"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SI.L1-3.14.4"
+    ],
+    "timestamp": "2026-11-01T15:25:48.876Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] Antivirus Signature Currency via Intune",
+    "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

@@ -18,7 +18,7 @@
 | **Assessment Route** | certification |
 | **Boundary Strategy** | single_enclave |
 | **Deployment Posture** | cloud_only |
-| **SSP Date** | 2026-11-02 |
+| **SSP Date** | 2026-11-01 |
 
 ## 2. System Description
 
@@ -86,9 +86,9 @@ Corvelline Defense Assemblies Inc. (FICTIONAL) implements security controls acro
 | Status | Count | Percentage |
 |--------|-------|-----------|
 | Met | 0 | 0% |
-| Partial | 24 | — |
-| Not Met | 89 | — |
-| Unknown | 16 | — |
+| Partial | 25 | — |
+| Not Met | 87 | — |
+| Unknown | 17 | — |
 | **Total** | **129** | — |
 
 ## 5. Organizational Defined Parameters (ODPs)
@@ -123,7 +123,7 @@ Corvelline Defense Assemblies Inc. (FICTIONAL) implements security controls acro
 
 | Field | Value |
 |-------|-------|
-| Policy Effective Date | 2026-11-02 |
+| Policy Effective Date | 2026-11-01 |
 | Review Cycle | Every 12 months |
 | Next Review Date | 2027-11-01 |
 | Affirming Official | Derwyn Arrowbrook |
@@ -138,7 +138,7 @@ Corvelline Defense Assemblies Inc. (FICTIONAL) implements security controls acro
 ---
 
 **Prepared by:** Belmira Pennanmore
-**Date:** 2026-11-02
+**Date:** 2026-11-01
 
 ## Approval
 

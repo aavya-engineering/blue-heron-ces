@@ -1,0 +1,50 @@
+{
+  "rawResponse": "\r\nId                                   Name                                \r\n--                                   ----                                \r\n11111111-1111-1111-1111-111111111111 11111111-1111-1111-1111-111111111111\r\n\r\n\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "AZ-CTX-001",
+    "label": "Set Azure Subscription Context",
+    "engine": "az",
+    "layer_hint": 6,
+    "sequence_hint": 1,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "SC.L1-3.13.1"
+    ],
+    "get_command": "Get-AzContext | Select-Object -ExpandProperty Subscription | Where-Object { $_.Id -eq '{subscriptionId}' } | Select-Object Id,Name | ConvertTo-Json",
+    "set_command": "Set-AzContext -Subscription '{subscriptionId}'",
+    "evidence_commands": [
+      "Get-AzContext | Select-Object -ExpandProperty Subscription | Where-Object { $_.Id -eq '{subscriptionId}' }"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "SC.L1-3.13.1"
+    ],
+    "timestamp": "2026-11-01T17:11:04.802Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "Set-AzContext -Subscription '{subscriptionId}'",
+    "sha256Hash": "fca072348bbc30be2c7b82d67d92752a7f9520aedc63d3a9e56b867c848c55b0",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\r\n    \"Id\":  \"11111111-1111-1111-1111-111111111111\",\r\n    \"Name\":  \"11111111-1111-1111-1111-111111111111\"\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

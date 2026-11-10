@@ -1,0 +1,50 @@
+{
+  "rawResponse": "{\r\n    \"id\":  \"namedLocation-1\",\r\n    \"ipRanges\":  [\r\n                     {\r\n                         \"cidrAddress\":  \"192.0.2.0/26\",\r\n                         \"@odata.type\":  \"#microsoft.graph.iPv4CidrRange\"\r\n                     }\r\n                 ],\r\n    \"displayName\":  \"Approved-CUI-Networks\",\r\n    \"isTrusted\":  true,\r\n    \"@odata.type\":  \"#microsoft.graph.ipNamedLocation\",\r\n    \"AdditionalProperties\":  {\r\n                                 \"@odata.type\":  \"#microsoft.graph.ipNamedLocation\",\r\n                                 \"ipRanges\":  [\r\n                                                  {\r\n                                                      \"cidrAddress\":  \"192.0.2.0/26\",\r\n                                                      \"@odata.type\":  \"#microsoft.graph.iPv4CidrRange\"\r\n                                                  }\r\n                                              ],\r\n                                 \"isTrusted\":  true\r\n                             }\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "All verification checks passed",
+  "verificationResult": {
+    "passed": true,
+    "confidence": "HIGH",
+    "score": 100,
+    "details": {
+      "exit_code_check": true,
+      "set_output_check": null,
+      "evidence_check": true
+    },
+    "reason": "All verification checks passed"
+  },
+  "registryEntry": {
+    "entry_id": "AC.L2-3.1.12.named-location",
+    "label": "Create Approved CUI Named Location (IP Range)",
+    "engine": "mgraph",
+    "layer_hint": 7,
+    "sequence_hint": 0,
+    "idempotency": "get-then-set",
+    "on_failure": "abort_step",
+    "control_ids": [
+      "AC.L2-3.1.12"
+    ],
+    "get_command": "Get-MgIdentityConditionalAccessNamedLocation -Filter \"displayName eq 'Approved-CUI-Networks'\" | ConvertTo-Json",
+    "set_command": "New-MgIdentityConditionalAccessNamedLocation -BodyParameter @{'@odata.type'='#microsoft.graph.ipNamedLocation';displayName='Approved-CUI-Networks';isTrusted=$true;ipRanges=@(@{'@odata.type'='#microsoft.graph.iPv4CidrRange';cidrAddress='{approvedIpRange}'})}",
+    "evidence_commands": [
+      "Get-MgIdentityConditionalAccessNamedLocation -Filter \"displayName eq 'Approved-CUI-Networks'\" | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AC.L2-3.1.12"
+    ],
+    "timestamp": "2026-11-01T06:58:10.702Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "New-MgIdentityConditionalAccessNamedLocation -BodyParameter @{'@odata.type'='#microsoft.graph.ipNamedLocation';displayName='Approved-CUI-Networks';isTrusted=$true;ipRanges=@(@{'@odata.type'='#microsoft.graph.iPv4CidrRange';cidrAddress='{approvedIpRange}'})}",
+    "sha256Hash": "578c3b16de1e303e761661e9667ea294287bee4a8b666af651ba9e0291bb7c1c",
+    "moduleVersions": {},
+    "environment": "GCC-High",
+    "preStateOutput": "",
+    "postStateOutput": "{\r\n    \"id\":  \"namedLocation-1\",\r\n    \"ipRanges\":  [\r\n                     {\r\n                         \"cidrAddress\":  \"192.0.2.0/26\",\r\n                         \"@odata.type\":  \"#microsoft.graph.iPv4CidrRange\"\r\n                     }\r\n                 ],\r\n    \"displayName\":  \"Approved-CUI-Networks\",\r\n    \"isTrusted\":  true,\r\n    \"@odata.type\":  \"#microsoft.graph.ipNamedLocation\",\r\n    \"AdditionalProperties\":  {\r\n                                 \"@odata.type\":  \"#microsoft.graph.ipNamedLocation\",\r\n                                 \"ipRanges\":  [\r\n                                                  \"@{cidrAddress=192.0.2.0/26; @odata.type=#microsoft.graph.iPv4CidrRange}\"\r\n                                              ],\r\n                                 \"isTrusted\":  true\r\n                             }\r\n}\r\n",
+    "stateChanged": true,
+    "postcheckMode": "state"
+  }
+}

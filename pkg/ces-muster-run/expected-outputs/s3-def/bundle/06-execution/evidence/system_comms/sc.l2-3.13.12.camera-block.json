@@ -1,5 +1,5 @@
 {
-  "rawResponse": "{\r\n    \"id\":  \"deviceConfiguration-15\",\r\n    \"createdDateTime\":  \"2026-11-02T11:36:13.280Z\",\r\n    \"cameraBlocked\":  true,\r\n    \"displayName\":  \"CMMC-CollaborativeDeviceBlock\",\r\n    \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n    \"isAssigned\":  true\r\n}\r\n",
+  "rawResponse": "{\r\n    \"id\":  \"deviceConfiguration-10\",\r\n    \"createdDateTime\":  \"2026-11-01T06:58:02.628Z\",\r\n    \"cameraBlocked\":  true,\r\n    \"displayName\":  \"CMMC-CollaborativeDeviceBlock\",\r\n    \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n    \"isAssigned\":  true\r\n}\r\n",
   "outcome": "automated_success",
   "outcomeRationale": "Command completed successfully (exit code 0)",
   "complianceVerdict": "SAT",
@@ -36,14 +36,14 @@
     "controlIds": [
       "SC.L2-3.13.12"
     ],
-    "timestamp": "2026-11-02T11:36:14.153Z",
+    "timestamp": "2026-11-01T06:58:03.485Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "$created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations' -Body (@{'@odata.type'='#microsoft.graph.windows10GeneralConfiguration';displayName='CMMC-CollaborativeDeviceBlock';cameraBlocked=$true} | ConvertTo-Json) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | ConvertTo-Json -Depth 10",
-    "sha256Hash": "e5d3e0eecb7d44867f15677015cf715d8796a3687c1ddec36f4609c8c4a57549",
+    "sha256Hash": "894a47d404bcd11099aa04a2c83a828f9e7f1eaace60c45b9cd14f3b4bca699f",
     "moduleVersions": {},
     "environment": "GCC-High",
     "preStateOutput": "",
-    "postStateOutput": "{\r\n    \"id\":  \"deviceConfiguration-15\",\r\n    \"createdDateTime\":  \"2026-11-02T11:36:13.280Z\",\r\n    \"cameraBlocked\":  true,\r\n    \"displayName\":  \"CMMC-CollaborativeDeviceBlock\",\r\n    \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceConfiguration-15_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ],\r\n    \"isAssigned\":  true\r\n}\r\n",
+    "postStateOutput": "{\r\n    \"id\":  \"deviceConfiguration-10\",\r\n    \"createdDateTime\":  \"2026-11-01T06:58:02.628Z\",\r\n    \"cameraBlocked\":  true,\r\n    \"displayName\":  \"CMMC-CollaborativeDeviceBlock\",\r\n    \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceConfiguration-10_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ],\r\n    \"isAssigned\":  true\r\n}\r\n",
     "stateChanged": true,
     "postcheckMode": "state"
   }

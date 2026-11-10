@@ -18,10 +18,7 @@ $script:EutContext = $null
 
 function Get-EutTenantConfig {
     param([Parameter(Mandatory)][string]$TenantSlug)
-    # PL-123 / CR-17: CES_STAMPER_TENANTS_DIR overrides the Stamper tenant-config folder (tests and the unit gate
-    # point it at a temp folder); unset = the real Stamper folder, ~\.stamper\tenants.
-    $dir = if ($env:CES_STAMPER_TENANTS_DIR) { $env:CES_STAMPER_TENANTS_DIR } else { Join-Path $HOME '.stamper\tenants' }
-    $path = Join-Path $dir "$TenantSlug.json"
+    $path = Join-Path $HOME ".stamper\tenants\$TenantSlug.json"
     if (-not (Test-Path $path)) { throw "Tenant config not found: $path" }
     Get-Content $path -Raw | ConvertFrom-Json
 }

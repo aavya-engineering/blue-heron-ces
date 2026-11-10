@@ -14,11 +14,7 @@
 //  - adminops_leaver_flows        one record per leaver flow (its state changes: awaiting -> confirmed -> done);
 //  - adminops_leaver_settings     one record per tenant (admin recipients, BHD opt-in, the windows);
 //  - adminops_mail_outbox         the simulated mail outbox (FD-6: composed and RECORDED, never delivered), the
-//                                 same record shape as Muster's muster_mail_outbox (mailOutbox.ts), insert-only.
-//                                 PL-122 (clean-room CR-24): a confirm link's token is never stored here. The stored
-//                                 body carries `?t=<redacted>` and the sha256 covers that stored body; the clear copy
-//                                 (the simulated recipient's mail) lives only in this process's memory (see
-//                                 rememberDelivered below);
+//                                 same record shape as Muster's muster_mail_outbox (mailOutbox.ts), insert-only;
 //  - adminops_leaver_escalations  one record per unconfirmed (or failed) leaver flow, insert-only; EO's collection
 //                                 scheduler records each as an EO finding.
 // The two insert-only collections are not yet on ces-shared's DEFAULT_WORM_COLLECTIONS (another owner's file;
@@ -114,7 +110,7 @@ export const MAX_WINDOW_MINUTES = 30 * 24 * 60;
 export interface FlowToken {
   /** The recipient this token was sent to (the confirmer, when used). */
   recipient: string;
-  /** SHA-256 of the token; the token itself is only in the delivered (in-memory) copy of the message, never stored. */
+  /** SHA-256 of the token; the token itself is only in the message. */
   sha256: string;
   expiresAt: string;
   usedAt?: string;
@@ -197,48 +193,6 @@ export function outboxHash(m: Pick<OutboxMessage, 'from' | 'to' | 'subject' | 'b
   return sha256Hex(canonical);
 }
 
-/** What a stored message body shows instead of a confirm token (PL-122). */
-export const REDACTED_TOKEN = '<redacted>';
-const CONFIRM_LINK_TOKEN = /(\/leaver\/confirm\/[^?\s]+\?t=)([^\s&#]+)/g;
-
-/** A message body with every confirm-link token replaced by `<redacted>` (what ces.db keeps). */
-export function redactConfirmTokens(body: string): string {
-  return body.replace(CONFIRM_LINK_TOKEN, (_m, head: string) => `${head}${REDACTED_TOKEN}`);
-}
-
-// PL-122: the simulated delivery. Each message that carries a confirm link keeps its clear body here, in process
-// memory only (never ces.db, never a file), so the operator's GET /api/leaver/outbox can show the simulated
-// recipient's mail while the flow is open. Dropped when the flow closes, and capped so it cannot grow without end.
-// A restart loses them; the next reminder or escalation mints fresh links.
-const deliveredCopies = new Map<string, string>();
-export const MAX_DELIVERED_COPIES = 5000;
-
-export function rememberDelivered(messageId: string, clearBody: string): void {
-  deliveredCopies.delete(messageId);
-  deliveredCopies.set(messageId, clearBody);
-  while (deliveredCopies.size > MAX_DELIVERED_COPIES) {
-    const oldest = deliveredCopies.keys().next().value;
-    if (oldest === undefined) break;
-    deliveredCopies.delete(oldest);
-  }
-}
-
-export function forgetDelivered(messageIds: readonly string[]): void {
-  for (const id of messageIds) deliveredCopies.delete(id);
-}
-
-/**
- * The tenant's outbox as the simulated recipients see it: the stored records, with the clear body put back for
- * the messages whose copy is still in memory (`delivered_copy: true`; their sha256 still covers the stored,
- * redacted body). Used only by the bearer-gated operator route.
- */
-export function listOutboxDelivered(tenantSlug: string): Array<OutboxMessage & { delivered_copy?: true }> {
-  return listOutbox(tenantSlug).map((m) => {
-    const clear = deliveredCopies.get(m.id);
-    return clear === undefined ? m : { ...m, body: clear, delivered_copy: true as const };
-  });
-}
-
 const repo = () => getCesRepository();
 
 const scopeOf = (tenantSlug: string, tenantId?: string) => ({ tenantSlug, ...(tenantId ? { tenantId } : {}) });
@@ -261,9 +215,7 @@ export function listFlows(tenantSlug: string): LeaverFlow[] {
   return repo().list<LeaverFlow>(LEAVER_COLLECTIONS.flows, { tenantSlug }).map((r) => r.data);
 }
 
-/** Insert one outbox record. A body that still carries a confirm token is refused (PL-122): redact it first. */
 export function recordMessage(m: OutboxMessage): OutboxMessage {
-  if (redactConfirmTokens(m.body) !== m.body) throw new Error(`${LEAVER_COLLECTIONS.outbox}: message "${m.id}" carries a confirm token; store it redacted`);
   insertOnce(LEAVER_COLLECTIONS.outbox, m.id, scopeOf(m.tenant_slug, m.tenant_id), m);
   return m;
 }

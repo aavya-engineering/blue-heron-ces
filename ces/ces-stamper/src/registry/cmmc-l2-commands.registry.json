@@ -1253,7 +1253,7 @@
         },
         "postcheck_mode": "state"
       },
-      "notes": "Deploys a WPA2-Enterprise Wi-Fi profile via Intune device configuration. Requires wifiSsid variable. Evidence proves wireless access is authorized and configured with enterprise authentication per AC.L2-3.1.16. PL-121 (founder ruling 2026-11-01): a setting built from an unanswered placeholder never counts; a read showing Muster's placeholder SSID (MUSTER-DEFAULT-SSID) is NOT_SAT: a profile for a network that does not exist authorizes no wireless access (shared guard, src/shared/musterPlaceholders.ts).",
+      "notes": "Deploys a WPA2-Enterprise Wi-Fi profile via Intune device configuration. Requires wifiSsid variable. Evidence proves wireless access is authorized and configured with enterprise authentication per AC.L2-3.1.16.",
       "lookup": {
         "source": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations?$expand=assignments').value",
         "by_name": {
@@ -4399,7 +4399,7 @@
         },
         "postcheck_mode": "state"
       },
-      "notes": "DEPTH-10.8 (P12-R4). User response: when a user reports a message as phishing or junk with Outlook's built-in Report button, the report goes to Microsoft and to the organisation's security mailbox ({securityEmail}), so the incident-handling team receives users' reports (IR.L2-3.6.1[g], the capability includes user response activities). Sets the one organisation policy, DefaultReportSubmissionPolicy (Defender portal: Settings > Email & collaboration > User reported settings). Learn notes a matching report submission rule (New-ReportSubmissionRule -SentTo) is advisable but not required; not created here. The security mailbox must exist as an Exchange Online mailbox. GCC High: user reported settings are part of Exchange Online Protection / Defender for Office 365 (portal security.microsoft.us); no licence gate in G5. No recurring Azure cost. PL-121 (founder ruling 2026-11-01): a setting built from an unanswered placeholder never counts; a read showing Muster's placeholder mailbox (unset-security-email@example.invalid) is NOT_SAT: reports routed to it reach no incident handler (shared guard, src/shared/musterPlaceholders.ts)."
+      "notes": "DEPTH-10.8 (P12-R4). User response: when a user reports a message as phishing or junk with Outlook's built-in Report button, the report goes to Microsoft and to the organisation's security mailbox ({securityEmail}), so the incident-handling team receives users' reports (IR.L2-3.6.1[g], the capability includes user response activities). Sets the one organisation policy, DefaultReportSubmissionPolicy (Defender portal: Settings > Email & collaboration > User reported settings). Learn notes a matching report submission rule (New-ReportSubmissionRule -SentTo) is advisable but not required; not created here. The security mailbox must exist as an Exchange Online mailbox. GCC High: user reported settings are part of Exchange Online Protection / Defender for Office 365 (portal security.microsoft.us); no licence gate in G5. No recurring Azure cost."
     },
     {
       "entry_id": "MA.L2-3.7.1.update-ring",
@@ -4860,7 +4860,7 @@
         "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations?$expand=assignments').value | Where-Object { ($_.storageBlockRemovableStorage -eq $true) -and (@($_.assignments | Where-Object { $_ }).Count -gt 0) } | ConvertTo-Json -Depth 10"
       ],
       "on_failure": "warn_continue",
-      "notes": "DEPTH-10.7 (P12-R2): reads the assigned Intune device restriction that blocks removable storage (the one AC.L2-3.1.21.block-storage creates or adopts), selected by effect, not by name: storageBlockRemovableStorage true and at least one assignment. Access to removable media containing CUI is controlled by denying it (MP.L2-3.8.5[a]). Read-only: under a document-prohibition directive this is the read that shows the prohibition is enforced; an empty read is NOT_SAT (founder Q3). GCC High: Intune device configuration is a standard MDM feature in GCC High (https://learn.microsoft.com/intune/fundamentals/government-service). FIX-SCORE (STOP-RF11-1, PL-119): its task runs after the one holding AC.L2-3.1.21.block-storage (read_after), so the read is never empty by ordering alone (R-F11 S3 and mp: read at plan position 3, block-storage at 28/30).",
+      "notes": "DEPTH-10.7 (P12-R2): reads the assigned Intune device restriction that blocks removable storage (the one AC.L2-3.1.21.block-storage creates or adopts), selected by effect, not by name: storageBlockRemovableStorage true and at least one assignment. Access to removable media containing CUI is controlled by denying it (MP.L2-3.8.5[a]). Read-only: under a document-prohibition directive this is the read that shows the prohibition is enforced; an empty read is NOT_SAT (founder Q3). GCC High: Intune device configuration is a standard MDM feature in GCC High (https://learn.microsoft.com/intune/fundamentals/government-service).",
       "verification": {
         "evidence": {
           "jsonpath": "$.storageBlockRemovableStorage",
@@ -4876,8 +4876,7 @@
             }
           ]
         }
-      },
-      "read_after": ["AC.L2-3.1.21.block-storage"]
+      }
     },
     {
       "entry_id": "MP.L2-3.8.6.bitlocker",
@@ -6548,10 +6547,9 @@
           ]
         },
         "consistency_hint": "eventual_slow",
-        "placeholder_ignore": ["$.InternalSenderAdminAddress"],
         "postcheck_mode": "state"
       },
-      "notes": "Creates a malware filter policy with file type rejection and internal admin notification. Requires securityEmail variable for admin notifications. Evidence proves malicious code protection at the email transport layer per SI.L1-3.14.2. PL-121 Round 2 (founder 2026-11-02: the setting that provides the protection must not depend on a placeholder): the file filter is the protection; the admin-notification address (InternalSenderAdminAddress) is incidental, so a Muster placeholder there is ignored (verification.placeholder_ignore). A placeholder anywhere else in the read is NOT_SAT (shared guard, src/shared/musterPlaceholders.ts).",
+      "notes": "Creates a malware filter policy with file type rejection and internal admin notification. Requires securityEmail variable for admin notifications. Evidence proves malicious code protection at the email transport layer per SI.L1-3.14.2.",
       "lookup": {
         "source": "Get-MalwareFilterPolicy",
         "by_name": {
@@ -7891,11 +7889,10 @@
         "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object { $_.'@odata.type' -like '*wifi*' } | ForEach-Object { [pscustomobject]@{ displayName = $_.displayName; id = $_.id; odataType = $_.'@odata.type'; ssid = $_.ssid; wifiSecurityType = $_.wifiSecurityType } } | ConvertTo-Json -Depth 5"
       ],
       "on_failure": "warn_continue",
-      "notes": "PH-13 (founder Q3, P13-ST): reads the Wi-Fi profiles by their Graph @odata.type (windowsWifiConfiguration, iosWiFiConfiguration, ...), REST-created ones included. An empty result is not evidence (founder Q3): no managed wireless profile is NOT_SAT; a tenant without wireless records that with a document-absence directive, not an empty read. FIX-SCORE (STOP-RF11-1 sibling): its task runs after the one holding AC.L2-3.1.16.wifi-profile (read_after), which creates CES's profile. PL-121 (founder ruling 2026-11-01): a profile whose SSID is Muster's unanswered placeholder (MUSTER-DEFAULT-SSID) never counts (shared guard, ces-stamper src/shared/musterPlaceholders.ts).",
+      "notes": "PH-13 (founder Q3, P13-ST): reads the Wi-Fi profiles by their Graph @odata.type (windowsWifiConfiguration, iosWiFiConfiguration, ...), REST-created ones included. An empty result is not evidence (founder Q3): no managed wireless profile is NOT_SAT; a tenant without wireless records that with a document-absence directive, not an empty read.",
       "verification": {
         "evidence": {}
-      },
-      "read_after": ["AC.L2-3.1.16.wifi-profile"]
+      }
     },
     {
       "entry_id": "IA.L1-3.5.1.identity-evidence",

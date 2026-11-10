@@ -1,6 +1,6 @@
 # Risk Assessment Report EDC-DOC-001-2026
 
-**Effective Date:** 2026-11-02
+**Effective Date:** 2026-11-01
 **Organization:** Sim tenant muster-partial
 **Authorizing Official:** Designated Official
 **Methodology:** NIST SP 800-30 Revision 1 (Rev 1 (September 2012))
@@ -49,7 +49,7 @@ Technical vulnerability data sources include Microsoft Defender for Cloud findin
 
 Organizational vulnerabilities are derived from readiness posture assessment results, specifically controls assessed as NOT MET in the current compliance posture.
 
-Current posture: 0 MET, 57 PARTIAL, 56 NOT MET, 21 UNKNOWN out of 134 total controls (0% compliance).
+Current posture: 0 MET, 60 PARTIAL, 52 NOT MET, 22 UNKNOWN out of 134 total controls (0% compliance).
 
 ### Environmental Vulnerabilities
 
@@ -90,6 +90,6 @@ I, Designated Official, as the Authorizing Official, have reviewed and approve t
 
 ---
 
-**Effective Date:** 2026-11-02
+**Effective Date:** 2026-11-01
 **CMMC Controls:** 3.11.1
 **Policy Owner:** Designated Official

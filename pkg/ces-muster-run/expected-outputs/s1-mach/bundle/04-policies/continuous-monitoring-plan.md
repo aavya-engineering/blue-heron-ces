@@ -8,7 +8,7 @@
 |-------|-------|
 | **Organization** | Hollinford Precision Machining LLC (FICTIONAL) |
 | **CMMC Level** | L2 |
-| **Effective Date** | 2026-11-02 |
+| **Effective Date** | 2026-11-01 |
 | **Prepared By** | Corvane Marrowholt |
 | **Authorizing Official** | Alvane Ashenmere, President / Owner |
 
@@ -69,7 +69,7 @@ This plan shall be reviewed every **12** months. Next scheduled review: **2027-1
 
 ---
 
-**Effective Date:** 2026-11-02
+**Effective Date:** 2026-11-01
 **NIST SP 800-171 Controls:** 3.12.3 (with 3.3.1, 3.3.5, 3.11.2, 3.11.3, 3.12.1, 3.12.2, 3.12.4, 3.14.1)
 **Plan Owner:** Corvane Marrowholt
 

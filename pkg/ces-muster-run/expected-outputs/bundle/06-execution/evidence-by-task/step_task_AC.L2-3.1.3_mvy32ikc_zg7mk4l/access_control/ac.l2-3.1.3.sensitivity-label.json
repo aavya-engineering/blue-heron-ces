@@ -1,0 +1,36 @@
+{
+  "rawResponse": "{\r\n    \"Name\":  \"CMMC-CUI-Policy\",\r\n    \"Labels\":  \"CUI\",\r\n    \"ExchangeLocation\":  \"All\",\r\n    \"SharePointLocation\":  null,\r\n    \"OneDriveLocation\":  null,\r\n    \"Mode\":  null,\r\n    \"WhenCreated\":  null\r\n}\r\n",
+  "outcome": "automated_success",
+  "outcomeRationale": "Command completed successfully (exit code 0)",
+  "complianceVerdict": "SAT",
+  "verdictRationale": "Outcome 'automated_success' indicates compliance requirement is satisfied",
+  "registryEntry": {
+    "entry_id": "AC.L2-3.1.3.sensitivity-label",
+    "label": "CUI Sensitivity Label and Publishing Policy",
+    "engine": "ipps",
+    "layer_hint": 7,
+    "sequence_hint": 1,
+    "idempotency": "evidence-only",
+    "on_failure": "warn_continue",
+    "control_ids": [
+      "AC.L2-3.1.3"
+    ],
+    "get_command": "Get-LabelPolicy | Where-Object { $_.Name -like '*CUI*' -or $_.Name -like '*CMMC*' } | Select-Object Name,Labels,ExchangeLocation",
+    "set_command": "",
+    "evidence_commands": [
+      "Get-Label | Where-Object { $_.DisplayName -like '*CUI*' -or $_.Name -like '*CMMC*' } | Select-Object Name,DisplayName,Priority,Disabled,ContentType,WhenCreated | ConvertTo-Json -Depth 10",
+      "Get-LabelPolicy | Where-Object { $_.Name -like '*CUI*' -or $_.Name -like '*CMMC*' } | Select-Object Name,Labels,ExchangeLocation,SharePointLocation,OneDriveLocation,Mode,WhenCreated | ConvertTo-Json -Depth 10"
+    ]
+  },
+  "metadata": {
+    "controlIds": [
+      "AC.L2-3.1.3"
+    ],
+    "timestamp": "2026-11-01T17:11:36.412Z",
+    "executorIdentity": "stamper/2.2.3@no-mgcontext",
+    "commandExecuted": "[manual/evidence-only] CUI Sensitivity Label and Publishing Policy",
+    "sha256Hash": "14a31119261d173989813fc2344b4abf07abef3db00c1881b7b0249a95a5aa6d",
+    "moduleVersions": {},
+    "environment": "GCC-High"
+  }
+}

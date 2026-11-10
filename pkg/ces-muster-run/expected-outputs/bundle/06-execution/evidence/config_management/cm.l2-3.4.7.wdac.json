@@ -1,5 +1,5 @@
 {
-  "rawResponse": "{\r\n    \"value\":  [\r\n                  {\r\n                      \"id\":  \"deviceConfiguration-7\",\r\n                      \"createdDateTime\":  \"2026-11-02T12:14:41.079Z\",\r\n                      \"appsAllowTrustedAppsSideloading\":  \"blocked\",\r\n                      \"displayName\":  \"CMMC-AppControl-Policy\",\r\n                      \"smartScreenBlockPromptOverride\":  true,\r\n                      \"smartScreenBlockPromptOverrideForFiles\":  true,\r\n                      \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n                      \"isAssigned\":  true\r\n                  }\r\n              ]\r\n}\r\n",
+  "rawResponse": "{\r\n    \"value\":  [\r\n                  {\r\n                      \"id\":  \"deviceConfiguration-7\",\r\n                      \"createdDateTime\":  \"2026-11-01T17:10:50.320Z\",\r\n                      \"appsAllowTrustedAppsSideloading\":  \"blocked\",\r\n                      \"displayName\":  \"CMMC-AppControl-Policy\",\r\n                      \"smartScreenBlockPromptOverride\":  true,\r\n                      \"smartScreenBlockPromptOverrideForFiles\":  true,\r\n                      \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n                      \"isAssigned\":  true\r\n                  }\r\n              ]\r\n}\r\n",
   "outcome": "automated_success",
   "outcomeRationale": "Command completed successfully (exit code 0)",
   "complianceVerdict": "SAT",
@@ -36,14 +36,14 @@
     "controlIds": [
       "CM.L2-3.4.7"
     ],
-    "timestamp": "2026-11-02T12:14:41.893Z",
+    "timestamp": "2026-11-01T17:10:51.142Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "$created = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations' -Body (@{'@odata.type'='#microsoft.graph.windows10GeneralConfiguration';displayName='CMMC-AppControl-Policy';smartScreenBlockPromptOverride=$true;smartScreenBlockPromptOverrideForFiles=$true;appsAllowTrustedAppsSideloading='blocked'} | ConvertTo-Json -Depth 10) -ContentType 'application/json'; Invoke-MgGraphRequest -Method POST -Uri \"https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations/$($created.id)/assign\" -Body (@{assignments=@(@{target=@{'@odata.type'='#microsoft.graph.groupAssignmentTarget';groupId='{cuiGroupId}'}})} | ConvertTo-Json -Depth 10) -ContentType 'application/json' | Out-Null; $created | ConvertTo-Json -Depth 10",
-    "sha256Hash": "5fafcfcc0e913fb5e5ca91e4f280e20042991c8bdbd3cab0fb27b7b3f697290e",
+    "sha256Hash": "662461bde715ccd8b919630a834d6da418a5fffa67935131c9b5344d78e03bca",
     "moduleVersions": {},
     "environment": "GCC-High",
     "preStateOutput": "",
-    "postStateOutput": "{\r\n    \"id\":  \"deviceConfiguration-7\",\r\n    \"createdDateTime\":  \"2026-11-02T12:14:41.079Z\",\r\n    \"appsAllowTrustedAppsSideloading\":  \"blocked\",\r\n    \"displayName\":  \"CMMC-AppControl-Policy\",\r\n    \"smartScreenBlockPromptOverride\":  true,\r\n    \"smartScreenBlockPromptOverrideForFiles\":  true,\r\n    \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceConfiguration-7_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ],\r\n    \"isAssigned\":  true\r\n}\r\n",
+    "postStateOutput": "{\r\n    \"id\":  \"deviceConfiguration-7\",\r\n    \"createdDateTime\":  \"2026-11-01T17:10:50.320Z\",\r\n    \"appsAllowTrustedAppsSideloading\":  \"blocked\",\r\n    \"displayName\":  \"CMMC-AppControl-Policy\",\r\n    \"smartScreenBlockPromptOverride\":  true,\r\n    \"smartScreenBlockPromptOverrideForFiles\":  true,\r\n    \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceConfiguration-7_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ],\r\n    \"isAssigned\":  true\r\n}\r\n",
     "stateChanged": true,
     "postcheckMode": "state"
   }

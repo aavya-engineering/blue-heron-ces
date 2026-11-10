@@ -23,7 +23,6 @@ import type { Server } from 'node:http';
 import { closeAllCesRepositories } from 'ces-shared/persistence/node';
 import { AoServer } from '../src/server/AoServer.js';
 import { LeaverFlowService, type LeaverExecArgs } from '../src/leaver/LeaverFlowService.js';
-import { redactLoggedPath } from '../src/server/middleware/quietRequestLogger.js';
 
 const TOKEN = 'p13lv-route-token-0001';
 const SLUG = 'lv-route';
@@ -128,10 +127,6 @@ describe('leaver routes (AoServer composition, bearer enforced)', () => {
     expect(JSON.stringify(flow)).not.toContain('sha256');
     const outbox: any[] = await (await api(`/api/leaver/outbox?tenant=${SLUG}`)).json();
     expect(outbox.map((m) => m.kind)).toEqual(['leaver_confirm_request', 'leaver_done']);
-    // PL-122: the flow is closed, so the operator view shows the stored record: the link redacted, never the token.
-    expect(JSON.stringify(outbox)).not.toContain(t);
-    expect(outbox[0].body).toContain(`${p}?t=<redacted>`);
-    expect(outbox[0].delivered_copy).toBeUndefined();
   });
 
   it('an HTML form post (what the page sends) also decides', async () => {
@@ -160,14 +155,5 @@ describe('leaver routes (AoServer composition, bearer enforced)', () => {
     expect((await api('/api/leaver/flows', { method: 'POST', body: JSON.stringify({ tenant: SLUG }) })).status).toBe(400);
     expect((await api('/api/leaver/flows', { method: 'POST', body: JSON.stringify({ tenant: 'nobody', upn: 'a@b.example' }) })).status).toBe(404);
     expect((await fetch(`${base}/leaver/confirm/lvf-x`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ t: 'x', decision: 'maybe' }) })).status).toBe(400);
-  });
-});
-
-describe('PL-122: the request log never carries a confirm token', () => {
-  it('redacts ?t= on the confirm route only', () => {
-    expect(redactLoggedPath('/leaver/confirm/lvf-1?t=abcDEF_123-xyz')).toBe('/leaver/confirm/lvf-1?t=<redacted>');
-    expect(redactLoggedPath('/leaver/confirm/lvf-1?x=1&t=abc&y=2')).toBe('/leaver/confirm/lvf-1?x=1&t=<redacted>&y=2');
-    expect(redactLoggedPath('/api/other?t=keep')).toBe('/api/other?t=keep');
-    expect(redactLoggedPath(undefined)).toBeUndefined();
   });
 });

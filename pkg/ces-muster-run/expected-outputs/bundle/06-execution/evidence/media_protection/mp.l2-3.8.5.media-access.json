@@ -1,5 +1,5 @@
 {
-  "rawResponse": "{\r\n    \"id\":  \"deviceConfiguration-5\",\r\n    \"createdDateTime\":  \"2026-11-02T12:13:56.603Z\",\r\n    \"displayName\":  \"CMMC-BlockRemovableStorage\",\r\n    \"storageBlockRemovableStorage\":  true,\r\n    \"@odata.type\":  \"#microsoft.graph.windows10GeneralConfiguration\",\r\n    \"assignments\":  [\r\n                        {\r\n                            \"id\":  \"deviceConfiguration-5_group-1\",\r\n                            \"target\":  {\r\n                                           \"@odata.type\":  \"#microsoft.graph.groupAssignmentTarget\",\r\n                                           \"groupId\":  \"group-1\"\r\n                                       }\r\n                        }\r\n                    ],\r\n    \"isAssigned\":  true\r\n}\r\n",
+  "rawResponse": "{\r\n    \"value\":  [\r\n\r\n              ]\r\n}\r\n",
   "outcome": "automated_success",
   "outcomeRationale": "Command completed successfully (exit code 0)",
   "complianceVerdict": "SAT",
@@ -8,28 +8,29 @@
     "entry_id": "MP.L2-3.8.5.media-access",
     "label": "CUI Media Access Control via Intune Removable Storage Policy",
     "engine": "mgraph",
-    "layer_hint": 0,
+    "layer_hint": 8,
     "sequence_hint": 19,
     "idempotency": "evidence-only",
     "on_failure": "warn_continue",
     "control_ids": [
       "MP.L2-3.8.5"
     ],
-    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations?$expand=assignments').value | Where-Object { ($_.storageBlockRemovableStorage -eq $true) -and (@($_.assignments | Where-Object { $_ }).Count -gt 0) } | Select-Object -First 1 | ConvertTo-Json -Depth 10",
+    "get_command": "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations').value | Where-Object { $_.displayName -like '*Removable*' -or $_.displayName -like '*Storage*' } | Select-Object displayName,createdDateTime",
     "set_command": "",
     "evidence_commands": [
-      "(Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations?$expand=assignments').value | Where-Object { ($_.storageBlockRemovableStorage -eq $true) -and (@($_.assignments | Where-Object { $_ }).Count -gt 0) } | ConvertTo-Json -Depth 10"
+      "Invoke-MgGraphRequest -Uri 'https://graph.microsoft.us/v1.0/deviceManagement/deviceConfigurations?$filter=displayName eq ''CMMC-Removable-Media-Policy''' | ConvertTo-Json -Depth 5"
     ]
   },
   "metadata": {
     "controlIds": [
       "MP.L2-3.8.5"
     ],
-    "timestamp": "2026-11-02T12:13:57.883Z",
+    "timestamp": "2026-11-01T17:12:08.995Z",
     "executorIdentity": "stamper/2.2.3@no-mgcontext",
     "commandExecuted": "[manual/evidence-only] CUI Media Access Control via Intune Removable Storage Policy",
-    "sha256Hash": "ef2638795216c2892a4f5d72b6acfe581209ff10d1d3aa5790761ddb1753694d",
+    "sha256Hash": "c29d4a1d55559e853b5949be6fbe4a986a0df0a44b9cafa189104f415354d439",
     "moduleVersions": {},
-    "environment": "GCC-High"
+    "environment": "GCC-High",
+    "gateContext": "manual_gate"
   }
 }
